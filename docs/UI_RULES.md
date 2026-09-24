@@ -1,0 +1,36 @@
+# UI and visual rules
+
+Part 7A is the locked visual amendment and supersedes ambiguous earlier concepts. Images establish mood and hierarchy, not pixel-accurate implementation targets.
+
+## Shared rules
+
+- Near-black background; large meaningful negative space. When nothing relevant is known or happening, render almost nothing. No filler stars, mist, particles, roots, noise, or ornamental HUD.
+- Bioluminescent, organic chemical visualization. Clean sans-serif typography, translucent small context cards, qualitative information first. Avoid a futuristic tactical interface.
+- Thin bright trail cores, faint chemical envelopes, representative moving traffic, restrained glow. Strong trails are coherent; fading trails become gapped and irregular. Familiarity can remain as a much fainter ghost after chemical loss.
+- Warm amber/gold primarily means carbohydrate/metabolic energy; cyan/blue, violet, red-orange, pale neutral, and restrained positive-state green remain distinct families. Exact hues are tunable. Color must not be the only distinction: water can ripple, alarm pulse abruptly, and death fragment/fade.
+- Pool and cap visual ants and effects. Their counts represent activity, not individual worker simulation. Graphics quality, facing, and animation must never alter gameplay.
+- Readability must survive reduced/disabled bloom. Prefer curves/Line2D, sprites, simple shaders, bounded particles or instancing. Do not depend on volumetric fog, real-time GI, refraction, many lights, costly soft shadows, heavy depth-of-field, or layered transparent geometry. Profile overdraw on the chosen renderer.
+
+## OUTWARD
+
+The active pile anchors a rotating **2D sensory panorama**, not a camera in a rendered 3D landscape. Approximate bearing is spatially meaningful; vertical placement/depth is a presentation of estimated distance, confidence, and strength.
+
+Knowledge-derived position relative to pile → bearing → wrapped difference from facing → horizontal screen position. Test the wrap seam. View rotation never moves the pile or reveals undiscovered objects. No minimap, ordinary player world map, literal resources, backyard diorama, or ant-eye camera.
+
+The Home Anchor may suggest an entrance, a little soil/silhouette, and representative departures/returns. Beyond it, physical detail rapidly dissolves into abstraction: approximately 15% physical anchor / 85% sensorium is an illustrative art target. Food/water/danger appear as amorphous sensory clouds, not crystals or visible world objects.
+
+Slice controls: rotation, bearing indicator, selectable signals/context cards, scout action, trail investment/recall, available workers, time controls, and OUTWARD/INWARD toggle. Persistent HUD stays small: available labor, mode, time, urgent colony pressures. Total population/brood/queens belong in context, not a permanent overview panel.
+
+Attention order: selected/critical signal → active major trails → destinations → environmental interference → representative ants → old information → physical suggestion.
+
+## INWARD
+
+Show **Queen, Nursery, Food Exchange, Entrance** as abstract functional organs suspended in darkness. Author the first four positions manually. Connections convey worker/resource flow and dependence, not literal tunnels. Node positions do not claim real chamber geography; later layout may reflow.
+
+Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
+
+## Input and diagnostics
+
+Use named Godot input actions: select, pan_or_rotate, zoom_attention, pause, time_1, time_4, time_16, time_64, toggle_inward, and development-only debug_world. Mouse and touch drag must call the same rotation logic; player actions cannot require hover or keyboard-only access. Android packaging can wait.
+
+The F3 debug world is a clearly labeled development view with raw truth/knowledge inspection. It may use conventional geometry and utilitarian colors. It must be excluded or inaccessible in normal release play and must not become a player-facing minimap.
