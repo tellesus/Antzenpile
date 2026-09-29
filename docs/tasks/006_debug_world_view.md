@@ -1,6 +1,6 @@
 # 006 — Debug world view
 
-Status: ready specification; implementation not started.
+Status: implemented 2026-09-28; foundation review complete.
 
 ## Goal
 
@@ -48,3 +48,13 @@ Run Main: F3 shows home (20,20), the four fixture nodes at their authored coordi
 ## Done when
 
 Read-only inspection and isolation checks pass, evidence/limitations are recorded, and Main remains runnable. One logical commit. **Review the foundation before expanding 007:** clock, isolated seeded run, hidden authored world, worker ledger, and development-only truth view. No scouting implementation in this card.
+
+## Implementation handoff and foundation review
+
+- Added src/debug/debug_world_model.gd (detached snapshots, invertible transform, picking) and debug_world_view.gd (development-only rendering/input), minimal GameRoot wiring, and tests/test_debug_world.gd. Corrected InputMap device matching and logical F3 binding.
+- Pinned Godot full suite: 1,326 checks, 0 failures; headless Main boots without creating the debug view. Transform tolerance is 0.0001 world meters at three viewport sizes. Debug activity preserves authoritative state and next RNG draw.
+- Windows manual: initially hidden; F3 shows/hides; home shows 1 queen/40 workers; all four labeled resources match fixture positions; carbohydrate and water picking show quantity 100 and active=true. Picking remains correct after maximizing from 1000x700. Final label layout inspected.
+- Release export not run: export templates are absent. Creation/input guards inspected and guard predicates tested. Android/touch hardware not tested.
+- Foundation review: clock owns time; runs own independent RNG/world/colony; invalid snapshots are atomic; worker commitments reconcile; debug receives detached dictionaries and is lazy-loaded only for graphical debug builds. No normal presentation or knowledge exists yet. No architecture change required.
+- Next: expand 007 with explicit provisional scout cap, mission timing, terrain pathing and failed-return policy before coding.
+
