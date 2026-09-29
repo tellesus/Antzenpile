@@ -1,6 +1,6 @@
 # 004 — Hidden world and World Nodes
 
-Status: ready specification; implementation not started.
+Status: implemented 2026-09-28.
 
 ## Goal
 
@@ -49,3 +49,11 @@ Run tests and inspect one compact dump of bounds/node IDs/coordinates/terrain. M
 ## Done when
 
 The authored world loads and validates headlessly, fixture assumptions are recorded, and handoff lists files/results/limitations. One logical commit; next task 005.
+
+## Implementation handoff
+
+- Added typed definitions and authored data in data/resources and data/scenarios, runtime world state/validation under src/sim/world, RunState ownership, and tests/test_world.gd.
+- Pinned Godot headless suite: 268 checks, 0 failures; Main startup passed. Inspected four node IDs/positions and 100-unit quantities.
+- Bounds use Godot half-open containment (0 <= coordinate < 40). Generic properties preserve JSON number values; integer-versus-float identity is not their contract. Invalid restores preserve exact prior runtime state.
+- No procedural generation, knowledge, or depletion. Next: 005 worker ledger.
+

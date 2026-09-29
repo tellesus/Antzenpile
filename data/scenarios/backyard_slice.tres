@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=13 format=3]
+[ext_resource type="Script" path="res://src/sim/world/scenario_definition.gd" id="scenario"]
+[ext_resource type="Script" path="res://src/sim/world/world_node_definition.gd" id="node"]
+[ext_resource type="Script" path="res://src/sim/world/terrain_definition.gd" id="terrain"]
+[ext_resource type="Resource" path="res://data/resources/carbohydrate.tres" id="carb"]
+[ext_resource type="Resource" path="res://data/resources/protein.tres" id="protein"]
+[ext_resource type="Resource" path="res://data/resources/water.tres" id="water"]
+[sub_resource type="Resource" id="carb_exposed"]
+script = ExtResource("node")
+id = "carb_exposed"
+definition = ExtResource("carb")
+position = Vector2(30, 20)
+[sub_resource type="Resource" id="carb_sheltered"]
+script = ExtResource("node")
+id = "carb_sheltered"
+definition = ExtResource("carb")
+position = Vector2(10, 20)
+[sub_resource type="Resource" id="protein_01"]
+script = ExtResource("node")
+id = "protein_01"
+definition = ExtResource("protein")
+position = Vector2(15, 30)
+[sub_resource type="Resource" id="water_01"]
+script = ExtResource("node")
+id = "water_01"
+definition = ExtResource("water")
+position = Vector2(25, 10)
+[sub_resource type="Resource" id="sheltered"]
+script = ExtResource("terrain")
+id = "sheltered"
+bounds = Rect2(0, 0, 20, 40)
+exposure = 0.0
+[sub_resource type="Resource" id="exposed"]
+script = ExtResource("terrain")
+id = "exposed"
+bounds = Rect2(20, 0, 20, 40)
+exposure = 1.0
+[resource]
+script = ExtResource("scenario")
+nodes = Array[ExtResource("node")]([SubResource("carb_exposed"), SubResource("carb_sheltered"), SubResource("protein_01"), SubResource("water_01")])
+terrain = Array[ExtResource("terrain")]([SubResource("sheltered"), SubResource("exposed")])
