@@ -4,15 +4,15 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-Documentation only. No Godot project, game code, assets, or executable tests exist yet. This pack distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm design conversation. It is durable implementation context, not a replacement for future design work.
+Task 001 is implemented: an empty runnable Godot shell and a lightweight headless test runner. No gameplay yet. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
 
-**Stack:** Godot 4.x, GDScript; agreed 4.7.x stable family, with 4.7.2 stable as the bootstrap candidate. Windows first, Android-compatible architecture and rendering from the start, iOS later. Task 001 records the exact tested engine build and renderer; no casual upgrades. The [official archive](https://godotengine.org/download/archive/) lists 4.7.2 as stable (checked 2026-09-23).
+**Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
 ## Start here
 
 1. Read [AGENTS.md](AGENTS.md), the current task card, [architecture](docs/ARCHITECTURE.md), and [coding rules](docs/CODING_RULES.md).
 2. Consult the [decision register](docs/DECISIONS.md) for locked constraints and explicitly provisional defaults.
-3. Implement one task at a time, beginning with [001: project bootstrap](docs/tasks/001_project_bootstrap.md). Creating this pack does not complete any implementation task.
+3. Implement one task at a time; task cards record status and verification evidence.
 4. Review the working skeleton after [006: debug world view](docs/tasks/006_debug_world_view.md), before expanding the scouting cards.
 
 | Document | Purpose |
@@ -28,7 +28,18 @@ Documentation only. No Godot project, game code, assets, or executable tests exi
 
 ## Running and testing
 
-Task 001 creates the project and lightweight headless runner, then replaces this section with verified Windows setup instructions. The planned runner command is `godot --headless --path . --script res://tests/run_tests.gd`; it is **not runnable in this documentation-only repository**. Use the pinned executable, not whichever Godot version happens to be on PATH.
+Download and extract the standard Windows x64 ZIP from the [official 4.7.2 archive](https://godotengine.org/download/archive/4.7.2-stable/) or its [official GitHub mirror](https://github.com/godotengine/godot-builds/releases/tag/4.7.2-stable). The engine is not checked into the repository. In PowerShell, set `GODOT_EXE` to the extracted console executable, then run from the repository root:
+
+```powershell
+$env:GODOT_EXE = 'C:\path\to\Godot_v4.7.2-stable_win64_console.exe'
+& $env:GODOT_EXE --version
+& $env:GODOT_EXE --headless --path . --import
+& $env:GODOT_EXE --headless --path . --script res://tests/run_tests.gd
+& $env:GODOT_EXE --headless --path . --quit-after 3
+& $env:GODOT_EXE --editor --path .
+```
+
+The runner returns 0 on success, 1 on check failure or an empty suite. Use the pinned executable, not an arbitrary Godot on PATH. In the editor, F5 runs Main and F8 stops it. The bootstrap window is intentionally empty and near-black, with a 1280×720 landscape viewport and canvas-items stretch. Named actions are defined but have no gameplay handlers yet.
 
 ## First milestone
 

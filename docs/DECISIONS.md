@@ -42,3 +42,4 @@ Scout cap/pathing parameters, knowledge uncertainty formulas, trail balance and 
 ## Change log
 
 - Initial documentation pack: locked decisions distilled; foundation defaults labeled; implementation tasks remain unstarted.
+- 2026-09-28 / 001: A01–A02 resolved to `4.7.2.stable.official.ed1daf0bf` and Compatibility (`gl_compatibility`). Verified Windows import, runner, headless Main, and editor launch. No architecture change.

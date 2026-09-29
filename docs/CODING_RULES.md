@@ -18,13 +18,13 @@
 
 ## Validation
 
-Task 001 creates `tests/run_tests.gd` with a nonzero exit on failure. Run from the repository root using the pinned Godot console executable:
+`tests/run_tests.gd` returns a nonzero exit on failure. Run from the repository root using the pinned Godot console executable:
 
 ```text
 godot --headless --path . --script res://tests/run_tests.gd
 ```
 
-This is the planned interface until bootstrap documents the verified local executable. Tests should exercise behavior and invariants, not reproduce implementation details. Introduce relevant tests with the system, not empty future suites.
+See README for verified Windows setup. Tests should exercise behavior and invariants, not reproduce implementation details. Introduce relevant tests with the system, not empty future suites.
 
 | System arrives | Required evidence |
 | --- | --- |

@@ -1,6 +1,6 @@
 # 001 — Project bootstrap
 
-Status: ready specification; implementation not started.
+Status: implemented and verified (2026-09-28).
 
 ## Goal
 
@@ -48,3 +48,11 @@ Open in the pinned editor and run Main on Windows. Confirm a blank near-black la
 ## Done when
 
 Project and runner work, exact setup is documented, relevant checks pass, and a short handoff lists changed files/results/limitations. One logical commit; next task 002.
+
+## Handoff
+
+- Added project settings/Input Map, empty Main scene, dependency-free runner and bootstrap suite, ignore/line-ending rules; updated README and agent context.
+- Pinned `4.7.2.stable.official.ed1daf0bf`; Compatibility renderer, 1280×720 landscape, canvas_items stretch.
+- Verified README import/test/headless-start commands. Suite: 5 checks, 0 failures, exit 0. Temporary failing check produced exit 1 and was removed; passing run repeated.
+- Windows editor opened and F5 ran the near-black scene; F8 returned to editor with zero errors/warnings. Compatibility renderer reported AMD Radeon RX 6650 XT. Windowed and maximized editor/game hosts checked; standalone drag-resizing is not yet verified.
+- No gameplay, mobile package, or mobile performance claim. Next: 002.

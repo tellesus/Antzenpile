@@ -7,7 +7,7 @@ Translate the design into code; do not invent major game systems.
 - Read the assigned card, `docs/ARCHITECTURE.md`, `docs/CODING_RULES.md`, and relevant entries in `docs/DECISIONS.md`. Read `DATA_MODEL.md` for state changes and `UI_RULES.md` for presentation work.
 - Inspect the existing implementation and task dependencies. Work on one bounded task; do not implement later cards opportunistically.
 - Tasks 001–006 are executable specifications. Tasks 007–022 are roadmap cards to expand against the actual code before implementing. Review the skeleton after 006.
-- Current repository state is documentation only. Do not claim commands or tests exist until their task creates and verifies them.
+- Consult README and task statuses for implemented scope. Do not claim future commands or tests exist until their task creates and verifies them.
 
 ## Preserve the design
 

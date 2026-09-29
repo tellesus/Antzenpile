@@ -20,7 +20,7 @@ Exclude rivals, foreign trails, swarms, combat, predators, parasites, mutualists
 
 ## Implementation order from Part 8
 
-All cards are unstarted. 001–006 contain executable instructions; 007–022 are intentionally concise and must be expanded before their implementation.
+Individual cards record implementation status. 001–006 contain executable instructions; 007–022 are intentionally concise and must be expanded before their implementation.
 
 | Task | Deliverable |
 | --- | --- |
