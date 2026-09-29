@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ScoutConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/scouting/scout_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+active_cap = 4
+speed = 1.0
+exploration_seconds = 30.0
+minimum_distance = 8.0
+maximum_distance = 12.0
+cone_radians = 0.7853981633974483
+target_attempts = 16

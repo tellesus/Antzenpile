@@ -29,7 +29,7 @@ func pick(screen_position: Vector2) -> void:
 	var threshold: float = 14.0 / transform.x.length()
 	var closest: float = threshold
 	selected_id = ""
-	for entry: Dictionary in snapshot.colony.piles + snapshot.world.nodes:
+	for entry: Dictionary in snapshot.colony.piles + snapshot.world.nodes + snapshot.scouts:
 		var distance: float = world_position.distance_to(Vector2(entry.position[0], entry.position[1]))
 		if distance <= closest:
 			selected_id = entry.id
@@ -39,7 +39,7 @@ func pick(screen_position: Vector2) -> void:
 func selected() -> Dictionary:
 	if snapshot.is_empty():
 		return {}
-	for entry: Dictionary in snapshot.colony.piles + snapshot.world.nodes:
+	for entry: Dictionary in snapshot.colony.piles + snapshot.world.nodes + snapshot.scouts:
 		if entry.id == selected_id:
 			return entry.duplicate(true)
 	return {}

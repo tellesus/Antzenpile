@@ -4,7 +4,7 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-Tasks 001–006 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, and development-only truth view. The foundation review is complete; scouting is next. No player gameplay yet. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
+Tasks 001–007 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, and capped individual scout missions with terrain routing and real return travel. The foundation review is complete; discovery and observations are next. No player gameplay yet. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
@@ -39,9 +39,8 @@ $env:GODOT_EXE = 'C:\path\to\Godot_v4.7.2-stable_win64_console.exe'
 & $env:GODOT_EXE --editor --path .
 ```
 
-The runner returns 0 on success, 1 on check failure or an empty suite. Use the pinned executable, not an arbitrary Godot on PATH. In the editor, F5 runs Main and F8 stops it. The bootstrap window is intentionally empty and near-black, with a 1280×720 landscape viewport and canvas-items stretch. F3 toggles DEBUG: WORLD TRUTH; click home or resource markers for raw fields. Other named actions await their gameplay tasks. Release and headless runs do not create the truth view.
+The runner returns 0 on success, 1 on check failure or an empty suite. Use the pinned executable, not an arbitrary Godot on PATH. In the editor, F5 runs Main and F8 stops it. The bootstrap window is intentionally empty and near-black, with a 1280×720 landscape viewport and canvas-items stretch. F3 toggles DEBUG: WORLD TRUTH; click home, resource, or scout markers for raw fields. Its labeled dispatch button starts a general scout mission. Other named actions await their gameplay tasks. Release and headless runs do not create the truth view.
 
 ## First milestone
 
 A roughly 20–30 minute slice: scout, learn, recruit a trail, bring resources home, support brood, develop Food Exchange, hear an additional music stem, and see exposed trails weaken under rain while familiarity persists. See [slice scope](docs/VERTICAL_SLICE.md). No conventional player map or minimap.
-

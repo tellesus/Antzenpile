@@ -28,6 +28,13 @@ func count(pool: String) -> int:
 	return int(_commitments[pool].count) if _commitments.has(pool) else -1
 
 
+func retire_commitment(id: String) -> bool:
+	if not _commitments.has(id) or count(id) != 0:
+		return _reject("Only an empty known commitment can be retired")
+	_commitments.erase(id)
+	return _success()
+
+
 func allocate(commitment: String, amount: Variant) -> bool:
 	return transfer("available", commitment, amount)
 

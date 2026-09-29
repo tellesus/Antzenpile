@@ -3,11 +3,19 @@ extends RefCounted
 ## Run-scoped composition; no scene tree, input, or graphics required.
 
 const Run = preload("res://src/core/run_state.gd")
+const Scouts = preload("res://src/sim/scouting/scout_system.gd")
 var run: RunState
+var scouting: RefCounted
 
 
 func _init(seed_value: int = 482817) -> void:
 	run = Run.new(seed_value)
+	scouting = Scouts.new(run)
+	run.clock.tick.connect(scouting.tick)
+
+
+func dispatch_scout(origin_id: String, bearing: Variant = null) -> bool:
+	return scouting.dispatch(origin_id, bearing)
 
 
 func advance(real_delta: float) -> bool:

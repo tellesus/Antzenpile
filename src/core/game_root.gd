@@ -12,6 +12,7 @@ func _ready() -> void:
 	if OS.is_debug_build() and DisplayServer.get_name() != "headless":
 		var debug_view: Node = load("res://src/debug/debug_world_view.gd").new()
 		debug_view.snapshot_provider = simulation.run.to_dict
+		debug_view.dispatch_command = simulation.dispatch_scout.bind("home")
 		add_child(debug_view)
 
 

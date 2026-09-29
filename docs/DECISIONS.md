@@ -34,10 +34,11 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A05 | Foundation fixture: 40 available living workers and 1 queen. Task 005 excludes brood. Later slice fixture defaults: one egg cohort of 8 (task 016), reserves 10 carbohydrate/5 protein/10 water in abstract units as resource storage is introduced. Brood/reserves are test defaults, not approved balance. |
 | A06 | Clock owned by RunState; pile worker totals/available are ledger-backed; colony totals derived. This resolves duplicate-looking ownership in Part 8's conceptual fields. |
 | A07 | Foundation test APIs/paths and fixture node coordinates in 001–006 are proposed implementation contracts. Equivalent local organization is acceptable if boundaries and acceptance checks remain explicit. |
+| A08 | Task 007 prototype defaults: cap 4 scouts, speed 1 m/s divided by terrain cost, 30 simulated seconds exploring plus actual return travel, 8–12 m targets, directional cone ±45°, cardinal 1 m grid. Authored in `data/scouting/default_scouts.tres`. Blocked travel retains the committed worker and retries; mortality/rescue gameplay remains deferred. These are provisional implementation values, not locked balance. |
 
 ## Details to resolve in their task
 
-Scout cap/pathing parameters, knowledge uncertainty formulas, trail balance and cohort bucket duration, brood/resource rates, the precise Food Exchange benefit and costs, rain timing/intensity, save migration policy, and measured rendering budgets. Roadmap cards must resolve their own required details before coding. Do not implement later ecology, adaptation, rivals, or replay just because their names appear in the design.
+Knowledge uncertainty formulas, trail balance and cohort bucket duration, brood/resource rates, the precise Food Exchange benefit and costs, rain timing/intensity, save migration policy, and measured rendering budgets. Roadmap cards must resolve their own required details before coding. Do not implement later ecology, adaptation, rivals, or replay just because their names appear in the design.
 
 ## Change log
 
