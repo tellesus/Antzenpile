@@ -1,11 +1,11 @@
 extends RefCounted
 
 
-func run(test: Object) -> void:
+func run(test: Object) -> bool:
 	var scene: PackedScene = load("res://scenes/main/main.tscn")
 	test.check(scene != null, "Main scene loads")
 	if scene == null:
-		return
+		return false
 	var main: Node = scene.instantiate()
 	test.check(main != null, "Main scene instantiates")
 	if main != null:
@@ -14,3 +14,4 @@ func run(test: Object) -> void:
 		main.free()
 	test.check(InputMap.has_action("debug_world"), "Project input settings are loaded")
 	test.check(ProjectSettings.get_setting("rendering/renderer/rendering_method") == "gl_compatibility", "Compatibility renderer is configured")
+	return true

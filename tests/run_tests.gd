@@ -1,7 +1,10 @@
 extends SceneTree
 ## Small explicit suite registry. Run with --headless --path . --script res://tests/run_tests.gd.
 
-const SUITES: Array[Script] = [preload("res://tests/test_bootstrap.gd")]
+const SUITES: Array[Script] = [
+	preload("res://tests/test_bootstrap.gd"),
+	preload("res://tests/test_simulation_clock.gd"),
+]
 
 var checks: int = 0
 var failures: int = 0
@@ -15,7 +18,7 @@ func _initialize() -> void:
 func _run() -> void:
 	for suite_script: Script in SUITES:
 		var suite: RefCounted = suite_script.new()
-		suite.run(self)
+		check(suite.run(self) == true, "Suite completed: " + suite_script.resource_path)
 	print("Tests: %d checks, %d failures" % [checks, failures])
 	quit(0 if failures == 0 and checks > 0 else 1)
 

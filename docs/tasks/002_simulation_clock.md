@@ -1,6 +1,6 @@
 # 002 — Simulation clock
 
-Status: ready specification; implementation not started.
+Status: implemented and verified (2026-09-28).
 
 ## Goal
 
@@ -48,3 +48,10 @@ Run the headless suite and a brief diagnostic print of tick counts at each speed
 ## Done when
 
 Tests pass with no view instantiated, clock ownership is documented, and handoff records files/results/limitations. One logical commit; next task 003.
+
+## Handoff
+
+- Added lightweight SimulationClock and focused tests; strengthened runner to fail if a suite aborts before completion.
+- Fixed 0.25-second steps, validated speeds/deltas, pause/reset, retained fractional time. Catch-up is bounded to 4,096 ticks per advance with backlog retained.
+- Headless suite: 39 checks, 0 failures. All four speeds produced 256 ticks for 64 simulated seconds. Invalid inputs, pause/remainder, reset and backlog checked.
+- No gameplay/UI added. Next: 003.

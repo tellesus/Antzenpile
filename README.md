@@ -4,7 +4,7 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-Task 001 is implemented: an empty runnable Godot shell and a lightweight headless test runner. No gameplay yet. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
+Tasks 001–002 are implemented: an empty Godot shell, headless test runner, and fixed simulation clock. No gameplay yet. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
