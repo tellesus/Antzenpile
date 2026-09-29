@@ -4,7 +4,7 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-Tasks 001–008 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scout missions, nearby chemical sensing with progressive localization, and private observations delivered on return. The foundation review is complete; colony knowledge and Known Nodes are next. No player gameplay yet. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
+Tasks 001â€“008 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scout missions, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. The foundation review is complete; perceived sensory signals are next. No player gameplay yet. The documentation distills **GDD v0.2, Parts 1â€“8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
@@ -24,7 +24,7 @@ Tasks 001–008 are implemented: Godot shell, fixed clock, isolated seeded runs,
 | [UI_RULES](docs/UI_RULES.md) | OUTWARD, INWARD, information and rendering rules |
 | [CODING_RULES](docs/CODING_RULES.md) | Implementation and validation workflow |
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
-| [Task cards](docs/tasks/) | 001–006 executable specifications; 007–022 roadmap |
+| [Task cards](docs/tasks/) | 001â€“006 executable specifications; 007â€“022 roadmap |
 
 ## Running and testing
 
@@ -39,8 +39,8 @@ $env:GODOT_EXE = 'C:\path\to\Godot_v4.7.2-stable_win64_console.exe'
 & $env:GODOT_EXE --editor --path .
 ```
 
-The runner returns 0 on success, 1 on check failure or an empty suite. Use the pinned executable, not an arbitrary Godot on PATH. In the editor, F5 runs Main and F8 stops it. The bootstrap window is intentionally empty and near-black, with a 1280×720 landscape viewport and canvas-items stretch. F3 toggles DEBUG: WORLD TRUTH; click home, resource, or scout markers for raw fields. Its labeled dispatch button starts and selects a general scout mission. The scout panel shows private estimates and uncertainty circles; the counters distinguish carried from delivered evidence. Other named actions await their gameplay tasks. Release and headless runs do not create the truth view.
+The runner returns 0 on success, 1 on check failure or an empty suite. Use the pinned executable, not an arbitrary Godot on PATH. In the editor, F5 runs Main and F8 stops it. The bootstrap window is intentionally empty and near-black, with a 1280Ã—720 landscape viewport and canvas-items stretch. F3 toggles DEBUG: WORLD TRUTH; click home, resource, or scout markers for raw fields. Its labeled dispatch button starts and selects a general scout mission. The scout panel shows private estimates and uncertainty circles; the counters distinguish private evidence, Known Nodes, and archived reports. Select a resource to compare true coordinates with the colony’s remembered estimate, uncertainty, confidence, and age. Other named actions await their gameplay tasks. Release and headless runs do not create the truth view.
 
 ## First milestone
 
-A roughly 20–30 minute slice: scout, learn, recruit a trail, bring resources home, support brood, develop Food Exchange, hear an additional music stem, and see exposed trails weaken under rain while familiarity persists. See [slice scope](docs/VERTICAL_SLICE.md). No conventional player map or minimap.
+A roughly 20â€“30 minute slice: scout, learn, recruit a trail, bring resources home, support brood, develop Food Exchange, hear an additional music stem, and see exposed trails weaken under rain while familiarity persists. See [slice scope](docs/VERTICAL_SLICE.md). No conventional player map or minimap.

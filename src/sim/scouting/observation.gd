@@ -15,6 +15,22 @@ var closest_distance: float
 var proximity_confirmed: bool = false
 
 
+func detached_copy() -> Observation:
+	var copy := Observation.new()
+	copy.id = id
+	copy.scout_id = scout_id
+	copy.origin_pile = origin_pile
+	copy.source_node_id = source_node_id
+	copy.definition_id = definition_id
+	copy.first_observed_at = first_observed_at
+	copy.observed_at = observed_at
+	copy.estimated_position = estimated_position
+	copy.uncertainty_radius = uncertainty_radius
+	copy.closest_distance = closest_distance
+	copy.proximity_confirmed = proximity_confirmed
+	return copy
+
+
 func to_dict() -> Dictionary:
 	return {"id": id, "scout_id": scout_id, "origin_pile": origin_pile,
 		"source_node_id": source_node_id, "definition_id": definition_id,

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="KnowledgeConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/knowledge/knowledge_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+confirmed_confidence = 0.9
+cue_confidence = 0.55
+uncertainty_scale = 4.0
+confidence_half_life = 300.0

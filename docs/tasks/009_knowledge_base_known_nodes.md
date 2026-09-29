@@ -1,6 +1,6 @@
-# 009 — KnowledgeBase and Known Nodes
+# 009 â€” KnowledgeBase and Known Nodes
 
-Status: roadmap; expand against the actual code before implementation.
+Status: complete 2026-09-29.
 
 ## Goal
 
@@ -43,3 +43,28 @@ Run the relevant prototype/debug scene and inspect the behavior above. On expans
 ## Done when
 
 The expanded card's checks pass, existing behavior remains intact, and the handoff records changed files, tests, limitations, and next task. One logical commit.
+
+## Executable expansion
+
+- Add typed KnownNode/KnowledgeBase under `src/sim/knowledge/`, authored knowledge confidence settings, RunState ownership/snapshots, controller dispatch after ScoutSystem each tick, and `tests/test_knowledge.gd`.
+- Consume only the delivered inbox after scout returns; move detached evidence into a knowledge-owned archive and clear successfully consumed inbox entries. Archived IDs make re-delivery idempotent. A reused ID with changed evidence rejects the whole batch atomically.
+- Prototype identity association uses the captured source ID; KnownNode ID is `known:<source_id>`. Identity is not permission to read current world state. One node per observed source; evidence IDs sorted for deterministic snapshots.
+- Estimate/classification/uncertainty come from the newest observation time. Equal-time reports prefer smaller uncertainty, then close confirmation, then lexical observation ID. Conflicting positions are not averaged into invented locations. Out-of-order stale reports add provenance but cannot replace fresher estimates.
+- Store first evidence time, latest observation time, first/last delivery time, winning evidence ID and all evidence IDs. Keep the winning estimate unchanged between reports. No live hidden-state refresh, deletion, or omniscient depletion information.
+- Provisional confidence: baseline 0.9 for close-confirmed evidence, 0.55 for a chemical cue, divided by (1 + uncertainty_radius / 4 m). Effective confidence halves every 300 simulated seconds since observation. Clamp to [0,1]; age and effective confidence are derived queries, not per-frame authoritative writes. All tuning lives in an authored Resource. Repeated identical reports do not manufacture certainty.
+- Knowledge processing receives observations/time only, never WorldState, scouts, views, or RNG. Restore validates evidence at the RunState boundary, reconstructs derived Known Nodes from the archive, and rejects inconsistent saved nodes atomically. Full-precision JSON continuation remains required.
+- Debug truth view compares source truth with KnownNode estimates, uncertainty, confidence and age. Clearly label known estimates; normal sensory/player presentation remains task 010 onward.
+
+## Exact validation
+
+Run pinned-engine import, full suite and Main smoke check. Test no knowledge before return, automatic inbox consumption on return, repeat/duplicate/conflicting evidence, stale delivery and deterministic ties, hidden truth mutation isolation, confidence bounds/age, no RNG use, populated JSON continuation and corrupt snapshot rejection. Update task 008 tests to inspect pending inbox plus archived deliveries now that the inbox is consumed. Manually dispatch through F3 and inspect truth-versus-known fields after return.
+
+
+## Implementation handoff
+
+- Added `src/sim/knowledge/{knowledge_base,known_node,knowledge_config}.gd`, their engine UID files, `data/knowledge/default_knowledge.tres`, and `tests/test_knowledge.gd`/UID. Extended RunState, SimulationController, Observation detached copying, debug model/view, test registry and task 008 regression tests. Updated README, ARCHITECTURE, DATA_MODEL, DECISIONS and this card.
+- Pinned Godot `4.7.2.stable.official.ed1daf0bf`: `--headless --path . --import`, `--headless --path . --script res://tests/run_tests.gd` (2,887 checks, 0 failures), and `--headless --path . --quit-after 3` all passed. Full-precision populated JSON and 100 subsequent ticks match; existing mid-investigation continuation also passes. Failed restore preserves the live run.
+- Windows/Compatibility manual check via F3: private report count 1 and Known/Reports 0 while scout returns; on arrival private count 0 and Known/Reports 1. Resource selection compared truth (30,20) with estimate (29.78,20.72), uncertainty 0.75 m, confidence 0.678 and age 48.3 s. The cyan estimate circle and labels are readable. Preview log has no runtime errors.
+- Hidden position/quantity/active changes, stale reports, duplicate delivery, conflicting IDs, invalid confidence/archive timestamps, atomic rejection and detached debug data are covered headlessly. Confidence aging and knowledge updates do not draw RNG.
+- Tuning remains provisional, with source-ID association and deterministic newest-evidence selection; no triangulation or statistical probability claim. No player-facing sensory UI, archive pruning, disk save migration, mobile-device test or release export in this task. Prototype snapshots now require a knowledge envelope; backward migration belongs to task 021.
+- Next bounded task: expand 010 (PerceivedSignals), deriving bearing, estimated distance and signal information from Known Nodes and the active pile only.

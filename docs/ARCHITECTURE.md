@@ -5,10 +5,10 @@
 Godot 4.x/GDScript; target stable 4.7.x and pin the tested patch in task 001. Windows first; Android compatibility is a design constraint now. Use inexpensive 2D presentation and a mobile-compatible renderer, with no dependency on Forward+ effects. Specific renderer selection is a bootstrap decision recorded in [DECISIONS](DECISIONS.md).
 
 ```text
-Hidden world reality → simulation interactions → colony knowledge
-                                                ↓
+Hidden world reality â†’ simulation interactions â†’ colony knowledge
+                                                â†“
                                           PerceptionModel
-                                                ↓
+                                                â†“
                                      OUTWARD / INWARD / HUD
 ```
 
@@ -39,16 +39,18 @@ These are responsibilities, not a requirement to create every class during boots
 
 - Immutable authored definitions: typed Resource classes and diffable `.tres` where editor integration helps. Runtime state: typed lightweight classes, preferably RefCounted, with stable IDs and explicit serialization.
 - The scene tree is not a database. No Node per worker, brood ant, trail traveler, or resource unit. Visible ants and particles are capped, pooled representatives.
-- One SimulationClock is authoritative. RunState owns it and exposes its time; do not maintain a second mutable time field. Fixed simulated interval starts at 0.25 seconds, with pause and 1×/4×/16×/64× speeds.
+- One SimulationClock is authoritative. RunState owns it and exposes its time; do not maintain a second mutable time field. Fixed simulated interval starts at 0.25 seconds, with pause and 1Ã—/4Ã—/16Ã—/64Ã— speeds.
 - Render-frame time feeds an accumulator; systems receive fixed simulated steps. Slower systems use accumulators or scheduling. Allocate labor when commitments/population/returns change, not each render frame.
 - Gameplay randomness comes only from the run-owned seeded RNG. Rendering never advances it. Stable iteration and event ordering are necessary for repeatability.
 - Preserve seed, current RNG state, tick/time, pending accumulators/events, and authoritative state for equivalent save continuation. Versioned explicit dictionaries/JSON are acceptable; save service implementation waits for its card.
 
 ## Knowledge boundary
 
-WorldNode → scout interaction → Observation → delivered KnowledgeBase evidence → KnownNode → PerceivedSignal → OUTWARD.
+WorldNode â†’ scout interaction â†’ Observation â†’ delivered KnowledgeBase evidence â†’ KnownNode â†’ PerceivedSignal â†’ OUTWARD.
 
 In the slice, a scout's private observations do not become colony knowledge until it returns. A world change does not silently refresh old knowledge. Perception uses known/estimated positions, never live hidden coordinates. INWARD uses an approved colony summary. Views receive snapshots or read-only values, not mutable hidden objects.
+
+Implemented through 009: SimulationController ticks ScoutSystem, then consumes the delivered inbox into RunState.knowledge. KnowledgeBase receives evidence and simulation time only; it owns archived reports and derives Known Nodes. Restore validates source identities at the RunState boundary without refreshing historical coordinates or quantity. Confidence aging is a query, not a mutable second clock.
 
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 

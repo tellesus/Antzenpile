@@ -21,14 +21,14 @@ func fixture() -> SimulationController:
 func run(test: Object) -> bool:
 	var game := fixture()
 	var agent: ScoutAgent = game.run.scouts.scout_1
-	test.check(agent.observations.is_empty() and game.run.delivered_observations.is_empty(), "Hidden resource initially gives no evidence")
+	test.check(agent.observations.is_empty() and (game.run.delivered_observations.is_empty() and game.run.knowledge.nodes.is_empty()), "Hidden resource initially gives no evidence")
 	var first_radius: float = 0.0
 	var saw_investigation: bool = false
 	var confirmed_distance: float = -1.0
 	var saved: Dictionary = {}
 	for index: int in range(110):
 		game.advance(0.25)
-		test.check(game.run.delivered_observations.is_empty(), "Unreturned encounters remain private")
+		test.check((game.run.delivered_observations.is_empty() and game.run.knowledge.nodes.is_empty()), "Unreturned encounters remain private")
 		saw_investigation = saw_investigation or agent.investigating == "carb_exposed"
 		if agent.observations.has("carb_exposed"):
 			var evidence: Observation = agent.observations.carb_exposed
@@ -57,29 +57,29 @@ func run(test: Object) -> bool:
 		reference.advance(0.25)
 		restored.advance(0.25)
 		test.check(reference.run.to_dict() == restored.run.to_dict(), "Sensory and RNG continuation matches")
-	test.check(reference.run.delivered_observations.size() == 1 and reference.run.scouts.is_empty(), "Exactly one delivered observation after return")
+	test.check(reference.run.knowledge.observations.size() == 1 and reference.run.scouts.is_empty(), "Exactly one delivered observation after return")
 	before = reference.run.to_dict()
 	invalid = before.duplicate(true)
-	invalid.delivered_observations.append(invalid.delivered_observations[0].duplicate(true))
+	invalid.knowledge.observations.append(invalid.knowledge.observations[0].duplicate(true))
 	test.check(not reference.run.restore(invalid) and reference.run.to_dict() == before, "Duplicate delivered evidence rejects atomically")
 	var detached: Dictionary = reference.run.to_dict()
-	detached.delivered_observations[0].estimated_position[0] = 0.0
+	detached.knowledge.observations[0].evidence.estimated_position[0] = 0.0
 	test.check(reference.run.to_dict() == before, "Delivered snapshot cannot mutate evidence")
-	var delivered: Dictionary = reference.run.delivered_observations.values()[0].to_dict()
+	var delivered: Dictionary = reference.run.knowledge.observations.values()[0].to_dict()
 	reference.advance(10.0)
-	test.check(reference.run.delivered_observations.size() == 1, "No duplicate delivery on later ticks")
+	test.check(reference.run.knowledge.observations.size() == 1, "No duplicate delivery on later ticks")
 	reference.run.world.nodes.carb_exposed.position = Vector2(35, 35)
 	reference.run.world.nodes.carb_exposed.quantity = 0
-	test.check(reference.run.delivered_observations.values()[0].to_dict() == delivered, "Hidden truth changes cannot refresh delivered memory")
+	test.check(reference.run.knowledge.observations.values()[0].to_dict() == delivered, "Hidden truth changes cannot refresh delivered memory")
 	test.check(restored.run.restore(JSON.parse_string(JSON.stringify(reference.run.to_dict(), "", true, true))), "Stale delivered evidence survives snapshot")
 	var blocked := fixture()
 	blocked.advance(28.0)
 	blocked.run.world.terrain.append({"id": "block", "bounds": [0.0, 0.0, 40.0, 40.0], "exposure": 0.0, "traversable": false, "movement_cost": 1.0})
 	blocked.advance(10.0)
-	test.check(blocked.run.scouts.scout_1.observations.size() == 1 and blocked.run.delivered_observations.is_empty() and blocked.run.colony.piles.home.workers_available == 39, "Blocked return keeps evidence private and worker committed")
+	test.check(blocked.run.scouts.scout_1.observations.size() == 1 and (blocked.run.delivered_observations.is_empty() and blocked.run.knowledge.nodes.is_empty()) and blocked.run.colony.piles.home.workers_available == 39, "Blocked return keeps evidence private and worker committed")
 	blocked.run.world.terrain.pop_back()
 	blocked.advance(50.0)
-	test.check(blocked.run.delivered_observations.size() == 1 and blocked.run.colony.piles.home.workers_available == 40, "Unblocked arrival delivers evidence once")
+	test.check(blocked.run.knowledge.observations.size() == 1 and blocked.run.colony.piles.home.workers_available == 40, "Unblocked arrival delivers evidence once")
 	var sensing := fixture()
 	var sensor: ScoutAgent = sensing.run.scouts.scout_1
 	var node: WorldNodeState = sensing.run.world.nodes.carb_exposed

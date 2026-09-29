@@ -1,6 +1,8 @@
 extends RefCounted
 ## Detached diagnostic data only. Never owns a RunState or consumes its RNG.
 
+const Known = preload("res://src/sim/knowledge/known_node.gd")
+
 var shown: bool = false
 var selected_id: String = "home"
 var snapshot: Dictionary = {}
@@ -42,4 +44,14 @@ func selected() -> Dictionary:
 	for entry: Dictionary in snapshot.colony.piles + snapshot.world.nodes + snapshot.scouts:
 		if entry.id == selected_id:
 			return entry.duplicate(true)
+	return {}
+
+
+func known_for(source_id: String) -> Dictionary:
+	for entry: Dictionary in snapshot.get("knowledge", {}).get("nodes", []):
+		if entry.source_node_id == source_id:
+			var result: Dictionary = entry.duplicate(true)
+			result.age = maxf(0.0, snapshot.clock.time - entry.last_observed_at)
+			result.effective_confidence = Known.aged_confidence(entry.confidence, result.age)
+			return result
 	return {}

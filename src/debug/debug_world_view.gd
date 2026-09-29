@@ -64,7 +64,7 @@ func _draw() -> void:
 	var carried: int = 0
 	for scout: Dictionary in data.scouts:
 		carried += scout.observations.size()
-	_label(Vector2(size.x * 0.64, 86), "Private: %d  |  Delivered: %d" % [carried, data.delivered_observations.size()])
+	_label(Vector2(size.x * 0.64, 86), "Private: %d  |  Known: %d  |  Reports: %d" % [carried, data.knowledge.nodes.size(), data.knowledge.observations.size()])
 	var bounds: Array = data.world.bounds
 	var origin: Vector2 = model.transform * Vector2(bounds[0], bounds[1])
 	var map_size: Vector2 = Vector2(bounds[2], bounds[3]) * model.transform.x.length()
@@ -93,6 +93,13 @@ func _draw() -> void:
 			_label(at + Vector2(12, 9), entry.definition_id, color, 13)
 		elif entry.has("phase"):
 			_label(at + Vector2(12, -7), entry.phase, color, 13)
+	for node: Dictionary in data.knowledge.nodes:
+		var estimate: Vector2 = model.transform * Vector2(node.estimated_position[0], node.estimated_position[1])
+		var radius: float = node.uncertainty_radius * model.transform.x.length()
+		draw_arc(estimate, radius, 0, TAU, 48, Color("76e1dc"), 1.0)
+		draw_line(estimate - Vector2(4, 0), estimate + Vector2(4, 0), Color("76e1dc"))
+		draw_line(estimate - Vector2(0, 4), estimate + Vector2(0, 4), Color("76e1dc"))
+		_label(estimate + Vector2(12, 30), "KNOWN estimate", Color("76e1dc"), 13)
 	_label(origin + Vector2(0, map_size.y + 24), "World bounds (0,0) to (40,40)")
 	var detail: Dictionary = model.selected()
 	var lines: Array[String] = ["Select home or a resource"]
@@ -102,13 +109,13 @@ func _draw() -> void:
 			lines.append("Queens: %s" % detail.queen_count)
 			lines.append("Workers total: %s" % detail.workers.total)
 			lines.append("Available: %s" % detail.workers.available)
-			lines.append("Delivered observations: %d" % data.delivered_observations.size())
+			lines.append("Archived reports: %d" % data.knowledge.observations.size())
 			lines.append("Commitments: " + ("none" if detail.workers.commitments.is_empty() else ""))
 			for id: String in detail.workers.commitments:
 				var entry: Dictionary = detail.workers.commitments[id]
 				lines.append("%s: %s (%s / %s)" % [id, entry.count, entry.kind, entry.owner_id])
-			for observation: Dictionary in data.delivered_observations.slice(0, 4):
-				lines.append("%s: uncertainty %.2fm" % [observation.source_node_id, observation.uncertainty_radius])
+			for node: Dictionary in data.knowledge.nodes.slice(0, 4):
+				lines.append("Known %s: radius %.2fm" % [node.source_node_id, node.uncertainty_radius])
 		elif detail.has("phase"):
 			lines.append("Phase: " + detail.phase)
 			lines.append("Origin: " + detail.origin_pile)
@@ -126,6 +133,16 @@ func _draw() -> void:
 			lines.append("Definition: " + detail.definition_id)
 			lines.append("Quantity: %s" % detail.quantity)
 			lines.append("Active: %s" % detail.active)
+			var known: Dictionary = model.known_for(detail.id)
+			if known.is_empty():
+				lines.append("Colony knowledge: UNKNOWN")
+			else:
+				lines.append("Known ID: " + known.id)
+				lines.append("Estimate: (%.2f, %.2f)" % known.estimated_position)
+				lines.append("Uncertainty: %.2fm" % known.uncertainty_radius)
+				lines.append("Confidence: %.3f | age: %.1fs" % [known.effective_confidence, known.age])
+				lines.append("Reports: %d | observed: %.2fs" % [known.evidence_ids.size(), known.last_observed_at])
+
 	for index: int in lines.size():
 		_label(Vector2(size.x * 0.64, 132 + 26 * index), lines[index])
 	draw_rect(_dispatch_rect(), Color("26332b"))
