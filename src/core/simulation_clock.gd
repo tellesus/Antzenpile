@@ -62,3 +62,30 @@ func reset() -> bool:
 	_tick_count = 0
 	_accumulator = 0.0
 	return true
+
+
+func to_dict() -> Dictionary:
+	return {"ticks": str(_tick_count), "time": simulation_time, "remainder": _accumulator,
+		"paused": paused, "scale": _time_scale, "interval": TICK_INTERVAL}
+
+
+func restore(data: Dictionary) -> bool:
+	if _advancing or not data.has_all(["ticks", "time", "remainder", "paused", "scale", "interval"]):
+		return false
+	if not data.ticks is String or not data.ticks.is_valid_int():
+		return false
+	var count: int = data.ticks.to_int()
+	if count < 0 or str(count) != data.ticks or typeof(data.paused) != TYPE_BOOL:
+		return false
+	for field: String in ["time", "remainder", "scale", "interval"]:
+		if not (typeof(data[field]) in [TYPE_INT, TYPE_FLOAT]) or not is_finite(float(data[field])):
+			return false
+	if data.time != count * TICK_INTERVAL or data.remainder < 0.0 or data.interval != TICK_INTERVAL:
+		return false
+	if not SCALES.has(int(data.scale)) or float(data.scale) != int(data.scale):
+		return false
+	_tick_count = count
+	_accumulator = float(data.remainder)
+	_time_scale = int(data.scale)
+	paused = data.paused
+	return true

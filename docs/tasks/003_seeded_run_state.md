@@ -1,6 +1,6 @@
 # 003 — Seeded RunState
 
-Status: ready specification; implementation not started.
+Status: implemented and verified (2026-09-28).
 
 ## Goal
 
@@ -48,3 +48,10 @@ Run headless tests and boot Main. Confirm repeatable diagnostic seed/scenario/ti
 ## Done when
 
 Isolation and reproducibility pass; ownership/snapshot contracts and handoff are recorded. One logical commit; next task 004.
+
+## Handoff
+
+- Added RunState, run-scoped SimulationController and Main composition; clock owns time and supports validated restoration.
+- Snapshots use decimal strings for 64-bit seed/RNG state and tick counts. Restoration validates before mutation and does not draw randomness.
+- Verified import, headless Main, and 249 checks with zero failures: repeated seeds, isolated runs, JSON round trip, 100-step continuation, detached snapshots, invalid version/time/integer rejection.
+- No world generation or disk save service. Next: 004.

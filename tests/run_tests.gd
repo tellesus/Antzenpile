@@ -4,6 +4,7 @@ extends SceneTree
 const SUITES: Array[Script] = [
 	preload("res://tests/test_bootstrap.gd"),
 	preload("res://tests/test_simulation_clock.gd"),
+	preload("res://tests/test_run_state.gd"),
 ]
 
 var checks: int = 0
