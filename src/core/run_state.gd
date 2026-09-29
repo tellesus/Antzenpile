@@ -7,11 +7,13 @@ const World = preload("res://src/sim/world/world_state.gd")
 const Loader = preload("res://src/sim/world/world_loader.gd")
 const Colony = preload("res://src/sim/colony/colony_state.gd")
 const Scout = preload("res://src/sim/scouting/scout_agent.gd")
+const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 var world: WorldState
 var colony: ColonyState = Colony.new()
 var scouts: Dictionary[String, ScoutAgent] = {}
 var next_scout_id: int = 1
+var delivered_observations: Dictionary[String, Observation] = {}
 
 var run_seed: int:
 	get: return _seed
@@ -40,14 +42,19 @@ func to_dict() -> Dictionary:
 	ids.sort()
 	for id: String in ids:
 		scout_records.append(scouts[id].to_dict())
+	var delivered: Array[Dictionary] = []
+	ids = delivered_observations.keys()
+	ids.sort()
+	for id: String in ids:
+		delivered.append(delivered_observations[id].to_dict())
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
-		"scouts": scout_records, "next_scout_id": next_scout_id}
+		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered}
 
 
 func restore(data: Dictionary) -> bool:
-	if not data.has_all(["version", "seed", "rng_state", "scenario_id", "clock", "world", "colony", "scouts", "next_scout_id"]):
+	if not data.has_all(["version", "seed", "rng_state", "scenario_id", "clock", "world", "colony", "scouts", "next_scout_id", "delivered_observations"]):
 		return false
 	if data.version != SNAPSHOT_VERSION or not data.scenario_id is String or data.scenario_id.is_empty():
 		return false
@@ -55,6 +62,9 @@ func restore(data: Dictionary) -> bool:
 		if not data[field] is String or not data[field].is_valid_int() or str(data[field].to_int()) != data[field]:
 			return false
 	var restored_world := World.new()
+	var restored_clock := Clock.new()
+	if not data.clock is Dictionary or not restored_clock.restore(data.clock):
+		return false
 	if not data.world is Dictionary or not restored_world.restore(data.world, Loader.definition_ids()):
 		return false
 	var restored_colony := Colony.new()
@@ -65,7 +75,7 @@ func restore(data: Dictionary) -> bool:
 	var restored_scouts: Dictionary[String, ScoutAgent] = {}
 	for value: Variant in data.scouts:
 		var agent := Scout.new()
-		if not value is Dictionary or not agent.restore(value, restored_world, restored_colony) or restored_scouts.has(agent.id):
+		if not value is Dictionary or not agent.restore(value, restored_world, restored_colony, restored_clock.simulation_time) or restored_scouts.has(agent.id):
 			return false
 		var suffix: String = agent.id.trim_prefix("scout_")
 		if not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_scout_id:
@@ -75,6 +85,19 @@ func restore(data: Dictionary) -> bool:
 		for id: String in pile.workers.to_dict().commitments:
 			if id.begins_with("scout_") and (not restored_scouts.has(id) or restored_scouts[id].origin_pile != pile.id):
 				return false
+	if not data.delivered_observations is Array:
+		return false
+	var restored_delivered: Dictionary[String, Observation] = {}
+	for value: Variant in data.delivered_observations:
+		var evidence := Evidence.new()
+		if not value is Dictionary or not evidence.restore(value, restored_world, restored_colony, restored_clock.simulation_time):
+			return false
+		var suffix: String = evidence.scout_id.trim_prefix("scout_")
+		if evidence.scout_id != "scout_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_scout_id:
+			return false
+		if restored_scouts.has(evidence.scout_id) or restored_delivered.has(evidence.id):
+			return false
+		restored_delivered[evidence.id] = evidence
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()
@@ -86,4 +109,5 @@ func restore(data: Dictionary) -> bool:
 	colony = restored_colony
 	scouts = restored_scouts
 	next_scout_id = int(data.next_scout_id)
+	delivered_observations = restored_delivered
 	return true

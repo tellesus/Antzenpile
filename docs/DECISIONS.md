@@ -20,6 +20,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D12 | Slice connects exterior resource success to brood and Primitive → Developed Food Exchange, including one synchronized music stem. |
 | D13 | Named input actions; mouse and touch share interaction logic. Simulation belongs to the active run, not global manager singletons. |
 | D14 | Debug truth view is development-only. Normal views receive knowledge-derived signals/approved colony summaries. |
+| D15 | User clarification, 2026-09-29: scouts sense nearby resources and progressively locate them; discovery does not require crossing the exact resource point. Private evidence still reaches the colony only upon return. |
 
 ## Provisional defaults for executable tasks
 
@@ -37,6 +38,8 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A08 | Task 007 prototype defaults: cap 4 scouts, speed 1 m/s divided by terrain cost, 30 simulated seconds exploring plus actual return travel, 8–12 m targets, directional cone ±45°, cardinal 1 m grid. Authored in `data/scouting/default_scouts.tres`. Blocked travel retains the committed worker and retries; mortality/rescue gameplay remains deferred. These are provisional implementation values, not locked balance. |
 
 ## Details to resolve in their task
+
+Task 008 sensory defaults: 4 m chemical cue radius, 1 m proximity confirmation, uncertainty radius 0.25 m + half the closest sensed distance. Closer samples refine a seeded estimate; stationary repeats do not reroll. Scouts investigate estimates on their existing grid and retain the original mission deadline. These are provisional game-scale parameters, not a biological model; wind/plume simulation is deferred.
 
 Knowledge uncertainty formulas, trail balance and cohort bucket duration, brood/resource rates, the precise Food Exchange benefit and costs, rain timing/intensity, save migration policy, and measured rendering budgets. Roadmap cards must resolve their own required details before coding. Do not implement later ecology, adaptation, rivals, or replay just because their names appear in the design.
 

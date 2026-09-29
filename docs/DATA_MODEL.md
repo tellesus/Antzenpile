@@ -28,6 +28,8 @@ Resource pools initially contain **carbohydrate, protein, water**. Authored defi
 
 Observation records what a scout encountered and when, with source identity/evidence and uncertainty. It is not itself a UI element. Define the detailed schema when expanding the knowledge card; the important contract now is separate ownership and delayed delivery.
 
+Task 008 implements Observation with stable observation/scout/origin/source IDs, resource definition, first/latest evidence times, estimated position, uncertainty radius, closest sensed distance, and proximity confirmation. One record per scout/source is refined by closer sensing. Scouts carry records privately; RunState's delivered-observation inbox receives detached copies only on arrival. Task 009 will consume that inbox. No quantity or live coordinate lookup is part of delivered evidence. Investigation routes follow estimates and preserve actual return breadcrumbs.
+
 PerceivedSignal contains `id`, `category`, `bearing`, `estimated_distance`, `strength`, `confidence`, `age`, `risk`, `traffic`, `source_knowledge_id`. Derive it from colony knowledge. Numeric confidence becomes qualitative UI wording in PerceptionModel. Unknown fields remain unknown, not perfect defaults. Renderer animation and facing do not change knowledge.
 
 MusicState exposes semantic development level for the slice. Stability/crisis may be added later. Audio does not inspect arbitrary simulation internals.
@@ -44,6 +46,8 @@ MusicState exposes semantic development level for the slice. Stability/crisis ma
 8. Definitions remain immutable during a run. Runtime instances do not share mutable resources, arrays, or dictionaries across fresh runs.
 
 ## Serialization
+
+Use `JSON.stringify(snapshot, "", true, true)` when persisting floating-point sensory state: full precision preserves equivalent continuation. This is exercised by the mid-investigation reload test.
 
 Use explicit `to_dict()` / `from_dict()` equivalents and a versioned envelope containing save_version, seed, scenario ID, clock, RNG state, world, colony, knowledge, trails, and pending work as it becomes implemented. Reference definitions by stable ID. Rebuild runtime references through validated IDs; do not serialize scene nodes or views.
 

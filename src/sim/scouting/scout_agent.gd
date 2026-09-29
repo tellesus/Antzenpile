@@ -1,6 +1,8 @@
 class_name ScoutAgent
 extends RefCounted
 
+const Evidence = preload("res://src/sim/scouting/observation.gd")
+
 var id: String
 var origin_pile: String
 var position: Vector2
@@ -9,12 +11,21 @@ var elapsed: float = 0.0
 var path: Array[Vector2] = []
 var cursor: int = 1
 var return_path: Array[Vector2] = []
+var mission_target: Vector2
+var investigating: String = ""
+var observations: Dictionary[String, Observation] = {}
 
 
 func to_dict() -> Dictionary:
+	var evidence: Array[Dictionary] = []
+	var ids: Array = observations.keys()
+	ids.sort()
+	for key: String in ids:
+		evidence.append(observations[key].to_dict())
 	return {"id": id, "mission_id": id, "origin_pile": origin_pile,
 		"position": [position.x, position.y], "phase": phase, "elapsed": elapsed,
-		"path": _points(path), "cursor": cursor, "return_path": _points(return_path)}
+		"path": _points(path), "cursor": cursor, "return_path": _points(return_path),
+		"mission_target": [mission_target.x, mission_target.y], "investigating": investigating, "observations": evidence}
 
 
 static func _points(points: Array[Vector2]) -> Array:
@@ -24,8 +35,8 @@ static func _points(points: Array[Vector2]) -> Array:
 	return result
 
 
-func restore(data: Dictionary, world: WorldState, colony: ColonyState) -> bool:
-	if not data.has_all(["id", "mission_id", "origin_pile", "position", "phase", "elapsed", "path", "cursor", "return_path"]):
+func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: float) -> bool:
+	if not data.has_all(["id", "mission_id", "origin_pile", "position", "phase", "elapsed", "path", "cursor", "return_path", "mission_target", "investigating", "observations"]):
 		return false
 	if not data.id is String or not data.id.begins_with("scout_") or data.mission_id != data.id or not data.origin_pile is String or not colony.piles.has(data.origin_pile):
 		return false
@@ -54,7 +65,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState) -> bool:
 				return false
 	var is_returning: bool = data.phase in ["returning", "blocked_returning"]
 	var home: Vector2 = colony.piles[data.origin_pile].position
-	if (is_returning and restored_path.back() != home) or (not is_returning and (restored_path[0] != home or data.cursor < 1)):
+	if (is_returning and restored_path.back() != home) or (not is_returning and (not restored_return.has(restored_path[0]) or data.cursor < 1)):
 		return false
 	var at := Vector2(data.position[0], data.position[1])
 	var cursor_index: int = int(data.cursor)
@@ -70,6 +81,18 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState) -> bool:
 		return false
 	if data.phase == "departing" and (at != home or data.elapsed != 0 or data.cursor != 1):
 		return false
+	if not _point(data.mission_target, world.bounds) or not data.investigating is String or not data.observations is Array:
+		return false
+	var restored_evidence: Dictionary[String, Observation] = {}
+	for value: Variant in data.observations:
+		var evidence := Evidence.new()
+		if not value is Dictionary or not evidence.restore(value, world, colony, time):
+			return false
+		if evidence.scout_id != data.id or evidence.origin_pile != data.origin_pile or restored_evidence.has(evidence.source_node_id):
+			return false
+		restored_evidence[evidence.source_node_id] = evidence
+	if not data.investigating.is_empty() and not restored_evidence.has(data.investigating):
+		return false
 	id = data.id
 	origin_pile = data.origin_pile
 	position = Vector2(data.position[0], data.position[1])
@@ -78,6 +101,9 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState) -> bool:
 	path = restored_path
 	return_path = restored_return
 	cursor = int(data.cursor)
+	mission_target = Vector2(data.mission_target[0], data.mission_target[1])
+	investigating = data.investigating
+	observations = restored_evidence
 	return true
 
 

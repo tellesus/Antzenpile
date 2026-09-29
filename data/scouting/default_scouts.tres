@@ -11,3 +11,7 @@ minimum_distance = 8.0
 maximum_distance = 12.0
 cone_radians = 0.7853981633974483
 target_attempts = 16
+sense_radius = 4.0
+confirmation_radius = 1.0
+localization_floor = 0.25
+distance_uncertainty = 0.5

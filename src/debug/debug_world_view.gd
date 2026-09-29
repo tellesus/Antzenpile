@@ -39,8 +39,10 @@ func _input(event: InputEvent) -> void:
 
 func _select_at(at: Vector2) -> void:
 	if _dispatch_rect().has_point(at) and dispatch_command.is_valid():
-		_dispatch_status = "Scout dispatched" if dispatch_command.call() else "Dispatch rejected (cap, workers, or path)"
-		model.selected_id = "home"
+		var scout_id: String = "scout_%d" % model.snapshot.next_scout_id
+		var accepted: bool = dispatch_command.call()
+		_dispatch_status = "Scout dispatched" if accepted else "Dispatch rejected (cap, workers, or path)"
+		model.selected_id = scout_id if accepted else "home"
 	else:
 		model.pick(at)
 
@@ -59,6 +61,10 @@ func _draw() -> void:
 	var data: Dictionary = model.snapshot
 	_label(Vector2(24, 62), "Seed %s  |  time %.2fs  |  %sx  |  paused: %s" % [data.seed, data.clock.time, data.clock.scale, data.clock.paused])
 	_label(Vector2(24, 86), "F3 hide  |  select a marker  |  meters: east +x, south +y")
+	var carried: int = 0
+	for scout: Dictionary in data.scouts:
+		carried += scout.observations.size()
+	_label(Vector2(size.x * 0.64, 86), "Private: %d  |  Delivered: %d" % [carried, data.delivered_observations.size()])
 	var bounds: Array = data.world.bounds
 	var origin: Vector2 = model.transform * Vector2(bounds[0], bounds[1])
 	var map_size: Vector2 = Vector2(bounds[2], bounds[3]) * model.transform.x.length()
@@ -96,14 +102,26 @@ func _draw() -> void:
 			lines.append("Queens: %s" % detail.queen_count)
 			lines.append("Workers total: %s" % detail.workers.total)
 			lines.append("Available: %s" % detail.workers.available)
+			lines.append("Delivered observations: %d" % data.delivered_observations.size())
 			lines.append("Commitments: " + ("none" if detail.workers.commitments.is_empty() else ""))
 			for id: String in detail.workers.commitments:
 				var entry: Dictionary = detail.workers.commitments[id]
 				lines.append("%s: %s (%s / %s)" % [id, entry.count, entry.kind, entry.owner_id])
+			for observation: Dictionary in data.delivered_observations.slice(0, 4):
+				lines.append("%s: uncertainty %.2fm" % [observation.source_node_id, observation.uncertainty_radius])
 		elif detail.has("phase"):
 			lines.append("Phase: " + detail.phase)
 			lines.append("Origin: " + detail.origin_pile)
 			lines.append("Exploration time: %.2fs" % detail.elapsed)
+			lines.append("Investigating: " + (detail.investigating if not detail.investigating.is_empty() else "none"))
+			lines.append("Private observations: %d" % detail.observations.size())
+			for observation: Dictionary in detail.observations.slice(0, 4):
+				lines.append("%s: %s" % [observation.source_node_id, "close confirmed" if observation.proximity_confirmed else "chemical cue"])
+				lines.append("Estimate (%.2f,%.2f), radius %.2fm" % [observation.estimated_position[0], observation.estimated_position[1], observation.uncertainty_radius])
+				var estimate: Vector2 = model.transform * Vector2(observation.estimated_position[0], observation.estimated_position[1])
+				draw_arc(estimate, observation.uncertainty_radius * model.transform.x.length(), 0, TAU, 48, Color("a6e5a3"), 1.0)
+				draw_line(estimate - Vector2(4, 0), estimate + Vector2(4, 0), Color("a6e5a3"))
+				draw_line(estimate - Vector2(0, 4), estimate + Vector2(0, 4), Color("a6e5a3"))
 		else:
 			lines.append("Definition: " + detail.definition_id)
 			lines.append("Quantity: %s" % detail.quantity)
