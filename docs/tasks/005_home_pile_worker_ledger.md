@@ -1,6 +1,6 @@
 # 005 — Home pile and worker ledger
 
-Status: ready specification; implementation not started.
+Status: implemented 2026-09-28.
 
 ## Goal
 
@@ -49,3 +49,11 @@ Run tests, boot Main, and inspect a compact home/ledger dump. Confirm 1 queen/40
 ## Done when
 
 Worker conservation and atomicity pass, ownership is unambiguous, and handoff records evidence. One logical commit; next task 006.
+
+## Implementation handoff
+
+- Added WorkerLedger, PileState, ColonyState under src/sim/colony; RunState owns colony and validates complete candidate state before restoring. Added tests/test_worker_ledger.gd.
+- Pinned Godot suite: 1,290 checks, 0 failures, including 1,000 deterministic transfers, rejection atomicity, detached snapshots, and populated JSON continuation. Main boots. Initial home has 1 queen and 40 available workers.
+- Explicit commitments use stable IDs, kind, owner ID and count. Count getters derive from the ledger. Population utilities require a diagnostic reason. Zero is a no-op; snapshots support integral JSON values up to 2^53-1. No brood/travel behavior.
+- Next: 006 development-only world view.
+

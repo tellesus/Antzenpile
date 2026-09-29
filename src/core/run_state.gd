@@ -5,7 +5,9 @@ const Clock = preload("res://src/core/simulation_clock.gd")
 const SNAPSHOT_VERSION: int = 1
 const World = preload("res://src/sim/world/world_state.gd")
 const Loader = preload("res://src/sim/world/world_loader.gd")
+const Colony = preload("res://src/sim/colony/colony_state.gd")
 var world: WorldState
+var colony: ColonyState = Colony.new()
 
 var run_seed: int:
 	get: return _seed
@@ -25,16 +27,17 @@ func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> voi
 	_scenario_id = scenario
 	rng.seed = _seed
 	world = Loader.new().load_scenario()
+	colony.initialize_home(world.home_position)
 
 
 func to_dict() -> Dictionary:
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state),
-		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict()}
+		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict()}
 
 
 func restore(data: Dictionary) -> bool:
-	if not data.has_all(["version", "seed", "rng_state", "scenario_id", "clock", "world"]):
+	if not data.has_all(["version", "seed", "rng_state", "scenario_id", "clock", "world", "colony"]):
 		return false
 	if data.version != SNAPSHOT_VERSION or not data.scenario_id is String or data.scenario_id.is_empty():
 		return false
@@ -44,6 +47,9 @@ func restore(data: Dictionary) -> bool:
 	var restored_world := World.new()
 	if not data.world is Dictionary or not restored_world.restore(data.world, Loader.definition_ids()):
 		return false
+	var restored_colony := Colony.new()
+	if not data.colony is Dictionary or not restored_colony.restore(data.colony, restored_world.bounds, restored_world.home_position):
+		return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()
@@ -52,4 +58,5 @@ func restore(data: Dictionary) -> bool:
 	rng.seed = _seed
 	rng.state = data.rng_state.to_int()
 	world = restored_world
+	colony = restored_colony
 	return true
