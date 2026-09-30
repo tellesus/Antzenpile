@@ -5,6 +5,7 @@ const Ledger = preload("res://src/sim/colony/worker_ledger.gd")
 const Brood = preload("res://src/sim/colony/brood_cohort.gd")
 const BROOD_CONFIG = preload("res://data/resources/default_brood.tres")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
+const NURSERY_CONFIG = preload("res://data/resources/default_nursery_development.tres")
 const RESOURCE_IDS: Array[String] = ["carbohydrate", "protein", "water"]
 var id: String = "home"
 var position: Vector2 = Vector2(20, 20)
@@ -14,6 +15,7 @@ var resources: Dictionary[String, float] = {"carbohydrate": 0.0, "protein": 0.0,
 var brood_cohorts: Array[BroodCohort] = []
 var brood_matured_total: int = 0
 var nursery_state: String = "primitive"
+var nursery_progress_seconds: float = 0.0
 var food_exchange_state: String = "primitive"
 var food_exchange_progress_seconds: float = 0.0
 var workers_total: int:
@@ -29,13 +31,13 @@ func to_dict() -> Dictionary:
 	return {"id": id, "position": [position.x, position.y], "queen_count": queen_count,
 		"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
-		"nursery_state": nursery_state,
+		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"food_exchange_state": food_exchange_state,
 		"food_exchange_progress_seconds": food_exchange_progress_seconds}
 
 
 func nursery_brood_capacity() -> int:
-	return BROOD_CONFIG.primitive_nursery_brood_capacity
+	return BROOD_CONFIG.developed_nursery_brood_capacity if nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_brood_capacity
 
 
 func nursery_occupied_space() -> int:
@@ -46,8 +48,11 @@ func nursery_occupied_space() -> int:
 
 
 func nursery_care_capacity() -> int:
-	return mini(BROOD_CONFIG.primitive_nursery_care_capacity,
-		floori(float(workers_available * BROOD_CONFIG.primitive_nursery_care_capacity) / BROOD_CONFIG.available_carers_required))
+	return mini(nursery_max_care_capacity(), floori(float(workers_available * BROOD_CONFIG.primitive_nursery_care_capacity) / BROOD_CONFIG.available_carers_required))
+
+
+func nursery_max_care_capacity() -> int:
+	return BROOD_CONFIG.developed_nursery_care_capacity if nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_care_capacity
 
 
 func deposit_resource(resource_id: String, amount: float) -> bool:
@@ -91,9 +96,12 @@ func restore(data: Dictionary) -> bool:
 		if not data.resources.has(resource_id) or not typeof(data.resources[resource_id]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.resources[resource_id])) or data.resources[resource_id] < 0.0:
 			return false
 		restored_resources[resource_id] = float(data.resources[resource_id])
-	if not data.brood_cohorts is Array or data.brood_cohorts.size() > 1 or not Ledger.valid_count(data.brood_matured_total):
+	var restored_nursery_state: Variant = data.get("nursery_state", "primitive")
+	var restored_nursery_progress: Variant = data.get("nursery_progress_seconds", 0.0)
+	if not restored_nursery_state in ["primitive", "developing", "developed"] or not typeof(restored_nursery_progress) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(restored_nursery_progress)) or restored_nursery_progress < 0.0:
 		return false
-	if data.get("nursery_state", "primitive") != "primitive":
+	var max_cohorts: int = 2 if restored_nursery_state == "developed" else 1
+	if not data.brood_cohorts is Array or data.brood_cohorts.size() > max_cohorts or not Ledger.valid_count(data.brood_matured_total):
 		return false
 	var restored_brood: Array[BroodCohort] = []
 	for record: Variant in data.brood_cohorts:
@@ -104,12 +112,26 @@ func restore(data: Dictionary) -> bool:
 	var emerged: int = int(data.brood_matured_total)
 	if emerged % BROOD_CONFIG.starting_count != 0 or (restored_brood.is_empty() and emerged < BROOD_CONFIG.starting_count):
 		return false
-	if not restored_brood.is_empty() and restored_brood[0].id != Brood.next_id(emerged):
-		return false
 	var occupied: int = 0
+	var cohort_ids: Dictionary[String, bool] = {}
+	var total_started: int = emerged / BROOD_CONFIG.starting_count + restored_brood.size()
 	for cohort: BroodCohort in restored_brood:
 		occupied += cohort.count
-	if occupied > BROOD_CONFIG.primitive_nursery_brood_capacity:
+		var suffix: String = cohort.id.trim_prefix("brood_")
+		if cohort.id != "brood_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() > total_started or cohort_ids.has(cohort.id):
+			return false
+		cohort_ids[cohort.id] = true
+	var brood_limit: int = BROOD_CONFIG.developed_nursery_brood_capacity if restored_nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_brood_capacity
+	if occupied > brood_limit:
+		return false
+	if restored_nursery_state != "developed" and not restored_brood.is_empty() and restored_brood[0].id != Brood.next_id(emerged):
+		return false
+	var nursery_commitment: String = "nursery:" + data.id
+	var nursery_record: Dictionary = restored.to_dict().commitments.get(nursery_commitment, {})
+	if restored_nursery_state == "developing":
+		if restored_nursery_progress >= NURSERY_CONFIG.build_seconds or nursery_record.get("kind") != "internal" or nursery_record.get("owner_id") != data.id or nursery_record.get("count") != NURSERY_CONFIG.workers_required:
+			return false
+	elif not nursery_record.is_empty() or restored_nursery_progress != (NURSERY_CONFIG.build_seconds if restored_nursery_state == "developed" else 0.0):
 		return false
 	var commitment: String = "food_exchange:" + data.id
 	var record: Dictionary = restored.to_dict().commitments.get(commitment, {})
@@ -125,7 +147,8 @@ func restore(data: Dictionary) -> bool:
 	resources = restored_resources
 	brood_cohorts = restored_brood
 	brood_matured_total = int(data.brood_matured_total)
-	nursery_state = "primitive"
+	nursery_state = restored_nursery_state
+	nursery_progress_seconds = float(restored_nursery_progress)
 	food_exchange_state = data.food_exchange_state
 	food_exchange_progress_seconds = float(data.food_exchange_progress_seconds)
 	return true

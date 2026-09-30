@@ -59,6 +59,8 @@ Task 025 puts one touch-sized **LAY 8 BROOD** action in the selected Queen or Nu
 
 Task 030 additionally shows occupied/total brood space and current/maximum care capacity in the selected Nursery context. Queen shows occupied Nursery space. Lay Brood requires the detached free-space summary as well as an empty Nursery and a queen; BroodSystem independently validates the command. These are colony facts, not a physical chamber floorplan.
 
+Task 031 adds a selected-Nursery **DEVELOP NURSERY** action with authored costs and a touch-sized target. Developing shows simulated progress and committed labor; Developed shows capacity for two aggregate cohorts. Lay Brood remains available in Queen/Nursery when a Developed Nursery has eight free slots, even while one cohort is active. The context summarizes both stages and shared care/nutrition, without individual brood graphics or a general building menu.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

@@ -8,6 +8,7 @@ var mode_command: Callable
 var pause_command: Callable
 var speed_command: Callable
 var develop_command: Callable
+var nursery_develop_command: Callable
 var brood_command: Callable
 var input_blocked: Callable
 var save_command: Callable
@@ -45,11 +46,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
-	if selected_id in ["queen", "nursery"] and _status.get("queens", 0) > 0 and _status.get("brood", []).is_empty() and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and _brood_rect().has_point(at):
+	if selected_id in ["queen", "nursery"] and _can_lay_brood() and _brood_rect().has_point(at):
 		_run_command("lay_brood")
 		return true
 	if selected_id == "food_exchange" and _status.get("food_exchange_state", "") == "primitive" and _develop_rect().has_point(at):
 		_run_command("develop")
+		return true
+	if selected_id == "nursery" and _status.get("nursery_state", "") == "primitive" and _nursery_develop_rect().has_point(at):
+		_run_command("develop_nursery")
 		return true
 	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "save", "load"]:
 		if _button_rect(command).has_point(at):
@@ -75,6 +79,11 @@ func _run_command(command: String) -> void:
 			if develop_command.is_valid():
 				var result: Dictionary = develop_command.call()
 				_feedback = "Development started" if result.get("accepted", false) else result.get("reason", "Requirements unmet")
+				_feedback_until = Time.get_ticks_msec() + 3000
+		"develop_nursery":
+			if nursery_develop_command.is_valid():
+				var result: Dictionary = nursery_develop_command.call()
+				_feedback = "Nursery development started" if result.get("accepted", false) else result.get("reason", "Requirements unmet")
 				_feedback_until = Time.get_ticks_msec() + 3000
 		"lay_brood":
 			if brood_command.is_valid():
@@ -128,7 +137,15 @@ func _develop_rect() -> Rect2:
 
 
 func _brood_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
+	return Rect2(get_viewport_rect().size.x - 300.0, 438.0 if selected_id == "nursery" else 380.0, 260.0, 44.0)
+
+
+func _nursery_develop_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 494.0, 260.0, 44.0)
+
+
+func _can_lay_brood() -> bool:
+	return _status.get("queens", 0) > 0 and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
 
 
 func _draw() -> void:
@@ -166,7 +183,7 @@ func _draw_hud(size: Vector2) -> void:
 func _draw_context(size: Vector2) -> void:
 	if selected_id.is_empty() or _status.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 284))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 400 if selected_id == "nursery" else 284))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), _title(selected_id), Color("d9d3be"), 20)
@@ -176,7 +193,7 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 91, "Living workers: %d" % _status.workers_total)
 			_detail_line(box, 117, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 157, "Nursery: %d / %d brood space" % [_status.nursery_occupied_space, _status.nursery_brood_capacity])
-			if _status.queens > 0 and _status.brood.is_empty() and _status.nursery_brood_capacity - _status.nursery_occupied_space >= _status.brood_batch_count:
+			if _can_lay_brood():
 				_draw_brood_button()
 		"nursery":
 			var brood: Array = _status.brood
@@ -186,10 +203,26 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 65, "Brood space: %d / %d" % [count, _status.nursery_brood_capacity])
 			_detail_line(box, 91, "Care capacity: %d / %d" % [_status.nursery_care_capacity, _status.nursery_max_care_capacity])
 			if not brood.is_empty():
-				_detail_line(box, 117, "%s · %.0fs" % [brood[0].stage.capitalize(), brood[0].progress_seconds])
-				_detail_line(box, 143, "Food %s · care %s" % ["enough" if brood[0].nutrition >= 1.0 else "short", "enough" if brood[0].care >= 1.0 else "short"])
+				var stages: String = "%s · %.0fs" % [brood[0].stage.capitalize(), brood[0].progress_seconds] if brood.size() == 1 else "2 cohorts: %s / %s" % [brood[0].stage, brood[1].stage]
+				_detail_line(box, 117, stages)
+				var food_enough: bool = true
+				var care_enough: bool = true
+				for cohort: Dictionary in brood:
+					food_enough = food_enough and cohort.nutrition >= 1.0
+					care_enough = care_enough and cohort.care >= 1.0
+				_detail_line(box, 143, "Food %s · care %s" % ["enough" if food_enough else "short", "enough" if care_enough else "short"])
 			_detail_line(box, 181, "Workers emerged: %d" % _status.brood_matured_total)
-			if _status.queens > 0 and brood.is_empty() and _status.nursery_brood_capacity - _status.nursery_occupied_space >= _status.brood_batch_count:
+			if _status.nursery_state == "primitive":
+				_detail_line(box, 209, "Develop for %d brood space" % _status.nursery_developed_capacity)
+				_detail_line(box, 235, "Needs %.0f carb · %.0f protein" % [_status.nursery_costs.carbohydrate, _status.nursery_costs.protein])
+				_detail_line(box, 261, "%.0f water · %d workers · %.0fs" % [_status.nursery_costs.water, _status.nursery_workers_required, _status.nursery_build_duration])
+				_draw_nursery_develop_button()
+			elif _status.nursery_state == "developing":
+				_detail_line(box, 209, "Developing: %.0f / %.0fs" % [_status.nursery_progress, _status.nursery_build_duration])
+				_detail_line(box, 235, "%d workers committed" % _status.nursery_workers_required)
+			else:
+				_detail_line(box, 209, "Developed: room for two cohorts")
+			if _can_lay_brood():
 				_draw_brood_button()
 		"food_exchange":
 			if _status.food_exchange_state == "primitive":
@@ -224,6 +257,11 @@ func _detail_line(box: Rect2, y: float, value: String) -> void:
 func _draw_brood_button() -> void:
 	draw_rect(_brood_rect(), Color("35483c"))
 	_label(_brood_rect().position + Vector2(130, 29), "LAY %d BROOD" % _status.brood_batch_count, Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+func _draw_nursery_develop_button() -> void:
+	draw_rect(_nursery_develop_rect(), Color("35483c"))
+	_label(_nursery_develop_rect().position + Vector2(130, 29), "DEVELOP NURSERY", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_controls(size: Vector2) -> void:

@@ -13,6 +13,7 @@ func run(test: Object) -> bool:
 	var before: Dictionary = game.run.to_dict()
 	var old_save: Dictionary = before.duplicate(true)
 	old_save.colony.piles[0].erase("nursery_state")
+	old_save.colony.piles[0].erase("nursery_progress_seconds")
 	var restored := Controller.new()
 	test.check(restored.restore_snapshot(old_save) and restored.run.to_dict() == before, "Older version-5 pile saves gain Primitive Nursery state")
 	var invalid: Dictionary = before.duplicate(true)

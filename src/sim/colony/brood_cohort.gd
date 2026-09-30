@@ -11,8 +11,8 @@ var nutrition: float = 1.0
 var care: float = 1.0
 
 
-static func next_id(matured_total: int) -> String:
-	return "brood_%d" % (matured_total / CONFIG.starting_count + 1)
+static func next_id(matured_total: int, active_count: int = 0) -> String:
+	return "brood_%d" % (matured_total / CONFIG.starting_count + active_count + 1)
 
 
 func to_dict() -> Dictionary:

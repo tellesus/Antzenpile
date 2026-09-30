@@ -8,6 +8,7 @@ const Audio = preload("res://src/audio/audio_controller.gd")
 const Save = preload("res://src/core/save_service.gd")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 const BROOD_CONFIG = preload("res://data/resources/default_brood.tres")
+const NURSERY_CONFIG = preload("res://data/resources/default_nursery_development.tres")
 var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
 var _debug_view: Node
@@ -44,6 +45,7 @@ func _ready() -> void:
 		inward.pause_command = simulation.toggle_pause
 		inward.speed_command = simulation.set_time_scale
 		inward.develop_command = start_food_exchange
+		inward.nursery_develop_command = start_nursery_development
 		inward.brood_command = start_brood
 		inward.input_blocked = debug_is_open
 		inward.save_command = quick_save
@@ -136,7 +138,12 @@ func inward_status(pile_id: String) -> Dictionary:
 		"nursery_state": pile.nursery_state, "nursery_brood_capacity": pile.nursery_brood_capacity(),
 		"nursery_occupied_space": pile.nursery_occupied_space(),
 		"nursery_care_capacity": pile.nursery_care_capacity(),
-		"nursery_max_care_capacity": BROOD_CONFIG.primitive_nursery_care_capacity,
+		"nursery_max_care_capacity": pile.nursery_max_care_capacity(),
+		"nursery_progress": pile.nursery_progress_seconds,
+		"nursery_build_duration": NURSERY_CONFIG.build_seconds,
+		"nursery_costs": NURSERY_CONFIG.costs(),
+		"nursery_workers_required": NURSERY_CONFIG.workers_required,
+		"nursery_developed_capacity": BROOD_CONFIG.developed_nursery_brood_capacity,
 		"resources": pile.resources.duplicate(), "food_exchange_state": pile.food_exchange_state,
 		"food_exchange_progress": pile.food_exchange_progress_seconds,
 		"food_exchange_duration": FOOD_CONFIG.build_seconds,
@@ -188,6 +195,11 @@ func start_food_exchange() -> Dictionary:
 func start_brood() -> Dictionary:
 	var accepted: bool = simulation.start_brood("home")
 	return {"accepted": accepted, "reason": simulation.brood.last_error}
+
+
+func start_nursery_development() -> Dictionary:
+	var accepted: bool = simulation.start_nursery_development("home")
+	return {"accepted": accepted, "reason": simulation.nursery.last_error}
 
 
 func trail_summaries(pile_id: String) -> Array[Dictionary]:

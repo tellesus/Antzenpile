@@ -7,6 +7,7 @@ const Scouts = preload("res://src/sim/scouting/scout_system.gd")
 const Trails = preload("res://src/sim/trails/trail_system.gd")
 const Brood = preload("res://src/sim/colony/brood_system.gd")
 const FoodExchange = preload("res://src/sim/colony/food_exchange_system.gd")
+const Nursery = preload("res://src/sim/colony/nursery_development_system.gd")
 const Rain = preload("res://src/sim/weather/rain_system.gd")
 const Ecology = preload("res://src/sim/ecology/ecology_system.gd")
 var run: RunState
@@ -14,6 +15,7 @@ var scouting: RefCounted
 var trails: RefCounted
 var brood: RefCounted
 var food_exchange: RefCounted
+var nursery: NurseryDevelopmentSystem
 var rain: RainSystem
 var ecology: EcologySystem
 
@@ -38,6 +40,7 @@ func _attach_run(next_run: RunState) -> void:
 	trails = Trails.new(run)
 	brood = Brood.new(run)
 	food_exchange = FoodExchange.new(run)
+	nursery = Nursery.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
 	run.clock.tick.connect(_tick)
@@ -79,6 +82,10 @@ func start_brood(pile_id: String) -> bool:
 	return brood.start(pile_id)
 
 
+func start_nursery_development(pile_id: String) -> bool:
+	return nursery.start(pile_id)
+
+
 func _tick(delta: float) -> void:
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():
@@ -88,4 +95,5 @@ func _tick(delta: float) -> void:
 	rain.tick(delta)
 	ecology.tick(delta)
 	food_exchange.tick(delta)
+	nursery.tick(delta)
 	brood.tick(delta)

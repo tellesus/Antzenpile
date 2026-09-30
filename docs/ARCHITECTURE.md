@@ -89,6 +89,8 @@ Task 029 makes TrailSystem charge aggregate travel energy from pile carbohydrate
 
 Task 030 gives each PileState a Primitive Nursery state, with brood-space and care limits from authored BroodConfig. The existing one-cohort rule remains; a repeat laying command also checks free capacity. Care capacity derives from available ledger workers and is queried by BroodSystem on fixed ticks. GameRoot projects occupied/total space and current/maximum care capacity into a detached INWARD summary. Older version-5 saves without `nursery_state` restore as Primitive.
 
+Task 031 adds NurseryDevelopmentSystem as a separate fixed-tick chamber transition. It atomically pays authored resources and reserves four workers in a `nursery:<pile_id>` ledger commitment, then releases them after 90 simulated seconds. PileState owns development state/progress and derives eight or sixteen space/care slots. Developed Nursery permits two manually started aggregate cohorts; BroodSystem computes one care fraction from total occupied brood before advancing both in stable array order. IDs derive from emerged plus active cohort count and stay unique through overlapping cycles. INWARD receives only detached costs, progress, capacity and brood records. Optional progress on version-5 saves defaults to Primitive zero, while restore validates the new commitment and bounded cohorts.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

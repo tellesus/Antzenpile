@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="NurseryDevelopmentConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/colony/nursery_development_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+workers_required = 4
+carbohydrate_cost = 18.0
+protein_cost = 8.0
+water_cost = 6.0
+build_seconds = 90.0

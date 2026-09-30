@@ -19,17 +19,18 @@ func start(pile_id: String) -> bool:
 	if pile.queen_count < 1:
 		last_error = "No queen in pile"
 		return false
-	if not pile.brood_cohorts.is_empty():
+	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty():
 		last_error = "Nursery already has brood"
 		return false
 	if pile.nursery_brood_capacity() - pile.nursery_occupied_space() < CONFIG.starting_count:
 		last_error = "Nursery lacks brood space"
 		return false
-	if pile.brood_matured_total > WorkerLedger.MAX_COUNT - CONFIG.starting_count or pile.workers_total > WorkerLedger.MAX_COUNT - CONFIG.starting_count:
+	var pending_brood: int = pile.nursery_occupied_space() + CONFIG.starting_count
+	if pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending_brood or pile.workers_total > WorkerLedger.MAX_COUNT - pending_brood:
 		last_error = "Population limit reached"
 		return false
 	var cohort := BroodCohort.new()
-	cohort.id = BroodCohort.next_id(pile.brood_matured_total)
+	cohort.id = BroodCohort.next_id(pile.brood_matured_total, pile.brood_cohorts.size())
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
 	return true
@@ -40,12 +41,14 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var pile: PileState = _run.colony.piles[id]
-		for cohort: BroodCohort in pile.brood_cohorts:
-			_advance(pile, cohort, delta)
+		var occupied: int = pile.nursery_occupied_space()
+		var care_fraction: float = minf(1.0, float(pile.nursery_care_capacity()) / occupied) if occupied > 0 else 1.0
+		for cohort: BroodCohort in pile.brood_cohorts.duplicate():
+			_advance(pile, cohort, delta, care_fraction)
 
 
-func _advance(pile: PileState, cohort: BroodCohort, delta: float) -> void:
-	cohort.care = minf(1.0, float(pile.nursery_care_capacity()) / cohort.count)
+func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction: float) -> void:
+	cohort.care = care_fraction
 	if cohort.care < 1.0:
 		cohort.nutrition = 0.0 if cohort.stage == "larva" else 1.0
 		return
