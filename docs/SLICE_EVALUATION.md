@@ -15,9 +15,9 @@ This is the task-022 integration baseline before later playtest changes, not a h
 
 The final run has three known signals and three invested routes. Resources came home before development, the rain event finished, and the ledger conserved all workers. The headless integration test and save/reload continuation suite pass. The scripted arc reaches all implemented milestones in **six simulated minutes**. It does not measure how long a person spends interpreting signals, choosing routes or using accelerated time. A 20–30 minute human session is therefore unverified and appears optimistic with current tuning.
 
-Two design gaps need evaluation before adding systems or changing balance:
+The original task-022 evaluation raised two questions:
 
-- The Food Exchange can be developed at 65 s, before protein is found and before the nursery needs larval food. Nothing currently makes the Primitive chamber feel strained. A player may receive the music reward well before brood growth, reversing the intended developmental arc. Decide whether the arc should be reordered, development gated, or strain communicated through existing state; do not add a new pressure mechanic without design approval.
+- The Food Exchange can be developed at 65 s, before protein is found and before the nursery needs larval food. The player has since chosen to keep this early project available. Its second music layer may arrive before brood growth by design; do not add a timing gate simply to reorder these milestones.
 - At emergence the probed run held about 111 carbohydrate and 42 protein, while water had fallen to about 0.2. Continuous routes can exceed this single cohort's demand by a wide margin, so the intended labor and route-maintenance tradeoff is not yet proven. A human playtest should examine resource choices before tuning delivery, costs or cohort timing.
 
 The resource-approach sensing, return-only knowledge, rain chemistry/familiarity contrast, save continuation and worker conservation each have dedicated tests. The player's subjective interest in scouting, weak scent recovery, INWARD context and the placeholder music remains to be assessed by play.
@@ -39,8 +39,22 @@ Inspected saved probe captures of rain OUTWARD at 1280×720, developed INWARD at
 
 ## Decision point
 
-Stop feature expansion here. Run a human Windows playthrough, ideally with more than one player, timing choices separately from simulated time. Ask whether the sensory search, trail decisions, rain recovery, chamber timing and music reward create the intended 20–30 minute arc. Use those observations to decide on pacing or scope changes before ecology, rivals or adaptation.
+Run a human Windows playthrough, ideally with more than one player, timing choices separately from simulated time. Ask whether the sensory search, trail decisions, rain recovery, early chamber project and music reward create the intended 20–30 minute arc. Use those observations to decide on pacing or scope changes before ecology, rivals or adaptation.
 
 The player's first hands-on feedback on 2026-09-30 identified that short scout missions could fail to locate water beyond their range and that rain did not replenish home water. Completed cards 023 and 024 now search for new sources until confirmation and add three water units steadily during rain. The timing and water-shortage figures above remain the original task-022 baseline; repeat the human playtest to assess the revised balance.
 
 Task 025 removes the single-cycle brood ceiling the player encountered. It leaves this original six-minute integration baseline intact; repeated cohorts require a longer human playtest to judge resource demand and growth pacing.
+
+## Task 026 extended command-driven run
+
+With seed 3030 and normal simulation commands, the longer run keeps Food Exchange available before protein discovery and before the first brood needs larval food. It uses no direct resource, worker or world edits.
+
+| Milestone | Simulated time at 1× |
+| --- | ---: |
+| Food Exchange development starts | 40.00 s |
+| First brood emerges; 48 living workers | 360.00 s |
+| Second cohort stalls on empty water | 620.25 s |
+| Returned scout reports water | 666.50 s |
+| Water trail supports second emergence; 56 living workers | 790.00 s |
+
+At first emergence, the run held 147.2 carbohydrate, 67.76 protein and 3.6 water. The second cohort stopped with zero water, then resumed after the player funded a trail to the returned water signal. At second emergence, the stores held 176.4 carbohydrate, 94.52 protein and 23.2 water. This demonstrates a concrete water decision in the authored scenario, while carbohydrate and protein still accumulate substantially. A mid-second-cycle save/reload with water travel in flight reached the same authoritative state. The scripted 13-minute-10-second duration is simulated time, not a measured human session or final balance approval.

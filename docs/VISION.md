@@ -18,7 +18,7 @@ OUTWARD is a stationary, rotatable sensory panorama centered on the active pile.
 
 ## Long-term direction
 
-Maps can contain several development chapters: founding, establishment, expansion, crisis, and dispersal. A meaningful session targets about 25–30 minutes; that does not imply an entire map ends then. Adaptation, ecological relationships, rivals, satellite piles, reproduction, and reality replay belong to later design/implementation stages, not the first slice.
+Maps can contain several development chapters: founding, establishment, expansion, crisis, and dispersal. A meaningful session targets about 25–30 minutes; that does not imply an entire map ends then. Adaptation, ecological relationships, rivals, satellite piles, broader reproduction such as daughter queens and dispersal, and reality replay belong to later design/implementation stages. The current slice supports repeat worker-brood cycles only.
 
 ## Guardrails
 

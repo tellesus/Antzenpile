@@ -24,6 +24,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D16 | User playtest decision, 2026-09-30: scouts continue beyond the initial mission range and search for a source the colony does not already know. They follow a chemical trace until proximity confirmation, then return with evidence. Search that exhausts reachable ground returns empty rather than trapping the worker. |
 | D17 | User playtest decision, 2026-09-30: rain steadily adds a modest amount of water to colony stores throughout the event, rather than giving one lump at its start. |
 | D18 | User playtest request: after a brood hatches, the colony needs an option to begin another hatching cycle. Task 025 adds that manual option within the existing aggregate-brood rules. |
+| D19 | User decision, 2026-09-30: Food Exchange may be developed early. Its availability gives the player a project during the early game; do not add a brood-pressure or protein-discovery gate solely to delay it. |
 
 ## Provisional defaults for executable tasks
 

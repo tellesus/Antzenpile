@@ -8,7 +8,7 @@ Start with one pile, one queen, 40 workers, a small brood cohort, small carbohyd
 
 One authored hidden backyard map, roughly 40×40 meters, contains exposed and sheltered terrain, **two carbohydrate nodes, one protein node, and one water node**. This is not procedural map generation.
 
-Required arc: send scouts → discover carbohydrate → return information → reinforce signal → create trail → commit workers → food returns → brood develops → workers emerge → discover protein → support growth → Food Exchange becomes strained → commit labor/resources/time to develop it → synchronized additional music layer appears.
+Required ingredients: send scouts → return information → interpret signals → create trails → commit workers → bring food and water home → support brood → grow the workforce. Food Exchange can be funded and developed as an early project as soon as its existing labor/resource requirements are met; its synchronized additional music layer follows completion. Protein and later water discovery support sustained growth, including repeat brood cycles. This is a flexible decision sequence, not a required order of milestones.
 
 After at least one exposed and one sheltered trail exist, trigger one rain event. The exposed trail loses substantially more pheromone; familiarity largely survives and helps recovery. The player decides where to scout, which signal to reinforce, how many workers to commit, whether to maintain a weakening trail, and whether to invest workers in Food Exchange.
 
@@ -49,6 +49,7 @@ Individual cards record implementation status. 001–006 contain executable inst
 | [023](tasks/023_persistent_scout_search.md) | Playtest follow-up: persistent scout search for new sources |
 | [024](tasks/024_rain_water_collection.md) | Playtest follow-up: steady water collection during rain |
 | [025](tasks/025_repeat_brood_cycle.md) | Playtest follow-up: manual repeat brood cycle |
+| [026](tasks/026_extended_colony_integration.md) | Extended command-driven growth and water integration |
 
 ## Acceptance and evaluation
 
@@ -65,3 +66,5 @@ The task-022 command-driven and Windows graphical baseline, including measured p
 The player's first playtest led to completed follow-up cards 023–024 for persistent scout search and rainfall water. These refine the core loop before any larger expansion.
 
 Task 025 also addresses the observed one-cycle population ceiling with a manual repeat-brood action. The first-slice acceptance arc above remains the initial milestone; continued growth can now be playtested afterward.
+
+The player chose to keep Food Exchange available early as a useful project. Task 026 measures the longer second-cycle path with that decision intact; it does not gate or retune development.
