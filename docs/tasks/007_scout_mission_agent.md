@@ -1,5 +1,7 @@
 # 007 — Scout mission and ScoutAgent
 
+Historical implementation card: task [023](023_persistent_scout_search.md) supersedes the fixed 30-second mission deadline below. Scouts now search until a new source is confirmed or reachable ground is exhausted.
+
 Status: implemented 2026-09-28.
 
 ## Goal

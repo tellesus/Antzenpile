@@ -27,8 +27,11 @@ func run(test: Object) -> bool:
 	var confirmed_distance: float = -1.0
 	var saved: Dictionary = {}
 	for index: int in range(110):
+		if game.run.scouts.is_empty():
+			break
 		game.advance(0.25)
-		test.check((game.run.delivered_observations.is_empty() and game.run.knowledge.nodes.is_empty()), "Unreturned encounters remain private")
+		if not game.run.scouts.is_empty():
+			test.check((game.run.delivered_observations.is_empty() and game.run.knowledge.nodes.is_empty()), "Unreturned encounters remain private")
 		saw_investigation = saw_investigation or agent.investigating == "carb_exposed"
 		if agent.observations.has("carb_exposed"):
 			var evidence: Observation = agent.observations.carb_exposed
@@ -73,7 +76,11 @@ func run(test: Object) -> bool:
 	test.check(reference.run.knowledge.observations.values()[0].to_dict() == delivered, "Hidden truth changes cannot refresh delivered memory")
 	test.check(restored.run.restore(JSON.parse_string(JSON.stringify(reference.run.to_dict(), "", true, true))), "Stale delivered evidence survives snapshot")
 	var blocked := fixture()
-	blocked.advance(28.0)
+	for index: int in 400:
+		if blocked.run.scouts.has("scout_1") and blocked.run.scouts.scout_1.phase == "returning":
+			break
+		blocked.advance(0.25)
+	test.check(blocked.run.scouts.has("scout_1") and blocked.run.scouts.scout_1.phase == "returning", "Off-path chemical trace is confirmed before breadcrumb return")
 	blocked.run.world.terrain.append({"id": "block", "bounds": [0.0, 0.0, 40.0, 40.0], "exposure": 0.0, "traversable": false, "movement_cost": 1.0})
 	blocked.advance(10.0)
 	test.check(blocked.run.scouts.scout_1.observations.size() == 1 and (blocked.run.delivered_observations.is_empty() and blocked.run.knowledge.nodes.is_empty()) and blocked.run.colony.piles.home.workers_available == 39, "Blocked return keeps evidence private and worker committed")

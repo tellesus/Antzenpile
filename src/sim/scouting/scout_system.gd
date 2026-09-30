@@ -63,21 +63,26 @@ func tick(delta: float) -> void:
 			agent.phase = "exploring"
 			continue
 		var exploring: bool = agent.phase in ["exploring", "blocked_exploring"]
-		if exploring and agent.elapsed >= config.exploration_seconds:
-			agent.path = agent.return_path.duplicate()
-			agent.path.reverse()
-			agent.cursor = 0
-			agent.phase = "returning"
-			agent.investigating = ""
-			exploring = false
-		agent.phase = "exploring" if exploring else "returning"
-		var cue: String = Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
+		Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
 		if exploring:
-			_investigate(agent, cue)
+			if _confirmed_new_source(agent) and _at_breadcrumb(agent):
+				_start_return(agent)
+				exploring = false
+			elif _at_breadcrumb(agent):
+				var cue: String = _new_source_cue(agent)
+				if not cue.is_empty():
+					_investigate(agent, cue)
+				if agent.cursor >= agent.path.size() and not _continue_search(agent):
+					_start_return(agent)
+					exploring = false
+		if not exploring and agent.phase != "returning":
+			agent.phase = "returning"
 		_move(agent, delta, exploring)
 		Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
 		if exploring:
 			agent.elapsed += delta
+			if _confirmed_new_source(agent) and _at_breadcrumb(agent):
+				_start_return(agent)
 		elif agent.cursor >= agent.path.size():
 			var home: PileState = _run.colony.piles[agent.origin_pile]
 			assert(agent.position == home.position)
@@ -94,26 +99,108 @@ func tick(delta: float) -> void:
 			_run.scouts.erase(id)
 
 
+func _confirmed_new_source(agent: ScoutAgent) -> bool:
+	for source_id: String in agent.observations:
+		if agent.observations[source_id].proximity_confirmed and not _run.knowledge.nodes.has("known:" + source_id):
+			return true
+	return false
+
+
+func _new_source_cue(agent: ScoutAgent) -> String:
+	var ids: Array = agent.observations.keys()
+	ids.sort()
+	var closest: float = INF
+	var chosen: String = ""
+	for source_id: String in ids:
+		var evidence: Observation = agent.observations[source_id]
+		if _run.knowledge.nodes.has("known:" + source_id) or evidence.proximity_confirmed:
+			continue
+		if evidence.closest_distance < closest:
+			closest = evidence.closest_distance
+			chosen = source_id
+	return chosen
+
+
+func _at_breadcrumb(agent: ScoutAgent) -> bool:
+	return agent.position.distance_to(agent.return_path.back()) < 0.0001
+
+
+func _start_return(agent: ScoutAgent) -> void:
+	agent.path = agent.return_path.duplicate()
+	agent.path.reverse()
+	agent.cursor = 0
+	agent.phase = "returning"
+	agent.investigating = ""
+
+
 func _investigate(agent: ScoutAgent, cue: String) -> void:
-	# Replan only at an actually reached waypoint; breadcrumbs stay physical.
-	if agent.position.distance_to(agent.return_path.back()) > 0.0001:
+	if agent.investigating == cue and agent.cursor < agent.path.size():
 		return
-	var target: Vector2 = agent.mission_target
-	if not cue.is_empty():
-		target = agent.observations[cue].estimated_position.round()
-		if target == agent.position:
-			# A broad estimate may round to our cell: probe one cardinal neighbor.
-			var direction: Vector2 = agent.observations[cue].estimated_position - agent.position
-			var step := Vector2(signf(direction.x), 0) if absf(direction.x) >= absf(direction.y) else Vector2(0, signf(direction.y))
-			target += step
-	agent.investigating = cue
-	if target == agent.path.back():
-		return
-	var route: Array[Vector2] = Pathfinder.new(_run.world).path(agent.position, target)
-	if route.is_empty():
-		return
+	var evidence: Observation = agent.observations[cue]
+	var estimate: Vector2 = evidence.estimated_position.round()
+	var route: Array[Vector2] = []
+	if not agent.return_path.has(estimate):
+		route = Pathfinder.new(_run.world).path(agent.position, estimate)
+	if route.size() < 2:
+		route = _frontier_path(agent, evidence.estimated_position, ceili(evidence.uncertainty_radius) + 2)
+	if route.size() > 1:
+		_set_search_path(agent, route, cue)
+	else:
+		agent.investigating = ""
+
+
+func _continue_search(agent: ScoutAgent) -> bool:
+	var route: Array[Vector2] = _frontier_path(agent, agent.position, -1)
+	if route.size() < 2:
+		return false
+	_set_search_path(agent, route, "")
+	return true
+
+
+func _set_search_path(agent: ScoutAgent, route: Array[Vector2], cue: String) -> void:
 	agent.path = route
 	agent.cursor = 1
+	agent.mission_target = route.back()
+	agent.investigating = cue
+	agent.phase = "exploring"
+
+
+func _frontier_path(agent: ScoutAgent, center: Vector2, radius: int) -> Array[Vector2]:
+	# Choose from unvisited reachable cells, never from hidden source positions.
+	var visited: Dictionary = {}
+	for point: Vector2 in agent.return_path:
+		visited[Vector2i(point)] = true
+	var current: Vector2 = agent.position.round()
+	var maximum_ring: int = ceili(_run.world.bounds.size.x + _run.world.bounds.size.y)
+	var finder: Variant = null
+	var outward: Vector2 = (current - _run.colony.piles[agent.origin_pile].position).normalized()
+	for ring: int in range(1, maximum_ring + 1):
+		var best_path: Array[Vector2] = []
+		var best_score: float = -INF
+		for dy: int in range(-ring, ring + 1):
+			var dx: int = ring - absi(dy)
+			for direction: int in [-1, 1]:
+				if dx == 0 and direction == 1:
+					continue
+				var candidate: Vector2 = current + Vector2(dx * direction, dy)
+				if visited.has(Vector2i(candidate)) or not _run.world.bounds.has_point(candidate) or radius >= 0 and candidate.distance_to(center) > radius:
+					continue
+				if not is_finite(Pathfinder.travel_cost(_run.world, candidate)):
+					continue
+				var route: Array[Vector2] = [current, candidate]
+				if ring > 1:
+					if finder == null:
+						finder = Pathfinder.new(_run.world)
+					route = finder.path(current, candidate)
+				if route.size() < 2:
+					continue
+				var score: float = -candidate.distance_to(center) if radius >= 0 else (candidate - current).dot(outward)
+				if score > best_score:
+					best_score = score
+					best_path = route
+		if not best_path.is_empty():
+			return best_path
+	return []
 
 
 func _move(agent: ScoutAgent, delta: float, exploring: bool) -> void:

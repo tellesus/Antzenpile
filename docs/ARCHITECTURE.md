@@ -75,6 +75,8 @@ Task 020 adds run-owned RainState and a fixed-tick RainSystem after trail traffi
 
 Task 021 adds run-scoped SaveService at `user://saves/slot_1.json`. It writes a versioned, checksummed full-precision RunState payload to a verified temporary sibling, then renames it over the slot. Loading validates the envelope and a fresh RunState before SimulationController swaps all run-scoped system references and clock connection. Unsupported earlier schemas reject; they were never released as disk saves. GameRoot routes both views' semantic Save/Load controls to the service, resets transient view selection/facing, rebinds debug inspection and restarts the audio pair from restored semantic development state. No view node or audio phase is serialized.
 
+Task 023 replaces the fixed scout mission deadline with continued frontier search. ScoutSystem uses authored terrain and the scout's own visited breadcrumbs to choose reachable grid cells; hidden resource positions are used only by proximity sensing, never by frontier choice. New-source confirmation starts breadcrumb return. The individual scout cap, ledger commitment, return-only knowledge delivery and version-5 snapshot shape remain unchanged.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

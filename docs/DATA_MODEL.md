@@ -58,6 +58,8 @@ Task 020 adds immutable `TrailSegmentState.exposure` in [0,1], averaged from 16 
 
 Task 021 persists the current version-5 authoritative RunState dictionary inside a disk envelope with format `antzenpile-run`, file version 1, full-precision JSON payload text and its SHA-256 checksum. The seed and 64-bit RNG state remain decimal strings inside the payload. SaveService writes a verified temporary sibling before replacing its one local slot; loading checks envelope/integrity, restores a fresh RunState and only then rebinds SimulationController to it. Unsupported schema versions and invalid references reject without changing the live run. Trail chemistry is re-quantized on restore to match its ten-decimal fixed-tick representation after JSON parsing. Old in-memory snapshot schemas have no automatic migration; no disk save existed before this card.
 
+Task 023 leaves the ScoutAgent and RunState snapshot schemas at version 5. `elapsed` now measures search time without ending a mission at 30 seconds. The path, target and return breadcrumbs already serialized by ScoutAgent support continued frontier search and exact reload. Private `Observation.proximity_confirmed` for a source absent from current KnowledgeBase starts return; seeing an already-known source alone does not. Exhausted reachable terrain starts an empty return and releases the ledger worker only at home.
+
 ## Invariants
 
 1. **Worker conservation:** total living workers = available + internal jobs + scouts + trails + other explicit commitments. Pools are disjoint, integral, and nonnegative. `workers_total` and `workers_available` on a pile are ledger-backed values, never independent counters.

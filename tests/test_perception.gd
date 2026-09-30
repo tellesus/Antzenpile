@@ -58,8 +58,11 @@ func run(test: Object) -> bool:
 	var root := Root.new()
 	root.simulation = SensoryFixture.new().fixture()
 	test.check(root.sensory_snapshot("home").is_empty() and root.sensory_snapshot("missing").is_empty(), "Fresh hidden world and invalid pile emit no signals")
-	root.simulation.advance(25.0)
-	test.check(not root.simulation.run.scouts.scout_1.observations.is_empty() and root.sensory_snapshot("home").is_empty(), "Private sensed evidence emits no signal")
+	for index: int in 80:
+		if root.simulation.run.scouts.has("scout_1") and not root.simulation.run.scouts.scout_1.observations.is_empty():
+			break
+		root.simulation.advance(0.25)
+	test.check(root.simulation.run.scouts.has("scout_1") and not root.simulation.run.scouts.scout_1.observations.is_empty() and root.sensory_snapshot("home").is_empty(), "Private sensed evidence emits no signal")
 	root.simulation.advance(60.0)
 	var projected: Array[Dictionary] = root.sensory_snapshot("home")
 	test.check(projected.size() == 1 and projected[0].category == "carbohydrate", "Returned evidence emits signal through the presentation boundary")

@@ -1,6 +1,6 @@
 # Task 022 slice evaluation
 
-This is an integration baseline, not a human playtest or final balance approval. It uses the authored backyard and seed 3030. The command-driven fixture follows normal simulation commands and never edits resources, worker counts or hidden world state.
+This is the task-022 integration baseline before later playtest changes, not a human playtest or final balance approval. It uses the authored backyard and seed 3030. The command-driven fixture follows normal simulation commands and never edits resources, worker counts or hidden world state.
 
 ## Arc and pacing
 
@@ -40,3 +40,5 @@ Inspected saved probe captures of rain OUTWARD at 1280×720, developed INWARD at
 ## Decision point
 
 Stop feature expansion here. Run a human Windows playthrough, ideally with more than one player, timing choices separately from simulated time. Ask whether the sensory search, trail decisions, rain recovery, chamber timing and music reward create the intended 20–30 minute arc. Use those observations to decide on pacing or scope changes before ecology, rivals or adaptation.
+
+The player's first hands-on feedback on 2026-09-30 identified that short scout missions could fail to locate water beyond their range and that rain did not replenish home water. The player chose new-source search until confirmation and a steady, modest rain-water gain. These are bounded follow-ups in cards 023 and 024; the timing table above remains the original task-022 baseline.

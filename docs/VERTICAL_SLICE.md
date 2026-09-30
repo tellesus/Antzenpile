@@ -46,6 +46,7 @@ Individual cards record implementation status. 001–006 contain executable inst
 | [020](tasks/020_rain.md) | Rain |
 | [021](tasks/021_save_load.md) | Save and load |
 | [022](tasks/022_vertical_slice_integration.md) | Integration and pacing; evaluate before expanding |
+| [023](tasks/023_persistent_scout_search.md) | Playtest follow-up: persistent scout search for new sources |
 
 ## Acceptance and evaluation
 
@@ -58,3 +59,5 @@ Individual cards record implementation status. 001–006 contain executable inst
 After 022, stop adding systems and evaluate actual play: scouting satisfaction, returned information, signal reinforcement, living trails, labor tension, useful decay/rain choices, panorama readability, INWARD usefulness, growth, and the music reward. Fix the core loop before beginning ecology, rivals, or adaptation.
 
 The task-022 command-driven and Windows graphical baseline, including measured pacing and unresolved design questions, is recorded in [SLICE_EVALUATION](SLICE_EVALUATION.md). It does not substitute for the planned human playtest.
+
+The player's first playtest led to bounded follow-up cards 023–024 for persistent scout search and rainfall water. These refine the core loop before any larger expansion.

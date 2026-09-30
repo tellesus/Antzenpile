@@ -1,5 +1,7 @@
 # 008 — Scout discovery and observations
 
+Historical implementation card: task [023](023_persistent_scout_search.md) supersedes the exploration deadline below while preserving private sensing and return-only delivery.
+
 Status: implemented 2026-09-29.
 
 ## Goal

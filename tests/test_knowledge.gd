@@ -66,8 +66,11 @@ func run(test: Object) -> bool:
 		test.check(not deliver(knowledge, malformed, 70.0) and knowledge.to_dict() == before, "Invalid uncertainty rejected atomically")
 	test.check(not deliver(knowledge, evidence("scout_4", 90.0), 70.0) and knowledge.to_dict() == before, "Future evidence rejected")
 	var fixture := SensoryFixture.new().fixture()
-	fixture.advance(25.0)
-	test.check(fixture.run.knowledge.nodes.is_empty() and not fixture.run.scouts.scout_1.observations.is_empty(), "Private sensing creates no colony knowledge")
+	for index: int in 80:
+		if fixture.run.scouts.has("scout_1") and not fixture.run.scouts.scout_1.observations.is_empty():
+			break
+		fixture.advance(0.25)
+	test.check(fixture.run.knowledge.nodes.is_empty() and fixture.run.scouts.has("scout_1") and not fixture.run.scouts.scout_1.observations.is_empty(), "Private sensing creates no colony knowledge")
 	fixture.advance(60.0)
 	test.check(fixture.run.delivered_observations.is_empty() and fixture.run.knowledge.nodes.size() == 1 and fixture.run.scouts.is_empty(), "Return automatically consumes evidence into one Known Node")
 	var saved: Dictionary = fixture.run.to_dict()

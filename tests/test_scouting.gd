@@ -76,7 +76,11 @@ func run(test: Object) -> bool:
 		test.check(original.run.to_dict() == restored.run.to_dict(), "Reloaded mission continuation matches")
 	var blocked := Controller.new(18)
 	blocked.dispatch_scout("home", 0)
-	blocked.advance(30.25)
+	for index: int in 400:
+		if blocked.run.scouts.has("scout_1") and blocked.run.scouts.scout_1.phase == "returning":
+			break
+		blocked.advance(0.25)
+	test.check(blocked.run.scouts.has("scout_1") and blocked.run.scouts.scout_1.phase == "returning", "Confirmed scout begins breadcrumb return before obstruction")
 	blocked.run.world.terrain.append({"id": "blocked", "bounds": [0.0, 0.0, 40.0, 40.0], "exposure": 0.0, "traversable": false, "movement_cost": 1.0})
 	blocked.advance(1.0)
 	test.check(blocked.run.scouts.scout_1.phase == "blocked_returning" and blocked.run.colony.piles.home.workers_available == 39, "Blocked return retains worker")
