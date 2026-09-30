@@ -52,7 +52,7 @@ Task 017 adds `PileState.food_exchange_state = primitive` as an initial semantic
 
 Task 018 extends the semantic Food Exchange state to `primitive`/`developing`/`developed` with simulated progress. Starting requires 12 carbohydrate, 4 protein, 4 water and 4 available workers; it pays once and reserves the workers in `food_exchange:<pile_id>` as an internal ledger commitment. During 60 fixed simulated seconds, no further food is charged. Completion releases/retire the commitment, marks Developed, and emits `chamber_online(pile_id)` once. Developed multiplies subsequent larval food costs by 0.75. No cancel command or refund exists in the slice. Snapshots validate state/progress/commitment consistency. Required run snapshot version is 4; older versions remain rejected pending task 021 migration.
 
-MusicState exposes semantic development level for the slice. Stability/crisis may be added later. Audio does not inspect arbitrary simulation internals.
+Task 019 implements MusicState as a detached, unsaved projection of one pile's Food Exchange state: `development_level` is 0 for Primitive/Developing and 1 for Developed. GameRoot creates AudioController only in graphical runs. Its two continuously playing loop players use this intent solely to set the secondary gain; no audio field enters RunState snapshots or simulation ticks. Stability/crisis may be added later.
 
 ## Invariants
 

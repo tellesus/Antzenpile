@@ -68,6 +68,8 @@ Task 017 adds INWARD as a second normal-play Node2D with four authored functiona
 
 Task 018 adds one FoodExchangeSystem command and fixed-tick transition. PileState owns semantic state/progress, while WorkerLedger owns construction labor and pile storage pays the one-time cost. `chamber_online` emits only on completion; BroodSystem checks the Developed state for a future-food-use multiplier. GameRoot exposes detached state/requirements and a semantic Start callback to the selected INWARD context. Audio is not yet present. Required run snapshots are version 4.
 
+Task 019 adds a graphical-only AudioController. GameRoot projects Food Exchange state to detached MusicState (`development_level` 0 or 1). Two equal-length, original placeholder loops start together and keep playing; development only fades the second player's mix in over three real seconds. Audio never advances simulation and is omitted in headless runs. Pause and simulation speed do not change musical tempo; audio phase is recreated, not saved, after run reload. Required gameplay snapshots remain version 4.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

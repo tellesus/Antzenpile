@@ -41,6 +41,8 @@ Task 017 uses four fixed normalized positions in the left functional field, with
 
 Task 018 extends selected Food Exchange context: Primitive shows exact start requirements and a touch-sized Develop action with a short rejection reason; Developing shows fixed simulated progress and committed labor; Developed names the 25% larval food-use benefit and stores. It remains one contextual action, not a general build menu. F3 can inspect exact state/progress and the authoritative labor commitment.
 
+Task 019 adds two restrained, phase-matched placeholder music loops without a new persistent UI panel. Developed Food Exchange brings in the second stem over three real seconds. Pausing or accelerating simulation does not alter the audio tempo; audio has no authority over game time. Headless runs remain silent.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

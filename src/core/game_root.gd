@@ -4,12 +4,14 @@ const Controller = preload("res://src/core/simulation_controller.gd")
 const Perception = preload("res://src/presentation/perception_model.gd")
 const Outward = preload("res://src/presentation/outward/outward_view.gd")
 const Inward = preload("res://src/presentation/inward/inward_view.gd")
+const Audio = preload("res://src/audio/audio_controller.gd")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
 var _debug_view: Node
 var _outward_view: Node2D
 var _inward_view: Node2D
+var _audio_controller: AudioController
 var mode: String = "outward"
 
 
@@ -39,6 +41,10 @@ func _ready() -> void:
 		inward.input_blocked = debug_is_open
 		add_child(inward)
 		_inward_view = inward
+		var audio: AudioController = Audio.new()
+		audio.state_provider = music_state.bind("home")
+		add_child(audio)
+		_audio_controller = audio
 		set_mode("outward")
 	# Lazy load keeps truth-view code out of the headless runtime and release input path.
 	if OS.is_debug_build() and DisplayServer.get_name() != "headless":
@@ -117,6 +123,12 @@ func inward_status(pile_id: String) -> Dictionary:
 		"active_scouts": simulation.run.scouts.size(), "trail_workers": trail_workers,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale}
+
+
+func music_state(pile_id: String) -> MusicState:
+	if not simulation.run.colony.piles.has(pile_id):
+		return MusicState.new()
+	return MusicState.from_food_exchange(simulation.run.colony.piles[pile_id].food_exchange_state)
 
 
 func start_food_exchange() -> Dictionary:
