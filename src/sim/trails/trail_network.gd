@@ -3,9 +3,13 @@ extends RefCounted
 
 const Route = preload("res://src/sim/trails/trail_route_state.gd")
 const Segment = preload("res://src/sim/trails/trail_segment_state.gd")
+const Cohort = preload("res://src/sim/trails/transit_cohort.gd")
+const CONFIG = preload("res://data/trails/default_trails.tres")
 var routes: Dictionary[String, TrailRouteState] = {}
 var segments: Dictionary[String, TrailSegmentState] = {}
+var cohorts: Dictionary[String, TransitCohort] = {}
 var next_route_id: int = 1
+var next_cohort_id: int = 1
 
 
 func find_route(origin_id: String, knowledge_id: String) -> TrailRouteState:
@@ -18,6 +22,7 @@ func find_route(origin_id: String, knowledge_id: String) -> TrailRouteState:
 func to_dict() -> Dictionary:
 	var route_records: Array[Dictionary] = []
 	var segment_records: Array[Dictionary] = []
+	var cohort_records: Array[Dictionary] = []
 	var ids: Array = routes.keys()
 	ids.sort()
 	for id: String in ids:
@@ -26,18 +31,24 @@ func to_dict() -> Dictionary:
 	ids.sort()
 	for id: String in ids:
 		segment_records.append(segments[id].to_dict())
-	return {"next_route_id": next_route_id, "routes": route_records, "segments": segment_records}
+	ids = cohorts.keys()
+	ids.sort()
+	for id: String in ids:
+		cohort_records.append(cohorts[id].to_dict())
+	return {"next_route_id": next_route_id, "next_cohort_id": next_cohort_id,
+		"routes": route_records, "segments": segment_records, "cohorts": cohort_records}
 
 
-func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bounds: Rect2) -> bool:
-	if not data.has_all(["next_route_id", "routes", "segments"]) or not WorkerLedger.valid_count(data.next_route_id) or data.next_route_id < 1 or not data.routes is Array or not data.segments is Array:
+func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState) -> bool:
+	if not data.has_all(["next_route_id", "next_cohort_id", "routes", "segments", "cohorts"]) or not WorkerLedger.valid_count(data.next_route_id) or data.next_route_id < 1 or not WorkerLedger.valid_count(data.next_cohort_id) or data.next_cohort_id < 1 or not data.routes is Array or not data.segments is Array or not data.cohorts is Array:
 		return false
 	var restored_routes: Dictionary[String, TrailRouteState] = {}
 	var restored_segments: Dictionary[String, TrailSegmentState] = {}
+	var restored_cohorts: Dictionary[String, TransitCohort] = {}
 	var pairs: Dictionary[String, bool] = {}
 	for record: Variant in data.routes:
 		var route := Route.new()
-		if not record is Dictionary or not route.restore(record, colony, knowledge, bounds) or restored_routes.has(route.id):
+		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id):
 			return false
 		var suffix: String = route.id.trim_prefix("route_")
 		if route.id != "route_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_route_id or route.segment_id != "segment_" + suffix:
@@ -49,13 +60,38 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 		restored_routes[route.id] = route
 	for record: Variant in data.segments:
 		var segment := Segment.new()
-		if not record is Dictionary or not segment.restore(record, bounds) or restored_segments.has(segment.id):
+		if not record is Dictionary or not segment.restore(record, world.bounds) or restored_segments.has(segment.id):
 			return false
 		restored_segments[segment.id] = segment
+	var active_counts: Dictionary[String, int] = {}
+	var cohort_counts: Dictionary[String, int] = {}
+	for record: Variant in data.cohorts:
+		var cohort := Cohort.new()
+		if not record is Dictionary or not cohort.restore(record) or restored_cohorts.has(cohort.id) or not restored_routes.has(cohort.route_id):
+			return false
+		var suffix: String = cohort.id.trim_prefix("cohort_")
+		if cohort.id != "cohort_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_cohort_id:
+			return false
+		var route: TrailRouteState = restored_routes[cohort.route_id]
+		if not restored_segments.has(route.segment_id) or cohort.worker_count > CONFIG.workers_per_cohort:
+			return false
+		var segment: TrailSegmentState = restored_segments[route.segment_id]
+		if cohort.remaining_ticks > CONFIG.leg_ticks(segment.start.distance_to(segment.end)):
+			return false
+		var source_id: String = knowledge.nodes[route.destination_knowledge_id].source_node_id
+		if not world.nodes.has(source_id):
+			return false
+		if cohort.payload > float(cohort.worker_count) * CONFIG.carry_per_worker or (not cohort.resource_id.is_empty() and cohort.resource_id != world.nodes[source_id].definition_id):
+			return false
+		active_counts[route.id] = active_counts.get(route.id, 0) + cohort.worker_count
+		cohort_counts[route.id] = cohort_counts.get(route.id, 0) + 1
+		restored_cohorts[cohort.id] = cohort
 	if restored_routes.size() != restored_segments.size():
 		return false
 	var used_segments: Dictionary[String, bool] = {}
 	for route: TrailRouteState in restored_routes.values():
+		if active_counts.get(route.id, 0) != route.active_workers or cohort_counts.get(route.id, 0) > CONFIG.max_cohorts_per_route:
+			return false
 		if not restored_segments.has(route.segment_id) or used_segments.has(route.segment_id):
 			return false
 		used_segments[route.segment_id] = true
@@ -64,7 +100,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 			return false
 		var commitment: String = "trail:" + route.id
 		var ledger: WorkerLedger = colony.piles[route.origin_pile].workers
-		if route.status == "active":
+		if route.status != "inactive":
 			var record: Dictionary = ledger.to_dict().commitments.get(commitment, {})
 			if record.get("kind") != "trail" or record.get("owner_id") != route.id or record.get("count") != route.allocated_workers:
 				return false
@@ -75,9 +111,11 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 			var entry: Dictionary = pile.workers.to_dict().commitments[id]
 			if entry.kind == "trail" or id.begins_with("trail:"):
 				var route_id: String = id.trim_prefix("trail:")
-				if id != "trail:" + route_id or not restored_routes.has(route_id) or restored_routes[route_id].origin_pile != pile.id or restored_routes[route_id].status != "active" or entry.kind != "trail" or entry.owner_id != route_id:
+				if id != "trail:" + route_id or not restored_routes.has(route_id) or restored_routes[route_id].origin_pile != pile.id or restored_routes[route_id].status == "inactive" or entry.kind != "trail" or entry.owner_id != route_id:
 					return false
 	routes = restored_routes
 	segments = restored_segments
+	cohorts = restored_cohorts
 	next_route_id = int(data.next_route_id)
+	next_cohort_id = int(data.next_cohort_id)
 	return true

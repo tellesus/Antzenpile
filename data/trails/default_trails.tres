@@ -5,3 +5,9 @@
 [resource]
 script = ExtResource("1")
 initial_workers = 5
+travel_speed = 1.0
+carry_per_worker = 1.0
+departure_interval_ticks = 8
+workers_per_cohort = 8
+max_cohorts_per_route = 8
+interaction_radius = 2.0

@@ -76,7 +76,7 @@ func run(test: Object) -> bool:
 	test.check(route.allocated_workers == 6 and ledger.count("trail:route_1") == 6, "OUTWARD adjustment uses semantic allocation command")
 	view._status = root.outward_status("home")
 	view._pointer_press(view._trail_button_rect("trail_cancel").get_center(), "touch")
-	test.check(route.status == "inactive" and ledger.count("trail:route_1") == -1, "OUTWARD cancellation returns labor")
+	test.check(route.status == "recalling" and route.desired_workers == 0 and ledger.count("trail:route_1") == route.active_workers, "OUTWARD cancellation waits for travelling labor")
 	view._status = root.outward_status("home")
 	view._pointer_press(view._trail_button_rect("trail_create").get_center(), "mouse")
 	test.check(route.status == "active" and route.allocated_workers == 5, "OUTWARD investment reopens preserved route")

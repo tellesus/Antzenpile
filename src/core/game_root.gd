@@ -52,7 +52,8 @@ func outward_status(pile_id: String) -> Dictionary:
 	return {"available_workers": simulation.run.colony.piles[pile_id].workers_available,
 		"active_scouts": simulation.run.scouts.size(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
-		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id)}
+		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
+		"resources": simulation.run.colony.piles[pile_id].resources.duplicate()}
 
 
 func trail_summaries(pile_id: String) -> Array[Dictionary]:
@@ -61,7 +62,8 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 		if route.origin_pile == pile_id:
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
 				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers,
-				"active_workers": route.active_workers, "status": route.status})
+				"active_workers": route.active_workers, "status": route.status,
+				"delivered_total": route.delivered_total})
 	summaries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.id < b.id)
 	return summaries
 

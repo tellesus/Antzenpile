@@ -112,7 +112,7 @@ func _run_command(command: String) -> void:
 				return
 			var route: Dictionary = _selected_route(signal_data)
 			var result: Dictionary = {}
-			if route.is_empty() or route.status == "inactive":
+			if route.is_empty() or route.status in ["inactive", "recalling"]:
 				if command != "trail_create" or not trail_create_command.is_valid():
 					return
 				result = trail_create_command.call(signal_data.source_knowledge_id)
@@ -158,7 +158,7 @@ func _button_at(at: Vector2) -> String:
 	if not _selected_signal().is_empty():
 		var route: Dictionary = _selected_route(_selected_signal())
 		var contextual: Array[String] = []
-		if route.is_empty() or route.status == "inactive":
+		if route.is_empty() or route.status in ["inactive", "recalling"]:
 			contextual.append("trail_create")
 		else:
 			contextual.append_array(["trail_less", "trail_more", "trail_cancel"])
@@ -225,7 +225,7 @@ func _draw_context(size: Vector2) -> void:
 	var selected: Dictionary = _selected_signal()
 	if selected.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 246))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 284))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), _signal_title(selected.category), _signal_color(selected.category), 20)
@@ -237,10 +237,17 @@ func _draw_context(size: Vector2) -> void:
 	var route: Dictionary = _selected_route(selected)
 	if route.is_empty() or route.status == "inactive":
 		_label(box.position + Vector2(16, 165), "Trail: no workers committed", Color("a8b8bd"), 13)
+		_label(box.position + Vector2(16, 187), "Home stores: %.1f" % _status.get("resources", {}).get(selected.category, 0.0), Color("8fa1a8"), 13)
 		_draw_trail_button("trail_create", "INVEST 5 WORKERS")
+	elif route.status == "recalling":
+		_label(box.position + Vector2(16, 165), "Recalling: %d workers away" % route.active_workers, Color("a8b8bd"), 13)
+		_label(box.position + Vector2(16, 187), "Delivered: %.1f  ·  Home: %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 13)
+		_draw_trail_button("trail_create", "REINVEST 5 WORKERS")
 	else:
-		_label(box.position + Vector2(16, 165), "Trail: %d desired / %d allocated" % [route.desired_workers, route.allocated_workers], Color("a8b8bd"), 13)
-		_label(box.position + Vector2(16, 183), "Workers in transit: %d" % route.active_workers, Color("8fa1a8"), 12)
+		_label(box.position + Vector2(16, 165), "Source unavailable (reported)" if route.status == "depleted" else "Trail active", Color("a8b8bd"), 14)
+		_label(box.position + Vector2(16, 185), "Wanted %d · Committed %d" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 14)
+		_label(box.position + Vector2(16, 205), "%d workers travelling" % route.active_workers, Color("8fa1a8"), 14)
+		_label(box.position + Vector2(16, 225), "Returned %.1f · Home %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 14)
 		_draw_trail_button("trail_less", "− 1")
 		_draw_trail_button("trail_more", "+ 1")
 		_draw_trail_button("trail_cancel", "CANCEL")
@@ -263,10 +270,10 @@ func _selected_route(signal_data: Dictionary) -> Dictionary:
 func _trail_button_rect(command: String) -> Rect2:
 	var x: float = get_viewport_rect().size.x - 300.0
 	match command:
-		"trail_create": return Rect2(x, 342, 260, 44)
-		"trail_less": return Rect2(x, 342, 64, 44)
-		"trail_more": return Rect2(x + 72, 342, 64, 44)
-		"trail_cancel": return Rect2(x + 144, 342, 116, 44)
+		"trail_create": return Rect2(x, 380, 260, 44)
+		"trail_less": return Rect2(x, 380, 64, 44)
+		"trail_more": return Rect2(x + 72, 380, 64, 44)
+		"trail_cancel": return Rect2(x + 144, 380, 116, 44)
 	return Rect2()
 
 

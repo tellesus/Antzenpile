@@ -120,7 +120,7 @@ func restore(data: Dictionary) -> bool:
 	if not restored_knowledge.restore(data.knowledge, archived, restored_clock.simulation_time):
 		return false
 	var restored_trails := Trails.new()
-	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world.bounds):
+	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world):
 		return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false

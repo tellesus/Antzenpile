@@ -37,6 +37,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A07 | Foundation test APIs/paths and fixture node coordinates in 001–006 are proposed implementation contracts. Equivalent local organization is acceptable if boundaries and acceptance checks remain explicit. |
 | A08 | Task 007 prototype defaults: cap 4 scouts, speed 1 m/s divided by terrain cost, 30 simulated seconds exploring plus actual return travel, 8–12 m targets, directional cone ±45°, cardinal 1 m grid. Authored in `data/scouting/default_scouts.tres`. Blocked travel retains the committed worker and retries; mortality/rescue gameplay remains deferred. These are provisional implementation values, not locked balance. |
 | A09 | Task 012 route investment starts at five workers from `data/trails/default_trails.tres`. Allocation changes request an exact target; shortages reject atomically with no partial allocation or priority system. Reducing/cancelling releases workers immediately while no transit exists. Cancelling retains route and segment IDs; re-investment reuses them. Task 013 must define recall for actual in-flight travelers. |
+| A10 | Task 013 prototype travel uses the captured straight estimated segment at 1 m/s, a 2 m source interaction radius, one unit carried per worker, 2-second departure buckets, at most eight workers per cohort and eight cohorts per route. Each leg rounds up to fixed 0.25-second ticks. Idle labor releases on reduction; in-flight labor returns before release. An empty return stops new departures until full cancellation/reinvestment. Home starts with authored stores of 10 carbohydrate, 5 protein and 10 water. These are tunable slice defaults, not final balance or a biological model. |
 
 ## Details to resolve in their task
 
@@ -48,7 +49,7 @@ Task 010 perception defaults: authored resource classification maps to carbohydr
 
 Task 011 OUTWARD defaults: 180-degree horizontal field, positive clockwise bearing from east, 8 logical-pixel tap/drag split, at least 44 logical-pixel signal hit radius, 64 logical-pixel-high action buttons, and distance affecting a non-geographic vertical display band. The home anchor stays fixed. These are provisional presentation settings; player UI never reads hidden world state. The first INWARD control waits for its real view in task 017.
 
-Trail balance and cohort bucket duration, brood/resource rates, the precise Food Exchange benefit and costs, rain timing/intensity, save migration policy, and measured rendering budgets. Roadmap cards must resolve their own required details before coding. Do not implement later ecology, adaptation, rivals, or replay just because their names appear in the design.
+Later trail balance, brood/resource consumption rates, the precise Food Exchange benefit and costs, rain timing/intensity, save migration policy, and measured rendering budgets. Roadmap cards must resolve their own required details before coding. Do not implement later ecology, adaptation, rivals, or replay just because their names appear in the design.
 
 ## Change log
 

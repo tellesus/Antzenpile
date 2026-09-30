@@ -118,6 +118,7 @@ func _draw() -> void:
 			lines.append("Queens: %s" % detail.queen_count)
 			lines.append("Workers total: %s" % detail.workers.total)
 			lines.append("Available: %s" % detail.workers.available)
+			lines.append("Stores: carb %.1f / protein %.1f / water %.1f" % [detail.resources.carbohydrate, detail.resources.protein, detail.resources.water])
 			lines.append("Archived reports: %d" % data.knowledge.observations.size())
 			lines.append("Commitments: " + ("none" if detail.workers.commitments.is_empty() else ""))
 			for id: String in detail.workers.commitments:
@@ -128,7 +129,11 @@ func _draw() -> void:
 			for route: Dictionary in data.trails.routes:
 				if route.origin_pile == detail.id:
 					lines.append("%s -> %s [%s]" % [route.id, route.destination_knowledge_id, route.status])
-					lines.append("%s: desired %d / allocated %d / active %d" % [route.segment_id, route.desired_workers, route.allocated_workers, route.active_workers])
+					lines.append("%s: desired %d / allocated %d / away %d" % [route.segment_id, route.desired_workers, route.allocated_workers, route.active_workers])
+					lines.append("Delivered %.1f / source reported unavailable: %s" % [route.delivered_total, route.reported_depleted])
+					for cohort: Dictionary in data.trails.cohorts:
+						if cohort.route_id == route.id:
+							lines.append("%s: %s %d workers / %.1f cargo / %d ticks" % [cohort.id, cohort.direction, cohort.worker_count, cohort.payload, cohort.remaining_ticks])
 		elif detail.has("phase"):
 			lines.append("Phase: " + detail.phase)
 			lines.append("Origin: " + detail.origin_pile)

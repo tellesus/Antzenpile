@@ -46,3 +46,4 @@ func _tick(delta: float) -> void:
 	if not run.delivered_observations.is_empty():
 		if not run.knowledge.consume(run.delivered_observations, run.simulation_time):
 			push_error("Knowledge delivery rejected: " + run.knowledge.last_error)
+	trails.tick(delta)
