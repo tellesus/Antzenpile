@@ -5,6 +5,7 @@ const Perception = preload("res://src/presentation/perception_model.gd")
 const Outward = preload("res://src/presentation/outward/outward_view.gd")
 const Inward = preload("res://src/presentation/inward/inward_view.gd")
 const Audio = preload("res://src/audio/audio_controller.gd")
+const Save = preload("res://src/core/save_service.gd")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
@@ -12,6 +13,7 @@ var _debug_view: Node
 var _outward_view: Node2D
 var _inward_view: Node2D
 var _audio_controller: AudioController
+var save_service: SaveService = Save.new()
 var mode: String = "outward"
 
 
@@ -30,6 +32,8 @@ func _ready() -> void:
 		outward.trail_set_command = set_trail_target
 		outward.input_blocked = debug_is_open
 		outward.mode_command = set_mode.bind("inward")
+		outward.save_command = quick_save
+		outward.load_command = quick_load
 		add_child(outward)
 		_outward_view = outward
 		var inward: Node2D = Inward.new()
@@ -39,6 +43,8 @@ func _ready() -> void:
 		inward.speed_command = simulation.set_time_scale
 		inward.develop_command = start_food_exchange
 		inward.input_blocked = debug_is_open
+		inward.save_command = quick_save
+		inward.load_command = quick_load
 		add_child(inward)
 		_inward_view = inward
 		var audio: AudioController = Audio.new()
@@ -60,6 +66,14 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not debug_is_open() and event.is_action_pressed("save_run"):
+		_show_save_feedback(quick_save(), "Run saved")
+		get_viewport().set_input_as_handled()
+		return
+	if not debug_is_open() and event.is_action_pressed("load_run"):
+		_show_save_feedback(quick_load(), "Run loaded")
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("toggle_inward") and not debug_is_open():
 		set_mode("inward" if mode == "outward" else "outward")
 		get_viewport().set_input_as_handled()
@@ -130,6 +144,32 @@ func music_state(pile_id: String) -> MusicState:
 	if not simulation.run.colony.piles.has(pile_id):
 		return MusicState.new()
 	return MusicState.from_food_exchange(simulation.run.colony.piles[pile_id].food_exchange_state)
+
+
+func quick_save() -> Dictionary:
+	var accepted: bool = save_service.save(simulation.run)
+	return {"accepted": accepted, "reason": save_service.last_error}
+
+
+func quick_load() -> Dictionary:
+	var accepted: bool = save_service.load_into(simulation)
+	if accepted:
+		if _outward_view != null:
+			_outward_view.facing = 0.0
+			_outward_view.selected_id = ""
+		if _inward_view != null:
+			_inward_view.selected_id = ""
+		if _debug_view != null:
+			_debug_view.snapshot_provider = simulation.run.to_dict
+		if _audio_controller != null:
+			_audio_controller.restart_after_load()
+	return {"accepted": accepted, "reason": save_service.last_error}
+
+
+func _show_save_feedback(result: Dictionary, success: String) -> void:
+	var view: Node2D = _outward_view if mode == "outward" else _inward_view
+	if view != null:
+		view.call("show_feedback", success if result.accepted else result.reason)
 
 
 func start_food_exchange() -> Dictionary:

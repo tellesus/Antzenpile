@@ -45,6 +45,8 @@ Task 019 adds two restrained, phase-matched placeholder music loops without a ne
 
 Task 020 shows rain in OUTWARD as a brief semantic status label, sparse thin screen-space streaks, and reduced signal opacity while the event is active. It does not reveal exposed terrain or a physical route map. Actual detached chemical strength and familiarity continue to drive existing scent/ghost visuals; F3 shows exact rain phase, elapsed time and segment exposure for diagnosis.
 
+Task 021 places touch-sized Save and Load buttons at the upper right of both normal views, with Ctrl+S/Ctrl+L named actions sharing the same semantic GameRoot path. A short success or error message appears in the existing view footer. Loading clears transient facing/selection and restarts music from the restored development level; it does not reveal hidden state or add a persistent overview panel.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

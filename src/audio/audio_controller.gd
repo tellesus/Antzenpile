@@ -16,6 +16,14 @@ var growth_player: AudioStreamPlayer
 func _ready() -> void:
 	base_player = _make_player(BASE_LOOP, MIX_DB)
 	growth_player = _make_player(GROWTH_LOOP, -80.0)
+	restart_after_load()
+
+
+func restart_after_load() -> void:
+	if base_player == null or growth_player == null:
+		return
+	base_player.stop()
+	growth_player.stop()
 	var state: MusicState = _current_state()
 	stem_gain = float(state.development_level)
 	_update_growth_volume()

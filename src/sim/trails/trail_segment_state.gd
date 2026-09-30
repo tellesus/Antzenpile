@@ -58,8 +58,9 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 	route_id = data.route_id
 	start = origin
 	end = destination
-	pheromone_strength = float(data.pheromone_strength)
-	route_familiarity = float(data.route_familiarity)
+	# Match the tick quantization after JSON's decimal-to-binary conversion.
+	pheromone_strength = snappedf(float(data.pheromone_strength), 0.0000000001)
+	route_familiarity = snappedf(float(data.route_familiarity), 0.0000000001)
 	traffic = int(data.traffic)
 	exposure = float(data.exposure)
 	return true

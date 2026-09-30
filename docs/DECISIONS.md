@@ -45,6 +45,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A15 | Task 018 Food Exchange requires 12 carbohydrate/4 protein/4 water and four available workers. Payment is upfront and nonrefundable; workers remain ledger-committed for 60 simulated seconds, with no cancel command. Completion releases labor, emits `chamber_online` once and reduces subsequent larval food costs by 25%. Five-decimal resource debits support exact continuation at this multiplier. Required snapshot version is 4. These are prototype economy/feel defaults. |
 | A16 | Task 019 uses two original eight-second, 22,050-Hz mono placeholder loops generated from `tools/generate_placeholder_music.py`. Both start in one audio frame, loop continuously, and the secondary fades in over three real seconds upon Developed state. Pause and simulation speed leave audio tempo unchanged. Reload starts loops at phase zero with the current semantic mix; audio phase is not gameplay state. These are prototype presentation defaults. |
 | A17 | Task 020 averages 16 midpoint terrain exposure samples per estimated TrailSegment; an exposed (≥0.75) and sheltered (≤0.25) route each need five successful returning workers before one 60 simulated-second rain event starts. Rain adds a 12-second exposed-chemistry half-life scaled by exposure; familiarity retains its baseline decay. The event is one-shot, independent of wall time and RNG. OUTWARD receives only semantic rain status. Required snapshot version is 5. These are provisional slice event/feel defaults. |
+| A18 | Task 021 uses one local `user://saves/slot_1.json` slot: disk envelope version 1 around required RunState snapshot version 5, full-precision payload, SHA-256 integrity check, verified temporary write then rename. Earlier snapshot schemas reject because no prior disk saves were released; migration is deferred until a real compatibility requirement exists. Load validates a fresh run before replacing controller systems. Ctrl+S/Ctrl+L and touch-sized buttons share semantic controls; view selection/facing and audio phase reset on load. |
 
 ## Details to resolve in their task
 
@@ -56,7 +57,7 @@ Task 010 perception defaults: authored resource classification maps to carbohydr
 
 Task 011 OUTWARD defaults: 180-degree horizontal field, positive clockwise bearing from east, 8 logical-pixel tap/drag split, at least 44 logical-pixel signal hit radius, 64 logical-pixel-high action buttons, and distance affecting a non-geographic vertical display band. The home anchor stays fixed. These are provisional presentation settings; player UI never reads hidden world state. The first INWARD control waits for its real view in task 017.
 
-Later trail balance, brood/resource consumption rates, save migration policy, and measured rendering budgets. Roadmap cards must resolve their own required details before coding. Do not implement later ecology, adaptation, rivals, or replay just because their names appear in the design.
+Later trail balance, brood/resource consumption rates, compatibility policy once public disk saves exist, and measured rendering budgets. Roadmap cards must resolve their own required details before coding. Do not implement later ecology, adaptation, rivals, or replay just because their names appear in the design.
 
 ## Change log
 

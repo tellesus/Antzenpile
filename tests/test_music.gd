@@ -35,6 +35,12 @@ func run(test: Object) -> bool:
 	controller._process(1.5)
 	controller._process(5.0)
 	test.check(is_equal_approx(controller.stem_gain, 1.0) and controller.get_child_count() == 2, "Repeated Developed updates clamp gain without duplicate players")
+	pile.food_exchange_state = "primitive"
+	controller.restart_after_load()
+	test.check(is_zero_approx(controller.stem_gain) and controller.get_child_count() == 2, "Reloaded primitive run resets the pair to the base-only mix")
+	pile.food_exchange_state = "developed"
+	controller.restart_after_load()
+	test.check(is_equal_approx(controller.stem_gain, 1.0) and controller.get_child_count() == 2, "Reloaded developed run resets phase and semantic mix without new players")
 	controller.free()
 	root.free()
 	return true

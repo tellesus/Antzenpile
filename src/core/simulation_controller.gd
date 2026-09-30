@@ -17,7 +17,21 @@ var rain: RainSystem
 
 
 func _init(seed_value: int = 482817) -> void:
-	run = Run.new(seed_value)
+	_attach_run(Run.new(seed_value))
+
+
+func restore_snapshot(snapshot: Dictionary) -> bool:
+	var candidate: RunState = Run.new()
+	if not candidate.restore(snapshot):
+		return false
+	_attach_run(candidate)
+	return true
+
+
+func _attach_run(next_run: RunState) -> void:
+	if run != null and run.clock.tick.is_connected(_tick):
+		run.clock.tick.disconnect(_tick)
+	run = next_run
 	scouting = Scouts.new(run)
 	trails = Trails.new(run)
 	brood = Brood.new(run)

@@ -9,11 +9,18 @@ var pause_command: Callable
 var speed_command: Callable
 var develop_command: Callable
 var input_blocked: Callable
+var save_command: Callable
+var load_command: Callable
 var selected_id: String = ""
 var _status: Dictionary = {}
 var _font: Font = ThemeDB.fallback_font
 var _feedback: String = ""
 var _feedback_until: int = 0
+
+
+func show_feedback(message: String) -> void:
+	_feedback = message
+	_feedback_until = Time.get_ticks_msec() + 3000
 
 
 func _process(_delta: float) -> void:
@@ -40,7 +47,7 @@ func activate_at(at: Vector2) -> bool:
 	if selected_id == "food_exchange" and _status.get("food_exchange_state", "") == "primitive" and _develop_rect().has_point(at):
 		_run_command("develop")
 		return true
-	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64"]:
+	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "save", "load"]:
 		if _button_rect(command).has_point(at):
 			_run_command(command)
 			return true
@@ -64,6 +71,12 @@ func _run_command(command: String) -> void:
 			if develop_command.is_valid():
 				var result: Dictionary = develop_command.call()
 				_feedback = "Development started" if result.get("accepted", false) else result.get("reason", "Requirements unmet")
+				_feedback_until = Time.get_ticks_msec() + 3000
+		"save", "load":
+			var action: Callable = save_command if command == "save" else load_command
+			if action.is_valid():
+				var result: Dictionary = action.call()
+				_feedback = ("Run saved" if command == "save" else "Run loaded") if result.get("accepted", false) else result.get("reason", "Save unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
 		_:
 			if command.begins_with("speed_") and speed_command.is_valid():
@@ -96,6 +109,8 @@ func _button_rect(command: String) -> Rect2:
 		"speed_4": return Rect2(378, y, 62, 64)
 		"speed_16": return Rect2(448, y, 62, 64)
 		"speed_64": return Rect2(518, y, 62, 64)
+		"save": return Rect2(get_viewport_rect().size.x - 220, 78, 100, 64)
+		"load": return Rect2(get_viewport_rect().size.x - 112, 78, 100, 64)
 	return Rect2()
 
 
@@ -189,12 +204,12 @@ func _detail_line(box: Rect2, y: float, value: String) -> void:
 
 
 func _draw_controls(size: Vector2) -> void:
-	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64"]:
+	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "save", "load"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale
 		draw_rect(box, Color("31505a") if active else Color("18252b"))
-		var title: String = "OUTWARD" if command == "outward" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
-		_label(box.position + Vector2(box.size.x * 0.5, 40), title, Color("d3dcd4"), 16, HORIZONTAL_ALIGNMENT_CENTER)
+		var title: String = "OUTWARD" if command == "outward" else "SAVE" if command == "save" else "LOAD" if command == "load" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
+		_label(box.position + Vector2(box.size.x * 0.5, 40), title, Color("d3dcd4"), 14 if command in ["save", "load"] else 16, HORIZONTAL_ALIGNMENT_CENTER)
 	var footer: String = _feedback if Time.get_ticks_msec() < _feedback_until else "Tab: switch view  ·  Space: pause  ·  1–4: time"
 	_label(Vector2(24, size.y - 17), footer, Color("a9bcad") if footer == _feedback else Color("7e8e94"), 13)
 

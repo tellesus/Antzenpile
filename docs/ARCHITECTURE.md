@@ -31,6 +31,7 @@ This expresses information flow, not a license for views to traverse upstream re
 | PresentationController / PerceptionModel | Knowledge-derived sensory signals and approved colony summaries |
 | OutwardView / InwardView / HUD | Rendering, selection, input intent |
 | AudioController | Semantic MusicState, initially development level only |
+| SaveService | Versioned one-slot disk envelope, integrity check and atomic replacement |
 | DebugTools | Explicit development-only access to truth and intermediate representations |
 
 These are responsibilities, not a requirement to create every class during bootstrap. Add owners as their task needs them. Use direct ownership and injected references; no simulation-manager autoload collection. AppSettings or SaveService may justify a later autoload.
@@ -71,6 +72,8 @@ Task 018 adds one FoodExchangeSystem command and fixed-tick transition. PileStat
 Task 019 adds a graphical-only AudioController. GameRoot projects Food Exchange state to detached MusicState (`development_level` 0 or 1). Two equal-length, original placeholder loops start together and keep playing; development only fades the second player's mix in over three real seconds. Audio never advances simulation and is omitted in headless runs. Pause and simulation speed do not change musical tempo; audio phase is recreated, not saved, after run reload. Required gameplay snapshots remain version 4.
 
 Task 020 adds run-owned RainState and a fixed-tick RainSystem after trail traffic. TrailSegmentState captures exposure from authored terrain along its estimated segment when invested; restore verifies it against world terrain. After an exposed and a sheltered route have both carried resources, one 60-second event accelerates exposed pheromone decay without modifying familiarity. OUTWARD receives only the detached rain phase for restrained sensory interference; F3 receives exact event and exposure state. Required run snapshots are version 5. Chemistry is rounded to ten decimal places per tick to preserve exact JSON continuation through the compounded rain decay.
+
+Task 021 adds run-scoped SaveService at `user://saves/slot_1.json`. It writes a versioned, checksummed full-precision RunState payload to a verified temporary sibling, then renames it over the slot. Loading validates the envelope and a fresh RunState before SimulationController swaps all run-scoped system references and clock connection. Unsupported earlier schemas reject; they were never released as disk saves. GameRoot routes both views' semantic Save/Load controls to the service, resets transient view selection/facing, rebinds debug inspection and restarts the audio pair from restored semantic development state. No view node or audio phase is serialized.
 
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
