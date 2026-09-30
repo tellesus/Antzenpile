@@ -119,6 +119,9 @@ func _draw() -> void:
 			lines.append("Workers total: %s" % detail.workers.total)
 			lines.append("Available: %s" % detail.workers.available)
 			lines.append("Stores: carb %.1f / protein %.1f / water %.1f" % [detail.resources.carbohydrate, detail.resources.protein, detail.resources.water])
+			lines.append("Brood matured total: %d" % detail.brood_matured_total)
+			for cohort: Dictionary in detail.brood_cohorts:
+				lines.append("%s: %d %s / %.1fs / nutrition %.1f / care %.1f" % [cohort.id, cohort.count, cohort.stage, cohort.progress_seconds, cohort.nutrition, cohort.care])
 			lines.append("Archived reports: %d" % data.knowledge.observations.size())
 			lines.append("Commitments: " + ("none" if detail.workers.commitments.is_empty() else ""))
 			for id: String in detail.workers.commitments:

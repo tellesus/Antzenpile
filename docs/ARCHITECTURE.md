@@ -62,6 +62,8 @@ Task 014 makes segment pheromone authoritative simulation state. Loaded cohort h
 
 Task 015 activates separate segment familiarity. Loaded returns teach it more slowly than chemistry, and its much longer half-life leaves a route memory after chemical washout. TrailSystem derives reliability equally from both values; this modestly broadens source interaction tolerance at the captured estimate without changing transit legs. OUTWARD receives detached familiarity for a sparse, faint memory ghost and has no route geometry.
 
+Task 016 adds aggregate BroodCohort state to each pile and a fixed-tick BroodSystem after trail deliveries. One starting cohort develops through egg, larva and pupa stages; available-worker care capacity and atomic food debits gate progress. Maturation removes immature brood and calls WorkerLedger once to add living available workers. Pile snapshots now include brood and emergence total; the run snapshot version is 2. F3 may inspect stage and stores. Player-facing INWARD waits for task 017.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

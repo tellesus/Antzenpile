@@ -1,0 +1,46 @@
+extends RefCounted
+## Aggregate brood progression on the run's fixed simulation clock.
+
+const CONFIG = preload("res://data/resources/default_brood.tres")
+var _run: RunState
+
+
+func _init(run_state: RunState) -> void:
+	_run = run_state
+
+
+func tick(delta: float) -> void:
+	var ids: Array = _run.colony.piles.keys()
+	ids.sort()
+	for id: String in ids:
+		var pile: PileState = _run.colony.piles[id]
+		for cohort: BroodCohort in pile.brood_cohorts:
+			_advance(pile, cohort, delta)
+
+
+func _advance(pile: PileState, cohort: BroodCohort, delta: float) -> void:
+	cohort.care = minf(1.0, float(pile.workers_available) / CONFIG.available_carers_required)
+	if cohort.care < 1.0:
+		cohort.nutrition = 0.0 if cohort.stage == "larva" else 1.0
+		return
+	if cohort.stage == "larva":
+		var costs: Dictionary = {"carbohydrate": cohort.count * CONFIG.carbohydrate_per_larva_second * delta,
+			"protein": cohort.count * CONFIG.protein_per_larva_second * delta,
+			"water": cohort.count * CONFIG.water_per_larva_second * delta}
+		if not pile.consume_resources(costs):
+			cohort.nutrition = 0.0
+			return
+	cohort.nutrition = 1.0
+	cohort.progress_seconds += delta
+	if cohort.progress_seconds < CONFIG.stage_seconds(cohort.stage):
+		return
+	cohort.progress_seconds = 0.0
+	match cohort.stage:
+		"egg": cohort.stage = "larva"
+		"larva": cohort.stage = "pupa"
+		"pupa":
+			if pile.workers.add_living_workers("available", cohort.count, "Brood emerged at " + pile.id):
+				pile.brood_matured_total += cohort.count
+				pile.brood_cohorts.erase(cohort)
+			else:
+				cohort.progress_seconds = CONFIG.pupa_seconds - delta

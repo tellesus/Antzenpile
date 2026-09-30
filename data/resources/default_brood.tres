@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BroodConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/colony/brood_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+starting_count = 8
+egg_seconds = 180.0
+larva_seconds = 120.0
+pupa_seconds = 60.0
+available_carers_required = 2
+carbohydrate_per_larva_second = 0.015
+protein_per_larva_second = 0.0045
+water_per_larva_second = 0.0075

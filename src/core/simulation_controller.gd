@@ -5,15 +5,18 @@ extends RefCounted
 const Run = preload("res://src/core/run_state.gd")
 const Scouts = preload("res://src/sim/scouting/scout_system.gd")
 const Trails = preload("res://src/sim/trails/trail_system.gd")
+const Brood = preload("res://src/sim/colony/brood_system.gd")
 var run: RunState
 var scouting: RefCounted
 var trails: RefCounted
+var brood: RefCounted
 
 
 func _init(seed_value: int = 482817) -> void:
 	run = Run.new(seed_value)
 	scouting = Scouts.new(run)
 	trails = Trails.new(run)
+	brood = Brood.new(run)
 	run.clock.tick.connect(_tick)
 
 
@@ -47,3 +50,4 @@ func _tick(delta: float) -> void:
 		if not run.knowledge.consume(run.delivered_observations, run.simulation_time):
 			push_error("Knowledge delivery rejected: " + run.knowledge.last_error)
 	trails.tick(delta)
+	brood.tick(delta)
