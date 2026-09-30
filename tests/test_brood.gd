@@ -42,7 +42,7 @@ func run(test: Object) -> bool:
 	var saved: Dictionary = continued.run.to_dict()
 	var restored := Controller.new()
 	var restored_ok: bool = restored.run.restore(JSON.parse_string(JSON.stringify(saved, "", true, true)))
-	test.check(saved.version == 2 and restored_ok and restored.run.to_dict() == saved, "Version-2 mid-larva JSON round trip preserves food and progress")
+	test.check(saved.version == 3 and restored_ok and restored.run.to_dict() == saved, "Current mid-larva JSON round trip preserves food and progress")
 	for index: int in 120:
 		continued.advance(0.25)
 		restored.advance(0.25)

@@ -3,9 +3,13 @@ extends Node
 const Controller = preload("res://src/core/simulation_controller.gd")
 const Perception = preload("res://src/presentation/perception_model.gd")
 const Outward = preload("res://src/presentation/outward/outward_view.gd")
+const Inward = preload("res://src/presentation/inward/inward_view.gd")
 var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
 var _debug_view: Node
+var _outward_view: Node2D
+var _inward_view: Node2D
+var mode: String = "outward"
 
 
 func _ready() -> void:
@@ -22,7 +26,18 @@ func _ready() -> void:
 		outward.trail_create_command = create_trail_for
 		outward.trail_set_command = set_trail_target
 		outward.input_blocked = debug_is_open
+		outward.mode_command = set_mode.bind("inward")
 		add_child(outward)
+		_outward_view = outward
+		var inward: Node2D = Inward.new()
+		inward.status_provider = inward_status.bind("home")
+		inward.mode_command = set_mode.bind("outward")
+		inward.pause_command = simulation.toggle_pause
+		inward.speed_command = simulation.set_time_scale
+		inward.input_blocked = debug_is_open
+		add_child(inward)
+		_inward_view = inward
+		set_mode("outward")
 	# Lazy load keeps truth-view code out of the headless runtime and release input path.
 	if OS.is_debug_build() and DisplayServer.get_name() != "headless":
 		_debug_view = load("res://src/debug/debug_world_view.gd").new()
@@ -34,6 +49,27 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	simulation.advance(delta)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("toggle_inward") and not debug_is_open():
+		set_mode("inward" if mode == "outward" else "outward")
+		get_viewport().set_input_as_handled()
+
+
+func set_mode(next_mode: String) -> bool:
+	if not next_mode in ["outward", "inward"]:
+		return false
+	mode = next_mode
+	if _outward_view != null:
+		_outward_view.visible = mode == "outward"
+		_outward_view.set_process(mode == "outward")
+		_outward_view.set_process_unhandled_input(mode == "outward")
+	if _inward_view != null:
+		_inward_view.visible = mode == "inward"
+		_inward_view.set_process(mode == "inward")
+		_inward_view.set_process_unhandled_input(mode == "inward")
+	return true
 
 
 func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
@@ -54,6 +90,26 @@ func outward_status(pile_id: String) -> Dictionary:
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate()}
+
+
+func inward_status(pile_id: String) -> Dictionary:
+	if not simulation.run.colony.piles.has(pile_id):
+		return {}
+	var pile: PileState = simulation.run.colony.piles[pile_id]
+	var brood: Array[Dictionary] = []
+	for cohort: BroodCohort in pile.brood_cohorts:
+		brood.append(cohort.to_dict())
+	var trail_workers: int = 0
+	for route: TrailRouteState in simulation.run.trails.routes.values():
+		if route.origin_pile == pile_id:
+			trail_workers += route.allocated_workers
+	return {"pile_id": pile_id, "queens": pile.queen_count,
+		"workers_total": pile.workers_total, "workers_available": pile.workers_available,
+		"brood": brood, "brood_matured_total": pile.brood_matured_total,
+		"resources": pile.resources.duplicate(), "food_exchange_state": pile.food_exchange_state,
+		"active_scouts": simulation.run.scouts.size(), "trail_workers": trail_workers,
+		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
+		"time_scale": simulation.run.clock.time_scale}
 
 
 func trail_summaries(pile_id: String) -> Array[Dictionary]:

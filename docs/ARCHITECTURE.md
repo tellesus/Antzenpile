@@ -64,6 +64,8 @@ Task 015 activates separate segment familiarity. Loaded returns teach it more sl
 
 Task 016 adds aggregate BroodCohort state to each pile and a fixed-tick BroodSystem after trail deliveries. One starting cohort develops through egg, larva and pupa stages; available-worker care capacity and atomic food debits gate progress. Maturation removes immature brood and calls WorkerLedger once to add living available workers. Pile snapshots now include brood and emergence total; the run snapshot version is 2. F3 may inspect stage and stores. Player-facing INWARD waits for task 017.
 
+Task 017 adds INWARD as a second normal-play Node2D with four authored functional nodes. GameRoot is the mode owner; it creates both views on graphical runs, activates only one at a time, switches visibility/input processing, and leaves the run untouched. InwardView receives a detached pile/clock summary with no WorldState, scout objects or route geometry. It keeps its own selected node while OUTWARD retains facing and trace selection. PileState now records the Primitive Food Exchange state, without development logic; required run snapshots are version 3.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

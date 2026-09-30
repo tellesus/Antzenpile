@@ -12,6 +12,7 @@ var speed_command: Callable
 var trail_create_command: Callable
 var trail_set_command: Callable
 var input_blocked: Callable
+var mode_command: Callable
 var facing: float = 0.0
 var selected_id: String = ""
 
@@ -36,6 +37,8 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not visible:
+		return
 	if input_blocked.is_valid() and input_blocked.call():
 		_pointer_kind = ""
 		return
@@ -131,6 +134,9 @@ func _run_command(command: String) -> void:
 		"pause":
 			if pause_command.is_valid():
 				pause_command.call()
+		"inward":
+			if mode_command.is_valid():
+				mode_command.call()
 		_:
 			if command.begins_with("speed_") and speed_command.is_valid():
 				speed_command.call(int(command.trim_prefix("speed_")))
@@ -152,6 +158,7 @@ func _button_rect(command: String) -> Rect2:
 		"speed_4": return Rect2(378, y, 62, 64)
 		"speed_16": return Rect2(448, y, 62, 64)
 		"speed_64": return Rect2(518, y, 62, 64)
+		"inward": return Rect2(get_viewport_rect().size.x - 172, y, 148, 64)
 	return Rect2()
 
 
@@ -166,7 +173,7 @@ func _button_at(at: Vector2) -> String:
 		for command: String in contextual:
 			if _trail_button_rect(command).has_point(at):
 				return command
-	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64"]:
+	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward"]:
 		if _button_rect(command).has_point(at):
 			return command
 	return ""
@@ -305,7 +312,7 @@ func _draw_trail_button(command: String, title: String) -> void:
 
 
 func _draw_controls(size: Vector2) -> void:
-	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64"]:
+	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale
 		var unavailable: bool = command == "scout" and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)
@@ -315,7 +322,7 @@ func _draw_controls(size: Vector2) -> void:
 		if unavailable:
 			color = Color("202326")
 		draw_rect(box, color)
-		var title: String = "SEND SCOUT" if command == "scout" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
+		var title: String = "SEND SCOUT" if command == "scout" else "INWARD" if command == "inward" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
 		_label(box.position + Vector2(box.size.x * 0.5, 40), title, Color("d3dcd4") if not unavailable else Color("78817e"), 16, HORIZONTAL_ALIGNMENT_CENTER)
 	if not _feedback.is_empty() and Time.get_ticks_msec() < _feedback_until:
 		_label(Vector2(24, size.y - 17), _feedback, Color("b6c8b2"), 13)

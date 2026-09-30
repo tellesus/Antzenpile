@@ -37,6 +37,8 @@ Attention order: selected/critical signal → active major trails → destinatio
 
 Show **Queen, Nursery, Food Exchange, Entrance** as abstract functional organs suspended in darkness. Author the first four positions manually. Connections convey worker/resource flow and dependence, not literal tunnels. Node positions do not claim real chamber geography; later layout may reflow.
 
+Task 017 uses four fixed normalized positions in the left functional field, with a selected-node context card on the right. Queen shows queen and living-worker counts; Nursery shows brood/stage/care/nutrition/emergence; Food Exchange shows its Primitive state and stores; Entrance shows available, scout and trail labor. The top bar keeps only available labor and time. Mouse/touch share node hit targets; OUTWARD and INWARD buttons and Tab switch views without affecting the run. Each view retains its own selection. The debug truth overlay remains separate and blocks mode switching while open.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

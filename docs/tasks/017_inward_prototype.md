@@ -1,6 +1,6 @@
 # 017 — INWARD prototype
 
-Status: roadmap; expand against the actual code before implementation.
+Status: complete (2026-09-30).
 
 ## Goal
 
@@ -22,7 +22,9 @@ Queen, Nursery, Food Exchange, Entrance at four authored positions; contextual p
 
 Render an abstract network using approved colony summaries. Show available labor and Food Exchange state; selecting nodes reveals detail. Mode switches change presentation only.
 
-Before coding: Resolve fixed layout and contextual summary/selection behavior using UI_RULES.
+Resolved contract: GameRoot owns one OUTWARD and one INWARD Node2D on graphical runs; only the active view processes/redraws/accepts input. A semantic `set_mode` command and the named `toggle_inward` action (Tab) switch them without touching RunState. Touch/mouse buttons expose the same switch. Each view retains its own selected ID while hidden; OUTWARD facing is likewise retained. The F3 truth layer stays above both and blocks mode changes while open.
+
+INWARD receives only detached pile/clock summaries from GameRoot: available/total living workers, queen count, aggregate brood records/emergence, three stores, active scouts and allocated trail labor, and the initial Food Exchange state. PileState adds authoritative `food_exchange_state = primitive` now, but no progress or development logic until 018; the required snapshot schema advances to version 3. Four authored normalized positions occupy the left two-thirds of the screen, leaving a right-side context card. Queen reveals queens/living workers; Nursery reveals brood/stage/care/nutrition; Food Exchange reveals Primitive and stores; Entrance reveals available/scout/trail labor. Lines are functional relationships, not geography. No permanent population overview card or simulated tunnel geometry.
 
 ## Explicit non-goals
 
@@ -38,8 +40,15 @@ Manual switching preserves simulation continuity/selection policy; displayed val
 
 ## Manual verification
 
-Run the relevant prototype/debug scene and inspect the behavior above. On expansion, name exact files, commands, fixtures, and expected results; do not treat this roadmap as a fully specified coding prompt.
+Run pinned Godot 4.7.2 import, headless suite, Main smoke and GUI previews at 1280×720 and 900×600. `tests/test_inward.gd` checks detached summaries, selection through shared mouse/touch paths, mode switching/selection persistence, continuity and absence of hidden-world values. Inspect four-node negative space and readable context/control placement in Compatibility.
 
 ## Done when
 
 The expanded card's checks pass, existing behavior remains intact, and the handoff records changed files, tests, limitations, and next task. One logical commit.
+
+## Completion evidence and handoff
+
+- Added `src/presentation/inward/inward_view.gd`, GameRoot mode ownership/detached summary, OUTWARD switch button, Primitive Food Exchange state, snapshot version 3 and `tests/test_inward.gd`. Updated README and architecture/data/UI/decision docs. No chamber development logic or hidden-world projection was introduced.
+- Pinned Godot 4.7.2 import and headless suite passed: 3,469 checks, 0 failures. Tests verify detached values, no hidden-world dependency, four-node hit layout, mouse/touch selection, button/Tab switching, per-view selection/facing preservation and simulation continuity. Main smoke and diff check passed.
+- Inspected Compatibility screenshots at 1280×720 (Nursery selected) and 900×600 (Food Exchange selected). Four functional nodes, faint connections, selected context and controls remained separate/readable without bloom. These temporary previews were not committed; actual device touch ergonomics remain unverified.
+- Next: task 018, a single Primitive → Developed Food Exchange transition.

@@ -12,6 +12,7 @@ var workers: WorkerLedger = Ledger.new()
 var resources: Dictionary[String, float] = {"carbohydrate": 0.0, "protein": 0.0, "water": 0.0}
 var brood_cohorts: Array[BroodCohort] = []
 var brood_matured_total: int = 0
+var food_exchange_state: String = "primitive"
 var workers_total: int:
 	get: return workers.total
 var workers_available: int:
@@ -24,7 +25,8 @@ func to_dict() -> Dictionary:
 		brood_records.append(cohort.to_dict())
 	return {"id": id, "position": [position.x, position.y], "queen_count": queen_count,
 		"workers": workers.to_dict(), "resources": resources.duplicate(),
-		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total}
+		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
+		"food_exchange_state": food_exchange_state}
 
 
 func deposit_resource(resource_id: String, amount: float) -> bool:
@@ -47,7 +49,7 @@ func consume_resources(costs: Dictionary) -> bool:
 
 
 func restore(data: Dictionary) -> bool:
-	if not data.has_all(["id", "position", "queen_count", "workers", "resources", "brood_cohorts", "brood_matured_total"]) or not data.id is String or data.id.is_empty() or not Ledger.valid_count(data.queen_count):
+	if not data.has_all(["id", "position", "queen_count", "workers", "resources", "brood_cohorts", "brood_matured_total", "food_exchange_state"]) or not data.id is String or data.id.is_empty() or not Ledger.valid_count(data.queen_count) or data.food_exchange_state != "primitive":
 		return false
 	if not data.position is Array or data.position.size() != 2 or not data.workers is Dictionary:
 		return false
@@ -81,4 +83,5 @@ func restore(data: Dictionary) -> bool:
 	resources = restored_resources
 	brood_cohorts = restored_brood
 	brood_matured_total = int(data.brood_matured_total)
+	food_exchange_state = data.food_exchange_state
 	return true
