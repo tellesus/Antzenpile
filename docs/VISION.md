@@ -18,7 +18,7 @@ OUTWARD is a stationary, rotatable sensory panorama centered on the active pile.
 
 ## Long-term direction
 
-Maps can contain several development chapters: founding, establishment, expansion, crisis, and dispersal. A meaningful session targets about 25–30 minutes; that does not imply an entire map ends then. Adaptation, ecological relationships, rivals, satellite piles, broader reproduction such as daughter queens and dispersal, and reality replay belong to later design/implementation stages. The current slice supports repeat worker-brood cycles only.
+Maps can contain several development chapters: founding, establishment, expansion, crisis, and dispersal. The original GDD proposed a 25–30 minute session rhythm, but the player has tabled that target until more systems exist; it is not a current implementation constraint. Adaptation, ecological relationships, rivals, satellite piles, broader reproduction such as daughter queens and dispersal, and reality replay belong to later design/implementation stages. The current slice supports repeat worker-brood cycles only.
 
 ## Guardrails
 

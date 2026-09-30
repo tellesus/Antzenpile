@@ -2,7 +2,7 @@
 
 ## Question and arc
 
-**Is interpreting and shaping a living ant trail network interesting enough to carry the game?** Deliver one approximately **20–30 minute** developmental arc, not the full GDD.
+**Is interpreting and shaping a living ant trail network interesting enough to carry the game?** The original GDD proposed an approximately **20–30 minute** developmental arc, not the full game. Session-length evaluation is now tabled until more systems exist; it is not an acceptance criterion for the next cards.
 
 Start with one pile, one queen, 40 workers, a small brood cohort, small carbohydrate/protein reserves, basic water, primitive nursery and Food Exchange, and almost no exterior knowledge. These are the eventual slice starting conditions; task 005 creates only the pile/ledger, and task 016 introduces brood. Unspecified quantities are provisional fixture values in [DECISIONS](DECISIONS.md).
 
@@ -68,3 +68,5 @@ The player's first playtest led to completed follow-up cards 023–024 for persi
 Task 025 also addresses the observed one-cycle population ceiling with a manual repeat-brood action. The first-slice acceptance arc above remains the initial milestone; continued growth can now be playtested afterward.
 
 The player chose to keep Food Exchange available early as a useful project. Task 026 measures the longer second-cycle path with that decision intact; it does not gate or retune development.
+
+The original slice evaluation and duration target above are historical. After tasks 027–028, the player tabled session-length judgment until more of Part 3's metabolism and chamber systems and Part 6's ecology exist. The [post-slice plan](POST_SLICE_PLAN.md) now guides the next bounded cards without a timing gate.

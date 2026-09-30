@@ -26,6 +26,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D18 | User playtest request: after a brood hatches, the colony needs an option to begin another hatching cycle. Task 025 adds that manual option within the existing aggregate-brood rules. |
 | D19 | User decision, 2026-09-30: Food Exchange may be developed early. Its availability gives the player a project during the early game; do not add a brood-pressure or protein-discovery gate solely to delay it. |
 | D20 | User direction, 2026-09-30: develop exterior resource ecology and recurring events next; defer economy balance until more systems and resource uses exist. |
+| D21 | User direction, 2026-09-30: table the original 20–30 minute session target until more game systems exist. Do not tune development toward a speculative session length now. |
 
 ## Provisional defaults for executable tasks
 

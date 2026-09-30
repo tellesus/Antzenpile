@@ -6,7 +6,7 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 Tasks 001–028 are implemented/evaluated: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scouts that search past their initial range for new sources, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. PerceivedSignals derive bearing, estimated distance, strength and qualitative confidence from colony memory. OUTWARD supports rotating sensory traces, scouting, time controls and invested worker trails. Successful returns reinforce short-lived pheromone and slower route familiarity. One aggregate brood cohort at a time consumes food and can mature into eight living workers through the ledger; after emergence, the player can begin another cycle. INWARD shows Queen, Nursery, Food Exchange and Entrance as an abstract functional network. Once trails bring sufficient food home, the Primitive Food Exchange can be developed with committed workers; completion makes larval food use 25% more efficient. An original synchronized placeholder music layer fades in on completion. Once exposed and sheltered trails both carry resources, one rain event washes out exposed chemistry while familiarity survives and steadily adds three water units to the home store. The sheltered carbohydrate source now renews on a hidden periodic nectar schedule. One local save slot resumes the full run, including work in flight. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
 
-The task-022 integration baseline reaches the original arc in six simulated minutes. See the [slice evaluation](docs/SLICE_EVALUATION.md) for measured Windows performance and unresolved pacing questions. Playtest follow-ups 023–026 include a longer second-brood integration run. Task 027 begins exterior resource ecology; economy balance is deferred while more systems come online. Food Exchange remains available early as a player project.
+The task-022 integration baseline reaches the original arc in six simulated minutes. See the [slice evaluation](docs/SLICE_EVALUATION.md) for historical Windows performance and pacing measurements. Session-length evaluation is tabled until more systems exist. Playtest follow-ups 023–026 include a longer second-brood integration run, and tasks 027–028 begin exterior resource ecology. Food Exchange remains available early as a player project; economy balance is deferred while more systems come online.
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
@@ -26,9 +26,9 @@ The task-022 integration baseline reaches the original arc in six simulated minu
 | [UI_RULES](docs/UI_RULES.md) | OUTWARD, INWARD, information and rendering rules |
 | [CODING_RULES](docs/CODING_RULES.md) | Implementation and validation workflow |
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
-| [Task cards](docs/tasks/) | 001–028 completed; resource ecology expansion next |
+| [Task cards](docs/tasks/) | 001–028 completed; route energy and Nursery development are proposed next |
 | [Slice evaluation](docs/SLICE_EVALUATION.md) | Measured arc, Windows workload and design questions |
-| [Post-slice plan](docs/POST_SLICE_PLAN.md) | Proposed cards 029–034 and decision gates before balance |
+| [Post-slice plan](docs/POST_SLICE_PLAN.md) | Revised from the original GDD: proposed cards 029–036, with session pacing tabled |
 
 ## Running and testing
 
@@ -47,4 +47,4 @@ The runner returns 0 on success, 1 on check failure or an empty suite. Use the p
 
 ## First milestone
 
-A roughly 20–30 minute slice: scout, learn, recruit a trail, bring resources home, support brood, develop Food Exchange, hear an additional music stem, and see exposed trails weaken under rain while familiarity persists. See [slice scope](docs/VERTICAL_SLICE.md). No conventional player map or minimap.
+The original slice milestone: scout, learn, recruit a trail, bring resources home, support brood, develop Food Exchange, hear an additional music stem, and see exposed trails weaken under rain while familiarity persists. Session length is tabled until more systems exist. See [slice scope](docs/VERTICAL_SLICE.md). No conventional player map or minimap.

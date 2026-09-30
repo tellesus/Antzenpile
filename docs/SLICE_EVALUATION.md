@@ -39,7 +39,7 @@ Inspected saved probe captures of rain OUTWARD at 1280×720, developed INWARD at
 
 ## Decision point
 
-Run a human Windows playthrough, ideally with more than one player, timing choices separately from simulated time. Ask whether the sensory search, trail decisions, rain recovery, early chamber project and music reward create the intended 20–30 minute arc. Use those observations to decide on pacing or scope changes before ecology, rivals or adaptation.
+Historical task-022 recommendation: run a human Windows playthrough, ideally with more than one player, timing choices separately from simulated time. This recommendation preceded tasks 023–028. The later player decision tables the 20–30 minute target until more systems exist; see the note below and the post-slice plan.
 
 The player's first hands-on feedback on 2026-09-30 identified that short scout missions could fail to locate water beyond their range and that rain did not replenish home water. Completed cards 023 and 024 now search for new sources until confirmation and add three water units steadily during rain. The timing and water-shortage figures above remain the original task-022 baseline; repeat the human playtest to assess the revised balance.
 
@@ -58,3 +58,5 @@ With seed 3030 and normal simulation commands, the longer run keeps Food Exchang
 | Water trail supports second emergence; 56 living workers | 790.00 s |
 
 At first emergence, the run held 147.2 carbohydrate, 67.76 protein and 3.6 water. The second cohort stopped with zero water, then resumed after the player funded a trail to the returned water signal. At second emergence, the stores held 176.4 carbohydrate, 94.52 protein and 23.2 water. This demonstrates a concrete water decision in the authored scenario, while carbohydrate and protein still accumulate substantially. A mid-second-cycle save/reload with water travel in flight reached the same authoritative state. The scripted 13-minute-10-second duration is simulated time, not a measured human session or final balance approval.
+
+The player later tabled the original 20–30 minute session target until more systems exist. These measurements remain useful regression evidence, not a pacing gate for the [post-slice plan](POST_SLICE_PLAN.md).
