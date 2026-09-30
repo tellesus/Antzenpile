@@ -45,8 +45,8 @@ func run(test: Object) -> bool:
 	before = restored.run.to_dict()
 	test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Mismatched route allocation rejects atomically")
 	invalid = saved.duplicate(true)
-	invalid.trails.segments[0].pheromone_strength = 0.2
-	test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Premature chemical state rejects atomically")
+	invalid.trails.segments[0].pheromone_strength = 1.2
+	test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Out-of-range chemical state rejects atomically")
 	invalid = saved.duplicate(true)
 	invalid.trails.segments[0].end[0] += 1
 	test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Mismatched segment estimate rejects atomically")

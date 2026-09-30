@@ -25,6 +25,8 @@ Task 012 adds a contextual investment button to a selected known resource trace.
 
 Task 013 shows current travelling workers, cumulative returned resources and the corresponding home store in the selected trace card. A cancelled route reports recall while cohorts return; reinvestment can use the same route. An empty return reports source unavailability. Normal UI never displays hidden world quantity, actual source position, cohort cargo or tick timers. F3 may show them for diagnosis. No visible ant traffic or chemical trail is introduced by this task.
 
+Task 014 adds a qualitative scent label and a screen-space link from the home anchor to a currently visible known signal. This is a sensory hint, not a projection of TrailSegment geometry or a player map. Below 0.1 strength the link is absent; from 0.1 to below 0.45 it appears as four short wisps; at 0.45 and above it is coherent. A thin core and faint fixed-width envelope remain readable without bloom. At most six links render. Facing away hides a link without changing chemistry. F3 can display exact segment strength and successful-worker traffic.
+
 Slice controls: rotation, bearing indicator, selectable signals/context cards, scout action, trail investment/recall, available workers, time controls, and OUTWARD/INWARD toggle. Persistent HUD stays small: available labor, mode, time, urgent colony pressures. Total population/brood/queens belong in context, not a permanent overview panel.
 
 Attention order: selected/critical signal → active major trails → destinations → environmental interference → representative ants → old information → physical suggestion.

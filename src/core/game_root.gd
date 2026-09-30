@@ -60,10 +60,12 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 	var summaries: Array[Dictionary] = []
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile == pile_id:
+			var segment: TrailSegmentState = simulation.run.trails.segments[route.segment_id]
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
 				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers,
 				"active_workers": route.active_workers, "status": route.status,
-				"delivered_total": route.delivered_total})
+				"delivered_total": route.delivered_total,
+				"pheromone_strength": segment.pheromone_strength})
 	summaries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.id < b.id)
 	return summaries
 

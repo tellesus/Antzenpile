@@ -58,6 +58,8 @@ Task 012 adds RunState-owned TrailNetwork, one typed route and one distinct segm
 
 Task 013 makes TrailSystem a fixed-tick system. Bounded TransitCohorts hold committed workers and cargo during estimated-segment travel. A cohort may query hidden WorldState only when it reaches the captured endpoint; returning cargo is deposited in the pile's resource store. Empty returns report source unavailability, stopping new departures without revealing live quantity through normal UI. A reduction releases idle labor immediately and releases in-flight surplus only on return. RunState snapshots validate route/cohort/ledger relationships and preserve mid-trip continuation. Normal OUTWARD receives only detached route progress and stored resource totals; F3 can inspect cohort and source truth.
 
+Task 014 makes segment pheromone authoritative simulation state. Loaded cohort home arrivals reinforce by worker count; every fixed tick decays all segments, including inactive routes. Familiarity remains separate and unchanged. GameRoot exposes detached pheromone strength in route summaries; TrailVisual maps that value and a visible projected signal into bounded screen-space strokes. It never receives segment endpoints. F3 may inspect numeric chemistry and aggregate traffic.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

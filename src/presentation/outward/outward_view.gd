@@ -3,6 +3,7 @@ extends Node2D
 ## Normal-play sensorium. Providers deliver approved detached values only.
 
 const Panorama = preload("res://src/presentation/outward/outward_projection.gd")
+const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 var signal_provider: Callable
 var status_provider: Callable
 var dispatch_command: Callable
@@ -174,12 +175,22 @@ func _button_at(at: Vector2) -> String:
 func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
+	_draw_trails(size)
 	_draw_anchor(size)
 	for entry: Dictionary in _placed:
 		_draw_signal(entry)
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
+
+
+func _draw_trails(size: Vector2) -> void:
+	for stroke: Dictionary in Scent.strokes(_status.get("trails", []), _placed, size):
+		var strength: float = clampf(stroke.strength, 0.0, 1.0)
+		var envelope := Color(0.40, 0.75, 0.68, 0.035 + 0.065 * strength)
+		var core := Color(0.62, 0.93, 0.79, 0.13 + 0.52 * strength)
+		draw_polyline(stroke.points, envelope, 5.0, true)
+		draw_polyline(stroke.points, core, 1.25, true)
 
 
 func _draw_anchor(size: Vector2) -> void:
@@ -236,21 +247,27 @@ func _draw_context(size: Vector2) -> void:
 	_label(box.position + Vector2(16, 137), "Risk unknown", Color("8fa1a8"), 13)
 	var route: Dictionary = _selected_route(selected)
 	if route.is_empty() or route.status == "inactive":
-		_label(box.position + Vector2(16, 165), "Trail: no workers committed", Color("a8b8bd"), 13)
+		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" else "No workers · scent " + _scent_label(route)
+		_label(box.position + Vector2(16, 165), idle_text, Color("a8b8bd"), 13)
 		_label(box.position + Vector2(16, 187), "Home stores: %.1f" % _status.get("resources", {}).get(selected.category, 0.0), Color("8fa1a8"), 13)
 		_draw_trail_button("trail_create", "INVEST 5 WORKERS")
 	elif route.status == "recalling":
 		_label(box.position + Vector2(16, 165), "Recalling: %d workers away" % route.active_workers, Color("a8b8bd"), 13)
-		_label(box.position + Vector2(16, 187), "Delivered: %.1f  ·  Home: %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 13)
+		_label(box.position + Vector2(16, 187), "Scent %s · Delivered %.1f" % [_scent_label(route), route.delivered_total], Color("8fa1a8"), 13)
 		_draw_trail_button("trail_create", "REINVEST 5 WORKERS")
 	else:
-		_label(box.position + Vector2(16, 165), "Source unavailable (reported)" if route.status == "depleted" else "Trail active", Color("a8b8bd"), 14)
+		_label(box.position + Vector2(16, 165), "Source unavailable · scent " + _scent_label(route) if route.status == "depleted" else "Trail scent: " + _scent_label(route), Color("a8b8bd"), 14)
 		_label(box.position + Vector2(16, 185), "Wanted %d · Committed %d" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 14)
 		_label(box.position + Vector2(16, 205), "%d workers travelling" % route.active_workers, Color("8fa1a8"), 14)
 		_label(box.position + Vector2(16, 225), "Returned %.1f · Home %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 14)
 		_draw_trail_button("trail_less", "− 1")
 		_draw_trail_button("trail_more", "+ 1")
 		_draw_trail_button("trail_cancel", "CANCEL")
+
+
+func _scent_label(route: Dictionary) -> String:
+	var strength: float = float(route.get("pheromone_strength", 0.0))
+	return "strong" if strength >= 0.7 else "clear" if strength >= 0.45 else "faint" if strength >= 0.1 else "absent"
 
 
 func _selected_signal() -> Dictionary:

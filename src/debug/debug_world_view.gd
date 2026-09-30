@@ -130,6 +130,9 @@ func _draw() -> void:
 				if route.origin_pile == detail.id:
 					lines.append("%s -> %s [%s]" % [route.id, route.destination_knowledge_id, route.status])
 					lines.append("%s: desired %d / allocated %d / away %d" % [route.segment_id, route.desired_workers, route.allocated_workers, route.active_workers])
+					for segment: Dictionary in data.trails.segments:
+						if segment.id == route.segment_id:
+							lines.append("Scent %.3f / successful worker traffic %d / familiarity %.3f" % [segment.pheromone_strength, segment.traffic, segment.route_familiarity])
 					lines.append("Delivered %.1f / source reported unavailable: %s" % [route.delivered_total, route.reported_depleted])
 					for cohort: Dictionary in data.trails.cohorts:
 						if cohort.route_id == route.id:

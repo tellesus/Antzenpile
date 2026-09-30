@@ -98,7 +98,12 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	return true
 
 
-func tick(_delta: float) -> void:
+func tick(delta: float) -> void:
+	# Every existing segment fades, including inactive and depleted routes.
+	for segment: TrailSegmentState in _run.trails.segments.values():
+		segment.pheromone_strength *= pow(0.5, delta / CONFIG.pheromone_half_life_seconds)
+		if segment.pheromone_strength < 0.0001:
+			segment.pheromone_strength = 0.0
 	var ids: Array = _run.trails.routes.keys()
 	ids.sort()
 	for id: String in ids:
@@ -169,6 +174,9 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		var deposited: bool = pile.deposit_resource(cohort.resource_id, cohort.payload)
 		assert(deposited)
 		route.delivered_total += cohort.payload
+		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
+		segment.pheromone_strength = clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0)
+		segment.traffic += mini(cohort.worker_count, WorkerLedger.MAX_COUNT - segment.traffic)
 	else:
 		route.reported_depleted = true
 	route.active_workers -= cohort.worker_count

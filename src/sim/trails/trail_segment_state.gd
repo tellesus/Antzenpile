@@ -33,16 +33,17 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 	var destination := Vector2(data.end[0], data.end[1])
 	if not bounds.has_point(origin) or not bounds.has_point(destination) or origin == destination:
 		return false
-	for key: String in ["pheromone_strength", "route_familiarity"]:
-		if not typeof(data[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data[key])) or data[key] != 0:
+	if not typeof(data.pheromone_strength) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.pheromone_strength)) or data.pheromone_strength < 0.0 or data.pheromone_strength > 1.0:
+		return false
+	if not typeof(data.route_familiarity) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.route_familiarity)) or data.route_familiarity != 0:
 			return false
-	if not WorkerLedger.valid_count(data.traffic) or data.traffic != 0:
+	if not WorkerLedger.valid_count(data.traffic):
 		return false
 	id = data.id
 	route_id = data.route_id
 	start = origin
 	end = destination
-	pheromone_strength = 0.0
+	pheromone_strength = float(data.pheromone_strength)
 	route_familiarity = 0.0
-	traffic = 0
+	traffic = int(data.traffic)
 	return true
