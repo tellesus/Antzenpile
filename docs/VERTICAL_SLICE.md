@@ -56,3 +56,5 @@ Individual cards record implementation status. 001–006 contain executable inst
 - Aim for 60 FPS presentation on modest desktop hardware. Record measured hardware, workload, renderer, and object/effect counts. No per-worker processing; simulation cost must not depend on visible-ant count. Android export can wait, but mobile-safe constraints cannot.
 
 After 022, stop adding systems and evaluate actual play: scouting satisfaction, returned information, signal reinforcement, living trails, labor tension, useful decay/rain choices, panorama readability, INWARD usefulness, growth, and the music reward. Fix the core loop before beginning ecology, rivals, or adaptation.
+
+The task-022 command-driven and Windows graphical baseline, including measured pacing and unresolved design questions, is recorded in [SLICE_EVALUATION](SLICE_EVALUATION.md). It does not substitute for the planned human playtest.

@@ -23,6 +23,7 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_music.gd"),
 	preload("res://tests/test_rain.gd"),
 	preload("res://tests/test_save_load.gd"),
+	preload("res://tests/test_slice_integration.gd"),
 ]
 
 var checks: int = 0

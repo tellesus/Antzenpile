@@ -4,7 +4,9 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-Tasks 001–021 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scout missions, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. PerceivedSignals derive bearing, estimated distance, strength and qualitative confidence from colony memory. OUTWARD supports rotating sensory traces, scouting, time controls and invested worker trails. Successful returns reinforce short-lived pheromone and slower route familiarity. One aggregate brood cohort consumes food and can mature into eight living workers through the ledger. INWARD shows Queen, Nursery, Food Exchange and Entrance as an abstract functional network. Once trails bring sufficient food home, the Primitive Food Exchange can be developed with committed workers; completion makes larval food use 25% more efficient. An original synchronized placeholder music layer fades in on completion. Once exposed and sheltered trails both carry resources, one rain event washes out exposed chemistry while familiarity survives. One local save slot now resumes the full run, including work in flight. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
+Tasks 001–022 are implemented/evaluated: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scout missions, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. PerceivedSignals derive bearing, estimated distance, strength and qualitative confidence from colony memory. OUTWARD supports rotating sensory traces, scouting, time controls and invested worker trails. Successful returns reinforce short-lived pheromone and slower route familiarity. One aggregate brood cohort consumes food and can mature into eight living workers through the ledger. INWARD shows Queen, Nursery, Food Exchange and Entrance as an abstract functional network. Once trails bring sufficient food home, the Primitive Food Exchange can be developed with committed workers; completion makes larval food use 25% more efficient. An original synchronized placeholder music layer fades in on completion. Once exposed and sheltered trails both carry resources, one rain event washes out exposed chemistry while familiarity survives. One local save slot now resumes the full run, including work in flight. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
+
+The task-022 integration baseline reaches the implemented arc in six simulated minutes. See the [slice evaluation](docs/SLICE_EVALUATION.md) for measured Windows performance and the unresolved 20–30 minute pacing and Food Exchange sequencing questions. Feature expansion is paused pending playtest decisions.
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
@@ -24,7 +26,8 @@ Tasks 001–021 are implemented: Godot shell, fixed clock, isolated seeded runs,
 | [UI_RULES](docs/UI_RULES.md) | OUTWARD, INWARD, information and rendering rules |
 | [CODING_RULES](docs/CODING_RULES.md) | Implementation and validation workflow |
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
-| [Task cards](docs/tasks/) | 001–021 completed; 022 roadmap |
+| [Task cards](docs/tasks/) | 001–022 completed; pause for slice evaluation |
+| [Slice evaluation](docs/SLICE_EVALUATION.md) | Measured arc, Windows workload and design questions |
 
 ## Running and testing
 
