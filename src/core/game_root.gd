@@ -33,6 +33,7 @@ func _ready() -> void:
 		outward.trail_create_command = create_trail_for
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
+		outward.investigate_command = investigate_known_source
 		outward.input_blocked = debug_is_open
 		outward.mode_command = set_mode.bind("inward")
 		outward.save_command = quick_save
@@ -112,12 +113,15 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 func outward_status(pile_id: String) -> Dictionary:
 	if not simulation.run.colony.piles.has(pile_id):
 		return {}
+	var temporal_hints: Dictionary = {}
+	for known_id: String in simulation.run.knowledge.nodes:
+		temporal_hints[known_id] = simulation.run.knowledge.temporal_hint(known_id)
 	return {"available_workers": simulation.run.colony.piles[pile_id].workers_available,
 		"active_scouts": simulation.run.scouts.size(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
-		"rain_phase": simulation.run.rain.phase}
+		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints}
 
 
 func inward_status(pile_id: String) -> Dictionary:
@@ -235,6 +239,11 @@ func recheck_trail(route_id: String) -> Dictionary:
 
 func dispatch_facing(bearing: float) -> bool:
 	return simulation.dispatch_scout("home", bearing)
+
+
+func investigate_known_source(knowledge_id: String) -> Dictionary:
+	var accepted: bool = simulation.investigate_known_source("home", knowledge_id)
+	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func debug_is_open() -> bool:

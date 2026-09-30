@@ -93,6 +93,8 @@ Task 031 adds NurseryDevelopmentSystem as a separate fixed-tick chamber transiti
 
 Task 032 adds a temporary backyard protein World Node representing picnic crumbs. Its authored start, expiry and recurrence ticks are derived from the saved clock; EcologySystem updates only its hidden quantity/active fields after scouts and trail traffic on a boundary tick. WorldLoader supports an initially inactive authored node. No ecology cursor or snapshot version is needed. Scouts discover only active crumbs by proximity and deliver observations on return; ordinary trail travel tests the remembered location. Appearance and expiry never mutate colony knowledge or normal presentation data directly.
 
+Task 033 adds bounded source outcomes inside KnowledgeBase. Scout reports, deliberate empty investigations and loaded/empty trail returns enter this record only at home; consecutive equal outcomes coalesce. A tentative recurrence hint derives solely from an available–unavailable–available sequence. An explicit known-source investigation sends one ledger-committed scout to the stored estimate, samples there, then returns; default scouts retain new-source frontier behavior. OUTWARD receives only detached hint language and a semantic Investigate callback. Optional outcome and scout-intent fields preserve older version-5 saves.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

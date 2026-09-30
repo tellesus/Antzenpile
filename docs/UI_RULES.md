@@ -61,6 +61,8 @@ Task 030 additionally shows occupied/total brood space and current/maximum care 
 
 Task 031 adds a selected-Nursery **DEVELOP NURSERY** action with authored costs and a touch-sized target. Developing shows simulated progress and committed labor; Developed shows capacity for two aggregate cohorts. Lay Brood remains available in Queen/Nursery when a Developed Nursery has eight free slots, even while one cohort is active. The context summarizes both stages and shared care/nutrition, without individual brood graphics or a general building menu.
 
+Task 033 places **INVESTIGATE SOURCE** in the selected OUTWARD trace context. It sends a scout to the colony's remembered estimate; no hidden location or source quantity is passed to the view. One short temporal line says an earlier source was found empty or may recur after an approximate, explicitly uncertain observed gap. This line appears only from returned colony evidence, never on physical appearance or expiry. The contextual button is touch-sized and uses the same mouse/touch command path.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

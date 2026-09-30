@@ -121,6 +121,9 @@ func restore(data: Dictionary) -> bool:
 	var restored_knowledge := Knowledge.new()
 	if not restored_knowledge.restore(data.knowledge, archived, restored_clock.simulation_time):
 		return false
+	for agent: ScoutAgent in restored_scouts.values():
+		if not agent.investigation_source_id.is_empty() and not restored_knowledge.nodes.has("known:" + agent.investigation_source_id):
+			return false
 	var restored_trails := Trails.new()
 	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world):
 		return false

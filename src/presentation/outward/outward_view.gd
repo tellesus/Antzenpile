@@ -12,6 +12,7 @@ var speed_command: Callable
 var trail_create_command: Callable
 var trail_set_command: Callable
 var trail_recheck_command: Callable
+var investigate_command: Callable
 var input_blocked: Callable
 var mode_command: Callable
 var save_command: Callable
@@ -118,6 +119,12 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 func _run_command(command: String) -> void:
 	match command:
+		"investigate":
+			var signal_data: Dictionary = _selected_signal()
+			if signal_data.is_empty() or not investigate_command.is_valid():
+				return
+			var result: Dictionary = investigate_command.call(signal_data.source_knowledge_id)
+			_feedback = "Scout investigating remembered source" if result.get("accepted", false) else result.get("reason", "Investigation unavailable")
 		"trail_create", "trail_less", "trail_more", "trail_cancel", "trail_recheck":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty():
@@ -183,6 +190,8 @@ func _button_rect(command: String) -> Rect2:
 
 func _button_at(at: Vector2) -> String:
 	if not _selected_signal().is_empty():
+		if _investigate_button_rect().has_point(at):
+			return "investigate"
 		var route: Dictionary = _selected_route(_selected_signal())
 		var contextual: Array[String] = []
 		if route.is_empty() or route.status in ["inactive", "recalling"]:
@@ -282,7 +291,7 @@ func _draw_context(size: Vector2) -> void:
 	var selected: Dictionary = _selected_signal()
 	if selected.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 284))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 404))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), _signal_title(selected.category), _signal_color(selected.category), 20)
@@ -314,6 +323,13 @@ func _draw_context(size: Vector2) -> void:
 			_draw_trail_button("trail_less", "− 1")
 			_draw_trail_button("trail_more", "+ 1")
 		_draw_trail_button("trail_cancel", "CANCEL")
+	var hint: Dictionary = _status.get("temporal_hints", {}).get(selected.source_knowledge_id, {})
+	if not hint.is_empty():
+		_label(box.position + Vector2(16, 309), hint.label, Color("91aab0"), 12)
+	var scout_available: bool = _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
+	var investigate_box: Rect2 = _investigate_button_rect()
+	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
+	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), "INVESTIGATE SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _scent_label(route: Dictionary) -> String:
@@ -344,6 +360,10 @@ func _trail_button_rect(command: String) -> Rect2:
 		"trail_more": return Rect2(x + 72, 380, 64, 44)
 		"trail_cancel": return Rect2(x + 144, 380, 116, 44)
 	return Rect2()
+
+
+func _investigate_button_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 492.0, 260.0, 44.0)
 
 
 func _draw_trail_button(command: String, title: String) -> void:

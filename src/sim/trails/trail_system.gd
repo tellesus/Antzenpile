@@ -218,6 +218,8 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
+	var source_id: String = _run.knowledge.nodes[route.destination_knowledge_id].source_node_id
+	assert(_run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail"))
 	if cohort.payload > 0.0:
 		var net_payload: float = maxf(0.0, cohort.payload - cohort.unpaid_energy_cost)
 		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload)

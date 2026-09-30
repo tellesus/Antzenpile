@@ -54,6 +54,38 @@ func dispatch(origin_id: String, bearing: Variant = null) -> bool:
 	return true
 
 
+func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
+	last_error = ""
+	if not _run.colony.piles.has(origin_id) or not _run.knowledge.nodes.has(knowledge_id):
+		return _reject("Known source unavailable")
+	if _run.scouts.size() >= config.active_cap or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
+		return _reject("Scout cap reached")
+	var pile: PileState = _run.colony.piles[origin_id]
+	if pile.workers_available < 1:
+		return _reject("No available worker")
+	var known: KnownNode = _run.knowledge.nodes[knowledge_id]
+	var target: Vector2 = known.estimated_position.round()
+	var route: Array[Vector2] = Pathfinder.new(_run.world).path(pile.position, target)
+	if route.size() < 2:
+		return _reject("No reachable known estimate")
+	var id: String = "scout_%d" % _run.next_scout_id
+	if pile.workers.count(id) >= 0 or not pile.workers.create_commitment(id, "scout", id):
+		return _reject("Scout commitment unavailable")
+	var allocated: bool = pile.workers.allocate(id, 1)
+	assert(allocated)
+	var agent := Agent.new()
+	agent.id = id
+	agent.origin_pile = origin_id
+	agent.position = pile.position
+	agent.path = route
+	agent.mission_target = target
+	agent.return_path.append(pile.position)
+	agent.investigation_source_id = known.source_node_id
+	_run.scouts[id] = agent
+	_run.next_scout_id += 1
+	return true
+
+
 func tick(delta: float) -> void:
 	var ids: Array = _run.scouts.keys()
 	ids.sort()
@@ -65,7 +97,11 @@ func tick(delta: float) -> void:
 		var exploring: bool = agent.phase in ["exploring", "blocked_exploring"]
 		Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
 		if exploring:
-			if _confirmed_new_source(agent) and _at_breadcrumb(agent):
+			if not agent.investigation_source_id.is_empty():
+				if _at_breadcrumb(agent) and (agent.cursor >= agent.path.size() or _confirmed_target(agent)):
+					_start_return(agent)
+					exploring = false
+			elif _confirmed_new_source(agent) and _at_breadcrumb(agent):
 				_start_return(agent)
 				exploring = false
 			elif _at_breadcrumb(agent):
@@ -81,7 +117,9 @@ func tick(delta: float) -> void:
 		Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
 		if exploring:
 			agent.elapsed += delta
-			if _confirmed_new_source(agent) and _at_breadcrumb(agent):
+			if agent.investigation_source_id.is_empty() and _confirmed_new_source(agent) and _at_breadcrumb(agent):
+				_start_return(agent)
+			elif not agent.investigation_source_id.is_empty() and agent.cursor >= agent.path.size():
 				_start_return(agent)
 		elif agent.cursor >= agent.path.size():
 			var home: PileState = _run.colony.piles[agent.origin_pile]
@@ -92,6 +130,8 @@ func tick(delta: float) -> void:
 				var valid: bool = delivered.restore(observation.to_dict(), _run.world, _run.colony, _run.simulation_time)
 				assert(valid)
 				_run.delivered_observations[delivered.id] = delivered
+			if not agent.investigation_source_id.is_empty() and not agent.observations.has(agent.investigation_source_id):
+				assert(_run.knowledge.record_outcome(agent.investigation_source_id, false, _run.simulation_time, "scout"))
 			var released: bool = home.workers.release(id, 1)
 			assert(released)
 			var retired: bool = home.workers.retire_commitment(id)
@@ -104,6 +144,10 @@ func _confirmed_new_source(agent: ScoutAgent) -> bool:
 		if agent.observations[source_id].proximity_confirmed and not _run.knowledge.nodes.has("known:" + source_id):
 			return true
 	return false
+
+
+func _confirmed_target(agent: ScoutAgent) -> bool:
+	return agent.observations.has(agent.investigation_source_id) and agent.observations[agent.investigation_source_id].proximity_confirmed
 
 
 func _new_source_cue(agent: ScoutAgent) -> String:

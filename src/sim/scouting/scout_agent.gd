@@ -13,6 +13,7 @@ var cursor: int = 1
 var return_path: Array[Vector2] = []
 var mission_target: Vector2
 var investigating: String = ""
+var investigation_source_id: String = ""
 var observations: Dictionary[String, Observation] = {}
 
 
@@ -25,7 +26,8 @@ func to_dict() -> Dictionary:
 	return {"id": id, "mission_id": id, "origin_pile": origin_pile,
 		"position": [position.x, position.y], "phase": phase, "elapsed": elapsed,
 		"path": _points(path), "cursor": cursor, "return_path": _points(return_path),
-		"mission_target": [mission_target.x, mission_target.y], "investigating": investigating, "observations": evidence}
+		"mission_target": [mission_target.x, mission_target.y], "investigating": investigating,
+		"investigation_source_id": investigation_source_id, "observations": evidence}
 
 
 static func _points(points: Array[Vector2]) -> Array:
@@ -83,6 +85,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if not _point(data.mission_target, world.bounds) or not data.investigating is String or not data.observations is Array:
 		return false
+	if not data.get("investigation_source_id", "") is String or (not data.get("investigation_source_id", "").is_empty() and not world.nodes.has(data.investigation_source_id)):
+		return false
 	var restored_evidence: Dictionary[String, Observation] = {}
 	for value: Variant in data.observations:
 		var evidence := Evidence.new()
@@ -103,6 +107,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	cursor = int(data.cursor)
 	mission_target = Vector2(data.mission_target[0], data.mission_target[1])
 	investigating = data.investigating
+	investigation_source_id = data.get("investigation_source_id", "")
 	observations = restored_evidence
 	return true
 

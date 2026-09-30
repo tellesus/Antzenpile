@@ -50,6 +50,10 @@ func dispatch_scout(origin_id: String, bearing: Variant = null) -> bool:
 	return scouting.dispatch(origin_id, bearing)
 
 
+func investigate_known_source(origin_id: String, knowledge_id: String) -> bool:
+	return scouting.dispatch_investigation(origin_id, knowledge_id)
+
+
 func advance(real_delta: float) -> bool:
 	return run.clock.advance(real_delta)
 

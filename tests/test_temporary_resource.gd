@@ -80,6 +80,6 @@ func _test_colony_encounter(test: Object) -> void:
 	test.check(route.delivered_total > 0.0 and game.run.world.nodes.protein_picnic.quantity < 24.0, "Aggregate foragers collect temporary protein through normal transit")
 	game.advance(200.0)
 	test.check(not game.run.world.nodes.protein_picnic.active and game.run.world.nodes.protein_picnic.quantity == 0.0, "The temporary source expires despite any trail")
-	test.check(game.run.knowledge.to_dict() == report_before, "Expiry does not refresh delivered colony evidence")
+	test.check(game.run.knowledge.to_dict().observations == report_before.observations and game.run.knowledge.to_dict().nodes == report_before.nodes, "Expiry does not refresh delivered colony evidence")
 	test.check(route.status == "depleted", "A route eventually reports the disappeared source through an empty return")
 	test.check(game.run.colony.piles.home.workers.invariant_holds(), "Temporary collection preserves worker conservation")

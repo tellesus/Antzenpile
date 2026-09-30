@@ -7,6 +7,7 @@ const CONFIG = preload("res://data/knowledge/default_knowledge.tres")
 var nodes: Dictionary[String, KnownNode] = {}
 var observations: Dictionary[String, Observation] = {}
 var _received_at: Dictionary[String, float] = {}
+var outcomes: Dictionary[String, Array] = {}
 var last_error: String = ""
 
 
@@ -27,9 +28,47 @@ func consume(inbox: Dictionary[String, Observation], time: float) -> bool:
 			observations[id] = inbox[id].detached_copy()
 			_received_at[id] = time
 			_rebuild_node(inbox[id].source_node_id)
+			record_outcome(inbox[id].source_node_id, true, time, "scout")
 	inbox.clear()
 	last_error = ""
 	return true
+
+
+func record_outcome(source_id: String, available: bool, time: float, method: String) -> bool:
+	if not nodes.has("known:" + source_id) or not method in ["scout", "trail"] or not is_finite(time) or time < 0:
+		return _reject("Invalid source outcome")
+	if not outcomes.has(source_id):
+		outcomes[source_id] = []
+	var history: Array = outcomes[source_id]
+	if not history.is_empty() and time < history.back().time:
+		return _reject("Source outcomes must be chronological")
+	if not history.is_empty() and history.back().available == available:
+		return true
+	history.append({"time": time, "available": available, "method": method})
+	if history.size() > 16:
+		history.pop_front()
+	last_error = ""
+	return true
+
+
+func temporal_hint(knowledge_id: String) -> Dictionary:
+	if not nodes.has(knowledge_id):
+		return {}
+	var history: Array = outcomes.get(nodes[knowledge_id].source_node_id, [])
+	var first_positive: float = -1.0
+	var saw_gap: bool = false
+	var interval: float = -1.0
+	for entry: Dictionary in history:
+		if entry.available:
+			if saw_gap and first_positive >= 0.0:
+				interval = entry.time - first_positive
+			first_positive = entry.time
+			saw_gap = false
+		else:
+			saw_gap = true
+	if interval < 0.0:
+		return {"label": "Earlier report only" if history.is_empty() or history.back().available else "Last return found empty", "possible_recurrence": false}
+	return {"label": "May recur after ~%.0f s (uncertain)" % (roundf(interval / 25.0) * 25.0), "possible_recurrence": true}
 
 
 static func _valid_evidence(evidence: Observation, time: float) -> bool:
@@ -91,7 +130,12 @@ func to_dict() -> Dictionary:
 	ids.sort()
 	for id: String in ids:
 		known.append(nodes[id].to_dict())
-	return {"observations": records, "nodes": known}
+	var history_records: Array[Dictionary] = []
+	ids = outcomes.keys()
+	ids.sort()
+	for source_id: String in ids:
+		history_records.append({"source_id": source_id, "visits": outcomes[source_id].duplicate(true)})
+	return {"observations": records, "nodes": known, "outcomes": history_records}
 
 
 func restore(data: Dictionary, validated_evidence: Dictionary[String, Observation], time: float) -> bool:
@@ -120,9 +164,28 @@ func restore(data: Dictionary, validated_evidence: Dictionary[String, Observatio
 	for index: int in rebuilt_nodes.size():
 		if not data.nodes[index] is Dictionary or not _matches_quantized_position(data.nodes[index], rebuilt_nodes[index]):
 			return _reject("Known nodes disagree with their evidence")
+	var history_records: Variant = data.get("outcomes", [])
+	if not history_records is Array:
+		return _reject("Malformed source history")
+	for record: Variant in history_records:
+		if not record is Dictionary or not record.has_all(["source_id", "visits"]) or not record.source_id is String or not candidate.nodes.has("known:" + record.source_id) or candidate.outcomes.has(record.source_id) or not record.visits is Array or record.visits.is_empty() or record.visits.size() > 16:
+			return _reject("Invalid source history")
+		var visits: Array = []
+		var previous_time: float = -1.0
+		var previous_available: Variant = null
+		for entry: Variant in record.visits:
+			if not entry is Dictionary or not entry.has_all(["time", "available", "method"]) or not typeof(entry.time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(entry.time)) or entry.time < 0 or entry.time > time or typeof(entry.available) != TYPE_BOOL or not entry.method in ["scout", "trail"]:
+				return _reject("Invalid source visit")
+			if entry.time < previous_time or entry.available == previous_available:
+				return _reject("Nonchronological source visits")
+			previous_time = float(entry.time)
+			previous_available = entry.available
+			visits.append(entry.duplicate(true))
+		candidate.outcomes[record.source_id] = visits
 	nodes = candidate.nodes
 	observations = candidate.observations
 	_received_at = candidate._received_at
+	outcomes = candidate.outcomes
 	last_error = ""
 	return true
 

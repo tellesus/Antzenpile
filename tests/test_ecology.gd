@@ -75,7 +75,7 @@ func _test_stale_knowledge_and_route(test: Object) -> void:
 	test.check(route.status == "depleted", "Reinvested dry route also returns empty")
 	game.advance(150.0)
 	test.check(nectar.quantity == 12.0 and route.status == "depleted", "Renewal does not secretly reactivate a depleted trail")
-	test.check(game.run.knowledge.to_dict() == known_before, "Renewal does not rewrite the colony's historical report")
+	test.check(game.run.knowledge.to_dict().observations == known_before.observations and game.run.knowledge.to_dict().nodes == known_before.nodes, "Renewal does not rewrite the colony's historical report")
 	var root := Root.new()
 	root.simulation = game
 	var view := Outward.new()
