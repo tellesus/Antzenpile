@@ -62,6 +62,8 @@ Task 023 leaves the ScoutAgent and RunState snapshot schemas at version 5. `elap
 
 Task 024 deposits 0.05 water per simulated second during the existing 60-second rain. RainSystem uses `PileState.deposit_resource` for each pile and limits the final tick by remaining event time. Resource deposits now round to five decimal places, matching brood/food debits for exact JSON continuation. RainState and required snapshot version remain unchanged; normal views show the approved pile store, while only F3 shows exact weather truth.
 
+Task 025 reuses the existing one-cohort slot after emergence. A semantic BroodSystem command starts an eight-ant egg cohort only with a queen and an empty nursery; it charges no upfront resource cost. Larval food and worker-care gates still apply. `brood_matured_total` remains the completed-ant count in multiples of eight; the active cohort ID is `brood_(brood_matured_total / 8 + 1)`. Restore validates count and ID, while the home ledger must contain at least the initial 40 workers plus recorded emergences because this slice has no worker-loss mechanic. Existing version-5 single-cycle saves keep their shape and restore. INWARD receives detached brood count, current cohort and batch size; the view cannot create state directly.
+
 ## Invariants
 
 1. **Worker conservation:** total living workers = available + internal jobs + scouts + trails + other explicit commitments. Pools are disjoint, integral, and nonnegative. `workers_total` and `workers_available` on a pile are ledger-backed values, never independent counters.

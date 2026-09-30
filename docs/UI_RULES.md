@@ -49,6 +49,8 @@ Task 024 lets the existing selected-context resource summaries show water gained
 
 Task 021 places touch-sized Save and Load buttons at the upper right of both normal views, with Ctrl+S/Ctrl+L named actions sharing the same semantic GameRoot path. A short success or error message appears in the existing view footer. Loading clears transient facing/selection and restarts music from the restored development level; it does not reveal hidden state or add a persistent overview panel.
 
+Task 025 puts one touch-sized **LAY 8 BROOD** action in the selected Queen or Nursery context only while the nursery is empty. Its callback goes through GameRoot to BroodSystem. The action disappears while the cohort is active, and the existing stage/care/nutrition summary replaces it. No permanent population menu or individual egg graphics are introduced.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

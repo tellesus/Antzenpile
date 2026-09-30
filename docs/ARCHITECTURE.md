@@ -79,6 +79,8 @@ Task 023 replaces the fixed scout mission deadline with continued frontier searc
 
 Task 024 makes RainSystem deposit water through each PileState resource API on fixed simulated ticks while rain is active. The event remains one-shot and 60 seconds long; water is already authoritative pile state, so no new counter or snapshot field is needed. Normal views receive its detached store value through existing summaries.
 
+Task 025 adds a BroodSystem command to start one new aggregate cohort when a pile's nursery is empty and a queen is present. GameRoot binds the semantic command to an INWARD Queen/Nursery action using only detached pile summaries. `brood_matured_total` determines the next stable cohort ID; PileState validates that ID and count on restore. All stages, care, nutrition and ledger emergence remain the existing rules. Version-5 saves need no new fields.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

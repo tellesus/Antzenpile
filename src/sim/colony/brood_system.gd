@@ -4,10 +4,32 @@ extends RefCounted
 const CONFIG = preload("res://data/resources/default_brood.tres")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 var _run: RunState
+var last_error: String = ""
 
 
 func _init(run_state: RunState) -> void:
 	_run = run_state
+
+
+func start(pile_id: String) -> bool:
+	if not _run.colony.piles.has(pile_id):
+		last_error = "Unknown pile"
+		return false
+	var pile: PileState = _run.colony.piles[pile_id]
+	if pile.queen_count < 1:
+		last_error = "No queen in pile"
+		return false
+	if not pile.brood_cohorts.is_empty():
+		last_error = "Nursery already has brood"
+		return false
+	if pile.brood_matured_total > WorkerLedger.MAX_COUNT - CONFIG.starting_count or pile.workers_total > WorkerLedger.MAX_COUNT - CONFIG.starting_count:
+		last_error = "Population limit reached"
+		return false
+	var cohort := BroodCohort.new()
+	cohort.id = BroodCohort.next_id(pile.brood_matured_total)
+	pile.brood_cohorts.append(cohort)
+	last_error = ""
+	return true
 
 
 func tick(delta: float) -> void:

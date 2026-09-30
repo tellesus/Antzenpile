@@ -48,6 +48,7 @@ Individual cards record implementation status. 001–006 contain executable inst
 | [022](tasks/022_vertical_slice_integration.md) | Integration and pacing; evaluate before expanding |
 | [023](tasks/023_persistent_scout_search.md) | Playtest follow-up: persistent scout search for new sources |
 | [024](tasks/024_rain_water_collection.md) | Playtest follow-up: steady water collection during rain |
+| [025](tasks/025_repeat_brood_cycle.md) | Playtest follow-up: manual repeat brood cycle |
 
 ## Acceptance and evaluation
 
@@ -62,3 +63,5 @@ After 022, stop adding systems and evaluate actual play: scouting satisfaction, 
 The task-022 command-driven and Windows graphical baseline, including measured pacing and unresolved design questions, is recorded in [SLICE_EVALUATION](SLICE_EVALUATION.md). It does not substitute for the planned human playtest.
 
 The player's first playtest led to completed follow-up cards 023–024 for persistent scout search and rainfall water. These refine the core loop before any larger expansion.
+
+Task 025 also addresses the observed one-cycle population ceiling with a manual repeat-brood action. The first-slice acceptance arc above remains the initial milestone; continued growth can now be playtested afterward.

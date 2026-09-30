@@ -7,6 +7,7 @@ const Inward = preload("res://src/presentation/inward/inward_view.gd")
 const Audio = preload("res://src/audio/audio_controller.gd")
 const Save = preload("res://src/core/save_service.gd")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
+const BROOD_CONFIG = preload("res://data/resources/default_brood.tres")
 var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
 var _debug_view: Node
@@ -42,6 +43,7 @@ func _ready() -> void:
 		inward.pause_command = simulation.toggle_pause
 		inward.speed_command = simulation.set_time_scale
 		inward.develop_command = start_food_exchange
+		inward.brood_command = start_brood
 		inward.input_blocked = debug_is_open
 		inward.save_command = quick_save
 		inward.load_command = quick_load
@@ -129,6 +131,7 @@ func inward_status(pile_id: String) -> Dictionary:
 	return {"pile_id": pile_id, "queens": pile.queen_count,
 		"workers_total": pile.workers_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
+		"brood_batch_count": BROOD_CONFIG.starting_count,
 		"resources": pile.resources.duplicate(), "food_exchange_state": pile.food_exchange_state,
 		"food_exchange_progress": pile.food_exchange_progress_seconds,
 		"food_exchange_duration": FOOD_CONFIG.build_seconds,
@@ -175,6 +178,11 @@ func _show_save_feedback(result: Dictionary, success: String) -> void:
 func start_food_exchange() -> Dictionary:
 	var accepted: bool = simulation.start_food_exchange("home")
 	return {"accepted": accepted, "reason": simulation.food_exchange.last_error}
+
+
+func start_brood() -> Dictionary:
+	var accepted: bool = simulation.start_brood("home")
+	return {"accepted": accepted, "reason": simulation.brood.last_error}
 
 
 func trail_summaries(pile_id: String) -> Array[Dictionary]:

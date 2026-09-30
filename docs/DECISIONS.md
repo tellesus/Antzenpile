@@ -23,6 +23,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D15 | User clarification, 2026-09-29: scouts sense nearby resources and progressively locate them; discovery does not require crossing the exact resource point. Private evidence still reaches the colony only upon return. |
 | D16 | User playtest decision, 2026-09-30: scouts continue beyond the initial mission range and search for a source the colony does not already know. They follow a chemical trace until proximity confirmation, then return with evidence. Search that exhausts reachable ground returns empty rather than trapping the worker. |
 | D17 | User playtest decision, 2026-09-30: rain steadily adds a modest amount of water to colony stores throughout the event, rather than giving one lump at its start. |
+| D18 | User playtest request: after a brood hatches, the colony needs an option to begin another hatching cycle. Task 025 adds that manual option within the existing aggregate-brood rules. |
 
 ## Provisional defaults for executable tasks
 
@@ -50,6 +51,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A18 | Task 021 uses one local `user://saves/slot_1.json` slot: disk envelope version 1 around required RunState snapshot version 5, full-precision payload, SHA-256 integrity check, verified temporary write then rename. Earlier snapshot schemas reject because no prior disk saves were released; migration is deferred until a real compatibility requirement exists. Load validates a fresh run before replacing controller systems. Ctrl+S/Ctrl+L and touch-sized buttons share semantic controls; view selection/facing and audio phase reset on load. |
 | A19 | Task 023 searches unvisited reachable grid cells after the initial mission path. It favors cells farther outward from home at equal distance, follows a private cue's estimate and nearby frontier until confirmation, and returns when no reachable frontier remains. This is deterministic from existing scout breadcrumbs and requires no new snapshot fields or version change. |
 | A20 | Task 024 deposits 0.05 water per simulated second into each pile during the existing 60-second rain, three units for a complete event. Fixed-tick deposits use the existing pile resource API and five-decimal storage precision; pause, speed and version-5 save continuation remain unchanged. This amount is provisional balance. |
+| A21 | Task 025 offers one manual Lay 8 Brood action in the selected Queen or Nursery context when its pile has no active cohort. It has no upfront cost; the existing two-worker care gate and larval food debits constrain growth. Only one cohort runs at a time. Consecutive `brood_N` IDs derive from the number already emerged, so the version-5 snapshot shape and existing saves remain valid. These are provisional slice interaction defaults, not a full reproduction system. |
 
 ## Details to resolve in their task
 

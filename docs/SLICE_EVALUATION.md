@@ -42,3 +42,5 @@ Inspected saved probe captures of rain OUTWARD at 1280×720, developed INWARD at
 Stop feature expansion here. Run a human Windows playthrough, ideally with more than one player, timing choices separately from simulated time. Ask whether the sensory search, trail decisions, rain recovery, chamber timing and music reward create the intended 20–30 minute arc. Use those observations to decide on pacing or scope changes before ecology, rivals or adaptation.
 
 The player's first hands-on feedback on 2026-09-30 identified that short scout missions could fail to locate water beyond their range and that rain did not replenish home water. Completed cards 023 and 024 now search for new sources until confirmation and add three water units steadily during rain. The timing and water-shortage figures above remain the original task-022 baseline; repeat the human playtest to assess the revised balance.
+
+Task 025 removes the single-cycle brood ceiling the player encountered. It leaves this original six-minute integration baseline intact; repeated cohorts require a longer human playtest to judge resource demand and growth pacing.

@@ -81,7 +81,10 @@ func restore(data: Dictionary) -> bool:
 		if not record is Dictionary or not cohort.restore(record):
 			return false
 		restored_brood.append(cohort)
-	if (restored_brood.is_empty() and data.brood_matured_total != BROOD_CONFIG.starting_count) or (not restored_brood.is_empty() and data.brood_matured_total != 0):
+	var emerged: int = int(data.brood_matured_total)
+	if emerged % BROOD_CONFIG.starting_count != 0 or (restored_brood.is_empty() and emerged < BROOD_CONFIG.starting_count):
+		return false
+	if not restored_brood.is_empty() and restored_brood[0].id != Brood.next_id(emerged):
 		return false
 	var commitment: String = "food_exchange:" + data.id
 	var record: Dictionary = restored.to_dict().commitments.get(commitment, {})

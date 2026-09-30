@@ -11,6 +11,10 @@ var nutrition: float = 1.0
 var care: float = 1.0
 
 
+static func next_id(matured_total: int) -> String:
+	return "brood_%d" % (matured_total / CONFIG.starting_count + 1)
+
+
 func to_dict() -> Dictionary:
 	return {"id": id, "stage": stage, "count": count, "progress_seconds": progress_seconds,
 		"nutrition": nutrition, "care": care}
@@ -19,7 +23,7 @@ func to_dict() -> Dictionary:
 func restore(data: Dictionary) -> bool:
 	if not data.has_all(["id", "stage", "count", "progress_seconds", "nutrition", "care"]):
 		return false
-	if data.id != "brood_1" or not data.stage in ["egg", "larva", "pupa"] or not WorkerLedger.valid_count(data.count) or data.count != CONFIG.starting_count:
+	if not data.id is String or not data.id.begins_with("brood_") or not data.stage in ["egg", "larva", "pupa"] or not WorkerLedger.valid_count(data.count) or data.count != CONFIG.starting_count:
 		return false
 	for key: String in ["progress_seconds", "nutrition", "care"]:
 		if not typeof(data[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data[key])) or data[key] < 0.0:

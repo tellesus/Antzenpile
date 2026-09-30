@@ -68,6 +68,10 @@ func start_food_exchange(pile_id: String) -> bool:
 	return food_exchange.start(pile_id)
 
 
+func start_brood(pile_id: String) -> bool:
+	return brood.start(pile_id)
+
+
 func _tick(delta: float) -> void:
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():
