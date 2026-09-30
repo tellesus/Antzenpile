@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RainConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/weather/rain_config.gd" id="rain"]
+
+[resource]
+script = ExtResource("rain")
+duration_seconds = 60.0
+exposed_chemical_half_life_seconds = 12.0
+minimum_successful_workers = 5
+sheltered_max_exposure = 0.25
+exposed_min_exposure = 0.75

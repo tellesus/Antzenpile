@@ -62,7 +62,7 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080c12"))
 	_label(Vector2(24, 34), "DEBUG: WORLD TRUTH", Color("ffd183"), 24)
 	var data: Dictionary = model.snapshot
-	_label(Vector2(24, 62), "Seed %s  |  time %.2fs  |  %sx  |  paused: %s" % [data.seed, data.clock.time, data.clock.scale, data.clock.paused])
+	_label(Vector2(24, 62), "Seed %s  |  time %.2fs  |  %sx  |  paused: %s  |  rain: %s / %.0fs" % [data.seed, data.clock.time, data.clock.scale, data.clock.paused, data.rain.phase, data.rain.elapsed_seconds])
 	_label(Vector2(24, 86), "F3 hide  |  select a marker  |  meters: east +x, south +y")
 	var carried: int = 0
 	for scout: Dictionary in data.scouts:
@@ -136,7 +136,7 @@ func _draw() -> void:
 					lines.append("%s: desired %d / allocated %d / away %d" % [route.segment_id, route.desired_workers, route.allocated_workers, route.active_workers])
 					for segment: Dictionary in data.trails.segments:
 						if segment.id == route.segment_id:
-							lines.append("Scent %.3f / successful worker traffic %d / familiarity %.3f" % [segment.pheromone_strength, segment.traffic, segment.route_familiarity])
+							lines.append("Scent %.3f / traffic %d / familiarity %.3f / exposure %.2f" % [segment.pheromone_strength, segment.traffic, segment.route_familiarity, segment.exposure])
 					lines.append("Delivered %.1f / source reported unavailable: %s" % [route.delivered_total, route.reported_depleted])
 					for cohort: Dictionary in data.trails.cohorts:
 						if cohort.route_id == route.id:

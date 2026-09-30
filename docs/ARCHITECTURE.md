@@ -70,6 +70,8 @@ Task 018 adds one FoodExchangeSystem command and fixed-tick transition. PileStat
 
 Task 019 adds a graphical-only AudioController. GameRoot projects Food Exchange state to detached MusicState (`development_level` 0 or 1). Two equal-length, original placeholder loops start together and keep playing; development only fades the second player's mix in over three real seconds. Audio never advances simulation and is omitted in headless runs. Pause and simulation speed do not change musical tempo; audio phase is recreated, not saved, after run reload. Required gameplay snapshots remain version 4.
 
+Task 020 adds run-owned RainState and a fixed-tick RainSystem after trail traffic. TrailSegmentState captures exposure from authored terrain along its estimated segment when invested; restore verifies it against world terrain. After an exposed and a sheltered route have both carried resources, one 60-second event accelerates exposed pheromone decay without modifying familiarity. OUTWARD receives only the detached rain phase for restrained sensory interference; F3 receives exact event and exposure state. Required run snapshots are version 5. Chemistry is rounded to ten decimal places per tick to preserve exact JSON continuation through the compounded rain decay.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

@@ -9,17 +9,30 @@ var end: Vector2
 var pheromone_strength: float = 0.0
 var route_familiarity: float = 0.0
 var traffic: int = 0
+var exposure: float = 0.0
+
+
+static func exposure_for(world: WorldState, origin: Vector2, destination: Vector2) -> float:
+	var total: float = 0.0
+	for index: int in 16:
+		var point: Vector2 = origin.lerp(destination, (float(index) + 0.5) / 16.0)
+		for region: Dictionary in world.terrain:
+			var area := Rect2(region.bounds[0], region.bounds[1], region.bounds[2], region.bounds[3])
+			if area.has_point(point):
+				total += float(region.exposure)
+				break
+	return total / 16.0
 
 
 func to_dict() -> Dictionary:
 	return {"id": id, "route_id": route_id,
 		"start": [start.x, start.y], "end": [end.x, end.y],
 		"pheromone_strength": pheromone_strength,
-		"route_familiarity": route_familiarity, "traffic": traffic}
+		"route_familiarity": route_familiarity, "traffic": traffic, "exposure": exposure}
 
 
 func restore(data: Dictionary, bounds: Rect2) -> bool:
-	if not data.has_all(["id", "route_id", "start", "end", "pheromone_strength", "route_familiarity", "traffic"]):
+	if not data.has_all(["id", "route_id", "start", "end", "pheromone_strength", "route_familiarity", "traffic", "exposure"]):
 		return false
 	if not data.id is String or data.id.is_empty() or not data.route_id is String or data.route_id.is_empty():
 		return false
@@ -39,6 +52,8 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 		return false
 	if not WorkerLedger.valid_count(data.traffic):
 		return false
+	if not typeof(data.exposure) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.exposure)) or data.exposure < 0.0 or data.exposure > 1.0:
+		return false
 	id = data.id
 	route_id = data.route_id
 	start = origin
@@ -46,4 +61,5 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 	pheromone_strength = float(data.pheromone_strength)
 	route_familiarity = float(data.route_familiarity)
 	traffic = int(data.traffic)
+	exposure = float(data.exposure)
 	return true

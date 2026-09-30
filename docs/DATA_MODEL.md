@@ -54,6 +54,8 @@ Task 018 extends the semantic Food Exchange state to `primitive`/`developing`/`d
 
 Task 019 implements MusicState as a detached, unsaved projection of one pile's Food Exchange state: `development_level` is 0 for Primitive/Developing and 1 for Developed. GameRoot creates AudioController only in graphical runs. Its two continuously playing loop players use this intent solely to set the secondary gain; no audio field enters RunState snapshots or simulation ticks. Stability/crisis may be added later.
 
+Task 020 adds immutable `TrailSegmentState.exposure` in [0,1], averaged from 16 authored-terrain midpoint samples along its captured estimate. Restore validates this value against saved terrain and segment geometry. RunState owns one `RainState`: waiting (elapsed 0), raining (0–60 simulated seconds), or finished (elapsed 60). After one exposed and one sheltered segment have each counted five successful returning workers, RainSystem emits `rain_started` once and applies extra exposed chemical loss with a 12-second half-life scaled by exposure. Familiarity retains its 900-second baseline half-life; continued loaded returns can rebuild chemistry. Current required snapshot version is 5; version migration remains task 021. OUTWARD receives only a detached rain phase, never numeric exposure.
+
 ## Invariants
 
 1. **Worker conservation:** total living workers = available + internal jobs + scouts + trails + other explicit commitments. Pools are disjoint, integral, and nonnegative. `workers_total` and `workers_available` on a pile are ledger-backed values, never independent counters.

@@ -96,7 +96,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 			return false
 		used_segments[route.segment_id] = true
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
-		if segment.route_id != route.id or segment.start != colony.piles[route.origin_pile].position or segment.end != route.estimated_destination:
+		if segment.route_id != route.id or segment.start != colony.piles[route.origin_pile].position or segment.end != route.estimated_destination or not is_equal_approx(segment.exposure, Segment.exposure_for(world, segment.start, segment.end)):
 			return false
 		var commitment: String = "trail:" + route.id
 		var ledger: WorkerLedger = colony.piles[route.origin_pile].workers

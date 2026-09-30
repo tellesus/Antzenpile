@@ -1,6 +1,6 @@
 # 020 — Rain
 
-Status: roadmap; expand against the actual code before implementation.
+Status: complete (2026-09-30).
 
 ## Goal
 
@@ -24,6 +24,10 @@ After exposed and sheltered trails exist, trigger the slice complication. Apply 
 
 Before coding: Resolve trigger/timing/duration/intensity and exposure formula; specify how interference reaches player perception.
 
+Resolved contract: each new TrailSegment captures mean exposure from 16 evenly spaced midpoint samples along its estimated straight geometry, reading the existing authored terrain's 0–1 exposure. The home boundary at x=20 therefore gives the east carbohydrate route exposure 1 and the west route exposure 0 without a route-ID exception. Exposure is immutable for that segment and validated against the saved world/geometry on restore. One run-owned RainState (`waiting`, `raining`, `finished`; elapsed simulated seconds) triggers on the first fixed tick when at least one segment of exposure ≥0.75 and one ≤0.25 have each recorded at least five successful returning workers. Rain lasts 60 simulated seconds once; no random or wall-clock trigger. RainSystem applies an additional exposed-chemistry half-life of 12 simulated seconds, scaled by exposure, after the normal TrailSystem tick. Sheltered chemistry and all route familiarity retain their existing baseline half-lives. Cargo returns still reinforce normally, making rebuilding possible during and after rain. Rain sends one `rain_started` signal. The snapshot includes rain state and segment exposure (version 5), with no migration until 021.
+
+OUTWARD receives only a detached rain phase, not terrain, exposure values or route geometry. While raining it shows a restrained weather label and sparse thin streaks and dims signal rendering; the existing chemistry/memory trail visuals naturally show exposed washout and ghost memory. F3 shows exact rain state and segment exposure. Rain is not an arbitrary player command.
+
 ## Explicit non-goals
 
 Full weather, floods, seasons, ecology, and global arbitrary trail deletion. Do not implement future systems not explicitly requested.
@@ -38,8 +42,15 @@ Compare otherwise identical exposure-1 and exposure-0 segments under rain; expos
 
 ## Manual verification
 
-Run the relevant prototype/debug scene and inspect the behavior above. On expansion, name exact files, commands, fixtures, and expected results; do not treat this roadmap as a fully specified coding prompt.
+Run pinned Godot 4.7.2 import, full `tests/run_tests.gd` suite, headless Main smoke and graphical OUTWARD inspection. `tests/test_rain.gd` must cover exposure derivation, no trigger before both established routes, one trigger, exposed versus sheltered decay with matched starting chemistry, baseline familiarity, post-rain traffic recovery, pause/speed equivalence, JSON continuation and malformed snapshot rejection. Inspect OUTWARD's interference treatment and F3 diagnostics; record any live-audio/device limitations separately.
 
 ## Done when
 
 The expanded card's checks pass, existing behavior remains intact, and the handoff records changed files, tests, limitations, and next task. One logical commit.
+
+## Completion evidence and handoff
+
+- Added authored RainConfig, RunState-owned RainState, fixed-tick RainSystem, captured/validated TrailSegment exposure, one event signal, semantic OUTWARD interference and F3 diagnostics. Run snapshots are version 5. Chemistry/familiarity round to ten decimal places for exact JSON continuation. Knowledge archive restore now quantizes Vector2 positions before exact derived-state comparison because the two-route JSON fixture revealed one last-bit decimal difference; identity and other fields remain exact.
+- Pinned Godot 4.7.2 import, full headless suite and Main smoke passed: 3,525 checks, 0 failures. `tests/test_rain.gd` verifies both-route trigger, authored 1/0 exposure, one event, stronger exposed washout, preserved familiarity, post-rain return/recovery, pause/speed equivalence, JSON continuation and malformed-state rejection. A brief Compatibility graphical startup exited successfully.
+- Inspected 1280×720 OUTWARD rain and F3 preview frames. The label/streaks remain sparse and readable in darkness; F3 weather status fits the header. Temporary preview scripts/images were not committed. Live Android/touch performance and subjective audio listening remain unverified; rapid graphical shutdown can still report Godot audio playback references from task 019.
+- Pause here for slice evaluation as requested. The next roadmap card is 021 save/load, after review.

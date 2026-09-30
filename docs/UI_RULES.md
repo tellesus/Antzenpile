@@ -43,6 +43,8 @@ Task 018 extends selected Food Exchange context: Primitive shows exact start req
 
 Task 019 adds two restrained, phase-matched placeholder music loops without a new persistent UI panel. Developed Food Exchange brings in the second stem over three real seconds. Pausing or accelerating simulation does not alter the audio tempo; audio has no authority over game time. Headless runs remain silent.
 
+Task 020 shows rain in OUTWARD as a brief semantic status label, sparse thin screen-space streaks, and reduced signal opacity while the event is active. It does not reveal exposed terrain or a physical route map. Actual detached chemical strength and familiarity continue to drive existing scent/ghost visuals; F3 shows exact rain phase, elapsed time and segment exposure for diagnosis.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

@@ -97,7 +97,8 @@ func outward_status(pile_id: String) -> Dictionary:
 		"active_scouts": simulation.run.scouts.size(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
-		"resources": simulation.run.colony.piles[pile_id].resources.duplicate()}
+		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
+		"rain_phase": simulation.run.rain.phase}
 
 
 func inward_status(pile_id: String) -> Dictionary:

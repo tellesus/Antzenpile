@@ -182,6 +182,7 @@ func _button_at(at: Vector2) -> String:
 func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
+	_draw_rain(size)
 	_draw_trails(size)
 	_draw_anchor(size)
 	for entry: Dictionary in _placed:
@@ -189,6 +190,15 @@ func _draw() -> void:
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
+
+
+func _draw_rain(size: Vector2) -> void:
+	if _status.get("rain_phase", "") != "raining":
+		return
+	# Sparse, fixed screen-space interference; it contains no physical map data.
+	for index: int in 18:
+		var at := Vector2(fmod(float(index * 173 + 41), size.x), fmod(float(index * 97 + 120), size.y - 130.0) + 85.0)
+		draw_line(at, at + Vector2(-7, 22), Color(0.48, 0.68, 0.76, 0.10), 1.0, true)
 
 
 func _draw_trails(size: Vector2) -> void:
@@ -220,10 +230,10 @@ func _draw_signal(entry: Dictionary) -> void:
 	var color: Color = _signal_color(signal_data.category)
 	for index: int in range(3):
 		var halo: Color = color
-		halo.a = (0.035 + 0.015 * index) * maxf(0.2, signal_data.strength)
+		halo.a = (0.035 + 0.015 * index) * maxf(0.2, signal_data.strength) * (0.6 if _status.get("rain_phase", "") == "raining" else 1.0)
 		draw_circle(at + Vector2(index * 4 - 4, (index - 1) * 3), radius * (1.4 - index * 0.28), halo)
 	var line: Color = color
-	line.a = clampf(signal_data.strength * 0.85 + 0.1, 0.1, 0.8)
+	line.a = clampf(signal_data.strength * 0.85 + 0.1, 0.1, 0.8) * (0.6 if _status.get("rain_phase", "") == "raining" else 1.0)
 	draw_arc(at, radius * 0.66, -1.1, 1.5, 28, line, 2.0)
 	if signal_data.category == "water":
 		draw_arc(at, radius * 0.43, 0.45, 2.6, 24, line, 1.5)
@@ -235,6 +245,8 @@ func _draw_signal(entry: Dictionary) -> void:
 func _draw_hud(size: Vector2) -> void:
 	_label(Vector2(24, 38), "OUTWARD  /  HOME", Color("dad7c8"), 22)
 	_label(Vector2(24, 63), "Drag to turn. Tap a trace to listen.", Color("82939c"), 13)
+	if _status.get("rain_phase", "") == "raining":
+		_label(Vector2(24, 92), "RAIN  /  scent disturbed", Color("8aadb8"), 13)
 	_label(Vector2(size.x * 0.5, 38), facing_text(facing), Color("a9bbc1"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	draw_line(Vector2(size.x * 0.5, 53), Vector2(size.x * 0.5, 72), Color("769aa3"), 1.0)
 	if not _status.is_empty():

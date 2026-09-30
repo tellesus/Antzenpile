@@ -32,7 +32,7 @@ func run(test: Object) -> bool:
 	test.check(pile.food_exchange_state == "developing" and pile.food_exchange_progress_seconds == 59.75 and events.is_empty(), "Development follows fixed simulated time")
 	var mid: Dictionary = game.run.to_dict()
 	var restored := Controller.new()
-	test.check(mid.version == 4 and restored.run.restore(JSON.parse_string(JSON.stringify(mid, "", true, true))) and restored.run.to_dict() == mid, "Mid-build version-4 JSON snapshot restores commitment and progress")
+	test.check(mid.version == RunState.SNAPSHOT_VERSION and restored.run.restore(JSON.parse_string(JSON.stringify(mid, "", true, true))) and restored.run.to_dict() == mid, "Mid-build current JSON snapshot restores commitment and progress")
 	game.advance(0.25)
 	test.check(pile.food_exchange_state == "developed" and pile.food_exchange_progress_seconds == Config.build_seconds and pile.workers.count("food_exchange:home") == -1 and pile.workers_available == 40 and pile.workers.invariant_holds() and events == ["home"], "Completion releases labor and emits chamber_online exactly once")
 	game.advance(120.0)

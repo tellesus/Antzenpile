@@ -50,6 +50,7 @@ func create_route(origin_id: String, knowledge_id: String) -> bool:
 	segment.route_id = route.id
 	segment.start = pile.position
 	segment.end = estimate
+	segment.exposure = Segment.exposure_for(_run.world, segment.start, segment.end)
 	_run.trails.routes[id] = route
 	_run.trails.segments[segment.id] = segment
 	_run.trails.next_route_id += 1
@@ -101,10 +102,10 @@ func set_workers(route_id: String, target: Variant) -> bool:
 func tick(delta: float) -> void:
 	# Every existing segment fades, including inactive and depleted routes.
 	for segment: TrailSegmentState in _run.trails.segments.values():
-		segment.pheromone_strength *= pow(0.5, delta / CONFIG.pheromone_half_life_seconds)
+		segment.pheromone_strength = snappedf(segment.pheromone_strength * pow(0.5, delta / CONFIG.pheromone_half_life_seconds), 0.0000000001)
 		if segment.pheromone_strength < 0.0001:
 			segment.pheromone_strength = 0.0
-		segment.route_familiarity *= pow(0.5, delta / CONFIG.familiarity_half_life_seconds)
+		segment.route_familiarity = snappedf(segment.route_familiarity * pow(0.5, delta / CONFIG.familiarity_half_life_seconds), 0.0000000001)
 		if segment.route_familiarity < 0.0001:
 			segment.route_familiarity = 0.0
 	var ids: Array = _run.trails.routes.keys()
@@ -179,8 +180,8 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		assert(deposited)
 		route.delivered_total += cohort.payload
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-		segment.pheromone_strength = clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0)
-		segment.route_familiarity = clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0)
+		segment.pheromone_strength = snappedf(clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0), 0.0000000001)
+		segment.route_familiarity = snappedf(clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.traffic += mini(cohort.worker_count, WorkerLedger.MAX_COUNT - segment.traffic)
 	else:
 		route.reported_depleted = true

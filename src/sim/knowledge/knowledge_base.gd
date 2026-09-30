@@ -104,7 +104,7 @@ func restore(data: Dictionary, validated_evidence: Dictionary[String, Observatio
 		var id: Variant = record.evidence.id
 		if not id is String or not validated_evidence.has(id) or candidate.observations.has(id):
 			return _reject("Unknown or duplicate archive evidence")
-		if not _valid_evidence(validated_evidence[id], time) or record.evidence != validated_evidence[id].to_dict():
+		if not _valid_evidence(validated_evidence[id], time) or not _matches_quantized_position(record.evidence, validated_evidence[id].to_dict()):
 			return _reject("Archive evidence mismatch")
 		if not typeof(record.received_at) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(record.received_at)) or record.received_at < validated_evidence[id].observed_at or record.received_at > time:
 			return _reject("Invalid evidence delivery time")
@@ -114,13 +114,31 @@ func restore(data: Dictionary, validated_evidence: Dictionary[String, Observatio
 		return _reject("Archive evidence mismatch")
 	for evidence: Observation in candidate.observations.values():
 		candidate._rebuild_node(evidence.source_node_id)
-	if candidate.to_dict().nodes != data.nodes:
+	var rebuilt_nodes: Array = candidate.to_dict().nodes
+	if rebuilt_nodes.size() != data.nodes.size():
 		return _reject("Known nodes disagree with their evidence")
+	for index: int in rebuilt_nodes.size():
+		if not data.nodes[index] is Dictionary or not _matches_quantized_position(data.nodes[index], rebuilt_nodes[index]):
+			return _reject("Known nodes disagree with their evidence")
 	nodes = candidate.nodes
 	observations = candidate.observations
 	_received_at = candidate._received_at
 	last_error = ""
 	return true
+
+
+static func _matches_quantized_position(record: Dictionary, expected: Dictionary) -> bool:
+	# JSON writes Vector2's float32 components as decimals; parsing can differ by
+	# a last double-precision bit. Quantize that one field before exact comparison.
+	if not record.has("estimated_position") or not record.estimated_position is Array or record.estimated_position.size() != 2:
+		return false
+	for value: Variant in record.estimated_position:
+		if not typeof(value) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(value)):
+			return false
+	var comparable: Dictionary = record.duplicate(true)
+	var position := Vector2(record.estimated_position[0], record.estimated_position[1])
+	comparable.estimated_position = [position.x, position.y]
+	return comparable == expected
 
 
 func _reject(reason: String) -> bool:
