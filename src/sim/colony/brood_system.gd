@@ -2,6 +2,7 @@ extends RefCounted
 ## Aggregate brood progression on the run's fixed simulation clock.
 
 const CONFIG = preload("res://data/resources/default_brood.tres")
+const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 var _run: RunState
 
 
@@ -24,9 +25,10 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float) -> void:
 		cohort.nutrition = 0.0 if cohort.stage == "larva" else 1.0
 		return
 	if cohort.stage == "larva":
-		var costs: Dictionary = {"carbohydrate": cohort.count * CONFIG.carbohydrate_per_larva_second * delta,
-			"protein": cohort.count * CONFIG.protein_per_larva_second * delta,
-			"water": cohort.count * CONFIG.water_per_larva_second * delta}
+		var food_multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0
+		var costs: Dictionary = {"carbohydrate": cohort.count * CONFIG.carbohydrate_per_larva_second * delta * food_multiplier,
+			"protein": cohort.count * CONFIG.protein_per_larva_second * delta * food_multiplier,
+			"water": cohort.count * CONFIG.water_per_larva_second * delta * food_multiplier}
 		if not pile.consume_resources(costs):
 			cohort.nutrition = 0.0
 			return

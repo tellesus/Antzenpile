@@ -120,6 +120,7 @@ func _draw() -> void:
 			lines.append("Available: %s" % detail.workers.available)
 			lines.append("Stores: carb %.1f / protein %.1f / water %.1f" % [detail.resources.carbohydrate, detail.resources.protein, detail.resources.water])
 			lines.append("Brood matured total: %d" % detail.brood_matured_total)
+			lines.append("Food Exchange: %s / %.1fs" % [detail.food_exchange_state, detail.food_exchange_progress_seconds])
 			for cohort: Dictionary in detail.brood_cohorts:
 				lines.append("%s: %d %s / %.1fs / nutrition %.1f / care %.1f" % [cohort.id, cohort.count, cohort.stage, cohort.progress_seconds, cohort.nutrition, cohort.care])
 			lines.append("Archived reports: %d" % data.knowledge.observations.size())

@@ -4,6 +4,7 @@ const Controller = preload("res://src/core/simulation_controller.gd")
 const Perception = preload("res://src/presentation/perception_model.gd")
 const Outward = preload("res://src/presentation/outward/outward_view.gd")
 const Inward = preload("res://src/presentation/inward/inward_view.gd")
+const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
 var _debug_view: Node
@@ -34,6 +35,7 @@ func _ready() -> void:
 		inward.mode_command = set_mode.bind("outward")
 		inward.pause_command = simulation.toggle_pause
 		inward.speed_command = simulation.set_time_scale
+		inward.develop_command = start_food_exchange
 		inward.input_blocked = debug_is_open
 		add_child(inward)
 		_inward_view = inward
@@ -107,9 +109,19 @@ func inward_status(pile_id: String) -> Dictionary:
 		"workers_total": pile.workers_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
 		"resources": pile.resources.duplicate(), "food_exchange_state": pile.food_exchange_state,
+		"food_exchange_progress": pile.food_exchange_progress_seconds,
+		"food_exchange_duration": FOOD_CONFIG.build_seconds,
+		"food_exchange_costs": FOOD_CONFIG.costs(),
+		"food_exchange_workers_required": FOOD_CONFIG.workers_required,
+		"food_exchange_food_multiplier": FOOD_CONFIG.developed_larval_food_multiplier,
 		"active_scouts": simulation.run.scouts.size(), "trail_workers": trail_workers,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale}
+
+
+func start_food_exchange() -> Dictionary:
+	var accepted: bool = simulation.start_food_exchange("home")
+	return {"accepted": accepted, "reason": simulation.food_exchange.last_error}
 
 
 func trail_summaries(pile_id: String) -> Array[Dictionary]:

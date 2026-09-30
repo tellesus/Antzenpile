@@ -7,10 +7,13 @@ var status_provider: Callable
 var mode_command: Callable
 var pause_command: Callable
 var speed_command: Callable
+var develop_command: Callable
 var input_blocked: Callable
 var selected_id: String = ""
 var _status: Dictionary = {}
 var _font: Font = ThemeDB.fallback_font
+var _feedback: String = ""
+var _feedback_until: int = 0
 
 
 func _process(_delta: float) -> void:
@@ -34,6 +37,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "food_exchange" and _status.get("food_exchange_state", "") == "primitive" and _develop_rect().has_point(at):
+		_run_command("develop")
+		return true
 	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64"]:
 		if _button_rect(command).has_point(at):
 			_run_command(command)
@@ -54,6 +60,11 @@ func _run_command(command: String) -> void:
 		"pause":
 			if pause_command.is_valid():
 				pause_command.call()
+		"develop":
+			if develop_command.is_valid():
+				var result: Dictionary = develop_command.call()
+				_feedback = "Development started" if result.get("accepted", false) else result.get("reason", "Requirements unmet")
+				_feedback_until = Time.get_ticks_msec() + 3000
 		_:
 			if command.begins_with("speed_") and speed_command.is_valid():
 				speed_command.call(int(command.trim_prefix("speed_")))
@@ -86,6 +97,10 @@ func _button_rect(command: String) -> Rect2:
 		"speed_16": return Rect2(448, y, 62, 64)
 		"speed_64": return Rect2(518, y, 62, 64)
 	return Rect2()
+
+
+func _develop_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
 
 
 func _draw() -> void:
@@ -144,10 +159,25 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 143, "Care: %s" % ("enough" if brood[0].care >= 1.0 else "short"))
 			_detail_line(box, 181, "Workers emerged: %d" % _status.brood_matured_total)
 		"food_exchange":
-			_detail_line(box, 65, "%s Food Exchange" % _status.food_exchange_state.capitalize())
-			_detail_line(box, 103, "Carbohydrate: %.1f" % _status.resources.carbohydrate)
-			_detail_line(box, 129, "Protein: %.1f" % _status.resources.protein)
-			_detail_line(box, 155, "Water: %.1f" % _status.resources.water)
+			if _status.food_exchange_state == "primitive":
+				_detail_line(box, 65, "Primitive Food Exchange")
+				_detail_line(box, 99, "Needs %.0f carb · %.0f protein" % [_status.food_exchange_costs.carbohydrate, _status.food_exchange_costs.protein])
+				_detail_line(box, 125, "%.0f water · %d workers" % [_status.food_exchange_costs.water, _status.food_exchange_workers_required])
+				_detail_line(box, 157, "Build: %.0f simulated seconds" % _status.food_exchange_duration)
+				_detail_line(box, 185, "Stores: %.1f / %.1f / %.1f" % [_status.resources.carbohydrate, _status.resources.protein, _status.resources.water])
+				draw_rect(_develop_rect(), Color("35483c"))
+				_label(_develop_rect().position + Vector2(130, 29), "DEVELOP", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+			elif _status.food_exchange_state == "developing":
+				_detail_line(box, 65, "Developing Food Exchange")
+				_detail_line(box, 99, "%.0f / %.0f simulated seconds" % [_status.food_exchange_progress, _status.food_exchange_duration])
+				_detail_line(box, 125, "%d workers committed" % _status.food_exchange_workers_required)
+				_detail_line(box, 157, "Resources paid at start")
+			else:
+				_detail_line(box, 65, "Developed Food Exchange")
+				_detail_line(box, 99, "Larval food use: %.0f%% less" % [(1.0 - _status.food_exchange_food_multiplier) * 100.0])
+				_detail_line(box, 137, "Carbohydrate: %.1f" % _status.resources.carbohydrate)
+				_detail_line(box, 163, "Protein: %.1f" % _status.resources.protein)
+				_detail_line(box, 189, "Water: %.1f" % _status.resources.water)
 		"entrance":
 			_detail_line(box, 65, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
@@ -165,7 +195,8 @@ func _draw_controls(size: Vector2) -> void:
 		draw_rect(box, Color("31505a") if active else Color("18252b"))
 		var title: String = "OUTWARD" if command == "outward" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
 		_label(box.position + Vector2(box.size.x * 0.5, 40), title, Color("d3dcd4"), 16, HORIZONTAL_ALIGNMENT_CENTER)
-	_label(Vector2(24, size.y - 17), "Tab: switch view  ·  Space: pause  ·  1–4: time", Color("7e8e94"), 13)
+	var footer: String = _feedback if Time.get_ticks_msec() < _feedback_until else "Tab: switch view  ·  Space: pause  ·  1–4: time"
+	_label(Vector2(24, size.y - 17), footer, Color("a9bcad") if footer == _feedback else Color("7e8e94"), 13)
 
 
 static func _title(id: String) -> String:

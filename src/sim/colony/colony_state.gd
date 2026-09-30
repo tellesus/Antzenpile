@@ -44,5 +44,9 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 		restored[pile.id] = pile
 	if not restored.has("home") or restored.home.position != home_position:
 		return false
+	for pile: PileState in restored.values():
+		for commitment_id: String in pile.workers.to_dict().commitments:
+			if commitment_id.begins_with("food_exchange:") and commitment_id != "food_exchange:" + pile.id:
+				return false
 	piles = restored
 	return true

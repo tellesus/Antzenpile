@@ -2,7 +2,7 @@ class_name RunState
 extends RefCounted
 
 const Clock = preload("res://src/core/simulation_clock.gd")
-const SNAPSHOT_VERSION: int = 3
+const SNAPSHOT_VERSION: int = 4
 const World = preload("res://src/sim/world/world_state.gd")
 const Loader = preload("res://src/sim/world/world_loader.gd")
 const Colony = preload("res://src/sim/colony/colony_state.gd")

@@ -39,6 +39,8 @@ Show **Queen, Nursery, Food Exchange, Entrance** as abstract functional organs s
 
 Task 017 uses four fixed normalized positions in the left functional field, with a selected-node context card on the right. Queen shows queen and living-worker counts; Nursery shows brood/stage/care/nutrition/emergence; Food Exchange shows its Primitive state and stores; Entrance shows available, scout and trail labor. The top bar keeps only available labor and time. Mouse/touch share node hit targets; OUTWARD and INWARD buttons and Tab switch views without affecting the run. Each view retains its own selection. The debug truth overlay remains separate and blocks mode switching while open.
 
+Task 018 extends selected Food Exchange context: Primitive shows exact start requirements and a touch-sized Develop action with a short rejection reason; Developing shows fixed simulated progress and committed labor; Developed names the 25% larval food-use benefit and stores. It remains one contextual action, not a general build menu. F3 can inspect exact state/progress and the authoritative labor commitment.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

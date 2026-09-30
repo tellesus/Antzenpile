@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FoodExchangeConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/colony/food_exchange_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+workers_required = 4
+carbohydrate_cost = 12.0
+protein_cost = 4.0
+water_cost = 4.0
+build_seconds = 60.0
+developed_larval_food_multiplier = 0.75

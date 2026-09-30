@@ -66,6 +66,8 @@ Task 016 adds aggregate BroodCohort state to each pile and a fixed-tick BroodSys
 
 Task 017 adds INWARD as a second normal-play Node2D with four authored functional nodes. GameRoot is the mode owner; it creates both views on graphical runs, activates only one at a time, switches visibility/input processing, and leaves the run untouched. InwardView receives a detached pile/clock summary with no WorldState, scout objects or route geometry. It keeps its own selected node while OUTWARD retains facing and trace selection. PileState now records the Primitive Food Exchange state, without development logic; required run snapshots are version 3.
 
+Task 018 adds one FoodExchangeSystem command and fixed-tick transition. PileState owns semantic state/progress, while WorkerLedger owns construction labor and pile storage pays the one-time cost. `chamber_online` emits only on completion; BroodSystem checks the Developed state for a future-food-use multiplier. GameRoot exposes detached state/requirements and a semantic Start callback to the selected INWARD context. Audio is not yet present. Required run snapshots are version 4.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout
