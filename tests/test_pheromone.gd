@@ -27,7 +27,7 @@ func run(test: Object) -> bool:
 	test.check(segment.pheromone_strength == 0.0 and segment.traffic == 0 and segment.route_familiarity == 0.0, "New segment starts chemically blank")
 	_steps(game, 2 * leg + 1)
 	test.check(segment.pheromone_strength > 0.17 and segment.pheromone_strength <= 1.0 and segment.traffic == 5, "Five loaded returning workers reinforce once")
-	test.check(segment.route_familiarity == 0.0, "Chemical change does not alter familiarity")
+	test.check(segment.route_familiarity > 0.0 and segment.route_familiarity < segment.pheromone_strength, "Familiarity now gains separately and more slowly")
 	var root := Root.new()
 	root.simulation = game
 	var summary: Dictionary = root.trail_summaries("home")[0]
@@ -46,9 +46,6 @@ func run(test: Object) -> bool:
 	var invalid: Dictionary = saved.duplicate(true)
 	invalid.trails.segments[0].traffic = -1
 	test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Negative traffic rejects atomically")
-	invalid = saved.duplicate(true)
-	invalid.trails.segments[0].route_familiarity = 0.2
-	test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Future familiarity cannot enter task 014 snapshots")
 	test.check(game.set_trail_workers("route_1", 0), "Cancel prevents new departures")
 	_steps(game, 2 * leg + 1)
 	var idle_strength: float = segment.pheromone_strength

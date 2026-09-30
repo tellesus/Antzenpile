@@ -104,6 +104,9 @@ func tick(delta: float) -> void:
 		segment.pheromone_strength *= pow(0.5, delta / CONFIG.pheromone_half_life_seconds)
 		if segment.pheromone_strength < 0.0001:
 			segment.pheromone_strength = 0.0
+		segment.route_familiarity *= pow(0.5, delta / CONFIG.familiarity_half_life_seconds)
+		if segment.route_familiarity < 0.0001:
+			segment.route_familiarity = 0.0
 	var ids: Array = _run.trails.routes.keys()
 	ids.sort()
 	for id: String in ids:
@@ -158,7 +161,8 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if not _run.world.nodes.has(source_id):
 		return
 	var node: WorldNodeState = _run.world.nodes[source_id]
-	if not node.active or node.quantity <= 0.0 or node.position.distance_to(route.estimated_destination) > CONFIG.interaction_radius:
+	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
+	if not node.active or node.quantity <= 0.0 or node.position.distance_to(route.estimated_destination) > CONFIG.interaction_radius * (1.0 + 0.5 * reliability(segment)):
 		return
 	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker)
 	node.quantity = maxf(0.0, node.quantity - amount)
@@ -176,6 +180,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		route.delivered_total += cohort.payload
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 		segment.pheromone_strength = clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0)
+		segment.route_familiarity = clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0)
 		segment.traffic += mini(cohort.worker_count, WorkerLedger.MAX_COUNT - segment.traffic)
 	else:
 		route.reported_depleted = true
@@ -197,6 +202,10 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 func _leg_ticks(route: TrailRouteState) -> int:
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	return CONFIG.leg_ticks(segment.start.distance_to(segment.end))
+
+
+static func reliability(segment: TrailSegmentState) -> float:
+	return clampf(0.5 * segment.pheromone_strength + 0.5 * segment.route_familiarity, 0.0, 1.0)
 
 
 func _reject(reason: String) -> bool:

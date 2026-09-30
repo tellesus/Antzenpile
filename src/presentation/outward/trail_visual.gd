@@ -14,8 +14,13 @@ static func strokes(routes: Array, placed: Array[Dictionary], viewport: Vector2)
 	for route: Dictionary in routes:
 		if count >= MAX_LINKS:
 			break
-		var strength: float = float(route.get("pheromone_strength", 0.0))
-		if not is_finite(strength) or strength < 0.1:
+		var chemical: float = float(route.get("pheromone_strength", 0.0))
+		var familiarity: float = float(route.get("route_familiarity", 0.0))
+		if not is_finite(chemical) or not is_finite(familiarity):
+			continue
+		var ghost: bool = chemical < 0.1 and familiarity >= 0.1
+		var strength: float = familiarity if ghost else chemical
+		if strength < 0.1:
 			continue
 		var destination_id: String = str(route.get("destination_knowledge_id", ""))
 		for entry: Dictionary in placed:
@@ -29,12 +34,12 @@ static func strokes(routes: Array, placed: Array[Dictionary], viewport: Vector2)
 			for step: int in range(STEPS + 1):
 				var t: float = float(step) / STEPS
 				points.append(start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t)
-			if strength >= 0.45:
-				result.append({"points": points, "strength": strength})
+			if chemical >= 0.45:
+				result.append({"points": points, "strength": strength, "ghost": false})
 			else:
 				for group: int in range(4):
 					var first: int = group * 6
-					result.append({"points": points.slice(first, first + 3), "strength": strength})
+					result.append({"points": points.slice(first, first + 3), "strength": strength, "ghost": ghost})
 			count += 1
 			break
 	return result

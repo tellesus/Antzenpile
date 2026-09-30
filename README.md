@@ -4,7 +4,7 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-Tasks 001–014 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scout missions, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. PerceivedSignals derive bearing, estimated distance, strength and qualitative confidence from colony memory. OUTWARD shows remembered traces and supports rotation, selection, scouting, pause, time controls, and trail investment. Invested trails send bounded worker cohorts to collect resources and deposit them on return; recall waits for travelling workers. Successful returns reinforce segment pheromone, which decays with disuse and appears as a thin sensory link in OUTWARD. Familiarity is next. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
+Tasks 001–015 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scout missions, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. PerceivedSignals derive bearing, estimated distance, strength and qualitative confidence from colony memory. OUTWARD shows remembered traces and supports rotation, selection, scouting, pause, time controls, and trail investment. Invested trails send bounded worker cohorts to collect resources and deposit them on return; recall waits for travelling workers. Successful returns reinforce short-lived segment pheromone and slower route familiarity. Chemistry appears as a thin sensory link; learned memory persists as a faint ghost and modestly improves route reliability. Brood growth is next. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
@@ -24,7 +24,7 @@ Tasks 001–014 are implemented: Godot shell, fixed clock, isolated seeded runs,
 | [UI_RULES](docs/UI_RULES.md) | OUTWARD, INWARD, information and rendering rules |
 | [CODING_RULES](docs/CODING_RULES.md) | Implementation and validation workflow |
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
-| [Task cards](docs/tasks/) | 001–014 completed; 015–022 roadmap |
+| [Task cards](docs/tasks/) | 001–015 completed; 016–022 roadmap |
 
 ## Running and testing
 

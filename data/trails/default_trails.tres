@@ -13,3 +13,5 @@ max_cohorts_per_route = 8
 interaction_radius = 2.0
 pheromone_half_life_seconds = 90.0
 pheromone_per_returning_worker = 0.035
+familiarity_half_life_seconds = 900.0
+familiarity_per_returning_worker = 0.008

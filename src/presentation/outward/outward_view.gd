@@ -187,10 +187,14 @@ func _draw() -> void:
 func _draw_trails(size: Vector2) -> void:
 	for stroke: Dictionary in Scent.strokes(_status.get("trails", []), _placed, size):
 		var strength: float = clampf(stroke.strength, 0.0, 1.0)
-		var envelope := Color(0.40, 0.75, 0.68, 0.035 + 0.065 * strength)
-		var core := Color(0.62, 0.93, 0.79, 0.13 + 0.52 * strength)
-		draw_polyline(stroke.points, envelope, 5.0, true)
-		draw_polyline(stroke.points, core, 1.25, true)
+		if stroke.ghost:
+			draw_polyline(stroke.points, Color(0.40, 0.75, 0.68, 0.025), 3.0, true)
+			draw_polyline(stroke.points, Color(0.62, 0.93, 0.79, 0.09 + 0.09 * strength), 1.0, true)
+		else:
+			var envelope := Color(0.40, 0.75, 0.68, 0.035 + 0.065 * strength)
+			var core := Color(0.62, 0.93, 0.79, 0.13 + 0.52 * strength)
+			draw_polyline(stroke.points, envelope, 5.0, true)
+			draw_polyline(stroke.points, core, 1.25, true)
 
 
 func _draw_anchor(size: Vector2) -> void:
@@ -247,7 +251,7 @@ func _draw_context(size: Vector2) -> void:
 	_label(box.position + Vector2(16, 137), "Risk unknown", Color("8fa1a8"), 13)
 	var route: Dictionary = _selected_route(selected)
 	if route.is_empty() or route.status == "inactive":
-		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" else "No workers · scent " + _scent_label(route)
+		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" and float(route.get("route_familiarity", 0.0)) < 0.1 else "No workers · scent " + _scent_label(route)
 		_label(box.position + Vector2(16, 165), idle_text, Color("a8b8bd"), 13)
 		_label(box.position + Vector2(16, 187), "Home stores: %.1f" % _status.get("resources", {}).get(selected.category, 0.0), Color("8fa1a8"), 13)
 		_draw_trail_button("trail_create", "INVEST 5 WORKERS")
@@ -267,7 +271,7 @@ func _draw_context(size: Vector2) -> void:
 
 func _scent_label(route: Dictionary) -> String:
 	var strength: float = float(route.get("pheromone_strength", 0.0))
-	return "strong" if strength >= 0.7 else "clear" if strength >= 0.45 else "faint" if strength >= 0.1 else "absent"
+	return "strong" if strength >= 0.7 else "clear" if strength >= 0.45 else "faint" if strength >= 0.1 else "remembered" if float(route.get("route_familiarity", 0.0)) >= 0.1 else "absent"
 
 
 func _selected_signal() -> Dictionary:

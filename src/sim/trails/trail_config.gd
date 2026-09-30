@@ -10,6 +10,8 @@ extends Resource
 @export var interaction_radius: float = 2.0
 @export var pheromone_half_life_seconds: float = 90.0
 @export var pheromone_per_returning_worker: float = 0.035
+@export var familiarity_half_life_seconds: float = 900.0
+@export var familiarity_per_returning_worker: float = 0.008
 
 
 func leg_ticks(length: float) -> int:

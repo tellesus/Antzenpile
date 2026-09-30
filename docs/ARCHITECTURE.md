@@ -60,6 +60,8 @@ Task 013 makes TrailSystem a fixed-tick system. Bounded TransitCohorts hold comm
 
 Task 014 makes segment pheromone authoritative simulation state. Loaded cohort home arrivals reinforce by worker count; every fixed tick decays all segments, including inactive routes. Familiarity remains separate and unchanged. GameRoot exposes detached pheromone strength in route summaries; TrailVisual maps that value and a visible projected signal into bounded screen-space strokes. It never receives segment endpoints. F3 may inspect numeric chemistry and aggregate traffic.
 
+Task 015 activates separate segment familiarity. Loaded returns teach it more slowly than chemistry, and its much longer half-life leaves a route memory after chemical washout. TrailSystem derives reliability equally from both values; this modestly broadens source interaction tolerance at the captured estimate without changing transit legs. OUTWARD receives detached familiarity for a sparse, faint memory ghost and has no route geometry.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

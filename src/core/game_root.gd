@@ -65,7 +65,8 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers,
 				"active_workers": route.active_workers, "status": route.status,
 				"delivered_total": route.delivered_total,
-				"pheromone_strength": segment.pheromone_strength})
+				"pheromone_strength": segment.pheromone_strength,
+				"route_familiarity": segment.route_familiarity})
 	summaries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.id < b.id)
 	return summaries
 

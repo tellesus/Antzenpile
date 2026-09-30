@@ -35,8 +35,8 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 		return false
 	if not typeof(data.pheromone_strength) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.pheromone_strength)) or data.pheromone_strength < 0.0 or data.pheromone_strength > 1.0:
 		return false
-	if not typeof(data.route_familiarity) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.route_familiarity)) or data.route_familiarity != 0:
-			return false
+	if not typeof(data.route_familiarity) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.route_familiarity)) or data.route_familiarity < 0.0 or data.route_familiarity > 1.0:
+		return false
 	if not WorkerLedger.valid_count(data.traffic):
 		return false
 	id = data.id
@@ -44,6 +44,6 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 	start = origin
 	end = destination
 	pheromone_strength = float(data.pheromone_strength)
-	route_familiarity = 0.0
+	route_familiarity = float(data.route_familiarity)
 	traffic = int(data.traffic)
 	return true

@@ -44,6 +44,8 @@ Task 013 adds `TransitCohort` with stable `cohort_N` ID, route ID, outbound/inbo
 
 Task 014 activates `TrailSegmentState.pheromone_strength` and `traffic`. Pheromone is finite in [0,1], decays with a 90 simulated-second half-life on every fixed tick, and increases by 0.035 per worker in a cohort that deposits positive cargo on home arrival. Reinforcement clamps at 1; values below 0.0001 snap to zero. `traffic` counts successful returning workers cumulatively and saturates at the ledger's maximum safe count. Empty returns do not count. Inactive segments retain and decay chemistry. Restore accepts validated nonzero chemistry/traffic and still requires zero familiarity until task 015. The normal route summary exposes only detached strength, never segment coordinates or raw traffic.
 
+Task 015 activates `TrailSegmentState.route_familiarity` as a second finite [0,1] value. A loaded return adds 0.008 per worker; every fixed tick applies a 900 simulated-second half-life, including on inactive segments. `TrailSystem.reliability` is `0.5 * pheromone + 0.5 * familiarity`; the source interaction radius is the task-013 base radius multiplied by `1 + 0.5 * reliability` (2–3 m with current tuning). No view reads this hidden interaction check. Save restore validates nonzero familiarity separately. Detached route summaries may carry both values for qualitative, memory-only presentation.
+
 MusicState exposes semantic development level for the slice. Stability/crisis may be added later. Audio does not inspect arbitrary simulation internals.
 
 ## Invariants
