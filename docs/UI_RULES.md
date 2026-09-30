@@ -57,6 +57,8 @@ Task 021 places touch-sized Save and Load buttons at the upper right of both nor
 
 Task 025 puts one touch-sized **LAY 8 BROOD** action in the selected Queen or Nursery context only while the nursery is empty. Its callback goes through GameRoot to BroodSystem. The action disappears while the cohort is active, and the existing stage/care/nutrition summary replaces it. No permanent population menu or individual egg graphics are introduced.
 
+Task 030 additionally shows occupied/total brood space and current/maximum care capacity in the selected Nursery context. Queen shows occupied Nursery space. Lay Brood requires the detached free-space summary as well as an empty Nursery and a queen; BroodSystem independently validates the command. These are colony facts, not a physical chamber floorplan.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

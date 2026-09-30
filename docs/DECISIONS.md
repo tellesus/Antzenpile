@@ -58,6 +58,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A22 | Task 027 makes `carb_sheltered` a flowering nectar source. At tick 1200 and every 1200 ticks after, a physical pulse adds up to 12 carbohydrate to a capacity of 100. The schedule is authored and derived from saved clock ticks, leaving snapshot version 5 unchanged. These are provisional ecology values, not a resource-balance pass. |
 | A23 | Task 028 offers Recheck on a selected depleted trail once its travelers are home. Existing committed workers test the source via normal travel; no hidden renewal check, auto-retry, new worker pool or snapshot version change. |
 | A24 | Task 029 charges each aggregate trail departure for its full round trip at a provisional 0.003 carbohydrate per worker-meter times sampled terrain movement cost. Insufficient protein/water routes wait without releasing labor. A known carbohydrate route may settle an unpaid remainder from returning cargo, avoiding a zero-carbohydrate lockout. These are provisional economy rules, not final balance. Optional route/cohort fields keep version-5 disk saves loadable. |
+| A25 | Task 030 records Primitive Nursery state on each pile. Authored capacity is eight brood and eight care slots; each available worker supplies four care slots up to that maximum. This preserves the existing two-worker full-care gate and one eight-ant cohort at a time. Older version-5 saves default the optional state to Primitive. Chamber development is card 031. |
 
 ## Details to resolve in their task
 

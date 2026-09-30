@@ -22,6 +22,9 @@ func start(pile_id: String) -> bool:
 	if not pile.brood_cohorts.is_empty():
 		last_error = "Nursery already has brood"
 		return false
+	if pile.nursery_brood_capacity() - pile.nursery_occupied_space() < CONFIG.starting_count:
+		last_error = "Nursery lacks brood space"
+		return false
 	if pile.brood_matured_total > WorkerLedger.MAX_COUNT - CONFIG.starting_count or pile.workers_total > WorkerLedger.MAX_COUNT - CONFIG.starting_count:
 		last_error = "Population limit reached"
 		return false
@@ -42,7 +45,7 @@ func tick(delta: float) -> void:
 
 
 func _advance(pile: PileState, cohort: BroodCohort, delta: float) -> void:
-	cohort.care = minf(1.0, float(pile.workers_available) / CONFIG.available_carers_required)
+	cohort.care = minf(1.0, float(pile.nursery_care_capacity()) / cohort.count)
 	if cohort.care < 1.0:
 		cohort.nutrition = 0.0 if cohort.stage == "larva" else 1.0
 		return

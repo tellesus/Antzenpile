@@ -87,6 +87,8 @@ Task 028 adds a semantic TrailSystem recheck command for a depleted route after 
 
 Task 029 makes TrailSystem charge aggregate travel energy from pile carbohydrate for each departing round trip. Captured segment length and sampled terrain movement cost scale the authored per-worker rate; each cohort departure represents traffic. A protein or water route waits with committed workers when carbohydrate is insufficient. A colony-known carbohydrate route can instead pay available reserves and settle the remainder from returning cargo, preserving a recovery path from zero stores. Route `energy_limited` and cohort `unpaid_energy_cost` are optional additions to version-5 records so earlier disk saves still restore. OUTWARD receives only the observed stall flag, never hidden terrain cost or source quantity.
 
+Task 030 gives each PileState a Primitive Nursery state, with brood-space and care limits from authored BroodConfig. The existing one-cohort rule remains; a repeat laying command also checks free capacity. Care capacity derives from available ledger workers and is queried by BroodSystem on fixed ticks. GameRoot projects occupied/total space and current/maximum care capacity into a detached INWARD summary. Older version-5 saves without `nursery_state` restore as Primitive.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

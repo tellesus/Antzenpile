@@ -13,6 +13,7 @@ var workers: WorkerLedger = Ledger.new()
 var resources: Dictionary[String, float] = {"carbohydrate": 0.0, "protein": 0.0, "water": 0.0}
 var brood_cohorts: Array[BroodCohort] = []
 var brood_matured_total: int = 0
+var nursery_state: String = "primitive"
 var food_exchange_state: String = "primitive"
 var food_exchange_progress_seconds: float = 0.0
 var workers_total: int:
@@ -28,8 +29,25 @@ func to_dict() -> Dictionary:
 	return {"id": id, "position": [position.x, position.y], "queen_count": queen_count,
 		"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
+		"nursery_state": nursery_state,
 		"food_exchange_state": food_exchange_state,
 		"food_exchange_progress_seconds": food_exchange_progress_seconds}
+
+
+func nursery_brood_capacity() -> int:
+	return BROOD_CONFIG.primitive_nursery_brood_capacity
+
+
+func nursery_occupied_space() -> int:
+	var occupied: int = 0
+	for cohort: BroodCohort in brood_cohorts:
+		occupied += cohort.count
+	return occupied
+
+
+func nursery_care_capacity() -> int:
+	return mini(BROOD_CONFIG.primitive_nursery_care_capacity,
+		floori(float(workers_available * BROOD_CONFIG.primitive_nursery_care_capacity) / BROOD_CONFIG.available_carers_required))
 
 
 func deposit_resource(resource_id: String, amount: float) -> bool:
@@ -75,6 +93,8 @@ func restore(data: Dictionary) -> bool:
 		restored_resources[resource_id] = float(data.resources[resource_id])
 	if not data.brood_cohorts is Array or data.brood_cohorts.size() > 1 or not Ledger.valid_count(data.brood_matured_total):
 		return false
+	if data.get("nursery_state", "primitive") != "primitive":
+		return false
 	var restored_brood: Array[BroodCohort] = []
 	for record: Variant in data.brood_cohorts:
 		var cohort := Brood.new()
@@ -85,6 +105,11 @@ func restore(data: Dictionary) -> bool:
 	if emerged % BROOD_CONFIG.starting_count != 0 or (restored_brood.is_empty() and emerged < BROOD_CONFIG.starting_count):
 		return false
 	if not restored_brood.is_empty() and restored_brood[0].id != Brood.next_id(emerged):
+		return false
+	var occupied: int = 0
+	for cohort: BroodCohort in restored_brood:
+		occupied += cohort.count
+	if occupied > BROOD_CONFIG.primitive_nursery_brood_capacity:
 		return false
 	var commitment: String = "food_exchange:" + data.id
 	var record: Dictionary = restored.to_dict().commitments.get(commitment, {})
@@ -100,6 +125,7 @@ func restore(data: Dictionary) -> bool:
 	resources = restored_resources
 	brood_cohorts = restored_brood
 	brood_matured_total = int(data.brood_matured_total)
+	nursery_state = "primitive"
 	food_exchange_state = data.food_exchange_state
 	food_exchange_progress_seconds = float(data.food_exchange_progress_seconds)
 	return true

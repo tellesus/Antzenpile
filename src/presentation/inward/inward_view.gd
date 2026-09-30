@@ -45,7 +45,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
-	if selected_id in ["queen", "nursery"] and _status.get("queens", 0) > 0 and _status.get("brood", []).is_empty() and _brood_rect().has_point(at):
+	if selected_id in ["queen", "nursery"] and _status.get("queens", 0) > 0 and _status.get("brood", []).is_empty() and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and _brood_rect().has_point(at):
 		_run_command("lay_brood")
 		return true
 	if selected_id == "food_exchange" and _status.get("food_exchange_state", "") == "primitive" and _develop_rect().has_point(at):
@@ -175,21 +175,21 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 65, "Queens: %d" % _status.queens)
 			_detail_line(box, 91, "Living workers: %d" % _status.workers_total)
 			_detail_line(box, 117, "Available workers: %d" % _status.workers_available)
-			if _status.queens > 0 and _status.brood.is_empty():
-				_detail_line(box, 157, "Nursery is empty")
+			_detail_line(box, 157, "Nursery: %d / %d brood space" % [_status.nursery_occupied_space, _status.nursery_brood_capacity])
+			if _status.queens > 0 and _status.brood.is_empty() and _status.nursery_brood_capacity - _status.nursery_occupied_space >= _status.brood_batch_count:
 				_draw_brood_button()
 		"nursery":
 			var brood: Array = _status.brood
 			var count: int = 0
 			for cohort: Dictionary in brood:
 				count += cohort.count
-			_detail_line(box, 65, "Immature brood: %d" % count)
+			_detail_line(box, 65, "Brood space: %d / %d" % [count, _status.nursery_brood_capacity])
+			_detail_line(box, 91, "Care capacity: %d / %d" % [_status.nursery_care_capacity, _status.nursery_max_care_capacity])
 			if not brood.is_empty():
-				_detail_line(box, 91, "Stage: %s · %.0fs" % [brood[0].stage.capitalize(), brood[0].progress_seconds])
-				_detail_line(box, 117, "Nutrition: %s" % ("enough" if brood[0].nutrition >= 1.0 else "short"))
-				_detail_line(box, 143, "Care: %s" % ("enough" if brood[0].care >= 1.0 else "short"))
+				_detail_line(box, 117, "%s · %.0fs" % [brood[0].stage.capitalize(), brood[0].progress_seconds])
+				_detail_line(box, 143, "Food %s · care %s" % ["enough" if brood[0].nutrition >= 1.0 else "short", "enough" if brood[0].care >= 1.0 else "short"])
 			_detail_line(box, 181, "Workers emerged: %d" % _status.brood_matured_total)
-			if _status.queens > 0 and brood.is_empty():
+			if _status.queens > 0 and brood.is_empty() and _status.nursery_brood_capacity - _status.nursery_occupied_space >= _status.brood_batch_count:
 				_draw_brood_button()
 		"food_exchange":
 			if _status.food_exchange_state == "primitive":
