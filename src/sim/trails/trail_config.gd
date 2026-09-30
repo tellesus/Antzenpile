@@ -12,7 +12,12 @@ extends Resource
 @export var pheromone_per_returning_worker: float = 0.035
 @export var familiarity_half_life_seconds: float = 900.0
 @export var familiarity_per_returning_worker: float = 0.008
+@export var carbohydrate_per_worker_meter: float = 0.003
 
 
 func leg_ticks(length: float) -> int:
 	return maxi(1, ceili(length / travel_speed / SimulationClock.TICK_INTERVAL))
+
+
+func round_trip_energy_cost(workers: int, length: float, terrain_cost: float) -> float:
+	return roundf(workers * length * terrain_cost * carbohydrate_per_worker_meter * 100000.0) / 100000.0

@@ -16,6 +16,7 @@ var status: String = "inactive"
 var departure_cooldown_ticks: int = 0
 var reported_depleted: bool = false
 var delivered_total: float = 0.0
+var energy_limited: bool = false
 
 
 func to_dict() -> Dictionary:
@@ -25,7 +26,8 @@ func to_dict() -> Dictionary:
 		"segment_id": segment_id, "desired_workers": desired_workers,
 		"allocated_workers": allocated_workers, "active_workers": active_workers,
 		"status": status, "departure_cooldown_ticks": departure_cooldown_ticks,
-		"reported_depleted": reported_depleted, "delivered_total": delivered_total}
+		"reported_depleted": reported_depleted, "delivered_total": delivered_total,
+		"energy_limited": energy_limited}
 
 
 func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bounds: Rect2) -> bool:
@@ -53,8 +55,10 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 		return false
 	if not typeof(data.delivered_total) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.delivered_total)) or data.delivered_total < 0.0:
 		return false
+	if data.has("energy_limited") and typeof(data.energy_limited) != TYPE_BOOL:
+		return false
 	var expected_status: String = "inactive" if data.allocated_workers == 0 else "recalling" if data.desired_workers == 0 else "depleted" if data.reported_depleted else "active"
-	if data.status != expected_status:
+	if data.status != expected_status or (data.get("energy_limited", false) and data.status != "active"):
 		return false
 	id = data.id
 	origin_pile = data.origin_pile
@@ -68,4 +72,5 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	departure_cooldown_ticks = int(data.departure_cooldown_ticks)
 	reported_depleted = data.reported_depleted
 	delivered_total = float(data.delivered_total)
+	energy_limited = data.get("energy_limited", false)
 	return true

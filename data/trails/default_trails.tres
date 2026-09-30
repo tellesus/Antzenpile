@@ -15,3 +15,4 @@ pheromone_half_life_seconds = 90.0
 pheromone_per_returning_worker = 0.035
 familiarity_half_life_seconds = 900.0
 familiarity_per_returning_worker = 0.008
+carbohydrate_per_worker_meter = 0.003

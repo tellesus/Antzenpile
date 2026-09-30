@@ -78,6 +78,9 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
 		if cohort.remaining_ticks > CONFIG.leg_ticks(segment.start.distance_to(segment.end)):
 			return false
+		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end))
+		if cohort.unpaid_energy_cost > maximum_energy_cost or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):
+			return false
 		var source_id: String = knowledge.nodes[route.destination_knowledge_id].source_node_id
 		if not world.nodes.has(source_id):
 			return false

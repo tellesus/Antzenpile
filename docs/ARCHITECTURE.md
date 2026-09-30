@@ -85,6 +85,8 @@ Task 027 adds an EcologySystem after trail traffic, driven solely by fixed clock
 
 Task 028 adds a semantic TrailSystem recheck command for a depleted route after all prior cohorts return. It clears the reported-depleted stop without inspecting the hidden source, preserves route/segment/ledger identity, and lets the next ordinary cohort discover whether resources have renewed. OUTWARD offers the action only from the selected depleted route's detached summary. No new snapshot field is needed.
 
+Task 029 makes TrailSystem charge aggregate travel energy from pile carbohydrate for each departing round trip. Captured segment length and sampled terrain movement cost scale the authored per-worker rate; each cohort departure represents traffic. A protein or water route waits with committed workers when carbohydrate is insufficient. A colony-known carbohydrate route can instead pay available reserves and settle the remainder from returning cargo, preserving a recovery path from zero stores. Route `energy_limited` and cohort `unpaid_energy_cost` are optional additions to version-5 records so earlier disk saves still restore. OUTWARD receives only the observed stall flag, never hidden terrain cost or source quantity.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

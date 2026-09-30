@@ -95,6 +95,8 @@ func set_workers(route_id: String, target: Variant) -> bool:
 		route.departure_cooldown_ticks = 0
 	else:
 		route.status = "recalling" if requested == 0 else "depleted" if route.reported_depleted else "active"
+	if route.status != "active":
+		route.energy_limited = false
 	last_error = ""
 	return true
 
@@ -114,6 +116,7 @@ func recheck(route_id: String) -> bool:
 	route.reported_depleted = false
 	route.status = "active"
 	route.departure_cooldown_ticks = 0
+	route.energy_limited = false
 	last_error = ""
 	return true
 
@@ -165,15 +168,36 @@ func _depart(route: TrailRouteState) -> void:
 			count += 1
 	if count >= CONFIG.max_cohorts_per_route:
 		return
+	var worker_count: int = mini(idle, CONFIG.workers_per_cohort)
+	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
+	var length: float = segment.start.distance_to(segment.end)
+	var terrain_cost: float = Segment.terrain_cost_for(_run.world, segment.start, segment.end)
+	var energy_cost: float = CONFIG.round_trip_energy_cost(worker_count, length, terrain_cost)
+	var pile: PileState = _run.colony.piles[route.origin_pile]
+	var unpaid_energy_cost: float = 0.0
+	if pile.resources.carbohydrate < energy_cost:
+		# A carbohydrate trip can replenish an exhausted pile. Pay the available reserve
+		# now and settle the remainder against its cargo; other routes must wait.
+		if _run.knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate":
+			route.energy_limited = true
+			return
+		var available: float = pile.resources.carbohydrate
+		unpaid_energy_cost = roundf((energy_cost - available) * 100000.0) / 100000.0
+		if not pile.consume_resources({"carbohydrate": available}):
+			return
+	elif not pile.consume_resources({"carbohydrate": energy_cost}):
+		return
 	var cohort := Cohort.new()
 	cohort.id = "cohort_%d" % _run.trails.next_cohort_id
 	cohort.route_id = route.id
-	cohort.worker_count = mini(idle, CONFIG.workers_per_cohort)
+	cohort.worker_count = worker_count
+	cohort.unpaid_energy_cost = unpaid_energy_cost
 	cohort.remaining_ticks = _leg_ticks(route)
 	_run.trails.cohorts[cohort.id] = cohort
 	_run.trails.next_cohort_id += 1
 	route.active_workers += cohort.worker_count
 	route.departure_cooldown_ticks = CONFIG.departure_interval_ticks
+	route.energy_limited = false
 
 
 func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
@@ -195,15 +219,17 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	if cohort.payload > 0.0:
-		var deposited: bool = pile.deposit_resource(cohort.resource_id, cohort.payload)
+		var net_payload: float = maxf(0.0, cohort.payload - cohort.unpaid_energy_cost)
+		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload)
 		assert(deposited)
-		route.delivered_total += cohort.payload
+		route.delivered_total += net_payload
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 		segment.pheromone_strength = snappedf(clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.route_familiarity = snappedf(clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.traffic += mini(cohort.worker_count, WorkerLedger.MAX_COUNT - segment.traffic)
 	else:
 		route.reported_depleted = true
+		route.energy_limited = false
 	route.active_workers -= cohort.worker_count
 	var release_count: int = mini(route.allocated_workers - route.desired_workers, route.allocated_workers - route.active_workers)
 	if release_count > 0:

@@ -1,6 +1,6 @@
 # Post-slice development plan
 
-Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) after tasks 027–028. This is a proposed order, not an approved balance pass. Expand one card against the current code before implementing it.
+Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) after tasks 027–028. Card 029 is complete; the remaining order is proposed, not an approved balance pass. Expand one card against the current code before implementing it.
 
 ## What the original design clarifies
 

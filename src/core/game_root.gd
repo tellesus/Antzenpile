@@ -194,6 +194,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
 				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers,
 				"active_workers": route.active_workers, "status": route.status,
+				"energy_limited": route.energy_limited,
 				"delivered_total": route.delivered_total,
 				"pheromone_strength": segment.pheromone_strength,
 				"route_familiarity": segment.route_familiarity})

@@ -9,12 +9,14 @@ var worker_count: int = 0
 var resource_id: String = ""
 var payload: float = 0.0
 var remaining_ticks: int = 1
+var unpaid_energy_cost: float = 0.0
 
 
 func to_dict() -> Dictionary:
 	return {"id": id, "route_id": route_id, "direction": direction,
 		"worker_count": worker_count, "resource_id": resource_id,
-		"payload": payload, "remaining_ticks": remaining_ticks}
+		"payload": payload, "remaining_ticks": remaining_ticks,
+		"unpaid_energy_cost": unpaid_energy_cost}
 
 
 func restore(data: Dictionary) -> bool:
@@ -29,6 +31,8 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if not typeof(data.payload) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.payload)) or data.payload < 0.0:
 		return false
+	if data.has("unpaid_energy_cost") and (not typeof(data.unpaid_energy_cost) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.unpaid_energy_cost)) or data.unpaid_energy_cost < 0.0):
+		return false
 	if data.direction == "outbound" and (data.payload != 0.0 or not data.resource_id.is_empty()):
 		return false
 	if (data.payload > 0.0) != (not data.resource_id.is_empty()):
@@ -40,4 +44,5 @@ func restore(data: Dictionary) -> bool:
 	resource_id = data.resource_id
 	payload = float(data.payload)
 	remaining_ticks = int(data.remaining_ticks)
+	unpaid_energy_cost = float(data.get("unpaid_energy_cost", 0.0))
 	return true

@@ -302,7 +302,8 @@ func _draw_context(size: Vector2) -> void:
 		_label(box.position + Vector2(16, 187), "Scent %s · Delivered %.1f" % [_scent_label(route), route.delivered_total], Color("8fa1a8"), 13)
 		_draw_trail_button("trail_create", "REINVEST 5 WORKERS")
 	else:
-		_label(box.position + Vector2(16, 165), "Source unavailable · scent " + _scent_label(route) if route.status == "depleted" else "Trail scent: " + _scent_label(route), Color("a8b8bd"), 14)
+		var route_note: String = "Source unavailable · scent " + _scent_label(route) if route.status == "depleted" else "Waiting for carbohydrate" if route.get("energy_limited", false) else "Trail scent: " + _scent_label(route)
+		_label(box.position + Vector2(16, 165), route_note, Color("a8b8bd"), 14)
 		_label(box.position + Vector2(16, 185), "Wanted %d · Committed %d" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 14)
 		_label(box.position + Vector2(16, 205), "%d workers travelling" % route.active_workers, Color("8fa1a8"), 14)
 		_label(box.position + Vector2(16, 225), "Returned %.1f · Home %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 14)

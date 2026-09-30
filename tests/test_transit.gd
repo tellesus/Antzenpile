@@ -26,26 +26,27 @@ func run(test: Object) -> bool:
 	var route: TrailRouteState = game.run.trails.routes.route_1
 	var segment: TrailSegmentState = game.run.trails.segments.segment_1
 	var leg: int = CONFIG.leg_ticks(segment.start.distance_to(segment.end))
+	var cost: float = CONFIG.round_trip_energy_cost(5, segment.start.distance_to(segment.end), TrailSegmentState.terrain_cost_for(game.run.world, segment.start, segment.end))
 	var original_rng: int = game.run.rng.state
 	steps(game, 1)
 	test.check(game.run.trails.cohorts.size() == 1 and route.active_workers == 5 and game.run.trails.cohorts.cohort_1.direction == "outbound", "One aggregate batch departs after the first tick")
 	steps(game, leg - 1)
-	test.check(node.quantity == 100.0 and pile.resources.carbohydrate == 10.0 and route.delivered_total == 0.0, "No resource removed or delivered before outbound arrival")
+	test.check(node.quantity == 100.0 and pile.resources.carbohydrate == 10.0 - cost and route.delivered_total == 0.0, "Only round-trip energy is debited before outbound arrival")
 	steps(game, 1)
-	test.check(node.quantity == 95.0 and pile.resources.carbohydrate == 10.0 and game.run.trails.cohorts.cohort_1.direction == "inbound" and game.run.trails.cohorts.cohort_1.payload == 5.0, "Arrival collects once into an inbound cohort")
+	test.check(node.quantity == 95.0 and pile.resources.carbohydrate == 10.0 - cost and game.run.trails.cohorts.cohort_1.direction == "inbound" and game.run.trails.cohorts.cohort_1.payload == 5.0, "Arrival collects once into an inbound cohort without another energy debit")
 	steps(game, leg - 1)
-	test.check(pile.resources.carbohydrate == 10.0 and route.delivered_total == 0.0, "Cargo stays in transit until home arrival")
+	test.check(pile.resources.carbohydrate == 10.0 - cost and route.delivered_total == 0.0, "Cargo stays in transit until home arrival")
 	steps(game, 1)
-	test.check(pile.resources.carbohydrate == 15.0 and route.delivered_total == 5.0 and node.quantity == 95.0, "Return deposits once and starts a later cycle")
+	test.check(pile.resources.carbohydrate == 15.0 - 2.0 * cost and route.delivered_total == 5.0 and node.quantity == 95.0, "Return deposits once and starts a later energy-paid cycle")
 	test.check(game.run.rng.state == original_rng and pile.workers.invariant_holds() and pile.workers.count("trail:route_1") == 5, "Transit does not use RNG or create workers")
-	test.check(is_equal_approx(node.quantity + pile.resources.carbohydrate + _cargo(game), 110.0), "World, cargo and pile conserve carbohydrate")
+	test.check(is_equal_approx(node.quantity + pile.resources.carbohydrate + _cargo(game) + 2.0 * cost, 110.0), "World, cargo, pile and spent energy reconcile")
 	var root := GameRoot.new()
 	root.simulation = game
 	var outward: Dictionary = root.outward_status("home")
-	test.check(outward.resources.carbohydrate == 15.0 and outward.trails[0].delivered_total == 5.0 and not outward.trails[0].has("payload") and not outward.trails[0].has("estimated_destination"), "Normal UI receives detached storage and reported route progress")
+	test.check(outward.resources.carbohydrate == pile.resources.carbohydrate and outward.trails[0].delivered_total == 5.0 and not outward.trails[0].has("payload") and not outward.trails[0].has("estimated_destination"), "Normal UI receives detached storage and reported route progress")
 	outward.resources.carbohydrate = 999.0
 	outward.trails[0].delivered_total = 999.0
-	test.check(pile.resources.carbohydrate == 15.0 and route.delivered_total == 5.0, "Presentation edits cannot change resource state")
+	test.check(pile.resources.carbohydrate == 15.0 - 2.0 * cost and route.delivered_total == 5.0, "Presentation edits cannot change resource state")
 	root.free()
 	var outbound := learned_game()
 	var outbound_pile: PileState = outbound.run.colony.piles.home
@@ -55,7 +56,7 @@ func run(test: Object) -> bool:
 	steps(outbound, 2 * leg - 1)
 	test.check(outbound_pile.workers_available == 35 and outbound.run.trails.routes.route_1.status == "recalling", "Recall does not teleport workers before return")
 	steps(outbound, 1)
-	test.check(outbound_pile.workers_available == 40 and outbound_pile.resources.carbohydrate == 15.0 and outbound.run.trails.routes.route_1.status == "inactive" and outbound.run.trails.cohorts.is_empty(), "Returning cohort deposits cargo, releases ledger and ends recall")
+	test.check(outbound_pile.workers_available == 40 and outbound_pile.resources.carbohydrate == 15.0 - cost and outbound.run.trails.routes.route_1.status == "inactive" and outbound.run.trails.cohorts.is_empty(), "Returning cohort deposits cargo, releases ledger and ends recall")
 	steps(outbound, 100)
 	test.check(outbound.run.trails.cohorts.is_empty() and outbound.run.world.nodes.carb_exposed.quantity == 95.0, "Cancelled route starts no later cycle")
 	test.check(outbound.create_trail("home", "known:carb_exposed") and outbound.run.trails.next_route_id == 2, "Reinvestment after completed recall reuses route identity")
@@ -64,7 +65,7 @@ func run(test: Object) -> bool:
 	steps(reduction, 1)
 	test.check(reduction.set_trail_workers("route_1", 2) and reduction.run.trails.routes.route_1.desired_workers == 2 and reduction.run.trails.routes.route_1.allocated_workers == 5, "Partial recall keeps three travelling workers committed")
 	steps(reduction, 2 * leg)
-	test.check(reduction.run.trails.routes.route_1.allocated_workers == 2 and reduction.run.colony.piles.home.workers_available == 38 and reduction.run.colony.piles.home.resources.carbohydrate == 15.0, "Only returned surplus workers become available")
+	test.check(reduction.run.trails.routes.route_1.allocated_workers == 2 and reduction.run.colony.piles.home.workers_available == 38 and reduction.run.colony.piles.home.resources.carbohydrate < 15.0 and reduction.run.colony.piles.home.resources.carbohydrate > 10.0, "Only returned surplus workers become available")
 	var buckets := learned_game()
 	buckets.run.world.nodes.carb_exposed.quantity = 9.0
 	test.check(buckets.create_trail("home", "known:carb_exposed") and buckets.set_trail_workers("route_1", 20), "Twenty workers committed for bucket contention")
@@ -77,7 +78,7 @@ func run(test: Object) -> bool:
 	test.check(bucket_counts == [4, 8, 8], "Batch sizes are bounded and exhaust committed workers without duplication")
 	steps(buckets, 140)
 	var bucket_route: TrailRouteState = buckets.run.trails.routes.route_1
-	test.check(buckets.run.world.nodes.carb_exposed.quantity == 0.0 and not buckets.run.world.nodes.carb_exposed.active and buckets.run.colony.piles.home.resources.carbohydrate == 19.0 and bucket_route.delivered_total == 9.0, "Contending arrivals collect only nine remaining units")
+	test.check(buckets.run.world.nodes.carb_exposed.quantity == 0.0 and not buckets.run.world.nodes.carb_exposed.active and buckets.run.colony.piles.home.resources.carbohydrate < 19.0 and bucket_route.delivered_total == 9.0, "Contending arrivals collect only nine remaining units after energy expense")
 	test.check(bucket_route.status == "depleted" and bucket_route.reported_depleted and bucket_route.active_workers == 0 and buckets.run.trails.cohorts.is_empty(), "Empty return reports unavailable source and stops departures")
 	var depleted_snapshot: Dictionary = buckets.run.to_dict()
 	steps(buckets, 100)
@@ -88,7 +89,7 @@ func run(test: Object) -> bool:
 	var remembered: Vector2 = stale.run.knowledge.nodes["known:carb_exposed"].estimated_position
 	test.check(stale.create_trail("home", "known:carb_exposed"), "Stale location still permits investment from knowledge")
 	steps(stale, 2 * CONFIG.leg_ticks(stale.run.trails.segments.segment_1.start.distance_to(stale.run.trails.segments.segment_1.end)) + 1)
-	test.check(stale.run.trails.routes.route_1.status == "depleted" and stale.run.trails.routes.route_1.delivered_total == 0.0 and stale.run.trails.segments.segment_1.end == remembered and stale.run.colony.piles.home.resources.carbohydrate == 10.0, "Moved hidden source returns empty without teleporting or leaking live coordinates")
+	test.check(stale.run.trails.routes.route_1.status == "depleted" and stale.run.trails.routes.route_1.delivered_total == 0.0 and stale.run.trails.segments.segment_1.end == remembered and stale.run.colony.piles.home.resources.carbohydrate == 10.0 - cost, "Moved hidden source costs energy without teleporting or leaking live coordinates")
 	var saved_game := learned_game()
 	saved_game.create_trail("home", "known:carb_exposed")
 	steps(saved_game, 4)

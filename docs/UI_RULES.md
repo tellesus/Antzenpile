@@ -51,6 +51,8 @@ Task 024 lets the existing selected-context resource summaries show water gained
 
 Task 028 gives a selected depleted route a touch-sized **RECHECK** action beside Cancel once all travelers have returned. It asks workers to test the remembered source; the label does not promise renewal or show a schedule. A still-empty return reports unavailability again. The action shares the existing mouse/touch context path and introduces no map or live resource quantity.
 
+Task 029 lets a selected active route say **Waiting for carbohydrate** after a departure fails for lack of energy. This is an observed route condition; the context never displays exact hidden terrain cost, pending cargo or source quantity. The existing home store remains visible. A carbohydrate route can recover from an empty store through a cargo-paid trip, so it does not show this stall.
+
 Task 021 places touch-sized Save and Load buttons at the upper right of both normal views, with Ctrl+S/Ctrl+L named actions sharing the same semantic GameRoot path. A short success or error message appears in the existing view footer. Loading clears transient facing/selection and restarts music from the restored development level; it does not reveal hidden state or add a persistent overview panel.
 
 Task 025 puts one touch-sized **LAY 8 BROOD** action in the selected Queen or Nursery context only while the nursery is empty. Its callback goes through GameRoot to BroodSystem. The action disappears while the cohort is active, and the existing stage/care/nutrition summary replaces it. No permanent population menu or individual egg graphics are introduced.

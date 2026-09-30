@@ -24,6 +24,20 @@ static func exposure_for(world: WorldState, origin: Vector2, destination: Vector
 	return total / 16.0
 
 
+static func terrain_cost_for(world: WorldState, origin: Vector2, destination: Vector2) -> float:
+	var total: float = 0.0
+	for index: int in 16:
+		var point: Vector2 = origin.lerp(destination, (float(index) + 0.5) / 16.0)
+		var movement_cost: float = 1.0
+		for region: Dictionary in world.terrain:
+			var area := Rect2(region.bounds[0], region.bounds[1], region.bounds[2], region.bounds[3])
+			if area.has_point(point):
+				movement_cost = float(region.movement_cost)
+				break
+		total += movement_cost
+	return total / 16.0
+
+
 func to_dict() -> Dictionary:
 	return {"id": id, "route_id": route_id,
 		"start": [start.x, start.y], "end": [end.x, end.y],

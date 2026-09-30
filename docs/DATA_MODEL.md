@@ -68,6 +68,8 @@ Task 027 uses an immutable ResourcePulseDefinition for the backyard's sheltered 
 
 Task 028 lets a depleted route with positive desired/allocated workers and zero active travelers resume after an explicit Recheck command. The route keeps the same captured estimate, ID, segment, and ledger commitment; only `reported_depleted`, `status`, and departure cooldown reset. The command never tests actual source quantity. An empty return restores depletion, while a loaded return follows the existing cargo, pheromone, familiarity and store rules. Version-5 snapshots already represent every in-flight state.
 
+Task 029 adds `TrailRouteState.energy_limited` and `TransitCohort.unpaid_energy_cost`, both defaulted when absent from older version-5 saves. Each aggregate departure costs five-decimal carbohydrate: workers × estimated segment length × average terrain movement cost × the authored per-worker-meter rate. A non-carbohydrate route with inadequate stores waits and retries; no cohort or debit occurs. A route whose **delivered knowledge** identifies carbohydrate can use the available reserve and record a shortfall on its cohort; the returning cargo pays that shortfall before net delivery. Empty or too-small cargo cannot make stores negative. Transit restore validates that a shortfall belongs to a carbohydrate route and does not exceed its computed cost. Normal view sees the observed energy stall flag only; it cannot inspect terrain cost or hidden source availability.
+
 ## Invariants
 
 1. **Worker conservation:** total living workers = available + internal jobs + scouts + trails + other explicit commitments. Pools are disjoint, integral, and nonnegative. `workers_total` and `workers_available` on a pile are ledger-backed values, never independent counters.

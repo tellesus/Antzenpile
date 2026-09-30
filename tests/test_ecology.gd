@@ -92,15 +92,16 @@ func _test_stale_knowledge_and_route(test: Object) -> void:
 	view.free()
 	root.free()
 	game.advance(0.25)
+	var energy_after_departure: float = game.run.colony.piles.home.resources.carbohydrate
 	var snapshot: Dictionary = JSON.parse_string(JSON.stringify(game.run.to_dict(), "", true, true))
 	var copy := Controller.new()
 	test.check(copy.restore_snapshot(snapshot), "Recheck in flight restores from a full-precision save")
 	game.advance(10.0)
 	copy.advance(10.0)
-	test.check(game.run.colony.piles.home.resources.carbohydrate == stored_before, "Renewed nectar remains in transit before workers return")
+	test.check(game.run.colony.piles.home.resources.carbohydrate == energy_after_departure and energy_after_departure < stored_before, "Renewed nectar remains in transit after departure energy is paid")
 	game.advance(11.0)
 	copy.advance(11.0)
-	test.check(game.run.colony.piles.home.resources.carbohydrate > stored_before and game.run.to_dict() == copy.run.to_dict(), "Recheck delivers renewed nectar on return and continues exactly after reload")
+	test.check(game.run.colony.piles.home.resources.carbohydrate > energy_after_departure and game.run.to_dict() == copy.run.to_dict(), "Recheck delivers renewed nectar on return and continues exactly after reload")
 	test.check(game.run.colony.piles.home.workers.invariant_holds(), "Recheck preserves worker conservation")
 
 
