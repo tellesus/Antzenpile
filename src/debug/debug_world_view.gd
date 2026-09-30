@@ -3,6 +3,8 @@ extends Node2D
 const Model = preload("res://src/debug/debug_world_model.gd")
 var model: RefCounted = Model.new()
 var snapshot_provider: Callable
+var signal_provider: Callable
+var _signals: Array[Dictionary] = []
 var dispatch_command: Callable
 var _dispatch_status: String = ""
 var _font: Font = ThemeDB.fallback_font
@@ -18,6 +20,7 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if model.shown and snapshot_provider.is_valid():
 		model.refresh(snapshot_provider.call(), get_viewport_rect().size)
+		_signals = signal_provider.call() if signal_provider.is_valid() else []
 		queue_redraw()
 
 
@@ -65,6 +68,7 @@ func _draw() -> void:
 	for scout: Dictionary in data.scouts:
 		carried += scout.observations.size()
 	_label(Vector2(size.x * 0.64, 86), "Private: %d  |  Known: %d  |  Reports: %d" % [carried, data.knowledge.nodes.size(), data.knowledge.observations.size()])
+	_label(Vector2(size.x * 0.64, 108), "Perceived signals: %d (relative to home)" % _signals.size(), Color("76e1dc"), 13)
 	var bounds: Array = data.world.bounds
 	var origin: Vector2 = model.transform * Vector2(bounds[0], bounds[1])
 	var map_size: Vector2 = Vector2(bounds[2], bounds[3]) * model.transform.x.length()
@@ -142,6 +146,12 @@ func _draw() -> void:
 				lines.append("Uncertainty: %.2fm" % known.uncertainty_radius)
 				lines.append("Confidence: %.3f | age: %.1fs" % [known.effective_confidence, known.age])
 				lines.append("Reports: %d | observed: %.2fs" % [known.evidence_ids.size(), known.last_observed_at])
+				for signal_data: Dictionary in _signals:
+					if signal_data.source_knowledge_id == known.id:
+						lines.append("Signal: %s | %s" % [signal_data.category, signal_data.confidence_label])
+						var direction: String = "undefined" if signal_data.bearing == null else "%.1f deg" % rad_to_deg(signal_data.bearing)
+						lines.append("Bearing: %s | range: %.2fm" % [direction, signal_data.estimated_distance])
+						lines.append("Strength: %.3f | risk/traffic: unknown" % signal_data.strength)
 
 	for index: int in lines.size():
 		_label(Vector2(size.x * 0.64, 132 + 26 * index), lines[index])

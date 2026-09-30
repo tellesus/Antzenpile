@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PerceptionConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/perception_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+categories = {"carbohydrate": "carbohydrate", "protein": "protein", "water": "water"}
+distance_scale = 10.0
+likely_threshold = 0.25
+clear_threshold = 0.65
