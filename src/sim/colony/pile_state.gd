@@ -35,7 +35,9 @@ func to_dict() -> Dictionary:
 func deposit_resource(resource_id: String, amount: float) -> bool:
 	if not resources.has(resource_id) or not is_finite(amount) or amount < 0.0 or not is_finite(resources[resource_id] + amount):
 		return false
-	resources[resource_id] += amount
+	# Fixed-tick rain uses fractional deposits; match the five-decimal debit precision
+	# so JSON save/reload preserves exact resource continuation.
+	resources[resource_id] = roundf((resources[resource_id] + amount) * 100000.0) / 100000.0
 	return true
 
 

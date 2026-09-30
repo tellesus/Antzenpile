@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("rain")
 duration_seconds = 60.0
+water_per_second = 0.05
 exposed_chemical_half_life_seconds = 12.0
 minimum_successful_workers = 5
 sheltered_max_exposure = 0.25

@@ -39,7 +39,9 @@ func _run() -> void:
 	await _measure("rain_outward")
 	get_root().get_viewport().get_texture().get_image().save_png("res://.godot/card022_rain_outward.png")
 	game_root.set_mode("inward")
+	game_root._inward_view.selected_id = "food_exchange"
 	await _measure("rain_inward")
+	get_root().get_viewport().get_texture().get_image().save_png("res://.godot/card024_rain_inward.png")
 	for tick: int in 2000:
 		if game.run.knowledge.nodes.has("known:protein_01"):
 			break

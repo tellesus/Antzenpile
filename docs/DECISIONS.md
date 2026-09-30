@@ -22,6 +22,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D14 | Debug truth view is development-only. Normal views receive knowledge-derived signals/approved colony summaries. |
 | D15 | User clarification, 2026-09-29: scouts sense nearby resources and progressively locate them; discovery does not require crossing the exact resource point. Private evidence still reaches the colony only upon return. |
 | D16 | User playtest decision, 2026-09-30: scouts continue beyond the initial mission range and search for a source the colony does not already know. They follow a chemical trace until proximity confirmation, then return with evidence. Search that exhausts reachable ground returns empty rather than trapping the worker. |
+| D17 | User playtest decision, 2026-09-30: rain steadily adds a modest amount of water to colony stores throughout the event, rather than giving one lump at its start. |
 
 ## Provisional defaults for executable tasks
 
@@ -48,6 +49,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A17 | Task 020 averages 16 midpoint terrain exposure samples per estimated TrailSegment; an exposed (≥0.75) and sheltered (≤0.25) route each need five successful returning workers before one 60 simulated-second rain event starts. Rain adds a 12-second exposed-chemistry half-life scaled by exposure; familiarity retains its baseline decay. The event is one-shot, independent of wall time and RNG. OUTWARD receives only semantic rain status. Required snapshot version is 5. These are provisional slice event/feel defaults. |
 | A18 | Task 021 uses one local `user://saves/slot_1.json` slot: disk envelope version 1 around required RunState snapshot version 5, full-precision payload, SHA-256 integrity check, verified temporary write then rename. Earlier snapshot schemas reject because no prior disk saves were released; migration is deferred until a real compatibility requirement exists. Load validates a fresh run before replacing controller systems. Ctrl+S/Ctrl+L and touch-sized buttons share semantic controls; view selection/facing and audio phase reset on load. |
 | A19 | Task 023 searches unvisited reachable grid cells after the initial mission path. It favors cells farther outward from home at equal distance, follows a private cue's estimate and nearby frontier until confirmation, and returns when no reachable frontier remains. This is deterministic from existing scout breadcrumbs and requires no new snapshot fields or version change. |
+| A20 | Task 024 deposits 0.05 water per simulated second into each pile during the existing 60-second rain, three units for a complete event. Fixed-tick deposits use the existing pile resource API and five-decimal storage precision; pause, speed and version-5 save continuation remain unchanged. This amount is provisional balance. |
 
 ## Details to resolve in their task
 

@@ -60,6 +60,8 @@ Task 021 persists the current version-5 authoritative RunState dictionary inside
 
 Task 023 leaves the ScoutAgent and RunState snapshot schemas at version 5. `elapsed` now measures search time without ending a mission at 30 seconds. The path, target and return breadcrumbs already serialized by ScoutAgent support continued frontier search and exact reload. Private `Observation.proximity_confirmed` for a source absent from current KnowledgeBase starts return; seeing an already-known source alone does not. Exhausted reachable terrain starts an empty return and releases the ledger worker only at home.
 
+Task 024 deposits 0.05 water per simulated second during the existing 60-second rain. RainSystem uses `PileState.deposit_resource` for each pile and limits the final tick by remaining event time. Resource deposits now round to five decimal places, matching brood/food debits for exact JSON continuation. RainState and required snapshot version remain unchanged; normal views show the approved pile store, while only F3 shows exact weather truth.
+
 ## Invariants
 
 1. **Worker conservation:** total living workers = available + internal jobs + scouts + trails + other explicit commitments. Pools are disjoint, integral, and nonnegative. `workers_total` and `workers_available` on a pile are ledger-backed values, never independent counters.
