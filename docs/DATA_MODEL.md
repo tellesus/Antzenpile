@@ -36,6 +36,8 @@ Task 010 implements PerceivedSignal with `id`, `source_knowledge_id`, `category`
 
 Signal strength is provisional presentation salience: aged confidence / (1 + estimated distance / 10 m). It never implies live chemical concentration or remaining resource quantity. Qualitative confidence is uncertain/likely/clear at authored 0.25/0.65 thresholds. Estimates and strength never read hidden coordinates, quantity or active flags. No private scout observation emits a signal. Output mutations, renderer animation and facing cannot change knowledge. Signals are derived on demand, not authoritative save data; rebuild them after restoring the run.
 
+Task 011 projects these signals into a 180-degree OUTWARD field centered on presentation-only facing. Bearing controls horizontal placement; estimated distance affects a vertical display band, never literal terrain depth. The normal view receives only detached signal dictionaries and an approved summary (available workers, active scouts/cap, simulation time, paused and scale). Scout/time actions pass through semantic controller methods. Selected signal ID and facing are view state, not authoritative save state.
+
 MusicState exposes semantic development level for the slice. Stability/crisis may be added later. Audio does not inspect arbitrary simulation internals.
 
 ## Invariants

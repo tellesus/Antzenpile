@@ -45,6 +45,8 @@ Task 009 knowledge defaults: one Known Node per captured source ID; newest obser
 
 Task 010 perception defaults: authored resource classification maps to carbohydrate/protein/water (otherwise unknown); bearing is radians clockwise from east, relative facing differences wrap to [-PI, PI), and coincident direction is null. Risk and traffic stay null. Presentation strength is aged confidence / (1 + estimated distance / 10 m); confidence labels are uncertain below 0.25, likely below 0.65, clear otherwise. Tuning lives in `data/signals/default_perception.tres`. This is display salience, not live resource quantity or chemistry. No culling/deletion policy is introduced here; task 011 resolves projection and visibility.
 
+Task 011 OUTWARD defaults: 180-degree horizontal field, positive clockwise bearing from east, 8 logical-pixel tap/drag split, at least 44 logical-pixel signal hit radius, 64 logical-pixel-high action buttons, and distance affecting a non-geographic vertical display band. The home anchor stays fixed. These are provisional presentation settings; player UI never reads hidden world state. The first INWARD control waits for its real view in task 017.
+
 Trail balance and cohort bucket duration, brood/resource rates, the precise Food Exchange benefit and costs, rain timing/intensity, save migration policy, and measured rendering budgets. Roadmap cards must resolve their own required details before coding. Do not implement later ecology, adaptation, rivals, or replay just because their names appear in the design.
 
 ## Change log

@@ -22,6 +22,14 @@ func advance(real_delta: float) -> bool:
 	return run.clock.advance(real_delta)
 
 
+func toggle_pause() -> void:
+	run.clock.paused = not run.clock.paused
+
+
+func set_time_scale(value: int) -> bool:
+	return run.clock.set_time_scale(value)
+
+
 func _tick(delta: float) -> void:
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():

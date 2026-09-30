@@ -19,6 +19,8 @@ Knowledge-derived position relative to pile → bearing → wrapped difference f
 
 The Home Anchor may suggest an entrance, a little soil/silhouette, and representative departures/returns. Beyond it, physical detail rapidly dissolves into abstraction: approximately 15% physical anchor / 85% sensorium is an illustrative art target. Food/water/danger appear as amorphous sensory clouds, not crystals or visible world objects.
 
+Task 011 prototype: one 180-degree bearing field, drag to rotate, tap to select, an anchored home silhouette and restrained resource-color sensory clouds. The status bar gives available workers and time; Scout, Pause and speed are actionable. The view does not render unknown signals, and the F3 truth layer stays separate. Trail and INWARD controls arrive with their systems.
+
 Slice controls: rotation, bearing indicator, selectable signals/context cards, scout action, trail investment/recall, available workers, time controls, and OUTWARD/INWARD toggle. Persistent HUD stays small: available labor, mode, time, urgent colony pressures. Total population/brood/queens belong in context, not a permanent overview panel.
 
 Attention order: selected/critical signal → active major trails → destinations → environmental interference → representative ants → old information → physical suggestion.
