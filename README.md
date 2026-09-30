@@ -28,6 +28,7 @@ The task-022 integration baseline reaches the original arc in six simulated minu
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
 | [Task cards](docs/tasks/) | 001–028 completed; resource ecology expansion next |
 | [Slice evaluation](docs/SLICE_EVALUATION.md) | Measured arc, Windows workload and design questions |
+| [Post-slice plan](docs/POST_SLICE_PLAN.md) | Proposed cards 029–034 and decision gates before balance |
 
 ## Running and testing
 
