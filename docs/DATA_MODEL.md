@@ -64,6 +64,8 @@ Task 024 deposits 0.05 water per simulated second during the existing 60-second 
 
 Task 025 reuses the existing one-cohort slot after emergence. A semantic BroodSystem command starts an eight-ant egg cohort only with a queen and an empty nursery; it charges no upfront resource cost. Larval food and worker-care gates still apply. `brood_matured_total` remains the completed-ant count in multiples of eight; the active cohort ID is `brood_(brood_matured_total / 8 + 1)`. Restore validates count and ID, while the home ledger must contain at least the initial 40 workers plus recorded emergences because this slice has no worker-loss mechanic. Existing version-5 single-cycle saves keep their shape and restore. INWARD receives detached brood count, current cohort and batch size; the view cannot create state directly.
 
+Task 027 uses an immutable ResourcePulseDefinition for the backyard's sheltered carbohydrate source: first tick 1200 (300 simulated seconds), every 1200 ticks thereafter, add up to 12 units without exceeding 100. The WorldNodeState's existing quantity and active fields own the physical result; no ecology cursor or snapshot field is added. An absent source in a minimal test world is skipped. Known Nodes keep their historical reports and a depleted route remains depleted until reinvested; renewal alone gives no player-facing signal.
+
 ## Invariants
 
 1. **Worker conservation:** total living workers = available + internal jobs + scouts + trails + other explicit commitments. Pools are disjoint, integral, and nonnegative. `workers_total` and `workers_available` on a pile are ledger-backed values, never independent counters.

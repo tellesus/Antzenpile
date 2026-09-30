@@ -25,6 +25,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D17 | User playtest decision, 2026-09-30: rain steadily adds a modest amount of water to colony stores throughout the event, rather than giving one lump at its start. |
 | D18 | User playtest request: after a brood hatches, the colony needs an option to begin another hatching cycle. Task 025 adds that manual option within the existing aggregate-brood rules. |
 | D19 | User decision, 2026-09-30: Food Exchange may be developed early. Its availability gives the player a project during the early game; do not add a brood-pressure or protein-discovery gate solely to delay it. |
+| D20 | User direction, 2026-09-30: develop exterior resource ecology and recurring events next; defer economy balance until more systems and resource uses exist. |
 
 ## Provisional defaults for executable tasks
 
@@ -53,6 +54,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A19 | Task 023 searches unvisited reachable grid cells after the initial mission path. It favors cells farther outward from home at equal distance, follows a private cue's estimate and nearby frontier until confirmation, and returns when no reachable frontier remains. This is deterministic from existing scout breadcrumbs and requires no new snapshot fields or version change. |
 | A20 | Task 024 deposits 0.05 water per simulated second into each pile during the existing 60-second rain, three units for a complete event. Fixed-tick deposits use the existing pile resource API and five-decimal storage precision; pause, speed and version-5 save continuation remain unchanged. This amount is provisional balance. |
 | A21 | Task 025 offers one manual Lay 8 Brood action in the selected Queen or Nursery context when its pile has no active cohort. It has no upfront cost; the existing two-worker care gate and larval food debits constrain growth. Only one cohort runs at a time. Consecutive `brood_N` IDs derive from the number already emerged, so the version-5 snapshot shape and existing saves remain valid. These are provisional slice interaction defaults, not a full reproduction system. |
+| A22 | Task 027 makes `carb_sheltered` a flowering nectar source. At tick 1200 and every 1200 ticks after, a physical pulse adds up to 12 carbohydrate to a capacity of 100. The schedule is authored and derived from saved clock ticks, leaving snapshot version 5 unchanged. These are provisional ecology values, not a resource-balance pass. |
 
 ## Details to resolve in their task
 

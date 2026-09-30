@@ -81,6 +81,8 @@ Task 024 makes RainSystem deposit water through each PileState resource API on f
 
 Task 025 adds a BroodSystem command to start one new aggregate cohort when a pile's nursery is empty and a queen is present. GameRoot binds the semantic command to an INWARD Queen/Nursery action using only detached pile summaries. `brood_matured_total` determines the next stable cohort ID; PileState validates that ID and count on restore. All stages, care, nutrition and ledger emergence remain the existing rules. Version-5 saves need no new fields.
 
+Task 027 adds an EcologySystem after trail traffic, driven solely by fixed clock ticks and an authored backyard nectar pulse. It may increase the hidden `carb_sheltered` World Node up to its capacity and reactivate it after depletion. The schedule has no runtime cursor: saved tick count and immutable pulse data determine the next occurrence, so version-5 snapshots stay unchanged. No event writes colony knowledge or wakes a depleted trail; ordinary scout reports and forager interactions remain the information boundary.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

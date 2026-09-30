@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ResourcePulseDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/ecology/resource_pulse_definition.gd" id="pulse"]
+
+[resource]
+script = ExtResource("pulse")
+source_id = "carb_sheltered"
+first_tick = 1200
+interval_ticks = 1200
+quantity = 12.0
+capacity = 100.0

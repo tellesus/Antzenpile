@@ -8,12 +8,14 @@ const Trails = preload("res://src/sim/trails/trail_system.gd")
 const Brood = preload("res://src/sim/colony/brood_system.gd")
 const FoodExchange = preload("res://src/sim/colony/food_exchange_system.gd")
 const Rain = preload("res://src/sim/weather/rain_system.gd")
+const Ecology = preload("res://src/sim/ecology/ecology_system.gd")
 var run: RunState
 var scouting: RefCounted
 var trails: RefCounted
 var brood: RefCounted
 var food_exchange: RefCounted
 var rain: RainSystem
+var ecology: EcologySystem
 
 
 func _init(seed_value: int = 482817) -> void:
@@ -37,6 +39,7 @@ func _attach_run(next_run: RunState) -> void:
 	brood = Brood.new(run)
 	food_exchange = FoodExchange.new(run)
 	rain = Rain.new(run)
+	ecology = Ecology.new(run)
 	run.clock.tick.connect(_tick)
 
 
@@ -79,5 +82,6 @@ func _tick(delta: float) -> void:
 			push_error("Knowledge delivery rejected: " + run.knowledge.last_error)
 	trails.tick(delta)
 	rain.tick(delta)
+	ecology.tick(delta)
 	food_exchange.tick(delta)
 	brood.tick(delta)
