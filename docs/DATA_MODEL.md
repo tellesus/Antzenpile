@@ -38,6 +38,8 @@ Signal strength is provisional presentation salience: aged confidence / (1 + est
 
 Task 011 projects these signals into a 180-degree OUTWARD field centered on presentation-only facing. Bearing controls horizontal placement; estimated distance affects a vertical display band, never literal terrain depth. The normal view receives only detached signal dictionaries and an approved summary (available workers, active scouts/cap, simulation time, paused and scale). Scout/time actions pass through semantic controller methods. Selected signal ID and facing are view state, not authoritative save state.
 
+Task 012 adds `RunState.trails`, a `TrailNetwork` containing stable `route_N` and `segment_N` objects plus `next_route_id`. A route records origin pile, destination KnownNode ID, captured estimated endpoint, segment ID, desired/allocated/active worker counts, and active/inactive status. A segment records captured start/end, pheromone strength, familiarity, and traffic; the last three remain zero until later tasks. Active route allocation exactly matches a ledger `trail:<route_id>` commitment owned by that route. Desired and allocated counts are separate fields but equal in 012; active travelers remain zero. Cancellation sets both targets to zero, retires the commitment, and retains route/segment identity for reopening. No worker moves or resource collection occurs yet. Snapshots validate IDs, knowledge/colony references, geometry, conservation and orphan commitments before replacing the run. OUTWARD gets detached destination ID and labor/status summaries only, not segment coordinates.
+
 MusicState exposes semantic development level for the slice. Stability/crisis may be added later. Audio does not inspect arbitrary simulation internals.
 
 ## Invariants

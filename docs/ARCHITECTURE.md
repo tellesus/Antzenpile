@@ -54,6 +54,8 @@ Implemented through 009: SimulationController ticks ScoutSystem, then consumes t
 
 Implemented through 010: GameRoot owns PerceptionModel and composes `sensory_snapshot(pile_id)` from Known Nodes, pile position and simulation time. The model never receives RunState, hidden WorldState, scouts, archive or RNG. Its typed signals and dictionary snapshots are detached values, rebuilt on demand and after restore. Only the explicit debug view receives both this provider and the separate truth provider. Task 011 composes a normal OUTWARD view only on graphical runs. Its providers return detached signals and an approved pile/clock summary; semantic callbacks dispatch scouts and control the clock. The view has no RunState or WorldState reference. F3 remains the separate, development-only truth layer drawn above it. UI facing/selection are presentation state and do not enter saves.
 
+Task 012 adds RunState-owned TrailNetwork, one typed route and one distinct segment per invested known destination, and TrailSystem commands on SimulationController. Routes capture the current colony estimate without querying live hidden nodes. The pile's WorkerLedger owns committed labor; each active route has a matching `trail:<route_id>` commitment. GameRoot passes detached route labor summaries and semantic create/adjust commands to OUTWARD. Only F3 accesses route geometry and raw ledger state. Travel and resource flow are not yet active.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

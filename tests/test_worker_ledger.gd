@@ -9,7 +9,7 @@ func run(test: Object) -> bool:
 	var home: PileState = state.colony.piles.home
 	var ledger: WorkerLedger = home.workers
 	test.check(home.position == Vector2(20, 20) and home.queen_count == 1 and home.workers_total == 40 and home.workers_available == 40, "Home fixture")
-	for entry: Array in [["trail_a", "trail", "route_a"], ["scouts", "scout", "mission_a"], ["care", "internal", "job_a"]]:
+	for entry: Array in [["trail_a", "other", "route_a"], ["scouts", "scout", "mission_a"], ["care", "internal", "job_a"]]:
 		test.check(ledger.create_commitment(entry[0], entry[1], entry[2]), "Explicit commitment")
 	test.check(ledger.allocate("trail_a", 10) and ledger.allocate("scouts", 2) and ledger.allocate("care", 5), "Allocate disjoint workers")
 	test.check(home.workers_available == 23 and home.workers_total == 40 and state.colony.workers_total == 40, "Derived counts")

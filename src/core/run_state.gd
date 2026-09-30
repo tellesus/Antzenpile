@@ -8,6 +8,7 @@ const Loader = preload("res://src/sim/world/world_loader.gd")
 const Colony = preload("res://src/sim/colony/colony_state.gd")
 const Scout = preload("res://src/sim/scouting/scout_agent.gd")
 const Knowledge = preload("res://src/sim/knowledge/knowledge_base.gd")
+const Trails = preload("res://src/sim/trails/trail_network.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 var world: WorldState
@@ -15,6 +16,7 @@ var colony: ColonyState = Colony.new()
 var scouts: Dictionary[String, ScoutAgent] = {}
 var next_scout_id: int = 1
 var knowledge: KnowledgeBase = Knowledge.new()
+var trails: TrailNetwork = Trails.new()
 var delivered_observations: Dictionary[String, Observation] = {}
 
 var run_seed: int:
@@ -52,11 +54,12 @@ func to_dict() -> Dictionary:
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
-		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered, "knowledge": knowledge.to_dict()}
+		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered,
+		"knowledge": knowledge.to_dict(), "trails": trails.to_dict()}
 
 
 func restore(data: Dictionary) -> bool:
-	if not data.has_all(["version", "seed", "rng_state", "scenario_id", "clock", "world", "colony", "scouts", "next_scout_id", "delivered_observations", "knowledge"]):
+	if not data.has_all(["version", "seed", "rng_state", "scenario_id", "clock", "world", "colony", "scouts", "next_scout_id", "delivered_observations", "knowledge", "trails"]):
 		return false
 	if data.version != SNAPSHOT_VERSION or not data.scenario_id is String or data.scenario_id.is_empty():
 		return false
@@ -116,6 +119,9 @@ func restore(data: Dictionary) -> bool:
 	var restored_knowledge := Knowledge.new()
 	if not restored_knowledge.restore(data.knowledge, archived, restored_clock.simulation_time):
 		return false
+	var restored_trails := Trails.new()
+	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world.bounds):
+		return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()
@@ -129,4 +135,5 @@ func restore(data: Dictionary) -> bool:
 	next_scout_id = int(data.next_scout_id)
 	delivered_observations = restored_delivered
 	knowledge = restored_knowledge
+	trails = restored_trails
 	return true

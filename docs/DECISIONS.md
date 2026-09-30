@@ -36,6 +36,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A06 | Clock owned by RunState; pile worker totals/available are ledger-backed; colony totals derived. This resolves duplicate-looking ownership in Part 8's conceptual fields. |
 | A07 | Foundation test APIs/paths and fixture node coordinates in 001–006 are proposed implementation contracts. Equivalent local organization is acceptable if boundaries and acceptance checks remain explicit. |
 | A08 | Task 007 prototype defaults: cap 4 scouts, speed 1 m/s divided by terrain cost, 30 simulated seconds exploring plus actual return travel, 8–12 m targets, directional cone ±45°, cardinal 1 m grid. Authored in `data/scouting/default_scouts.tres`. Blocked travel retains the committed worker and retries; mortality/rescue gameplay remains deferred. These are provisional implementation values, not locked balance. |
+| A09 | Task 012 route investment starts at five workers from `data/trails/default_trails.tres`. Allocation changes request an exact target; shortages reject atomically with no partial allocation or priority system. Reducing/cancelling releases workers immediately while no transit exists. Cancelling retains route and segment IDs; re-investment reuses them. Task 013 must define recall for actual in-flight travelers. |
 
 ## Details to resolve in their task
 

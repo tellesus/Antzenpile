@@ -4,7 +4,7 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-Tasks 001–011 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scout missions, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. PerceivedSignals now derive bearing, estimated distance, strength and qualitative confidence from colony memory. The first player-facing OUTWARD prototype now shows remembered sensory traces and supports rotation, selection, scouting, pause and time controls. Trail creation and resource delivery are next. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
+Tasks 001–012 are implemented: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, capped individual scout missions, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. PerceivedSignals derive bearing, estimated distance, strength and qualitative confidence from colony memory. OUTWARD shows remembered traces and supports rotation, selection, scouting, pause, time controls, and trail investment. A trail to a known destination commits workers and retains separate route/segment state. Worker transit and resource delivery are next. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
@@ -24,7 +24,7 @@ Tasks 001–011 are implemented: Godot shell, fixed clock, isolated seeded runs,
 | [UI_RULES](docs/UI_RULES.md) | OUTWARD, INWARD, information and rendering rules |
 | [CODING_RULES](docs/CODING_RULES.md) | Implementation and validation workflow |
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
-| [Task cards](docs/tasks/) | 001–011 completed; 012–022 roadmap |
+| [Task cards](docs/tasks/) | 001–012 completed; 013–022 roadmap |
 
 ## Running and testing
 
@@ -39,7 +39,7 @@ $env:GODOT_EXE = 'C:\path\to\Godot_v4.7.2-stable_win64_console.exe'
 & $env:GODOT_EXE --editor --path .
 ```
 
-The runner returns 0 on success, 1 on check failure or an empty suite. Use the pinned executable, not an arbitrary Godot on PATH. In the editor, F5 runs Main and F8 stops it. The near-black OUTWARD window uses a 1280×720 landscape viewport and canvas-items stretch. Drag the field with a mouse or touch to face another direction; tap a trace for its context. The Scout button sends a scout in the facing direction. Pause/Resume and 1×/4×/16×/64× buttons also have Space and 1/2/3/4 shortcuts. F3 toggles DEBUG: WORLD TRUTH; click home, resource, or scout markers for raw fields. Its labeled dispatch button starts and selects a general scout mission. The scout panel shows private estimates and uncertainty circles; the counters distinguish private evidence, Known Nodes, and archived reports. Select a resource to compare true coordinates with the colony’s remembered estimate, uncertainty, confidence, and age, then the projected signal category, bearing, range and strength. Signals remain absent until a scout returns. Other named actions await their gameplay tasks. Release and headless runs do not create the truth view.
+The runner returns 0 on success, 1 on check failure or an empty suite. Use the pinned executable, not an arbitrary Godot on PATH. In the editor, F5 runs Main and F8 stops it. The near-black OUTWARD window uses a 1280×720 landscape viewport and canvas-items stretch. Drag the field with a mouse or touch to face another direction; tap a trace for its context. Once a scout has returned with a known resource, its context offers **Invest 5 Workers**, then −1, +1 and Cancel. The Scout button sends a scout in the facing direction. Pause/Resume and 1×/4×/16×/64× buttons also have Space and 1/2/3/4 shortcuts. F3 toggles DEBUG: WORLD TRUTH; click home, resource, or scout markers for raw fields. The home panel shows trail route/segment IDs and commitments; estimated segment geometry appears on the debug map. Signals remain absent until a scout returns. Other named actions await their gameplay tasks. Release and headless runs do not create the truth view.
 
 ## First milestone
 

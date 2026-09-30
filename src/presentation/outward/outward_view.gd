@@ -8,6 +8,8 @@ var status_provider: Callable
 var dispatch_command: Callable
 var pause_command: Callable
 var speed_command: Callable
+var trail_create_command: Callable
+var trail_set_command: Callable
 var input_blocked: Callable
 var facing: float = 0.0
 var selected_id: String = ""
@@ -104,6 +106,22 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 func _run_command(command: String) -> void:
 	match command:
+		"trail_create", "trail_less", "trail_more", "trail_cancel":
+			var signal_data: Dictionary = _selected_signal()
+			if signal_data.is_empty():
+				return
+			var route: Dictionary = _selected_route(signal_data)
+			var result: Dictionary = {}
+			if route.is_empty() or route.status == "inactive":
+				if command != "trail_create" or not trail_create_command.is_valid():
+					return
+				result = trail_create_command.call(signal_data.source_knowledge_id)
+			else:
+				if not trail_set_command.is_valid():
+					return
+				var target: int = 0 if command == "trail_cancel" else maxi(0, route.desired_workers - 1) if command == "trail_less" else route.desired_workers + 1
+				result = trail_set_command.call(route.id, target)
+			_feedback = "Trail updated" if result.get("accepted", false) else result.get("reason", "Trail unavailable")
 		"scout":
 			if not dispatch_command.is_valid() or _status.get("available_workers", 0) < 1 or _status.get("active_scouts", 0) >= _status.get("scout_cap", 0):
 				_feedback = "No scout available"
@@ -137,6 +155,16 @@ func _button_rect(command: String) -> Rect2:
 
 
 func _button_at(at: Vector2) -> String:
+	if not _selected_signal().is_empty():
+		var route: Dictionary = _selected_route(_selected_signal())
+		var contextual: Array[String] = []
+		if route.is_empty() or route.status == "inactive":
+			contextual.append("trail_create")
+		else:
+			contextual.append_array(["trail_less", "trail_more", "trail_cancel"])
+		for command: String in contextual:
+			if _trail_button_rect(command).has_point(at):
+				return command
 	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64"]:
 		if _button_rect(command).has_point(at):
 			return command
@@ -194,16 +222,10 @@ func _draw_hud(size: Vector2) -> void:
 
 
 func _draw_context(size: Vector2) -> void:
-	if selected_id.is_empty():
-		return
-	var selected: Dictionary = {}
-	for signal_data: Dictionary in _signals:
-		if signal_data.id == selected_id:
-			selected = signal_data
-			break
+	var selected: Dictionary = _selected_signal()
 	if selected.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 166))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 246))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), _signal_title(selected.category), _signal_color(selected.category), 20)
@@ -212,6 +234,46 @@ func _draw_context(size: Vector2) -> void:
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 14)
 	_label(box.position + Vector2(16, 109), "Last sensed %.0f s ago" % selected.age, Color("8fa1a8"), 13)
 	_label(box.position + Vector2(16, 137), "Risk unknown", Color("8fa1a8"), 13)
+	var route: Dictionary = _selected_route(selected)
+	if route.is_empty() or route.status == "inactive":
+		_label(box.position + Vector2(16, 165), "Trail: no workers committed", Color("a8b8bd"), 13)
+		_draw_trail_button("trail_create", "INVEST 5 WORKERS")
+	else:
+		_label(box.position + Vector2(16, 165), "Trail: %d desired / %d allocated" % [route.desired_workers, route.allocated_workers], Color("a8b8bd"), 13)
+		_label(box.position + Vector2(16, 183), "Workers in transit: %d" % route.active_workers, Color("8fa1a8"), 12)
+		_draw_trail_button("trail_less", "− 1")
+		_draw_trail_button("trail_more", "+ 1")
+		_draw_trail_button("trail_cancel", "CANCEL")
+
+
+func _selected_signal() -> Dictionary:
+	for signal_data: Dictionary in _signals:
+		if signal_data.id == selected_id:
+			return signal_data
+	return {}
+
+
+func _selected_route(signal_data: Dictionary) -> Dictionary:
+	for route: Dictionary in _status.get("trails", []):
+		if route.destination_knowledge_id == signal_data.source_knowledge_id:
+			return route
+	return {}
+
+
+func _trail_button_rect(command: String) -> Rect2:
+	var x: float = get_viewport_rect().size.x - 300.0
+	match command:
+		"trail_create": return Rect2(x, 342, 260, 44)
+		"trail_less": return Rect2(x, 342, 64, 44)
+		"trail_more": return Rect2(x + 72, 342, 64, 44)
+		"trail_cancel": return Rect2(x + 144, 342, 116, 44)
+	return Rect2()
+
+
+func _draw_trail_button(command: String, title: String) -> void:
+	var box: Rect2 = _trail_button_rect(command)
+	draw_rect(box, Color("263b3c"))
+	_label(box.position + Vector2(box.size.x * 0.5, 29), title, Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_controls(size: Vector2) -> void:

@@ -73,6 +73,11 @@ func _draw() -> void:
 	var origin: Vector2 = model.transform * Vector2(bounds[0], bounds[1])
 	var map_size: Vector2 = Vector2(bounds[2], bounds[3]) * model.transform.x.length()
 	draw_rect(Rect2(origin, map_size), Color("657488"), false, 1.0)
+	for segment: Dictionary in data.trails.segments:
+		var a: Vector2 = model.transform * Vector2(segment.start[0], segment.start[1])
+		var b: Vector2 = model.transform * Vector2(segment.end[0], segment.end[1])
+		draw_line(a, b, Color("70d2bb"), 2.0)
+		_label((a + b) * 0.5 + Vector2(5, -5), segment.id, Color("70d2bb"), 12)
 	for entry: Dictionary in data.colony.piles + data.world.nodes + data.scouts:
 		var at: Vector2 = model.transform * Vector2(entry.position[0], entry.position[1])
 		var color := Color("eee7d6")
@@ -120,6 +125,10 @@ func _draw() -> void:
 				lines.append("%s: %s (%s / %s)" % [id, entry.count, entry.kind, entry.owner_id])
 			for node: Dictionary in data.knowledge.nodes.slice(0, 4):
 				lines.append("Known %s: radius %.2fm" % [node.source_node_id, node.uncertainty_radius])
+			for route: Dictionary in data.trails.routes:
+				if route.origin_pile == detail.id:
+					lines.append("%s -> %s [%s]" % [route.id, route.destination_knowledge_id, route.status])
+					lines.append("%s: desired %d / allocated %d / active %d" % [route.segment_id, route.desired_workers, route.allocated_workers, route.active_workers])
 		elif detail.has("phase"):
 			lines.append("Phase: " + detail.phase)
 			lines.append("Origin: " + detail.origin_pile)

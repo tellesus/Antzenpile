@@ -19,6 +19,8 @@ func _ready() -> void:
 		outward.dispatch_command = dispatch_facing
 		outward.pause_command = simulation.toggle_pause
 		outward.speed_command = simulation.set_time_scale
+		outward.trail_create_command = create_trail_for
+		outward.trail_set_command = set_trail_target
 		outward.input_blocked = debug_is_open
 		add_child(outward)
 	# Lazy load keeps truth-view code out of the headless runtime and release input path.
@@ -50,7 +52,28 @@ func outward_status(pile_id: String) -> Dictionary:
 	return {"available_workers": simulation.run.colony.piles[pile_id].workers_available,
 		"active_scouts": simulation.run.scouts.size(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
-		"time_scale": simulation.run.clock.time_scale}
+		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id)}
+
+
+func trail_summaries(pile_id: String) -> Array[Dictionary]:
+	var summaries: Array[Dictionary] = []
+	for route: TrailRouteState in simulation.run.trails.routes.values():
+		if route.origin_pile == pile_id:
+			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
+				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers,
+				"active_workers": route.active_workers, "status": route.status})
+	summaries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.id < b.id)
+	return summaries
+
+
+func create_trail_for(knowledge_id: String) -> Dictionary:
+	var accepted: bool = simulation.create_trail("home", knowledge_id)
+	return {"accepted": accepted, "reason": simulation.trails.last_error}
+
+
+func set_trail_target(route_id: String, target: int) -> Dictionary:
+	var accepted: bool = simulation.set_trail_workers(route_id, target)
+	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
 
 func dispatch_facing(bearing: float) -> bool:
