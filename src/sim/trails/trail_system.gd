@@ -99,6 +99,25 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	return true
 
 
+func recheck(route_id: String) -> bool:
+	if not _run.trails.routes.has(route_id):
+		return _reject("Unknown trail")
+	var route: TrailRouteState = _run.trails.routes[route_id]
+	if route.status != "depleted" or not route.reported_depleted or route.desired_workers <= 0 or route.allocated_workers <= 0:
+		return _reject("Trail is not ready to recheck")
+	if route.active_workers > 0:
+		return _reject("Wait for travelling workers")
+	var pile: PileState = _run.colony.piles[route.origin_pile]
+	if pile.workers.count("trail:" + route.id) != route.allocated_workers:
+		return _reject("Trail labor is unavailable")
+	# This changes colony intent only; hidden source truth is checked at outbound arrival.
+	route.reported_depleted = false
+	route.status = "active"
+	route.departure_cooldown_ticks = 0
+	last_error = ""
+	return true
+
+
 func tick(delta: float) -> void:
 	# Every existing segment fades, including inactive and depleted routes.
 	for segment: TrailSegmentState in _run.trails.segments.values():

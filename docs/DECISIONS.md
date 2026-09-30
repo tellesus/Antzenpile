@@ -55,6 +55,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A20 | Task 024 deposits 0.05 water per simulated second into each pile during the existing 60-second rain, three units for a complete event. Fixed-tick deposits use the existing pile resource API and five-decimal storage precision; pause, speed and version-5 save continuation remain unchanged. This amount is provisional balance. |
 | A21 | Task 025 offers one manual Lay 8 Brood action in the selected Queen or Nursery context when its pile has no active cohort. It has no upfront cost; the existing two-worker care gate and larval food debits constrain growth. Only one cohort runs at a time. Consecutive `brood_N` IDs derive from the number already emerged, so the version-5 snapshot shape and existing saves remain valid. These are provisional slice interaction defaults, not a full reproduction system. |
 | A22 | Task 027 makes `carb_sheltered` a flowering nectar source. At tick 1200 and every 1200 ticks after, a physical pulse adds up to 12 carbohydrate to a capacity of 100. The schedule is authored and derived from saved clock ticks, leaving snapshot version 5 unchanged. These are provisional ecology values, not a resource-balance pass. |
+| A23 | Task 028 offers Recheck on a selected depleted trail once its travelers are home. Existing committed workers test the source via normal travel; no hidden renewal check, auto-retry, new worker pool or snapshot version change. |
 
 ## Details to resolve in their task
 

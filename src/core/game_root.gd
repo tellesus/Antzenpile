@@ -31,6 +31,7 @@ func _ready() -> void:
 		outward.speed_command = simulation.set_time_scale
 		outward.trail_create_command = create_trail_for
 		outward.trail_set_command = set_trail_target
+		outward.trail_recheck_command = recheck_trail
 		outward.input_blocked = debug_is_open
 		outward.mode_command = set_mode.bind("inward")
 		outward.save_command = quick_save
@@ -207,6 +208,11 @@ func create_trail_for(knowledge_id: String) -> Dictionary:
 
 func set_trail_target(route_id: String, target: int) -> Dictionary:
 	var accepted: bool = simulation.set_trail_workers(route_id, target)
+	return {"accepted": accepted, "reason": simulation.trails.last_error}
+
+
+func recheck_trail(route_id: String) -> Dictionary:
+	var accepted: bool = simulation.recheck_trail(route_id)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
 

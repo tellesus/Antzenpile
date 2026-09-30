@@ -11,6 +11,7 @@ var pause_command: Callable
 var speed_command: Callable
 var trail_create_command: Callable
 var trail_set_command: Callable
+var trail_recheck_command: Callable
 var input_blocked: Callable
 var mode_command: Callable
 var save_command: Callable
@@ -117,13 +118,17 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 func _run_command(command: String) -> void:
 	match command:
-		"trail_create", "trail_less", "trail_more", "trail_cancel":
+		"trail_create", "trail_less", "trail_more", "trail_cancel", "trail_recheck":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty():
 				return
 			var route: Dictionary = _selected_route(signal_data)
 			var result: Dictionary = {}
-			if route.is_empty() or route.status in ["inactive", "recalling"]:
+			if command == "trail_recheck":
+				if route.is_empty() or route.status != "depleted" or not trail_recheck_command.is_valid():
+					return
+				result = trail_recheck_command.call(route.id)
+			elif route.is_empty() or route.status in ["inactive", "recalling"]:
 				if command != "trail_create" or not trail_create_command.is_valid():
 					return
 				result = trail_create_command.call(signal_data.source_knowledge_id)
@@ -132,7 +137,7 @@ func _run_command(command: String) -> void:
 					return
 				var target: int = 0 if command == "trail_cancel" else maxi(0, route.desired_workers - 1) if command == "trail_less" else route.desired_workers + 1
 				result = trail_set_command.call(route.id, target)
-			_feedback = "Trail updated" if result.get("accepted", false) else result.get("reason", "Trail unavailable")
+			_feedback = ("Workers sent to recheck" if command == "trail_recheck" else "Trail updated") if result.get("accepted", false) else result.get("reason", "Trail unavailable")
 		"scout":
 			if not dispatch_command.is_valid() or _status.get("available_workers", 0) < 1 or _status.get("active_scouts", 0) >= _status.get("scout_cap", 0):
 				_feedback = "No scout available"
@@ -182,6 +187,10 @@ func _button_at(at: Vector2) -> String:
 		var contextual: Array[String] = []
 		if route.is_empty() or route.status in ["inactive", "recalling"]:
 			contextual.append("trail_create")
+		elif route.status == "depleted":
+			if route.active_workers == 0:
+				contextual.append("trail_recheck")
+			contextual.append("trail_cancel")
 		else:
 			contextual.append_array(["trail_less", "trail_more", "trail_cancel"])
 		for command: String in contextual:
@@ -297,8 +306,12 @@ func _draw_context(size: Vector2) -> void:
 		_label(box.position + Vector2(16, 185), "Wanted %d · Committed %d" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 14)
 		_label(box.position + Vector2(16, 205), "%d workers travelling" % route.active_workers, Color("8fa1a8"), 14)
 		_label(box.position + Vector2(16, 225), "Returned %.1f · Home %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 14)
-		_draw_trail_button("trail_less", "− 1")
-		_draw_trail_button("trail_more", "+ 1")
+		if route.status == "depleted":
+			if route.active_workers == 0:
+				_draw_trail_button("trail_recheck", "RECHECK")
+		else:
+			_draw_trail_button("trail_less", "− 1")
+			_draw_trail_button("trail_more", "+ 1")
 		_draw_trail_button("trail_cancel", "CANCEL")
 
 
@@ -325,6 +338,7 @@ func _trail_button_rect(command: String) -> Rect2:
 	var x: float = get_viewport_rect().size.x - 300.0
 	match command:
 		"trail_create": return Rect2(x, 380, 260, 44)
+		"trail_recheck": return Rect2(x, 380, 136, 44)
 		"trail_less": return Rect2(x, 380, 64, 44)
 		"trail_more": return Rect2(x + 72, 380, 64, 44)
 		"trail_cancel": return Rect2(x + 144, 380, 116, 44)

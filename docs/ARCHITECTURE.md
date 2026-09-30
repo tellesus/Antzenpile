@@ -83,6 +83,8 @@ Task 025 adds a BroodSystem command to start one new aggregate cohort when a pil
 
 Task 027 adds an EcologySystem after trail traffic, driven solely by fixed clock ticks and an authored backyard nectar pulse. It may increase the hidden `carb_sheltered` World Node up to its capacity and reactivate it after depletion. The schedule has no runtime cursor: saved tick count and immutable pulse data determine the next occurrence, so version-5 snapshots stay unchanged. No event writes colony knowledge or wakes a depleted trail; ordinary scout reports and forager interactions remain the information boundary.
 
+Task 028 adds a semantic TrailSystem recheck command for a depleted route after all prior cohorts return. It clears the reported-depleted stop without inspecting the hidden source, preserves route/segment/ledger identity, and lets the next ordinary cohort discover whether resources have renewed. OUTWARD offers the action only from the selected depleted route's detached summary. No new snapshot field is needed.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

@@ -67,6 +67,10 @@ func set_trail_workers(route_id: String, target: Variant) -> bool:
 	return trails.set_workers(route_id, target)
 
 
+func recheck_trail(route_id: String) -> bool:
+	return trails.recheck(route_id)
+
+
 func start_food_exchange(pile_id: String) -> bool:
 	return food_exchange.start(pile_id)
 
