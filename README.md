@@ -26,9 +26,9 @@ The task-022 integration baseline reaches the original arc in six simulated minu
 | [UI_RULES](docs/UI_RULES.md) | OUTWARD, INWARD, information and rendering rules |
 | [CODING_RULES](docs/CODING_RULES.md) | Implementation and validation workflow |
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
-| [Task cards](docs/tasks/) | 001–033 completed; storage and throughput are proposed next |
+| [Task cards](docs/tasks/) | 001–033 completed; 034 deferred after review; recurring weather is next |
 | [Slice evaluation](docs/SLICE_EVALUATION.md) | Measured arc, Windows workload and design questions |
-| [Post-slice plan](docs/POST_SLICE_PLAN.md) | Revised from the original GDD: tasks 029–033 complete, cards 034–036 proposed, session pacing tabled |
+| [Post-slice plan](docs/POST_SLICE_PLAN.md) | Revised from the original GDD: tasks 029–033 complete, 034 deferred, cards 035–036 proposed, session pacing tabled |
 
 ## Running and testing
 
