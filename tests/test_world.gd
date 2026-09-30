@@ -12,13 +12,14 @@ func run(test: Object) -> bool:
 		return false
 	var other := loader.load_scenario()
 	test.check(world.to_dict() == other.to_dict(), "Independent authored worlds are identical")
-	test.check(world.nodes.size() == 4 and world.bounds == Rect2(0, 0, 40, 40), "Four-node 40m fixture")
+	test.check(world.nodes.size() == 5 and world.bounds == Rect2(0, 0, 40, 40), "Five-node 40m fixture")
 	var counts: Dictionary = {"carbohydrate": 0, "protein": 0, "water": 0}
 	for id: String in world.nodes:
 		var node: WorldNodeState = world.nodes[id]
 		counts[node.definition_id] += 1
 		print("[WORLD] %s %s quantity=%.0f" % [id, node.position, node.quantity])
-	test.check(counts == {"carbohydrate": 2, "protein": 1, "water": 1}, "Expected resource categories")
+	test.check(counts == {"carbohydrate": 2, "protein": 2, "water": 1}, "Expected resource categories")
+	test.check(world.nodes.protein_picnic.quantity == 0.0 and not world.nodes.protein_picnic.active, "Temporary picnic protein begins unavailable")
 	world.nodes.carb_exposed.quantity = 50.0
 	world.nodes.carb_exposed.properties["test"] = [1]
 	test.check(other.nodes.carb_exposed.quantity == 100.0 and other.nodes.carb_exposed.properties.is_empty(), "Runtime nodes are isolated")

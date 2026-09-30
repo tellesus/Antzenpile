@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TemporaryResourceDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/ecology/temporary_resource_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+source_id = "protein_picnic"
+first_tick = 1800
+interval_ticks = 2400
+duration_ticks = 800
+quantity = 24.0

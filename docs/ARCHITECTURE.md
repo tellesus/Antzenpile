@@ -91,6 +91,8 @@ Task 030 gives each PileState a Primitive Nursery state, with brood-space and ca
 
 Task 031 adds NurseryDevelopmentSystem as a separate fixed-tick chamber transition. It atomically pays authored resources and reserves four workers in a `nursery:<pile_id>` ledger commitment, then releases them after 90 simulated seconds. PileState owns development state/progress and derives eight or sixteen space/care slots. Developed Nursery permits two manually started aggregate cohorts; BroodSystem computes one care fraction from total occupied brood before advancing both in stable array order. IDs derive from emerged plus active cohort count and stay unique through overlapping cycles. INWARD receives only detached costs, progress, capacity and brood records. Optional progress on version-5 saves defaults to Primitive zero, while restore validates the new commitment and bounded cohorts.
 
+Task 032 adds a temporary backyard protein World Node representing picnic crumbs. Its authored start, expiry and recurrence ticks are derived from the saved clock; EcologySystem updates only its hidden quantity/active fields after scouts and trail traffic on a boundary tick. WorldLoader supports an initially inactive authored node. No ecology cursor or snapshot version is needed. Scouts discover only active crumbs by proximity and deliver observations on return; ordinary trail travel tests the remembered location. Appearance and expiry never mutate colony knowledge or normal presentation data directly.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout
