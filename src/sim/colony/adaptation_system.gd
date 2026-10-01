@@ -23,7 +23,7 @@ func start(pile_id: String, trait_id: String) -> bool:
 	if pile.workers_available < AdaptationRules.NURSES:
 		return _reject("Two available nurses required")
 	var pending: int = pile.nursery_occupied_space() + BROOD.starting_count
-	if pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending or pile.workers_total > WorkerLedger.MAX_COUNT - pending:
+	if pile.brood_started_total >= WorkerLedger.MAX_COUNT or pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending or pile.workers_total > WorkerLedger.MAX_COUNT - pending:
 		return _reject("Population limit reached")
 	for resource_id: String in AdaptationRules.COSTS:
 		if pile.resources[resource_id] < AdaptationRules.COSTS[resource_id]:
@@ -39,7 +39,8 @@ func start(pile_id: String, trait_id: String) -> bool:
 		pile.workers.retire_commitment(commitment)
 		return _reject("Resources unavailable")
 	var cohort := BroodCohort.new()
-	cohort.id = BroodCohort.next_id(pile.brood_matured_total, pile.brood_cohorts.size())
+	pile.brood_started_total += 1
+	cohort.id = "brood_%d" % pile.brood_started_total
 	cohort.adaptation_id = trait_id
 	cohort.adaptation_trial = true
 	pile.brood_cohorts.append(cohort)

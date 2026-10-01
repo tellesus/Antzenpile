@@ -6,6 +6,7 @@ const CONFIG = preload("res://data/resources/default_brood.tres")
 var id: String = "brood_1"
 var stage: String = "egg"
 var count: int = CONFIG.starting_count
+var lost_count: int = 0
 var progress_seconds: float = 0.0
 var nutrition: float = 1.0
 var care: float = 1.0
@@ -18,7 +19,7 @@ static func next_id(matured_total: int, active_count: int = 0) -> String:
 
 
 func to_dict() -> Dictionary:
-	return {"id": id, "stage": stage, "count": count, "progress_seconds": progress_seconds,
+	return {"id": id, "stage": stage, "count": count, "lost_count": lost_count, "progress_seconds": progress_seconds,
 		"nutrition": nutrition, "care": care,
 		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial}
 
@@ -26,7 +27,8 @@ func to_dict() -> Dictionary:
 func restore(data: Dictionary) -> bool:
 	if not data.has_all(["id", "stage", "count", "progress_seconds", "nutrition", "care"]):
 		return false
-	if not data.id is String or not data.id.begins_with("brood_") or not data.stage in ["egg", "larva", "pupa"] or not WorkerLedger.valid_count(data.count) or data.count != CONFIG.starting_count:
+	var lost: Variant = data.get("lost_count", 0)
+	if not data.id is String or not data.id.begins_with("brood_") or not data.stage in ["egg", "larva", "pupa"] or not WorkerLedger.valid_count(data.count) or not WorkerLedger.valid_count(lost) or data.count < 1 or data.count + lost != CONFIG.starting_count:
 		return false
 	for key: String in ["progress_seconds", "nutrition", "care"]:
 		if not typeof(data[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data[key])) or data[key] < 0.0:
@@ -40,6 +42,7 @@ func restore(data: Dictionary) -> bool:
 	id = data.id
 	stage = data.stage
 	count = int(data.count)
+	lost_count = int(lost)
 	progress_seconds = float(data.progress_seconds)
 	nutrition = float(data.nutrition)
 	care = float(data.care)

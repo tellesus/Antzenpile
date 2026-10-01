@@ -13,6 +13,7 @@ const Rain = preload("res://src/sim/weather/rain_state.gd")
 const Honeydew = preload("res://src/sim/ecology/honeydew_state.gd")
 const HONEYDEW_CONFIG = preload("res://data/ecology/backyard_honeydew.tres")
 const Swarm = preload("res://src/sim/ecology/swarm_state.gd")
+const Guest = preload("res://src/sim/ecology/guest_state.gd")
 const Rival = preload("res://src/sim/ecology/rival_state.gd")
 const Predator = preload("res://src/sim/ecology/predator_state.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
@@ -26,6 +27,7 @@ var trails: TrailNetwork = Trails.new()
 var rain: RainState = Rain.new()
 var honeydew: HoneydewState = Honeydew.new()
 var swarm: SwarmState = Swarm.new()
+var guest: GuestState = Guest.new()
 var rival: RivalState = Rival.new()
 var predator: PredatorState = Predator.new()
 var delivered_observations: Dictionary[String, Observation] = {}
@@ -67,7 +69,7 @@ func to_dict() -> Dictionary:
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(),
-		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict()}
+		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict()}
 
 
 func active_scout_count() -> int:
@@ -225,6 +227,15 @@ func restore(data: Dictionary) -> bool:
 	for pile: PileState in restored_colony.piles.values():
 		if restored_trails.pending_for_pile(pile.id, true) > pile.adapted_workers_lost or restored_trails.pending_for_pile(pile.id) > WorkerLedger.MAX_COUNT - pile.workers_total:
 			return false
+	var restored_guest := Guest.new()
+	if data.has("guest") and (not data.guest is Dictionary or not restored_guest.restore(data.guest, restored_colony.piles.home, restored_clock.tick_count)):
+		return false
+	for pile: PileState in restored_colony.piles.values():
+		for commitment: String in pile.workers.to_dict().commitments:
+			if commitment.begins_with("rejection:") and (pile.id != "home" or commitment != "rejection:home" or restored_guest.phase != "rejecting"):
+				return false
+		if pile.brood_lost_total != (restored_guest.reported_losses if pile.id == "home" else 0):
+			return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()
@@ -244,6 +255,7 @@ func restore(data: Dictionary) -> bool:
 	predator = restored_predator
 	rival = restored_rival
 	swarm = restored_swarm
+	guest = restored_guest
 	return true
 
 

@@ -14,6 +14,8 @@ var workers: WorkerLedger = Ledger.new()
 var resources: Dictionary[String, float] = {"carbohydrate": 0.0, "protein": 0.0, "water": 0.0}
 var brood_cohorts: Array[BroodCohort] = []
 var brood_matured_total: int = 0
+var brood_started_total: int = 1
+var brood_lost_total: int = 0
 var adaptation_repertoire: String = ""
 var adapted_workers_total: int = 0
 var adapted_workers_lost: int = 0
@@ -34,6 +36,7 @@ func to_dict() -> Dictionary:
 	return {"id": id, "position": [position.x, position.y], "queen_count": queen_count,
 		"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
+		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
 		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
 		"adapted_workers_lost": adapted_workers_lost,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
@@ -140,21 +143,28 @@ func restore(data: Dictionary) -> bool:
 			return false
 		restored_brood.append(cohort)
 	var emerged: int = int(data.brood_matured_total)
-	if emerged % BROOD_CONFIG.starting_count != 0 or (restored_brood.is_empty() and emerged < BROOD_CONFIG.starting_count):
+	var legacy: bool = not data.has("brood_started_total")
+	var started: Variant = data.get("brood_started_total", emerged / BROOD_CONFIG.starting_count + restored_brood.size())
+	var brood_lost: Variant = data.get("brood_lost_total", 0)
+	if not Ledger.valid_count(started) or started < 1 or not Ledger.valid_count(brood_lost) or (legacy and (emerged % BROOD_CONFIG.starting_count != 0 or brood_lost != 0)):
 		return false
 	var occupied: int = 0
 	var cohort_ids: Dictionary[String, bool] = {}
-	var total_started: int = emerged / BROOD_CONFIG.starting_count + restored_brood.size()
+	var total_started: int = int(started)
+	var active_losses: int = 0
 	for cohort: BroodCohort in restored_brood:
 		occupied += cohort.count
+		active_losses += cohort.lost_count
 		var suffix: String = cohort.id.trim_prefix("brood_")
 		if cohort.id != "brood_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() > total_started or cohort_ids.has(cohort.id):
 			return false
 		cohort_ids[cohort.id] = true
+	if emerged + int(brood_lost) + occupied != total_started * BROOD_CONFIG.starting_count or active_losses > brood_lost:
+		return false
 	var brood_limit: int = BROOD_CONFIG.developed_nursery_brood_capacity if restored_nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_brood_capacity
 	if occupied > brood_limit:
 		return false
-	if restored_nursery_state != "developed" and not restored_brood.is_empty() and restored_brood[0].id != Brood.next_id(emerged):
+	if restored_nursery_state != "developed" and not restored_brood.is_empty() and restored_brood[0].id != "brood_%d" % total_started:
 		return false
 	var repertoire: Variant = data.get("adaptation_repertoire", "")
 	var adapted: Variant = data.get("adapted_workers_total", 0)
@@ -162,7 +172,7 @@ func restore(data: Dictionary) -> bool:
 	if not repertoire is String or not (repertoire == "" or AdaptationRules.valid_trait(repertoire)) or not Ledger.valid_count(adapted) or not Ledger.valid_count(adapted_lost) or adapted > restored.total or adapted_lost > restored.lost_total or adapted > emerged or adapted_lost > emerged - adapted:
 		return false
 	var lifetime_adapted: int = int(adapted) + int(adapted_lost)
-	if lifetime_adapted % BROOD_CONFIG.starting_count != 0:
+	if brood_lost == 0 and lifetime_adapted % BROOD_CONFIG.starting_count != 0:
 		return false
 	if (repertoire == "") != (lifetime_adapted == 0):
 		return false
@@ -204,6 +214,8 @@ func restore(data: Dictionary) -> bool:
 	resources = restored_resources
 	brood_cohorts = restored_brood
 	brood_matured_total = int(data.brood_matured_total)
+	brood_started_total = int(started)
+	brood_lost_total = int(brood_lost)
 	adaptation_repertoire = repertoire
 	adapted_workers_total = int(adapted)
 	adapted_workers_lost = int(adapted_lost)

@@ -11,6 +11,7 @@ const Nursery = preload("res://src/sim/colony/nursery_development_system.gd")
 const Adaptation = preload("res://src/sim/colony/adaptation_system.gd")
 const Rain = preload("res://src/sim/weather/rain_system.gd")
 const Swarm = preload("res://src/sim/ecology/swarm_system.gd")
+const Guest = preload("res://src/sim/ecology/guest_system.gd")
 const Rival = preload("res://src/sim/ecology/rival_system.gd")
 const Predator = preload("res://src/sim/ecology/predator_system.gd")
 const Ecology = preload("res://src/sim/ecology/ecology_system.gd")
@@ -24,6 +25,7 @@ var adaptation: RefCounted
 var rain: RainSystem
 var ecology: EcologySystem
 var swarm: SwarmSystem
+var guest: GuestSystem
 var rival: RivalSystem
 var predator: PredatorSystem
 
@@ -51,6 +53,7 @@ func _attach_run(next_run: RunState) -> void:
 	swarm = Swarm.new(run, trails.apply_loss)
 	trails.swarm = swarm
 	brood = Brood.new(run)
+	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
 	adaptation = Adaptation.new(run)
@@ -115,6 +118,14 @@ func stop_honeydew_tending(pile_id: String) -> bool:
 	return ecology.stop_tending(pile_id)
 
 
+func start_guest_rejection() -> bool:
+	return guest.start_rejection()
+
+
+func stop_guest_rejection() -> bool:
+	return guest.stop_rejection()
+
+
 func _tick(delta: float) -> void:
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():
@@ -127,4 +138,5 @@ func _tick(delta: float) -> void:
 	ecology.tick(delta)
 	food_exchange.tick(delta)
 	nursery.tick(delta)
+	guest.tick()
 	brood.tick(delta)

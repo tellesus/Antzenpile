@@ -12,6 +12,7 @@ var develop_command: Callable
 var nursery_develop_command: Callable
 var brood_command: Callable
 var adaptation_command: Callable
+var guest_rejection_command: Callable
 var input_blocked: Callable
 var save_command: Callable
 var load_command: Callable
@@ -51,6 +52,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	var guest: Dictionary = _status.get("guest", {})
+	if selected_id == "guest" and guest.get("reported_losses", 0) > 0 and guest.get("observation", "") != "purged" and _guest_rect().has_point(at):
+		_run_command("guest_rejection")
+		return true
 	if selected_id == "adaptation" and _can_choose_adaptation():
 		for trait_id: String in ["lean", "load"]:
 			if _adaptation_rect(trait_id).has_point(at):
@@ -69,7 +74,7 @@ func activate_at(at: Vector2) -> bool:
 		if _button_rect(command).has_point(at):
 			_run_command(command)
 			return true
-	var picked: String = node_at(at, get_viewport_rect().size)
+	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty())
 	if not picked.is_empty():
 		selected_id = picked
 		queue_redraw()
@@ -79,6 +84,11 @@ func activate_at(at: Vector2) -> bool:
 
 func _run_command(command: String) -> void:
 	match command:
+		"guest_rejection":
+			if guest_rejection_command.is_valid():
+				var enabled: bool = not _status.get("guest", {}).get("rejection_active", false)
+				var result: Dictionary = guest_rejection_command.call(enabled)
+				show_feedback(("Rejection effort started" if enabled else "Rejection effort stopped") if result.get("accepted", false) else result.get("reason", "Effort unavailable"))
 		"outward":
 			if mode_command.is_valid():
 				mode_command.call()
@@ -124,10 +134,13 @@ static func positions(size: Vector2) -> Dictionary:
 		"nursery": origin + Vector2(field_width * 0.72, field_height * 0.32),
 		"food_exchange": origin + Vector2(field_width * 0.72, field_height * 0.72),
 		"entrance": origin + Vector2(field_width * 0.28, field_height * 0.78),
-		"adaptation": origin + Vector2(field_width * 0.5, field_height * 0.52)}
+		"adaptation": origin + Vector2(field_width * 0.5, field_height * 0.52),
+		"guest": origin + Vector2(field_width * 0.50, field_height * 0.89)}
 
 
-static func node_at(at: Vector2, size: Vector2) -> String:
+static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false) -> String:
+	if guest_visible and at.distance_to(positions(size).guest) <= 44.0:
+		return "guest"
 	for id: String in NODES:
 		if at.distance_to(positions(size)[id]) <= 44.0:
 			return id
@@ -164,6 +177,10 @@ func _adaptation_rect(trait_id: String) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 380.0 if trait_id == "lean" else 438.0, 260.0, 44.0)
 
 
+func _guest_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
+
+
 func _can_choose_adaptation() -> bool:
 	return _status.get("adaptation_repertoire", "") == "" and _status.get("adaptation_trial", {}).is_empty()
 
@@ -182,6 +199,9 @@ func _draw() -> void:
 		draw_line(centers[id], centers["adaptation"], Color(0.43, 0.40, 0.55, 0.20), 1.0, true)
 	for id: String in NODES:
 		_draw_node(id, centers[id])
+	if not _status.get("guest", {}).is_empty():
+		draw_line(centers.guest, centers.nursery, Color(0.65, 0.53, 0.64, 0.18), 1.0, true)
+		_draw_node("guest", centers.guest)
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
@@ -209,6 +229,9 @@ func _draw_node(id: String, at: Vector2) -> void:
 	draw_colored_polygon(outline, Color(color, 0.045))
 	draw_polyline(outline.slice(1, 27), Color(color, 0.4), 1.1, true)
 	match id:
+		"guest":
+			for index: int in 3:
+				draw_arc(at + Vector2(index * 5 - 5, index * 3 - 3), 9, 0.4, 4.1, 16, Color(color, 0.45), 1.0, true)
 		"nursery":
 			var occupied: int = int(_status.get("nursery_occupied_space", 0))
 			for index: int in mini(6, occupied):
@@ -226,6 +249,8 @@ func _draw_node(id: String, at: Vector2) -> void:
 		"queen":
 			draw_circle(at, 5.0, Color(color, 0.65))
 			draw_circle(at + Vector2(0, 9), 3.0, Color(color, 0.36))
+	if id == "nursery" and _status.get("guest", {}).get("observation", "") == "foreign":
+		draw_arc(at, 39.0, 0.3, 1.9, 20, Color("b79eaf"), 1.0, true)
 	if id == selected_id:
 		var focus: PackedVector2Array = Art.membrane(at, 43.0, 1.5)
 		draw_polyline(focus.slice(1, 8), Color("dce5d9"), 1.0, true)
@@ -276,7 +301,7 @@ func _draw_context(size: Vector2) -> void:
 					food_enough = food_enough and cohort.nutrition >= 1.0
 					care_enough = care_enough and cohort.care >= 1.0
 				_detail_line(box, 143, "Food %s · care %s" % ["enough" if food_enough else "short", "enough" if care_enough else "short"])
-			_detail_line(box, 181, "Workers emerged: %d" % _status.brood_matured_total)
+			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)])
 			if _status.nursery_state == "primitive":
 				_detail_line(box, 209, "Develop for %d brood space" % _status.nursery_developed_capacity)
 				_detail_line(box, 235, "Needs %.0f carb · %.0f protein" % [_status.nursery_costs.carbohydrate, _status.nursery_costs.protein])
@@ -312,6 +337,22 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 65, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
 			_detail_line(box, 117, "Trail workers: %d" % _status.trail_workers)
+		"guest":
+			var guest: Dictionary = _status.get("guest", {})
+			var observation: String = guest.get("observation", "")
+			_detail_line(box, 65, "Guest purged" if observation == "purged" else "Internal foreignness · Nursery" if observation == "foreign" else "Nursery losses · cause uncertain" if observation == "loss" else "Guest tolerated at home")
+			_detail_line(box, 99, "%d brood lost" % guest.get("reported_losses", 0) if observation != "tolerated" else "No harmful effect observed")
+			if guest.get("rejection_active", false):
+				_detail_line(box, 137, "%d workers on rejection effort" % guest.workers_committed)
+				_detail_line(box, 163, "Recognition and clearing take time")
+			elif observation in ["loss", "foreign"]:
+				_detail_line(box, 137, "Commit %d available workers" % guest.workers_required)
+				_detail_line(box, 163, "Effort competes with colony care")
+			elif observation == "purged":
+				_detail_line(box, 137, "Rejection workers released")
+			if observation in ["loss", "foreign"]:
+				draw_rect(_guest_rect(), Color("39323e"))
+				_label(_guest_rect().position + Vector2(130, 29), "STOP REJECTION" if guest.get("rejection_active", false) else "INCREASE REJECTION", Color("d9c9d7"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		"adaptation":
 			if not _status.adaptation_trial.is_empty():
 				_detail_line(box, 65, "%s trial" % ("Lean Foragers" if _status.adaptation_trial.adaptation_id == "lean" else "Load Bearers"))
@@ -373,6 +414,7 @@ static func _title(id: String) -> String:
 		"food_exchange": return "Food Exchange"
 		"entrance": return "Entrance"
 		"adaptation": return "Adaptation"
+		"guest": return "Guest"
 	return ""
 
 

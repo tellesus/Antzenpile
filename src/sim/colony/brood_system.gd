@@ -26,14 +26,37 @@ func start(pile_id: String) -> bool:
 		last_error = "Nursery lacks brood space"
 		return false
 	var pending_brood: int = pile.nursery_occupied_space() + CONFIG.starting_count
-	if pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending_brood or pile.workers_total > WorkerLedger.MAX_COUNT - pending_brood:
+	if pile.brood_started_total >= WorkerLedger.MAX_COUNT or pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending_brood or pile.workers_total > WorkerLedger.MAX_COUNT - pending_brood:
 		last_error = "Population limit reached"
 		return false
 	var cohort := BroodCohort.new()
-	cohort.id = BroodCohort.next_id(pile.brood_matured_total, pile.brood_cohorts.size())
+	pile.brood_started_total += 1
+	cohort.id = "brood_%d" % pile.brood_started_total
 	cohort.adaptation_id = pile.adaptation_repertoire
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
+	return true
+
+
+func lose_one(pile_id: String) -> bool:
+	if not _run.colony.piles.has(pile_id):
+		return false
+	var pile: PileState = _run.colony.piles[pile_id]
+	if pile.brood_cohorts.is_empty() or pile.brood_lost_total >= WorkerLedger.MAX_COUNT:
+		return false
+	# Stable oldest-first choice, no individual brood agents or adult ledger debit.
+	var cohort: BroodCohort = pile.brood_cohorts[0]
+	cohort.count -= 1
+	cohort.lost_count += 1
+	pile.brood_lost_total += 1
+	if cohort.count == 0:
+		if cohort.adaptation_trial:
+			var commitment: String = "adaptation:" + pile.id
+			var released: bool = pile.workers.release(commitment, AdaptationRules.NURSES)
+			assert(released)
+			var retired: bool = pile.workers.retire_commitment(commitment)
+			assert(retired)
+		pile.brood_cohorts.erase(cohort)
 	return true
 
 

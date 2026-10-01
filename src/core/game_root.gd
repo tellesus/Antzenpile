@@ -51,6 +51,7 @@ func _ready() -> void:
 		inward.develop_command = start_food_exchange
 		inward.nursery_develop_command = start_nursery_development
 		inward.brood_command = start_brood
+		inward.guest_rejection_command = set_guest_rejection
 		inward.adaptation_command = start_adaptation
 		inward.input_blocked = debug_is_open
 		inward.save_command = quick_save
@@ -159,6 +160,7 @@ func inward_status(pile_id: String) -> Dictionary:
 	return {"pile_id": pile_id, "queens": pile.queen_count,
 		"workers_total": expected_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
+		"brood_losses": pile.brood_lost_total, "guest": guest_summary(pile_id),
 		"adaptation_repertoire": pile.adaptation_repertoire,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
 		"adapted_workers": expected_adapted,
@@ -229,6 +231,20 @@ func _show_save_feedback(result: Dictionary, success: String) -> void:
 func start_food_exchange() -> Dictionary:
 	var accepted: bool = simulation.start_food_exchange("home")
 	return {"accepted": accepted, "reason": simulation.food_exchange.last_error}
+
+
+func guest_summary(pile_id: String) -> Dictionary:
+	if pile_id != "home" or simulation.run.guest.observation == "":
+		return {}
+	var state: GuestState = simulation.run.guest
+	return {"observation": state.observation, "reported_losses": state.reported_losses,
+		"rejection_active": state.phase == "rejecting", "workers_required": simulation.guest.CONFIG.rejection_workers,
+		"workers_committed": simulation.run.colony.piles.home.workers.count("rejection:home")}
+
+
+func set_guest_rejection(enabled: bool) -> Dictionary:
+	var accepted: bool = simulation.start_guest_rejection() if enabled else simulation.stop_guest_rejection()
+	return {"accepted": accepted, "reason": simulation.guest.last_error}
 
 
 func start_brood() -> Dictionary:

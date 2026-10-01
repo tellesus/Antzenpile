@@ -22,7 +22,7 @@ func run(test: Object) -> bool:
 	test.check(pile.deposit_resource("protein", 2.0) and root.inward_status("home").resources.protein == 7.0 and unchanged.resources.protein == 5.0, "INWARD store summary updates after a deposit without mutating an older detached snapshot")
 	for size: Vector2 in [Vector2(1280, 720), Vector2(900, 600)]:
 		var centers: Dictionary = View.positions(size)
-		test.check(centers.size() == 5 and centers.food_exchange.x < size.x - 316.0 and centers.adaptation.x < size.x - 316.0 and centers.queen.y > 98.0 and centers.entrance.y < size.y - 110.0, "Five authored nodes fit beside context and above controls")
+		test.check(centers.size() == 6 and centers.food_exchange.x < size.x - 316.0 and centers.adaptation.x < size.x - 316.0 and centers.guest.x < size.x - 316.0 and centers.queen.y > 98.0 and centers.entrance.y < size.y - 110.0 and centers.guest.y < size.y - 110.0, "Five permanent functions and conditional guest fit beside context and above controls")
 		for id: String in View.NODES:
 			test.check(View.node_at(centers[id], size) == id, "Node hit target selects " + id)
 	var inward: InwardView = View.new()
