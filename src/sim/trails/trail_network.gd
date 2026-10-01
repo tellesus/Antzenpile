@@ -39,7 +39,7 @@ func to_dict() -> Dictionary:
 		"routes": route_records, "segments": segment_records, "cohorts": cohort_records}
 
 
-func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState) -> bool:
+func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float) -> bool:
 	if not data.has_all(["next_route_id", "next_cohort_id", "routes", "segments", "cohorts"]) or not WorkerLedger.valid_count(data.next_route_id) or data.next_route_id < 1 or not WorkerLedger.valid_count(data.next_cohort_id) or data.next_cohort_id < 1 or not data.routes is Array or not data.segments is Array or not data.cohorts is Array:
 		return false
 	var restored_routes: Dictionary[String, TrailRouteState] = {}
@@ -67,7 +67,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 	var cohort_counts: Dictionary[String, int] = {}
 	for record: Variant in data.cohorts:
 		var cohort := Cohort.new()
-		if not record is Dictionary or not cohort.restore(record) or restored_cohorts.has(cohort.id) or not restored_routes.has(cohort.route_id):
+		if not record is Dictionary or not cohort.restore(record, world, colony, time) or restored_cohorts.has(cohort.id) or not restored_routes.has(cohort.route_id):
 			return false
 		var suffix: String = cohort.id.trim_prefix("cohort_")
 		if cohort.id != "cohort_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_cohort_id:
@@ -77,6 +77,12 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 			return false
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
 		if cohort.remaining_ticks > CONFIG.leg_ticks(segment.start.distance_to(segment.end)):
+			return false
+		if cohort.detour != null:
+			var join: Vector2 = cohort.detour.path[0] if cohort.detour.phase == "outbound" else cohort.detour.path.back()
+			if cohort.detour.origin_pile != route.origin_pile or cohort.detour.source_id == knowledge.nodes[route.destination_knowledge_id].source_node_id or _distance_to_segment(join, segment.start, segment.end) > 1.5:
+				return false
+		if cohort.detour_report != null and (cohort.detour_report.origin_pile != route.origin_pile or cohort.detour_report.source_node_id == knowledge.nodes[route.destination_knowledge_id].source_node_id):
 			return false
 		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end))
 		if cohort.unpaid_energy_cost > maximum_energy_cost or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):
@@ -122,3 +128,11 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 	next_route_id = int(data.next_route_id)
 	next_cohort_id = int(data.next_cohort_id)
 	return true
+
+
+static func _distance_to_segment(point: Vector2, start: Vector2, finish: Vector2) -> float:
+	var span: Vector2 = finish - start
+	if span.length_squared() <= 0.0:
+		return point.distance_to(start)
+	var t: float = clampf((point - start).dot(span) / span.length_squared(), 0.0, 1.0)
+	return point.distance_to(start + span * t)

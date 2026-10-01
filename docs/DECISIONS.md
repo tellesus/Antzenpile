@@ -28,6 +28,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D20 | User direction, 2026-09-30: develop exterior resource ecology and recurring events next; defer economy balance until more systems and resource uses exist. |
 | D21 | User direction, 2026-09-30: table the original 20–30 minute session target until more game systems exist. Do not tune development toward a speculative session length now. |
 | D22 | User playtest feedback, 2026-09-30: resource balance remains deferred while there are few expenditures; four active scouts feels restrictive; returned depletion needs a visible cue; no numerical source-renewal forecast belongs in colony UI. Trail workers may investigate nearby cues and rejoin their route. Bring a bounded Adaptation Web choice forward as a biologically grounded resource spend. |
+| D23 | User choice, 2026-09-30: trail-side investigation is automatic with a bounded chance, not an approval prompt for every detour. The first Adaptation Web trait pair is left to implementation judgment within the original biological-cost and delayed-expression design. |
 
 ## Provisional defaults for executable tasks
 
@@ -65,6 +66,7 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 | A28 | Task 033 keeps at most sixteen alternating loaded/empty home-return outcomes per known source. A tentative recurrence hint requires a positive–negative–positive sequence and never reads authored schedules. Card 037 removes the numerical gap from player-facing language and marks the most recent empty return as a reported-empty trace. A selected trace can send a scout to the remembered estimate, returning after sampling there. Default scouts still seek new sources. Outcome and scout-intent fields are optional in older version-5 saves. |
 | A29 | Card 034 is deferred under its explicit conditional gate. The first episodic protein run collects its 24 units with no intake queue, overflow or missed harvest, so it has not demonstrated a storage/throughput problem or player decision. Revisit after a run identifies a concrete bottleneck; do not impose a speculative resource cap now. |
 | A30 | Task 035 keeps the first rain traffic trigger, then repeats a 60-second front after a provisional 2400-tick dry interval following each completion. Later weather is independent of route traffic. Each front retains the 12-second exposed-chemistry half-life, baseline familiarity and steady three-water total. RainState stores completed count/next tick, optional for older version-5 saves. The interval is an authored weather fixture, not a session target. |
+| A31 | Task 038 gives an outbound cohort one chance at a previously unknown active source within the scout's 4 m chemical sense radius: a seeded 50% roll, one unresolved report per route/source and a maximum 12-step outward grid detour. A full shared eight-scout cap defers the roll. The cohort waits; its one detouring worker remains inside its five-or-more-worker trail commitment and returns with private evidence. The values are provisional discovery defaults, not balance targets. |
 
 ## Details to resolve in their task
 

@@ -60,6 +60,14 @@ func to_dict() -> Dictionary:
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict()}
 
 
+func active_scout_count() -> int:
+	var count: int = scouts.size()
+	for cohort: TransitCohort in trails.cohorts.values():
+		if cohort.detour != null:
+			count += 1
+	return count
+
+
 func restore(data: Dictionary) -> bool:
 	if not data.has_all(["version", "seed", "rng_state", "scenario_id", "clock", "world", "colony", "scouts", "next_scout_id", "delivered_observations", "knowledge", "trails", "rain"]):
 		return false
@@ -125,7 +133,30 @@ func restore(data: Dictionary) -> bool:
 		if not agent.investigation_source_id.is_empty() and not restored_knowledge.nodes.has("known:" + agent.investigation_source_id):
 			return false
 	var restored_trails := Trails.new()
-	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world):
+	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time):
+		return false
+	var used_scout_ids: Dictionary[String, bool] = {}
+	for id: String in restored_scouts:
+		used_scout_ids[id] = true
+	for evidence: Observation in restored_delivered.values():
+		used_scout_ids[evidence.scout_id] = true
+	for evidence: Observation in archived.values():
+		used_scout_ids[evidence.scout_id] = true
+	var active_detours: int = 0
+	for cohort: TransitCohort in restored_trails.cohorts.values():
+		var scout_id: String = ""
+		if cohort.detour != null:
+			active_detours += 1
+			scout_id = cohort.detour.id
+		elif cohort.detour_report != null:
+			scout_id = cohort.detour_report.scout_id
+		if scout_id.is_empty():
+			continue
+		var suffix: String = scout_id.trim_prefix("scout_")
+		if scout_id != "scout_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_scout_id or used_scout_ids.has(scout_id):
+			return false
+		used_scout_ids[scout_id] = true
+	if restored_scouts.size() + active_detours > SCOUT_CONFIG.active_cap:
 		return false
 	var restored_rain := Rain.new()
 	if not data.rain is Dictionary or not restored_rain.restore(data.rain, restored_clock.tick_count):

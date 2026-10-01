@@ -13,6 +13,8 @@ extends Resource
 @export var familiarity_half_life_seconds: float = 900.0
 @export var familiarity_per_returning_worker: float = 0.008
 @export var carbohydrate_per_worker_meter: float = 0.003
+@export var side_scout_chance: float = 0.5
+@export var side_scout_max_steps: int = 12
 
 
 func leg_ticks(length: float) -> int:

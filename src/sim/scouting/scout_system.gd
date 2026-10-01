@@ -15,7 +15,7 @@ func _init(run_state: RunState) -> void:
 
 func dispatch(origin_id: String, bearing: Variant = null) -> bool:
 	last_error = ""
-	if not _run.colony.piles.has(origin_id) or _run.scouts.size() >= config.active_cap:
+	if not _run.colony.piles.has(origin_id) or _run.active_scout_count() >= config.active_cap:
 		return _reject("Unknown origin or scout cap reached")
 	if bearing != null and (not typeof(bearing) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(bearing))):
 		return _reject("Bearing must be finite or null")
@@ -58,7 +58,7 @@ func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 	last_error = ""
 	if not _run.colony.piles.has(origin_id) or not _run.knowledge.nodes.has(knowledge_id):
 		return _reject("Known source unavailable")
-	if _run.scouts.size() >= config.active_cap or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
+	if _run.active_scout_count() >= config.active_cap or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
 		return _reject("Scout cap reached")
 	var pile: PileState = _run.colony.piles[origin_id]
 	if pile.workers_available < 1:

@@ -321,7 +321,8 @@ func _draw_context(size: Vector2) -> void:
 		var route_note: String = "Source unavailable · scent " + _scent_label(route) if route.status == "depleted" else "Waiting for carbohydrate" if route.get("energy_limited", false) else "Trail scent: " + _scent_label(route)
 		_label(box.position + Vector2(16, 165), route_note, Color("a8b8bd"), 14)
 		_label(box.position + Vector2(16, 185), "Wanted %d · Committed %d" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 14)
-		_label(box.position + Vector2(16, 205), "%d workers travelling" % route.active_workers, Color("8fa1a8"), 14)
+		var traffic: String = "%d travelling · %d checking" % [route.active_workers, route.checking_workers] if route.get("checking_workers", 0) > 0 else "%d workers travelling" % route.active_workers
+		_label(box.position + Vector2(16, 205), traffic, Color("8fa1a8"), 14)
 		_label(box.position + Vector2(16, 225), "Returned %.1f · Home %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 14)
 		if route.status == "depleted":
 			if route.active_workers == 0:

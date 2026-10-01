@@ -4,7 +4,10 @@ extends RefCounted
 const Route = preload("res://src/sim/trails/trail_route_state.gd")
 const Segment = preload("res://src/sim/trails/trail_segment_state.gd")
 const Cohort = preload("res://src/sim/trails/transit_cohort.gd")
+const Detour = preload("res://src/sim/trails/trail_detour.gd")
+const Pathfinder = preload("res://src/sim/scouting/scout_pathfinder.gd")
 const CONFIG = preload("res://data/trails/default_trails.tres")
+const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 var last_error: String = ""
 var _run: RunState
 
@@ -139,10 +142,17 @@ func tick(delta: float) -> void:
 	ids.sort_custom(func(a: String, b: String) -> bool: return a.trim_prefix("cohort_").to_int() < b.trim_prefix("cohort_").to_int())
 	for id: String in ids:
 		var cohort: TransitCohort = _run.trails.cohorts[id]
+		var route: TrailRouteState = _run.trails.routes[cohort.route_id]
+		if cohort.detour != null:
+			if cohort.detour.tick(_run.world, _run.rng, _run.simulation_time):
+				cohort.detour_report = cohort.detour.observation.detached_copy()
+				cohort.detour = null
+			continue
+		if cohort.direction == "outbound" and _maybe_detour(cohort, route):
+			continue
 		cohort.remaining_ticks -= 1
 		if cohort.remaining_ticks > 0:
 			continue
-		var route: TrailRouteState = _run.trails.routes[cohort.route_id]
 		if cohort.direction == "outbound":
 			_collect(cohort, route)
 			cohort.direction = "inbound"
@@ -156,6 +166,49 @@ func tick(delta: float) -> void:
 		var route: TrailRouteState = _run.trails.routes[id]
 		if route.status == "active" and route.departure_cooldown_ticks == 0:
 			_depart(route)
+
+
+func _maybe_detour(cohort: TransitCohort, route: TrailRouteState) -> bool:
+	if cohort.detour_attempted or _run.active_scout_count() >= SCOUT_CONFIG.active_cap or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
+		return false
+	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
+	var progress: float = 1.0 - float(cohort.remaining_ticks) / float(_leg_ticks(route))
+	var join: Vector2 = segment.start.lerp(segment.end, progress).round()
+	if not _run.world.bounds.has_point(join) or not is_finite(Pathfinder.travel_cost(_run.world, join)):
+		return false
+	var ids: Array = _run.world.nodes.keys()
+	ids.sort()
+	for source_id: String in ids:
+		var node: WorldNodeState = _run.world.nodes[source_id]
+		if not node.active or node.quantity <= 0.0 or _run.knowledge.nodes.has("known:" + source_id) or join.distance_to(node.position) > SCOUT_CONFIG.sense_radius or _pending_detour(route.id, source_id):
+			continue
+		cohort.detour_attempted = true
+		if _run.rng.randf() >= CONFIG.side_scout_chance:
+			return false
+		var detour := Detour.new()
+		detour.id = "scout_%d" % _run.next_scout_id
+		detour.source_id = source_id
+		detour.origin_pile = route.origin_pile
+		detour.position = join
+		detour.sample(_run.world, _run.rng, _run.simulation_time)
+		if detour.observation == null:
+			return false
+		var target: Vector2 = detour.observation.estimated_position.round()
+		var path: Array[Vector2] = Pathfinder.new(_run.world).path(join, target)
+		if path.size() < 2 or path.size() > CONFIG.side_scout_max_steps + 1:
+			return false
+		detour.path = path
+		cohort.detour = detour
+		_run.next_scout_id += 1
+		return true
+	return false
+
+
+func _pending_detour(route_id: String, source_id: String) -> bool:
+	for other: TransitCohort in _run.trails.cohorts.values():
+		if other.route_id == route_id and ((other.detour != null and other.detour.source_id == source_id) or (other.detour_report != null and other.detour_report.source_node_id == source_id)):
+			return true
+	return false
 
 
 func _depart(route: TrailRouteState) -> void:
@@ -218,6 +271,9 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
+	if cohort.detour_report != null:
+		assert(not _run.delivered_observations.has(cohort.detour_report.id))
+		_run.delivered_observations[cohort.detour_report.id] = cohort.detour_report.detached_copy()
 	var source_id: String = _run.knowledge.nodes[route.destination_knowledge_id].source_node_id
 	assert(_run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail"))
 	if cohort.payload > 0.0:

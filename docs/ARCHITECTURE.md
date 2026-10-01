@@ -97,6 +97,8 @@ Task 033 adds bounded source outcomes inside KnowledgeBase. Scout reports, delib
 
 Task 035 extends RainSystem after its first traffic-gated front. Each completed 60-second event schedules another front 2400 fixed ticks later, independent of future route traffic. RainState stores completed count and next start tick; RunState restores those against its authoritative clock, with defaults for older version-5 saves. Every front applies the existing exposed pheromone loss, leaves familiarity on baseline decay, and deposits water steadily. Normal OUTWARD still receives semantic rain phase only; development truth may inspect cycle count and next tick.
 
+Task 038 lets one outbound aggregate TransitCohort occasionally pause while one of its already committed workers makes a short, individually tracked detour from a sensed unfamiliar cue and rejoins at the encounter point. TrailSystem owns the detour; it uses the run RNG, existing scout sensory estimator and terrain-aware grid path, never a hidden node coordinate as its navigation target. TransitCohort keeps a private report through the trip, passing it to the usual delivered-evidence inbox only on home arrival. Detailed detours and ordinary scouts share the cap of eight. Route/segment ownership, aggregate cargo and ledger totals do not change. Optional cohort fields preserve old version-5 saves; the normal selected context receives only a detached count of currently checking workers.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

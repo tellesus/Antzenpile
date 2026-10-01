@@ -117,7 +117,7 @@ func outward_status(pile_id: String) -> Dictionary:
 	for known_id: String in simulation.run.knowledge.nodes:
 		temporal_hints[known_id] = simulation.run.knowledge.temporal_hint(known_id)
 	return {"available_workers": simulation.run.colony.piles[pile_id].workers_available,
-		"active_scouts": simulation.run.scouts.size(), "scout_cap": simulation.scouting.config.active_cap,
+		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
@@ -211,9 +211,13 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile == pile_id:
 			var segment: TrailSegmentState = simulation.run.trails.segments[route.segment_id]
+			var checking: int = 0
+			for cohort: TransitCohort in simulation.run.trails.cohorts.values():
+				if cohort.route_id == route.id and cohort.detour != null:
+					checking += 1
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
 				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers,
-				"active_workers": route.active_workers, "status": route.status,
+				"active_workers": route.active_workers, "checking_workers": checking, "status": route.status,
 				"energy_limited": route.energy_limited,
 				"delivered_total": route.delivered_total,
 				"pheromone_strength": segment.pheromone_strength,

@@ -67,6 +67,8 @@ Task 033 places **INVESTIGATE SOURCE** in the selected OUTWARD trace context. It
 
 Card 037 supersedes the numerical temporal line: after returned positive–empty–positive evidence, say only that a source returned before and its timing is unknown. A most-recent empty return mutes and breaks the OUTWARD trace and labels it EMPTY even without selection. A hidden physical refill alone does not change the cue; a later positive return clears it. This is a report about last contact, not a live source meter.
 
+Task 038 counts an active trail-side detour in the top-bar scout cap and says one worker is **checking** in the selected route context. It does not draw the detour's actual position, expose its target before the report returns, or turn the panorama into a route map. The returning evidence enters existing sensory traces through KnowledgeBase.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics
