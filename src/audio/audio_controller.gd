@@ -4,10 +4,14 @@ extends Node
 
 const BASE_LOOP = preload("res://assets/audio/base_loop.wav")
 const GROWTH_LOOP = preload("res://assets/audio/growth_loop.wav")
+const ALARM_CUE = preload("res://assets/audio/returned_alarm.wav")
 const FADE_SECONDS: float = 3.0
 const MIX_DB: float = -4.0
 
 var state_provider: Callable
+var alarm_provider: Callable
+var alarm_player: AudioStreamPlayer
+var _reported_losses: int = 0
 var stem_gain: float = 0.0
 var base_player: AudioStreamPlayer
 var growth_player: AudioStreamPlayer
@@ -16,12 +20,20 @@ var growth_player: AudioStreamPlayer
 func _ready() -> void:
 	base_player = _make_player(BASE_LOOP, MIX_DB)
 	growth_player = _make_player(GROWTH_LOOP, -80.0)
+	if alarm_provider.is_valid():
+		alarm_player = AudioStreamPlayer.new()
+		alarm_player.stream = ALARM_CUE
+		alarm_player.volume_db = -15.0
+		add_child(alarm_player)
 	restart_after_load()
 
 
 func restart_after_load() -> void:
 	if base_player == null or growth_player == null:
 		return
+	_reported_losses = int(alarm_provider.call()) if alarm_provider.is_valid() else 0
+	if alarm_player != null:
+		alarm_player.stop()
 	base_player.stop()
 	growth_player.stop()
 	var state: MusicState = _current_state()
@@ -37,10 +49,22 @@ func _process(delta: float) -> void:
 	var target: float = float(_current_state().development_level)
 	stem_gain = move_toward(stem_gain, target, delta / FADE_SECONDS)
 	_update_growth_volume()
+	poll_returned_alarm()
+
+
+func poll_returned_alarm() -> bool:
+	if not alarm_provider.is_valid():
+		return false
+	var losses: int = int(alarm_provider.call())
+	var new_report: bool = losses > _reported_losses
+	_reported_losses = losses
+	if new_report and alarm_player != null and DisplayServer.get_name() != "headless":
+		alarm_player.play()
+	return new_report
 
 
 func _exit_tree() -> void:
-	for player: AudioStreamPlayer in [base_player, growth_player]:
+	for player: AudioStreamPlayer in [base_player, growth_player, alarm_player]:
 		if player != null:
 			player.stop()
 			player.stream = null

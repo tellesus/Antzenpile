@@ -2,6 +2,7 @@ class_name InwardView
 extends Node2D
 ## Abstract functional network; consumes detached pile summaries only.
 
+const Art = preload("res://src/presentation/sensory_art.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
 var mode_command: Callable
@@ -15,6 +16,7 @@ var input_blocked: Callable
 var save_command: Callable
 var load_command: Callable
 var selected_id: String = ""
+var _animation_time: float = 0.0
 var _status: Dictionary = {}
 var _font: Font = ThemeDB.fallback_font
 var _feedback: String = ""
@@ -26,10 +28,12 @@ func show_feedback(message: String) -> void:
 	_feedback_until = Time.get_ticks_msec() + 3000
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if status_provider.is_valid():
 		_status = status_provider.call()
-		queue_redraw()
+	if not _status.get("paused", false):
+		_animation_time = fposmod(_animation_time + minf(delta, 0.1), 3600.0)
+	queue_redraw()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -173,7 +177,7 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
 	var centers: Dictionary = positions(size)
 	for pair: Array in [["queen", "nursery"], ["nursery", "food_exchange"], ["food_exchange", "entrance"], ["entrance", "queen"]]:
-		draw_line(centers[pair[0]], centers[pair[1]], Color(0.33, 0.49, 0.49, 0.20), 1.0, true)
+		_draw_flow(centers[pair[0]], centers[pair[1]], pair[0] == "nursery" or pair[0] == "entrance")
 	for id: String in ["queen", "nursery"]:
 		draw_line(centers[id], centers["adaptation"], Color(0.43, 0.40, 0.55, 0.20), 1.0, true)
 	for id: String in NODES:
@@ -183,13 +187,49 @@ func _draw() -> void:
 	_draw_controls(size)
 
 
+func _draw_flow(start: Vector2, finish: Vector2, representative: bool) -> void:
+	var control: Vector2 = (start + finish) * 0.5 + Vector2(12, -18)
+	var points := PackedVector2Array()
+	for step: int in 25:
+		var t: float = float(step) / 24.0
+		points.append(start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t)
+	draw_polyline(points, Color(0.45, 0.59, 0.53, 0.18), 1.0, true)
+	var activity: int = int(_status.get("nursery_occupied_space", 0)) + int(_status.get("trail_workers", 0))
+	if representative and activity > 0:
+		for index: int in 2:
+			var t: float = fposmod(_animation_time * 0.05 + index * 0.5, 1.0)
+			var at: Vector2 = start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t
+			Art.ant(self, at, finish - start, Color(0.76, 0.80, 0.69, 0.36), _animation_time, 0.72)
+
+
 func _draw_node(id: String, at: Vector2) -> void:
 	var color: Color = Color("d5c4a1") if id == "queen" else Color("aebdb7") if id == "nursery" else Color("c7af86") if id == "food_exchange" else Color("bba6c8") if id == "adaptation" else Color("8daeb3")
-	draw_circle(at, 32.0, Color(color.r, color.g, color.b, 0.035))
-	draw_arc(at, 25.0, -0.65, PI * 1.55, 36, Color(color.r, color.g, color.b, 0.55), 1.5, true)
-	draw_circle(at, 4.0, Color(color.r, color.g, color.b, 0.65))
+	var phase: float = _animation_time * 0.18 + NODES.find(id)
+	var outline: PackedVector2Array = Art.membrane(at, 34.0, phase, 0.86)
+	draw_colored_polygon(outline, Color(color, 0.045))
+	draw_polyline(outline.slice(1, 27), Color(color, 0.4), 1.1, true)
+	match id:
+		"nursery":
+			var occupied: int = int(_status.get("nursery_occupied_space", 0))
+			for index: int in mini(6, occupied):
+				var seed_at: Vector2 = at + Vector2(index % 3 * 9 - 9, index / 3 * 11 - 5)
+				draw_circle(seed_at, 2.9, Color(color, 0.52))
+		"adaptation":
+			for index: int in 3:
+				var seed_at: Vector2 = at + Vector2.from_angle(index * TAU / 3.0 + 0.3) * 13
+				draw_line(at, seed_at, Color(color, 0.4), 1.0, true)
+				draw_circle(seed_at, 3.2, Color(color, 0.64))
+		"food_exchange":
+			draw_polyline(Art.membrane(at, 16, -phase, 0.56).slice(3, 22), Color(color, 0.5), 1.2, true)
+		"entrance":
+			draw_arc(at + Vector2(0, 5), 12, PI, TAU, 20, Color(color, 0.6), 1.5, true)
+		"queen":
+			draw_circle(at, 5.0, Color(color, 0.65))
+			draw_circle(at + Vector2(0, 9), 3.0, Color(color, 0.36))
 	if id == selected_id:
-		draw_arc(at, 39.0, 0.0, TAU, 48, Color("dce5d9"), 1.0, true)
+		var focus: PackedVector2Array = Art.membrane(at, 43.0, 1.5)
+		draw_polyline(focus.slice(1, 8), Color("dce5d9"), 1.0, true)
+		draw_polyline(focus.slice(17, 24), Color("dce5d9"), 1.0, true)
 	_label(at + Vector2(0, 52), _title(id), color, 15, HORIZONTAL_ALIGNMENT_CENTER)
 
 

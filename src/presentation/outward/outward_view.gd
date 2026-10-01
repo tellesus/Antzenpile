@@ -3,6 +3,7 @@ extends Node2D
 ## Normal-play sensorium. Providers deliver approved detached values only.
 
 const Panorama = preload("res://src/presentation/outward/outward_projection.gd")
+const Art = preload("res://src/presentation/sensory_art.gd")
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 var signal_provider: Callable
 var status_provider: Callable
@@ -22,6 +23,7 @@ var load_command: Callable
 var facing: float = 0.0
 var selected_id: String = ""
 
+var _animation_time: float = 0.0
 var _signals: Array[Dictionary] = []
 var _status: Dictionary = {}
 var _placed: Array[Dictionary] = []
@@ -39,12 +41,14 @@ func show_feedback(message: String) -> void:
 	_feedback_until = Time.get_ticks_msec() + 3000
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if signal_provider.is_valid() and status_provider.is_valid():
 		_signals = signal_provider.call()
 		_status = status_provider.call()
 		_placed = Panorama.project(_signals, facing, get_viewport_rect().size)
-		queue_redraw()
+	if not _status.get("paused", false):
+		_animation_time = fposmod(_animation_time + minf(delta, 0.1), 3600.0)
+	queue_redraw()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -250,16 +254,26 @@ func _draw_rain(size: Vector2) -> void:
 
 
 func _draw_trails(size: Vector2) -> void:
-	for stroke: Dictionary in Scent.strokes(_status.get("trails", []), _placed, size):
+	var routes: Array = _status.get("trails", [])
+	for stroke: Dictionary in Scent.strokes(routes, _placed, size):
 		var strength: float = clampf(stroke.strength, 0.0, 1.0)
+		var color: Color = Art.color_for(stroke.category)
 		if stroke.ghost:
-			draw_polyline(stroke.points, Color(0.40, 0.75, 0.68, 0.025), 3.0, true)
-			draw_polyline(stroke.points, Color(0.62, 0.93, 0.79, 0.09 + 0.09 * strength), 1.0, true)
+			draw_polyline(stroke.points, Color(color, 0.06 + 0.05 * strength), 0.85, true)
 		else:
-			var envelope := Color(0.40, 0.75, 0.68, 0.035 + 0.065 * strength)
-			var core := Color(0.62, 0.93, 0.79, 0.13 + 0.52 * strength)
-			draw_polyline(stroke.points, envelope, 5.0, true)
-			draw_polyline(stroke.points, core, 1.25, true)
+			draw_polyline(stroke.points, Color(color, 0.025 + 0.045 * strength), 4.0, true)
+			draw_polyline(stroke.points, Color(color.lightened(0.18), 0.16 + 0.5 * strength), 1.1, true)
+	for path: Dictionary in Scent.paths(routes, _placed, size):
+		if path.ghost:
+			continue
+		for index: int in 8:
+			var sample: float = fposmod(_animation_time * 0.025 + index / 8.0, 0.96) * Scent.STEPS
+			var first: int = int(sample)
+			var at: Vector2 = path.points[first].lerp(path.points[first + 1], sample - first)
+			at += Vector2(sin(index * 2.7 + _animation_time), cos(index * 1.8 + _animation_time * 0.7)) * 3.5
+			draw_circle(at, 0.75, Color(Art.color_for(path.category), 0.12 * path.strength))
+	for rep: Dictionary in Scent.representatives(routes, _placed, size, _animation_time):
+		Art.ant(self, rep.position, rep.direction, Color(Art.color_for(rep.category).lightened(0.25), 0.62), _animation_time, 0.82)
 
 
 func _draw_anchor(size: Vector2) -> void:
@@ -268,6 +282,13 @@ func _draw_anchor(size: Vector2) -> void:
 	draw_arc(center, 52, PI, TAU, 40, Color(0.65, 0.45, 0.26, 0.25), 2.0)
 	draw_colored_polygon(PackedVector2Array([center + Vector2(-30, 17), center + Vector2(-15, -10), center + Vector2(0, -18), center + Vector2(15, -10), center + Vector2(30, 17)]), Color("191815"))
 	draw_arc(center + Vector2(0, 12), 14, PI, TAU, 24, Color("9b8d70"), 2.0)
+	var traffic: int = int(_status.get("active_scouts", 0))
+	for route: Dictionary in _status.get("trails", []):
+		traffic += int(route.get("active_workers", 0))
+	for index: int in mini(3, traffic):
+		var phase: float = fposmod(_animation_time * 0.16 + index * 0.34, 1.0)
+		var at: Vector2 = center + Vector2(index * 12 - 12, 15 - phase * 42)
+		Art.ant(self, at, Vector2.UP if index % 2 == 0 else Vector2.DOWN, Color(0.68, 0.61, 0.45, 0.58), _animation_time + index)
 	_label(center + Vector2(-25, 42), "HOME", Color("8f988e"), 11)
 
 
@@ -276,24 +297,12 @@ func _draw_signal(entry: Dictionary) -> void:
 	var at: Vector2 = entry.center
 	var radius: float = entry.radius
 	var reported_empty: bool = _reported_empty(signal_data)
-	var color: Color = Color("819092") if reported_empty else _signal_color(signal_data.category)
-	for index: int in range(1 if reported_empty else 3):
-		var halo: Color = color
-		halo.a = (0.02 if reported_empty else 0.035 + 0.015 * index) * maxf(0.2, signal_data.strength) * (0.6 if _status.get("rain_phase", "") == "raining" else 1.0)
-		draw_circle(at + Vector2(index * 4 - 4, (index - 1) * 3), radius * (1.4 - index * 0.28), halo)
-	var line: Color = color
-	line.a = clampf(signal_data.strength * 0.85 + 0.1, 0.1, 0.8) * (0.6 if _status.get("rain_phase", "") == "raining" else 1.0)
-	if reported_empty:
-		draw_arc(at, radius * 0.66, -1.1, -0.25, 12, line, 1.5)
-		draw_arc(at, radius * 0.66, 0.7, 1.5, 12, line, 1.5)
-	else:
-		draw_arc(at, radius * 0.66, -1.1, 1.5, 28, line, 2.0)
-	if signal_data.category == "water" and not reported_empty:
-		draw_arc(at, radius * 0.43, 0.45, 2.6, 24, line, 1.5)
+	var color: Color = Color("819092") if reported_empty else Art.color_for(signal_data.category)
+	Art.cloud(self, entry, _animation_time, reported_empty)
 	if entry.id == selected_id:
-		draw_arc(at, radius + 7, 0, TAU, 48, Color(0.89, 0.91, 0.84, 0.48), 1.5)
-	if signal_data.get("risk") == "reported_loss":
-		draw_arc(at, radius + 2, -0.7, 0.15, 12, Color("c48c7c"), 1.5)
+		var attention: PackedVector2Array = Art.membrane(at, radius + 8.0, 1.5)
+		draw_polyline(attention.slice(1, 7), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
+		draw_polyline(attention.slice(17, 23), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
 	var title: String = _signal_title_for(signal_data) + " · EMPTY" if reported_empty else _signal_title_for(signal_data)
 	if signal_data.get("risk") == "reported_loss":
 		title += " · ALARM"
@@ -476,12 +485,7 @@ func _draw_controls(size: Vector2) -> void:
 
 
 func _signal_color(category: String) -> Color:
-	match category:
-		"carbohydrate": return Color("e9ae63")
-		"protein": return Color("bd9ad9")
-		"water": return Color("77cddd")
-	return Color("b2b9b8")
-
+	return Art.color_for(category)
 
 func _signal_title(category: String) -> String:
 	match category:

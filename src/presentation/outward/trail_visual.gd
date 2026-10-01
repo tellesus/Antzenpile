@@ -4,9 +4,11 @@ extends RefCounted
 
 const MAX_LINKS: int = 6
 const STEPS: int = 24
+const ANTS_PER_LINK: int = 3
+const MAX_ANTS: int = MAX_LINKS * ANTS_PER_LINK
 
 
-static func strokes(routes: Array, placed: Array[Dictionary], viewport: Vector2) -> Array[Dictionary]:
+static func paths(routes: Array, placed: Array[Dictionary], viewport: Vector2) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	if not viewport.is_finite() or viewport.x <= 0.0 or viewport.y <= 0.0:
 		return result
@@ -34,12 +36,41 @@ static func strokes(routes: Array, placed: Array[Dictionary], viewport: Vector2)
 			for step: int in range(STEPS + 1):
 				var t: float = float(step) / STEPS
 				points.append(start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t)
-			if chemical >= 0.45:
-				result.append({"points": points, "strength": strength, "ghost": false})
-			else:
-				for group: int in range(4):
-					var first: int = group * 6
-					result.append({"points": points.slice(first, first + 3), "strength": strength, "ghost": ghost})
+			result.append({"points": points, "strength": strength, "chemical": chemical, "ghost": ghost,
+				"category": entry.signal.get("category", "carbohydrate"), "route": route.duplicate(true)})
 			count += 1
 			break
+	return result
+
+
+static func strokes(routes: Array, placed: Array[Dictionary], viewport: Vector2) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for path: Dictionary in paths(routes, placed, viewport):
+		if path.chemical >= 0.45:
+			result.append(path)
+		else:
+			for group: int in 4:
+				var fragment: Dictionary = path.duplicate()
+				fragment.points = path.points.slice(group * 6, group * 6 + 3)
+				result.append(fragment)
+	return result
+
+
+static func representatives(routes: Array, placed: Array[Dictionary], viewport: Vector2, time: float) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for path: Dictionary in paths(routes, placed, viewport):
+		var workers: int = int(path.route.get("active_workers", 0))
+		if path.ghost or workers <= 0:
+			continue
+		var count: int = mini(ANTS_PER_LINK, workers)
+		var phase: float = float(abs(str(path.route.get("id", "")).hash()) % 100) / 100.0
+		for index: int in count:
+			var t: float = fposmod(time * 0.065 + float(index) / ANTS_PER_LINK + phase, 1.0)
+			if index % 2 == 1:
+				t = 1.0 - t
+			var sample: float = clampf(t, 0.025, 0.975) * STEPS
+			var first: int = int(sample)
+			var a: Vector2 = path.points[first]
+			var b: Vector2 = path.points[first + 1]
+			result.append({"position": a.lerp(b, sample - first), "direction": (b - a) * (-1.0 if index % 2 == 1 else 1.0), "category": path.category})
 	return result

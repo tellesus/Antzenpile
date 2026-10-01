@@ -1,6 +1,6 @@
 # Post-slice development plan
 
-Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–046 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
+Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–047 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
 
 ## Current rolling roadmap
 
@@ -12,7 +12,7 @@ Keep the next two to four cards executable against the code that exists; leave l
 
 The original 20–30 minute session target and broad resource balance stay tabled. Player feedback can reorder the next cards when it exposes a concrete failure; otherwise continue through the current feature without routine approval pauses.
 
-[045 — mortality accounting](tasks/045_worker_mortality_accounting.md) is complete as a prerequisite: loss-aware population/adaptation/save contracts now pass without adding deaths to live play. [046 — first predator interaction](tasks/046_first_predator_interaction.md) is complete: an aggregate ambush produces delayed alarms, and Stop Traffic plus a safe known source supplies avoidance. The next bounded outcome is [047 — early visual-quality proof](tasks/047_early_visual_quality_proof.md).
+[045 — mortality accounting](tasks/045_worker_mortality_accounting.md) is complete as a prerequisite: loss-aware population/adaptation/save contracts now pass without adding deaths to live play. [046 — first predator interaction](tasks/046_first_predator_interaction.md) is complete: an aggregate ambush produces delayed alarms, and Stop Traffic plus a safe known source supplies avoidance. [047 — early visual-quality proof](tasks/047_early_visual_quality_proof.md) is complete and measured on Windows Compatibility. Next, scope rival contact and a bounded swarm response as a connected feature; the original prototype requires the reinforcement/withdrawal story before claiming rival warfare complete.
 
 ## What the original design clarifies
 

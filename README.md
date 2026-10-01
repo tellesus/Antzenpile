@@ -4,7 +4,7 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-The first playable colony slice is implemented: scouts return uncertain evidence; the colony invests aggregate workers in trails, gathers resources, raises brood, develops functional chambers, and responds to rain. Later cards added repeat brood, a first Adaptation Web choice, recurring exterior resources, trail-side discovery, a honeydew mutualism with player-controlled protection, and a first stationary predator encounter with returning loss alarms. Hidden reality, colony knowledge, and normal presentation remain separate. See the [task cards](docs/tasks/) for individual completion evidence.
+The first playable colony slice is implemented: scouts return uncertain evidence; the colony invests aggregate workers in trails, gathers resources, raises brood, develops functional chambers, and responds to rain. Later cards added repeat brood, a first Adaptation Web choice, recurring exterior resources, trail-side discovery, a honeydew mutualism with player-controlled protection, and a first stationary predator encounter with returning loss alarms. An early visual proof adds organic resource clouds, colored chemical filaments, capped representative ants, functional INWARD forms and a short returned-loss sound. Hidden reality, colony knowledge, and normal presentation remain separate. See the [task cards](docs/tasks/) for individual completion evidence.
 
 Current development follows the [rolling post-slice roadmap](docs/POST_SLICE_PLAN.md). The original session-length target and broad resource balance are tabled until more systems are playable. The [first-slice evaluation](docs/SLICE_EVALUATION.md) and [post-slice evaluation](docs/POST_SLICE_EVALUATION.md) preserve earlier measurements and player feedback.
 
@@ -26,7 +26,7 @@ Current development follows the [rolling post-slice roadmap](docs/POST_SLICE_PLA
 | [UI_RULES](docs/UI_RULES.md) | OUTWARD, INWARD, information and rendering rules |
 | [CODING_RULES](docs/CODING_RULES.md) | Implementation and validation workflow |
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
-| [Task cards](docs/tasks/) | 001–033, 035, 037–040, 042–046 implemented; 034 deferred; 036 reviewed; 041 source-recovery audit complete |
+| [Task cards](docs/tasks/) | 001–033, 035, 037–040, 042–047 implemented; 034 deferred; 036 reviewed; 041 source-recovery audit complete |
 | [Slice evaluation](docs/SLICE_EVALUATION.md) | Measured arc, Windows workload and design questions |
 | [Post-slice evaluation](docs/POST_SLICE_EVALUATION.md) | Combined run, Windows visual/workload review, and remaining playtest questions |
 | [Post-slice plan](docs/POST_SLICE_PLAN.md) | Current rolling roadmap and completed post-slice history |

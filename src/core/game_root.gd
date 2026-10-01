@@ -59,6 +59,7 @@ func _ready() -> void:
 		_inward_view = inward
 		var audio: AudioController = Audio.new()
 		audio.state_provider = music_state.bind("home")
+		audio.alarm_provider = returned_losses.bind("home")
 		add_child(audio)
 		_audio_controller = audio
 		set_mode("outward")
@@ -181,6 +182,14 @@ func inward_status(pile_id: String) -> Dictionary:
 		"active_scouts": simulation.run.scouts.size(), "trail_workers": trail_workers,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale}
+
+
+func returned_losses(pile_id: String) -> int:
+	var total: int = 0
+	for route: TrailRouteState in simulation.run.trails.routes.values():
+		if route.origin_pile == pile_id:
+			total += route.reported_losses
+	return total
 
 
 func music_state(pile_id: String) -> MusicState:
