@@ -1,6 +1,6 @@
 # Post-slice development plan
 
-Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035 and 037–040 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md). Review source depletion and recovery as the next bounded gameplay issue.
+Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035 and 037–041 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
 
 ## What the original design clarifies
 
@@ -34,7 +34,7 @@ The player finds four simultaneous scouts restrictive, asks for a visible deplet
 | [039 — First Adaptation Web choice](tasks/039_first_adaptation_choice.md) — complete | One trial brood selects Lean Foragers or Load Bearers, spends food/nurses/Nursery space and expresses the result only as adapted brood emerges. | Inspect travel-energy/carry tradeoffs and whether the one-time cost feels useful; keep balance and the full web open. |
 | [040 — INWARD stores and Adaptation Web clarity](tasks/040_inward_stock_and_adaptation_clarity.md) — complete | Show colony stores throughout INWARD and distinguish brood-trait trials from chamber projects. | Keep normal UI on detached pile totals and do not change resource rates under this UI task. |
 
-The next [source-recovery audit](tasks/041_source_recovery_audit.md) should reproduce the risk recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md): starting protein/water and exposed carbohydrate do not renew, and water recovery through rain requires a prior traffic gate. Establish an ordinary-command recovery path before a broad economy balance pass; do not reveal hidden schedules or quantities through normal UI.
+The [source-recovery audit](tasks/041_source_recovery_audit.md) reproduced quick depletion with high labor and delayed, conditional recovery, but not an irreversible lock. The smallest next gameplay candidate is rain refilling a physical exterior water source, which a depleted route could Recheck using its existing returned-memory controls. Specify this as a separate card if pursued; test saved continuation and whether the real access problem improves before considering wider source quantities or collection rates. Do not reveal hidden schedules or quantities through normal UI.
 
 Ecological relationships, rivals, satellite piles, dispersal, human attention and reality replay follow only when their dependencies and player-facing purpose are specified. Do not scaffold them all at once.
 
