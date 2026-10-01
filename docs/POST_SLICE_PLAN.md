@@ -1,10 +1,10 @@
 # Post-slice development plan
 
-Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–052 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
+Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–055 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
 
-## Accepted playtest fixes — current work
+## Accepted playtest fixes — complete
 
-Before the next genetic expansion, implement 053 Adaptation selection clarity, 054 finite scout departure and mission memory, then 055 returned loss evidence. These are accepted player feedback: graph selection with one contextual action; finite departure animation; fading departure scent with a remembered directional stub and simulated elapsed time; qualitative witness reports tied to journeys. Scout courses/discoveries remain private until information returns. Each card owns its verification and commit.
+[053 Adaptation selection clarity](tasks/053_adaptation_selection_clarity.md), [054 finite scout departure and mission memory](tasks/054_scout_departure_memory.md), and [055 returned loss evidence](tasks/055_returned_loss_evidence.md) are complete. These are accepted player feedback: graph selection with one contextual action; finite departure animation; fading departure scent with a remembered directional stub and simulated elapsed time; qualitative witness reports tied to journeys. Scout courses/discoveries remain private until information returns. Each card records its verification and commit. Next: the genetic repertoire milestone below.
 
 ## Current rolling roadmap
 

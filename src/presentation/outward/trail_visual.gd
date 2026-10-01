@@ -56,6 +56,25 @@ static func strokes(routes: Array, placed: Array[Dictionary], viewport: Vector2)
 	return result
 
 
+static func alarm_markers(routes: Array, placed: Array[Dictionary], viewport: Vector2) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var home := Vector2(viewport.x * 0.5, viewport.y * 0.78 - 18.0)
+	for route: Dictionary in routes:
+		if route.get("reported_losses", 0) == 0 or result.size() >= MAX_LINKS:
+			continue
+		for entry: Dictionary in placed:
+			if entry.signal.source_knowledge_id == route.destination_knowledge_id:
+				# A route association, not an estimate of the hidden attack location.
+				var finish: Vector2 = entry.center + Vector2(0, entry.radius * 0.45)
+				var bend: float = 24.0 if finish.x >= home.x else -24.0
+				var control := Vector2((home.x + finish.x) * 0.5 + bend, minf(home.y, finish.y) - 28.0)
+				var t: float = 0.32
+				var at: Vector2 = home * (1.0 - t) * (1.0 - t) + control * 2.0 * t * (1.0 - t) + finish * t * t
+				result.append({"id": entry.id, "center": at})
+				break
+	return result
+
+
 static func representatives(routes: Array, placed: Array[Dictionary], viewport: Vector2, time: float) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for path: Dictionary in paths(routes, placed, viewport):

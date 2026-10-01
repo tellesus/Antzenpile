@@ -324,6 +324,8 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
+				"attack_reports": route.attack_reports, "fighting_reports": route.fighting_reports,
+				"missing_workers": route.missing_workers, "last_witness_time": route.last_witness_time,
 				"energy_limited": route.energy_limited,
 				"delivered_total": route.delivered_total,
 				"pheromone_strength": segment.pheromone_strength,

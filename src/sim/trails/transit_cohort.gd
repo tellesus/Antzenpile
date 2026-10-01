@@ -26,6 +26,8 @@ var rival_losses: int = 0
 var conflict_report: String = ""
 var conflict_observed_at: float = 0.0
 var predator_encountered: bool = false
+var witnessed_attack: bool = false
+var witnessed_fighting: bool = false
 var detour_attempted: bool = false
 var detour: TrailDetour
 var detour_report: Observation
@@ -38,6 +40,7 @@ func to_dict() -> Dictionary:
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
 		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
+		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
 		"foreign_sampled": foreign_sampled, "reports_source_outcome": reports_source_outcome,
 		"swarm_engaged": swarm_engaged, "rival_losses": rival_losses,
 		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
@@ -93,6 +96,12 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if data.worker_count == 0 and (losses == 0 or data.payload != 0.0 or restored_detour != null or restored_report != null):
 		return false
+	var attack_witness: Variant = data.get("witnessed_attack", false)
+	var fighting_witness: Variant = data.get("witnessed_fighting", false)
+	if typeof(attack_witness) != TYPE_BOOL or typeof(fighting_witness) != TYPE_BOOL:
+		return false
+	if (attack_witness and (data.worker_count == 0 or losses <= rival_deaths)) or (fighting_witness and (data.worker_count == 0 or rival_deaths == 0)):
+		return false
 	for key: String in ["foreign_sampled", "reports_source_outcome", "swarm_engaged"]:
 		if typeof(data.get(key, key == "reports_source_outcome")) != TYPE_BOOL:
 			return false
@@ -119,6 +128,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	lost_workers = int(losses)
 	adapted_lost_workers = int(adapted_losses)
 	predator_encountered = encountered
+	witnessed_attack = attack_witness
+	witnessed_fighting = fighting_witness
 	foreign_contact = data.get("foreign_contact", false)
 	foreign_sampled = data.get("foreign_sampled", foreign_contact)
 	reports_source_outcome = data.get("reports_source_outcome", true)

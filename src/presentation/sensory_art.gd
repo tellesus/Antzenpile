@@ -64,10 +64,6 @@ static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool) -
 		for index: int in 6:
 			var at: Vector2 = center + Vector2(sin(time * 1.5 + index * 2.1), cos(time * 1.3 + index)) * radius * 0.6
 			canvas.draw_line(at - Vector2(2, 1), at + Vector2(2, 1), Color(0.8, 0.39, 0.27, 0.5), 1.0, true)
-	if signal_data.get("risk") == "reported_loss":
-		var alarm: PackedVector2Array = membrane(center, radius * 1.05, phase)
-		canvas.draw_polyline(alarm.slice(1, 8), Color(0.82, 0.39, 0.27, 0.35 + 0.15 * sin(time * 2.0)), 1.5, true)
-		canvas.draw_circle(alarm[4], 2.0, Color("ce896f"))
 
 
 static func ant(canvas: Node2D, at: Vector2, direction: Vector2, color: Color, phase: float, scale: float = 1.0) -> void:

@@ -214,10 +214,15 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 	cohort.adapted_lost_workers += adapted
 	if cause == "rival":
 		cohort.rival_losses += 1
+		cohort.witnessed_fighting = cohort.worker_count > 0
+	else:
+		cohort.witnessed_attack = cohort.worker_count > 0
 	cohort.payload = minf(cohort.payload, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
 	if cohort.payload == 0.0:
 		cohort.resource_id = ""
 	if cohort.worker_count == 0:
+		cohort.witnessed_attack = false
+		cohort.witnessed_fighting = false
 		cohort.detour_report = null
 		cohort.swarm_engaged = false
 		cohort.conflict_report = ""
@@ -355,6 +360,13 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		route.reported_losses += cohort.lost_workers
 		route.reported_rival_losses += cohort.rival_losses
 		route.last_loss_time = _run.simulation_time
+		if cohort.worker_count == 0:
+			route.missing_workers += cohort.lost_workers
+		else:
+			route.attack_reports += 1 if cohort.witnessed_attack else 0
+			route.fighting_reports += 1 if cohort.witnessed_fighting else 0
+			if cohort.witnessed_attack or cohort.witnessed_fighting:
+				route.last_witness_time = _run.simulation_time
 	var source_id: String = _run.knowledge.nodes[route.destination_knowledge_id].source_node_id
 	if cohort.worker_count > 0 and cohort.reports_source_outcome:
 		var recorded: bool = _run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail")

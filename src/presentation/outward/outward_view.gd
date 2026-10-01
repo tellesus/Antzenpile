@@ -7,6 +7,7 @@ const SWARM_CONFIG = preload("res://data/ecology/default_swarm.tres")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd")
+const LossEvidence = preload("res://src/presentation/returned_loss_evidence.gd")
 var signal_provider: Callable
 var status_provider: Callable
 var dispatch_command: Callable
@@ -147,6 +148,11 @@ func _pointer_release(at: Vector2, kind: String) -> void:
 		return
 	if not _dragged and at.distance_to(_pointer_start) <= 8.0:
 		var picked: String = Panorama.pick(_placed, at)
+		if picked.is_empty():
+			for marker: Dictionary in Scent.alarm_markers(_status.get("trails", []), _placed, get_viewport_rect().size):
+				if at.distance_to(marker.center) <= 44.0:
+					picked = marker.id
+					break
 		selected_id = picked if not picked.is_empty() else ScoutTrace.pick(_mission_traces, at, selected_id)
 	_pointer_kind = ""
 
@@ -311,6 +317,11 @@ func _draw_trails(size: Vector2) -> void:
 			draw_circle(at, 0.75, Color(Art.color_for(path.category), 0.12 * path.strength))
 	for rep: Dictionary in Scent.representatives(routes, _placed, size, _animation_time):
 		Art.ant(self, rep.position, rep.direction, Color(Art.color_for(rep.category).lightened(0.25), 0.62), _animation_time, 0.82)
+	for marker: Dictionary in Scent.alarm_markers(routes, _placed, size):
+		var at: Vector2 = marker.center
+		draw_arc(at, 8.0, 0.0, 2.2, 16, Color(0.82, 0.39, 0.27, 0.5), 1.3, true)
+		draw_arc(at, 8.0, PI, PI + 1.3, 12, Color(0.82, 0.39, 0.27, 0.4), 1.0, true)
+		_label(at + Vector2(0, -14), "JOURNEY ALARM", Color("b77d6c"), 10, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_scout_traces(size: Vector2) -> void:
@@ -373,8 +384,6 @@ func _draw_signal(entry: Dictionary) -> void:
 	var title: String = _signal_title_for(signal_data) + " · EMPTY" if reported_empty else _signal_title_for(signal_data)
 	if signal_data.get("foreign_contact", false):
 		title += " · FOREIGN"
-	if signal_data.get("risk") == "reported_loss":
-		title += " · ALARM"
 	_label(at + Vector2(0, radius + 22), title, color, 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
@@ -399,7 +408,7 @@ func _draw_context(size: Vector2) -> void:
 	var selected: Dictionary = _selected_signal()
 	if selected.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 344))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 344 + _evidence_offset()))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), _signal_title_for(selected), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
@@ -417,27 +426,34 @@ func _draw_context(size: Vector2) -> void:
 		if losses > 0:
 			hint_text += " · %d lost" % losses
 
-	_label(box.position + Vector2(16, 137), hint_text, Color("c48c7c") if losses > 0 else Color("8fa1a8"), 13)
+	var evidence: Array[String] = LossEvidence.lines(loss_route, float(_status.get("time", 0.0)))
+	if not evidence.is_empty():
+		for index: int in evidence.size():
+			_label(box.position + Vector2(16, 137 + index * 19), evidence[index], Color("c48c7c") if index == 0 else Color("8fa1a8"), 13)
+	else:
+		_label(box.position + Vector2(16, 137), hint_text, Color("8fa1a8"), 13)
 	if _is_honeydew(selected):
 		_draw_honeydew_context(selected, box)
 		return
+	var body: Rect2 = box
+	body.position.y += _evidence_offset()
 	var route: Dictionary = _selected_route(selected)
 	if route.is_empty() or route.status == "inactive":
 		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" and float(route.get("route_familiarity", 0.0)) < 0.1 else "No workers · scent " + _scent_label(route)
-		_label(box.position + Vector2(16, 165), idle_text, Color("a8b8bd"), 13)
-		_label(box.position + Vector2(16, 187), "Home stores: %.1f" % _status.get("resources", {}).get(selected.category, 0.0), Color("8fa1a8"), 13)
+		_label(body.position + Vector2(16, 165), idle_text, Color("a8b8bd"), 13)
+		_label(body.position + Vector2(16, 187), "Home stores: %.1f" % _status.get("resources", {}).get(selected.category, 0.0), Color("8fa1a8"), 13)
 		_draw_trail_button("trail_create", "INVEST 5 WORKERS")
 	elif route.status == "recalling":
-		_label(box.position + Vector2(16, 165), "Recalling: %d workers away" % route.active_workers, Color("a8b8bd"), 13)
-		_label(box.position + Vector2(16, 187), "Scent %s · Delivered %.1f" % [_scent_label(route), route.delivered_total], Color("8fa1a8"), 13)
+		_label(body.position + Vector2(16, 165), "Recalling: %d workers away" % route.active_workers, Color("a8b8bd"), 13)
+		_label(body.position + Vector2(16, 187), "Scent %s · Delivered %.1f" % [_scent_label(route), route.delivered_total], Color("8fa1a8"), 13)
 		_draw_trail_button("trail_create", "REINVEST 5 WORKERS")
 	else:
 		var route_note: String = "Source unavailable · scent " + _scent_label(route) if route.status == "depleted" else "Waiting for carbohydrate" if route.get("energy_limited", false) else "Trail scent: " + _scent_label(route)
-		_label(box.position + Vector2(16, 165), route_note, Color("a8b8bd"), 14)
-		_label(box.position + Vector2(16, 185), "Wanted %d · Committed %d" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 14)
+		_label(body.position + Vector2(16, 165), route_note, Color("a8b8bd"), 14)
+		_label(body.position + Vector2(16, 185), "Wanted %d · Committed %d" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 14)
 		var traffic: String = "%d travelling · %d checking" % [route.active_workers, route.checking_workers] if route.get("checking_workers", 0) > 0 else "%d workers travelling" % route.active_workers
-		_label(box.position + Vector2(16, 205), traffic, Color("8fa1a8"), 14)
-		_label(box.position + Vector2(16, 225), "Returned %.1f · Home %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 14)
+		_label(body.position + Vector2(16, 205), traffic, Color("8fa1a8"), 14)
+		_label(body.position + Vector2(16, 225), "Returned %.1f · Home %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 14)
 		if route.status == "depleted":
 			if route.active_workers == 0:
 				_draw_trail_button("trail_recheck", "RECHECK")
@@ -452,16 +468,18 @@ func _draw_context(size: Vector2) -> void:
 
 
 func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
+	var body: Rect2 = box
+	body.position.y += _evidence_offset()
 	var relationship: String = _status.get("honeydew", {}).get("relationship", "unknown")
 	var required: int = int(_status.get("honeydew", {}).get("required_workers", 0))
 	var available: int = int(_status.get("available_workers", 0))
 	var relation_text: String = "Workers protecting producers" if relationship == "tended" else "Sweet source · protection possible" if relationship == "exploited" else "Sweet source · not yet harvested"
-	_label(box.position + Vector2(16, 162), relation_text, Color("d6b98c"), 13)
+	_label(body.position + Vector2(16, 162), relation_text, Color("d6b98c"), 13)
 	var route: Dictionary = _selected_route(selected)
 	var route_text: String = "Trail: no workers committed" if route.is_empty() or route.status == "inactive" else "Trail recalling · %d away" % route.active_workers if route.status == "recalling" else "Trail: source reported empty" if route.status == "depleted" else "Trail: %d committed · %d moving" % [route.allocated_workers, route.active_workers]
-	_label(box.position + Vector2(16, 184), route_text, Color("a8b8bd"), 12)
+	_label(body.position + Vector2(16, 184), route_text, Color("a8b8bd"), 12)
 	var labor_text: String = "Protection: %d committed · %d available" % [int(_status.honeydew.protection_workers), available] if relationship == "tended" else "Protection needs %d · %d available" % [required, available]
-	_label(box.position + Vector2(16, 201), labor_text, Color("8fa1a8"), 12)
+	_label(body.position + Vector2(16, 201), labor_text, Color("8fa1a8"), 12)
 	if relationship in ["exploited", "tended"]:
 		var protect_box: Rect2 = _honeydew_button_rect()
 		var can_start: bool = relationship == "tended" or available >= required
@@ -519,6 +537,8 @@ func _selected_signal() -> Dictionary:
 
 
 func _selected_route(signal_data: Dictionary) -> Dictionary:
+	if signal_data.is_empty():
+		return {}
 	for route: Dictionary in _status.get("trails", []):
 		if route.destination_knowledge_id == signal_data.source_knowledge_id:
 			return route
@@ -540,6 +560,7 @@ func _is_honeydew(signal_data: Dictionary) -> bool:
 func _trail_button_rect(command: String) -> Rect2:
 	var x: float = get_viewport_rect().size.x - 300.0
 	var y: float = 398.0 if _is_honeydew(_selected_signal()) else 380.0
+	y += _evidence_offset()
 	match command:
 		"trail_create": return Rect2(x, y, 260, 44)
 		"trail_recheck": return Rect2(x, y, 136, 44)
@@ -550,11 +571,15 @@ func _trail_button_rect(command: String) -> Rect2:
 
 
 func _investigate_button_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0, 444.0 if _is_honeydew(_selected_signal()) else 438.0, 260.0, 44.0)
+	return Rect2(get_viewport_rect().size.x - 300.0, (444.0 if _is_honeydew(_selected_signal()) else 438.0) + _evidence_offset(), 260.0, 44.0)
 
 
 func _honeydew_button_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0, 350.0, 260.0, 44.0)
+	return Rect2(get_viewport_rect().size.x - 300.0, 350.0 + _evidence_offset(), 260.0, 44.0)
+
+
+func _evidence_offset() -> float:
+	return 48.0 if _selected_route(_selected_signal()).get("reported_losses", 0) > 0 else 0.0
 
 
 func _signal_title_for(signal_data: Dictionary) -> String:
