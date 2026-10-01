@@ -6,6 +6,7 @@ const Panorama = preload("res://src/presentation/outward/outward_projection.gd")
 const SWARM_CONFIG = preload("res://data/ecology/default_swarm.tres")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
+const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd")
 var signal_provider: Callable
 var status_provider: Callable
 var dispatch_command: Callable
@@ -28,6 +29,10 @@ var _animation_time: float = 0.0
 var _signals: Array[Dictionary] = []
 var _status: Dictionary = {}
 var _placed: Array[Dictionary] = []
+var _mission_traces: Array[Dictionary] = []
+var _seen_missions: Dictionary = {}
+var _missions_baselined: bool = false
+var _departures: Array[Dictionary] = []
 var _font: Font = ThemeDB.fallback_font
 var _pointer_kind: String = ""
 var _pointer_start: Vector2
@@ -47,9 +52,37 @@ func _process(delta: float) -> void:
 		_signals = signal_provider.call()
 		_status = status_provider.call()
 		_placed = Panorama.project(_signals, facing, get_viewport_rect().size)
+		_mission_traces = ScoutTrace.traces(_status.get("scout_missions", []), facing, get_viewport_rect().size)
+		_sync_departures()
 	if not _status.get("paused", false):
 		_animation_time = fposmod(_animation_time + minf(delta, 0.1), 3600.0)
+		_advance_departures(minf(delta, 0.1))
 	queue_redraw()
+
+
+func reset_mission_visuals() -> void:
+	_seen_missions.clear()
+	_missions_baselined = false
+	_departures.clear()
+	_mission_traces.clear()
+
+
+func _sync_departures() -> void:
+	var current: Dictionary = {}
+	for mission: Dictionary in _status.get("scout_missions", []):
+		current[mission.id] = true
+		if _missions_baselined and not _seen_missions.has(mission.id) and mission.returned_at < 0.0 and mission.age < 8.0 and _departures.size() < 3:
+			_departures.append({"age": 0.0, "side": -1.0 if int(str(mission.id).trim_prefix("scout_")) % 2 else 1.0})
+	_seen_missions = current
+	_missions_baselined = true
+
+
+func _advance_departures(delta: float) -> void:
+	for entry: Dictionary in _departures:
+		entry.age += delta
+	for index: int in range(_departures.size() - 1, -1, -1):
+		if _departures[index].age >= ScoutTrace.DEPARTURE_SECONDS:
+			_departures.remove_at(index)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -113,7 +146,8 @@ func _pointer_release(at: Vector2, kind: String) -> void:
 	if _pointer_kind != kind:
 		return
 	if not _dragged and at.distance_to(_pointer_start) <= 8.0:
-		selected_id = Panorama.pick(_placed, at)
+		var picked: String = Panorama.pick(_placed, at)
+		selected_id = picked if not picked.is_empty() else ScoutTrace.pick(_mission_traces, at, selected_id)
 	_pointer_kind = ""
 
 
@@ -121,6 +155,7 @@ func turn_pixels(delta_x: float, width: float) -> void:
 	if is_finite(delta_x) and is_finite(width) and width > 0:
 		facing = fposmod(facing - delta_x * PI / width, TAU)
 		_placed = Panorama.project(_signals, facing, get_viewport_rect().size)
+		_mission_traces = ScoutTrace.traces(_status.get("scout_missions", []), facing, get_viewport_rect().size)
 		queue_redraw()
 
 
@@ -237,6 +272,7 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
 	_draw_rain(size)
 	_draw_trails(size)
+	_draw_scout_traces(size)
 	_draw_anchor(size)
 	for entry: Dictionary in _placed:
 		_draw_signal(entry)
@@ -277,19 +313,49 @@ func _draw_trails(size: Vector2) -> void:
 		Art.ant(self, rep.position, rep.direction, Color(Art.color_for(rep.category).lightened(0.25), 0.62), _animation_time, 0.82)
 
 
+func _draw_scout_traces(size: Vector2) -> void:
+	for entry: Dictionary in _mission_traces:
+		var selected: bool = false
+		for mission: Dictionary in entry.missions:
+			selected = selected or selected_id == "mission:" + mission.id
+		var color := Color("a8b4ad")
+		draw_polyline(entry.points, Color(color, 0.30 if selected else 0.16 if entry.stub else 0.13 + 0.10 * entry.scent), 1.0, true)
+		# Broken cap means remembered departure, distinct from a resource route.
+		draw_arc(entry.center, 6.0, 0.2, 2.4 if entry.stub else 5.8, 16, Color(color, 0.55), 1.0, true)
+		if selected:
+			draw_arc(entry.center, 15.0, PI, TAU, 20, Color("dce5d9"), 1.0, true)
+		var label: String = "SCOUT" if entry.missions[0].returned_at < 0.0 else "RETURNED"
+		if entry.missions.size() > 1:
+			label += " ×%d" % entry.missions.size()
+		_label(entry.center + Vector2(0, -13), label, Color(color, 0.78), 10, HORIZONTAL_ALIGNMENT_CENTER)
+	var chosen: Dictionary = _selected_mission()
+	if chosen.is_empty() or chosen.returned_at < 0.0:
+		return
+	var previous: Variant = null
+	for sample: Dictionary in chosen.course:
+		var signals: Array[Dictionary] = [{"id": "course", "bearing": sample.bearing,
+			"estimated_distance": sample.estimated_distance, "strength": 0.0, "uncertainty_radius": 0.0}]
+		var projected: Array[Dictionary] = Panorama.project(signals, facing, size)
+		if projected.is_empty():
+			previous = null
+			continue
+		var at: Vector2 = projected[0].center
+		if previous != null:
+			draw_line(previous, at, Color(0.65, 0.72, 0.68, 0.15), 1.0, true)
+		draw_circle(at, 2.0, Color(0.65, 0.72, 0.68, 0.30))
+		previous = at
+
+
 func _draw_anchor(size: Vector2) -> void:
 	var center := Vector2(size.x * 0.5, size.y * 0.78)
 	draw_circle(center + Vector2(0, 8), 57, Color(0.37, 0.25, 0.13, 0.08))
 	draw_arc(center, 52, PI, TAU, 40, Color(0.65, 0.45, 0.26, 0.25), 2.0)
 	draw_colored_polygon(PackedVector2Array([center + Vector2(-30, 17), center + Vector2(-15, -10), center + Vector2(0, -18), center + Vector2(15, -10), center + Vector2(30, 17)]), Color("191815"))
 	draw_arc(center + Vector2(0, 12), 14, PI, TAU, 24, Color("9b8d70"), 2.0)
-	var traffic: int = int(_status.get("active_scouts", 0))
-	for route: Dictionary in _status.get("trails", []):
-		traffic += int(route.get("active_workers", 0))
-	for index: int in mini(3, traffic):
-		var phase: float = fposmod(_animation_time * 0.16 + index * 0.34, 1.0)
-		var at: Vector2 = center + Vector2(index * 12 - 12, 15 - phase * 42)
-		Art.ant(self, at, Vector2.UP if index % 2 == 0 else Vector2.DOWN, Color(0.68, 0.61, 0.45, 0.58), _animation_time + index)
+	for entry: Dictionary in _departures:
+		var rep: Dictionary = ScoutTrace.departure(entry.age, entry.side, size)
+		if not rep.is_empty():
+			Art.ant(self, rep.position, rep.direction, Color(0.68, 0.61, 0.45, 0.70), _animation_time)
 	_label(center + Vector2(-25, 42), "HOME", Color("8f988e"), 11)
 
 
@@ -326,6 +392,10 @@ func _draw_hud(size: Vector2) -> void:
 
 
 func _draw_context(size: Vector2) -> void:
+	var mission: Dictionary = _selected_mission()
+	if not mission.is_empty():
+		_draw_mission_context(mission, size)
+		return
 	var selected: Dictionary = _selected_signal()
 	if selected.is_empty():
 		return
@@ -416,6 +486,29 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 func _scent_label(route: Dictionary) -> String:
 	var strength: float = float(route.get("pheromone_strength", 0.0))
 	return "strong" if strength >= 0.7 else "clear" if strength >= 0.45 else "faint" if strength >= 0.1 else "remembered" if float(route.get("route_familiarity", 0.0)) >= 0.1 else "absent"
+
+
+func _selected_mission() -> Dictionary:
+	for mission: Dictionary in _status.get("scout_missions", []):
+		if selected_id == "mission:" + mission.id:
+			return mission
+	return {}
+
+
+func _draw_mission_context(mission: Dictionary, size: Vector2) -> void:
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 226))
+	draw_rect(box, Color("111921"))
+	draw_rect(box, Color("41535a"), false, 1.0)
+	_label(box.position + Vector2(16, 31), "Scout " + str(mission.id).trim_prefix("scout_"), Color("d9d3be"), 20)
+	_label(box.position + Vector2(16, 65), "Dispatched %.0f° · %s ago" % [rad_to_deg(mission.bearing), _mission_duration(mission.age)], Color("a9b9bc"), 14)
+	_label(box.position + Vector2(16, 91), "Awaiting return · away " + _mission_duration(mission.away_seconds) if mission.returned_at < 0.0 else "Returned · journey " + _mission_duration(mission.away_seconds), Color("a9b9bc"), 14)
+	_label(box.position + Vector2(16, 125), "Departure scent faint" if mission.scent >= 0.1 else "Scent faded · departure remembered", Color("8fa1a8"), 13)
+	_label(box.position + Vector2(16, 151), "Course unknown until a report returns" if mission.returned_at < 0.0 else "Coarse remembered course from return", Color("8fa1a8"), 13)
+	_label(box.position + Vector2(16, 187), "Tap a grouped trace again to cycle scouts", Color("82939c"), 12)
+
+
+static func _mission_duration(seconds: float) -> String:
+	return "%dm %02ds" % [int(seconds) / 60, int(seconds) % 60]
 
 
 func _selected_signal() -> Dictionary:

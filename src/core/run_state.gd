@@ -8,6 +8,7 @@ const Loader = preload("res://src/sim/world/world_loader.gd")
 const Colony = preload("res://src/sim/colony/colony_state.gd")
 const Scout = preload("res://src/sim/scouting/scout_agent.gd")
 const Knowledge = preload("res://src/sim/knowledge/knowledge_base.gd")
+const MissionMemory = preload("res://src/sim/knowledge/scout_mission_memory.gd")
 const Trails = preload("res://src/sim/trails/trail_network.gd")
 const Rain = preload("res://src/sim/weather/rain_state.gd")
 const Honeydew = preload("res://src/sim/ecology/honeydew_state.gd")
@@ -21,6 +22,7 @@ const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 var world: WorldState
 var colony: ColonyState = Colony.new()
 var scouts: Dictionary[String, ScoutAgent] = {}
+var scout_missions: Dictionary[String, ScoutMissionMemory] = {}
 var next_scout_id: int = 1
 var knowledge: KnowledgeBase = Knowledge.new()
 var trails: TrailNetwork = Trails.new()
@@ -60,6 +62,11 @@ func to_dict() -> Dictionary:
 	for id: String in ids:
 		scout_records.append(scouts[id].to_dict())
 	var delivered: Array[Dictionary] = []
+	var missions: Array[Dictionary] = []
+	ids = scout_missions.keys()
+	ids.sort()
+	for id: String in ids:
+		missions.append(scout_missions[id].to_dict())
 	ids = delivered_observations.keys()
 	ids.sort()
 	for id: String in ids:
@@ -67,7 +74,7 @@ func to_dict() -> Dictionary:
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
-		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered,
+		"scouts": scout_records, "scout_missions": missions, "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(),
 		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict()}
 
@@ -114,6 +121,19 @@ func restore(data: Dictionary) -> bool:
 				return false
 	if not data.delivered_observations is Array:
 		return false
+	var restored_missions: Dictionary[String, ScoutMissionMemory] = {}
+	var returned_count: int = 0
+	if data.has("scout_missions"):
+		if not data.scout_missions is Array or data.scout_missions.size() > SCOUT_CONFIG.active_cap + MissionMemory.RECENT_RETURNS:
+			return false
+		for value: Variant in data.scout_missions:
+			var memory := MissionMemory.new()
+			if not value is Dictionary or not memory.restore(value, restored_colony, restored_scouts, int(data.next_scout_id), restored_clock.simulation_time) or restored_missions.has(memory.id):
+				return false
+			returned_count += 1 if memory.returned_at >= 0.0 else 0
+			restored_missions[memory.id] = memory
+		if returned_count > MissionMemory.RECENT_RETURNS:
+			return false
 	var restored_delivered: Dictionary[String, Observation] = {}
 	for value: Variant in data.delivered_observations:
 		var evidence := Evidence.new()
@@ -246,6 +266,7 @@ func restore(data: Dictionary) -> bool:
 	world = restored_world
 	colony = restored_colony
 	scouts = restored_scouts
+	scout_missions = restored_missions
 	next_scout_id = int(data.next_scout_id)
 	delivered_observations = restored_delivered
 	knowledge = restored_knowledge

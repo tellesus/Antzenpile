@@ -135,7 +135,24 @@ func outward_status(pile_id: String) -> Dictionary:
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
+		"scout_missions": scout_mission_summaries(pile_id),
 		"honeydew": honeydew_summary(pile_id)}
+
+
+func scout_mission_summaries(pile_id: String) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for memory: ScoutMissionMemory in simulation.run.scout_missions.values():
+		if memory.origin_pile != pile_id:
+			continue
+		var record: Dictionary = memory.to_dict()
+		record["age"] = simulation.run.simulation_time - memory.departed_at
+		record["away_seconds"] = record.age if memory.returned_at < 0.0 else memory.returned_at - memory.departed_at
+		result.append(record)
+	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if (a.returned_at < 0.0) != (b.returned_at < 0.0):
+			return a.returned_at < 0.0
+		return a.departed_at > b.departed_at if a.departed_at != b.departed_at else a.id > b.id)
+	return result
 
 
 func honeydew_summary(pile_id: String) -> Dictionary:
@@ -218,6 +235,7 @@ func quick_load() -> Dictionary:
 		if _outward_view != null:
 			_outward_view.facing = 0.0
 			_outward_view.selected_id = ""
+			_outward_view.reset_mission_visuals()
 		if _inward_view != null:
 			_inward_view.selected_id = ""
 			_inward_view.web_selection = "foraging"

@@ -4,6 +4,7 @@ const Agent = preload("res://src/sim/scouting/scout_agent.gd")
 const Pathfinder = preload("res://src/sim/scouting/scout_pathfinder.gd")
 const Senses = preload("res://src/sim/scouting/scout_senses.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
+const Memory = preload("res://src/sim/knowledge/scout_mission_memory.gd")
 var config: ScoutConfig = preload("res://data/scouting/default_scouts.tres")
 var last_error: String = ""
 var _run: RunState
@@ -50,6 +51,7 @@ func dispatch(origin_id: String, bearing: Variant = null) -> bool:
 	var allocated: bool = origin.workers.allocate(id, 1)
 	assert(allocated)
 	_run.scouts[id] = agent
+	_remember_departure(agent, (agent.mission_target - origin.position).angle() if bearing == null else float(bearing))
 	_run.next_scout_id += 1
 	return true
 
@@ -82,11 +84,17 @@ func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 	agent.return_path.append(pile.position)
 	agent.investigation_source_id = known.source_node_id
 	_run.scouts[id] = agent
+	_remember_departure(agent, (target - pile.position).angle())
 	_run.next_scout_id += 1
 	return true
 
 
 func tick(delta: float) -> void:
+	for memory: ScoutMissionMemory in _run.scout_missions.values():
+		var half_life: float = config.rain_scent_half_life if _run.rain.phase == "raining" else config.departure_scent_half_life
+		memory.scent = roundf(memory.scent * pow(0.5, delta / half_life) * 1e10) / 1e10
+		if memory.scent < 0.0001:
+			memory.scent = 0.0
 	var ids: Array = _run.scouts.keys()
 	ids.sort()
 	for id: String in ids:
@@ -124,6 +132,7 @@ func tick(delta: float) -> void:
 		elif agent.cursor >= agent.path.size():
 			var home: PileState = _run.colony.piles[agent.origin_pile]
 			assert(agent.position == home.position)
+			_remember_return(agent, home.position)
 			for observation: Observation in agent.observations.values():
 				assert(not _run.delivered_observations.has(observation.id))
 				var delivered := Evidence.new()
@@ -137,6 +146,44 @@ func tick(delta: float) -> void:
 			var retired: bool = home.workers.retire_commitment(id)
 			assert(retired)
 			_run.scouts.erase(id)
+
+
+func _remember_departure(agent: ScoutAgent, bearing: float) -> void:
+	var memory := Memory.new()
+	memory.id = agent.id
+	memory.origin_pile = agent.origin_pile
+	memory.bearing = _memory_bearing(bearing)
+	memory.departed_at = _run.simulation_time
+	_run.scout_missions[agent.id] = memory
+
+
+func _remember_return(agent: ScoutAgent, home: Vector2) -> void:
+	if not _run.scout_missions.has(agent.id):
+		return # Older saves contain no reliable departure history.
+	var memory: ScoutMissionMemory = _run.scout_missions[agent.id]
+	memory.returned_at = _run.simulation_time
+	var count: int = mini(Memory.MAX_COURSE, agent.return_path.size() - 1)
+	for index: int in count:
+		var sample_index: int = 1 + int(float(index) * (agent.return_path.size() - 2) / maxi(1, count - 1))
+		var relative: Vector2 = agent.return_path[sample_index] - home
+		if relative.is_zero_approx():
+			continue
+		memory.course.append({"bearing": _memory_bearing(roundf(relative.angle() * 10.0) / 10.0),
+			"estimated_distance": roundf(relative.length() / 2.0) * 2.0})
+	var returned: Array[ScoutMissionMemory] = []
+	for record: ScoutMissionMemory in _run.scout_missions.values():
+		if record.returned_at >= 0.0:
+			returned.append(record)
+	returned.sort_custom(func(a: ScoutMissionMemory, b: ScoutMissionMemory) -> bool:
+		return a.returned_at < b.returned_at if a.returned_at != b.returned_at else a.id < b.id)
+	while returned.size() > Memory.RECENT_RETURNS:
+		_run.scout_missions.erase(returned.pop_front().id)
+
+
+static func _memory_bearing(value: float) -> float:
+	# Stable decimals also keep earlier version-5 JSON snapshot clients compatible.
+	var normalized: float = roundf(fposmod(value, TAU) * 1e8) / 1e8
+	return 0.0 if normalized >= TAU else normalized
 
 
 func _confirmed_new_source(agent: ScoutAgent) -> bool:

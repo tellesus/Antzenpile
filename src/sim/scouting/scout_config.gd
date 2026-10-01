@@ -11,3 +11,5 @@ extends Resource
 @export var confirmation_radius: float = 1.0
 @export var localization_floor: float = 0.25
 @export var distance_uncertainty: float = 0.5
+@export var departure_scent_half_life: float = 180.0
+@export var rain_scent_half_life: float = 12.0
