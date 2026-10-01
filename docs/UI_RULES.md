@@ -73,6 +73,8 @@ Task 039 adds a fifth abstract INWARD function, Adaptation, connected to Queen a
 
 Task 040 makes all three on-hand resource stores visible in a single restrained INWARD header line even with no function selected. These are detached pile totals, not exterior source quantities. Adaptation Web has a distinct violet context and outlined brood-trial actions; the active trial names its chosen trait. Chamber development keeps its own green action treatment, and the Food Exchange button names the chamber. This clarifies what the colony is growing or developing without turning INWARD into a full inventory dashboard.
 
+Card 044 labels the returned aphid-source evidence as a Honeydew trace in OUTWARD. Its selected context reports whether workers have harvested it and whether six workers protect the producers, alongside available labor. After a loaded return, **Protect producers** commits that labor; while tended, **Withdraw protection** releases it. Both actions share the existing mouse/touch path and fit beside trail and investigation controls. The view does not show producer condition, exact exterior stock, predator pressure, pulse schedule or predicted yield. A depleted-source cue remains a last-return report.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

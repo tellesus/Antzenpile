@@ -9,6 +9,7 @@ const Save = preload("res://src/core/save_service.gd")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 const BROOD_CONFIG = preload("res://data/resources/default_brood.tres")
 const NURSERY_CONFIG = preload("res://data/resources/default_nursery_development.tres")
+const HONEYDEW_CONFIG = preload("res://data/ecology/backyard_honeydew.tres")
 var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
 var _debug_view: Node
@@ -34,6 +35,8 @@ func _ready() -> void:
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
 		outward.investigate_command = investigate_known_source
+		outward.honeydew_start_command = start_honeydew_tending
+		outward.honeydew_stop_command = stop_honeydew_tending
 		outward.input_blocked = debug_is_open
 		outward.mode_command = set_mode.bind("inward")
 		outward.save_command = quick_save
@@ -117,12 +120,20 @@ func outward_status(pile_id: String) -> Dictionary:
 	var temporal_hints: Dictionary = {}
 	for known_id: String in simulation.run.knowledge.nodes:
 		temporal_hints[known_id] = simulation.run.knowledge.temporal_hint(known_id)
+	var honeydew: Dictionary = {}
+	var producer_knowledge_id: String = "known:" + HONEYDEW_CONFIG.source_id
+	if pile_id == "home" and simulation.run.knowledge.nodes.has(producer_knowledge_id):
+		honeydew = {"knowledge_id": producer_knowledge_id,
+			"relationship": simulation.run.honeydew.relationship,
+			"protection_workers": simulation.run.honeydew.protection_workers,
+			"required_workers": HONEYDEW_CONFIG.protection_workers}
 	return {"available_workers": simulation.run.colony.piles[pile_id].workers_available,
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
-		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints}
+		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
+		"honeydew": honeydew}
 
 
 func inward_status(pile_id: String) -> Dictionary:
@@ -216,6 +227,20 @@ func start_adaptation(trait_id: String) -> Dictionary:
 func start_nursery_development() -> Dictionary:
 	var accepted: bool = simulation.start_nursery_development("home")
 	return {"accepted": accepted, "reason": simulation.nursery.last_error}
+
+
+func start_honeydew_tending(knowledge_id: String) -> Dictionary:
+	if knowledge_id != "known:" + HONEYDEW_CONFIG.source_id or not simulation.run.knowledge.nodes.has(knowledge_id):
+		return {"accepted": false, "reason": "Honeydew source unknown"}
+	var accepted: bool = simulation.start_honeydew_tending("home")
+	return {"accepted": accepted, "reason": simulation.ecology.last_error}
+
+
+func stop_honeydew_tending(knowledge_id: String) -> Dictionary:
+	if knowledge_id != "known:" + HONEYDEW_CONFIG.source_id or not simulation.run.knowledge.nodes.has(knowledge_id):
+		return {"accepted": false, "reason": "Honeydew source unknown"}
+	var accepted: bool = simulation.stop_honeydew_tending("home")
+	return {"accepted": accepted, "reason": simulation.ecology.last_error}
 
 
 func trail_summaries(pile_id: String) -> Array[Dictionary]:

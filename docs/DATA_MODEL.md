@@ -90,6 +90,8 @@ Task 042 also refills the backyard's physical `water_01` WorldNodeState by an au
 
 Card 043 adds `aphid_01` as a normal hidden carbohydrate World Node at (35,33), initially holding 20 and capped at 40. An authored HoneydewDefinition provides 30-second output and pressure rates. RunState owns HoneydewState (`unknown`, `exploited`, `tended`; condition 50–100; protection-worker count). A loaded known-route return establishes exploitation; tending reserves six workers in `honeydew:home` as a separate `other` ledger commitment. Every pulse adds condition-scaled output to the physical node, 3 untended or 8 tended at full condition, while condition falls by 2 unprotected or rises by 1 protected. The relationship and condition are saved; the clock determines pulses. Version-5 snapshots without the optional state, including older worlds without this source, restore as unknown. Restore validates evidence, source type and ledger agreement atomically. Physical quantity, condition and pulse timing never enter normal presentation directly.
 
+Card 044 adds no authoritative fields. OUTWARD derives a honeydew source identity from the returned KnownNode ID and receives only a detached relationship, protection-worker count and authored labor requirement. Starting or stopping protection is a semantic command validated by GameRoot and EcologySystem; the normal view never receives a live producer object.
+
 ## Invariants
 
 1. **Worker conservation:** total living workers = available + internal jobs + scouts + trails + other explicit commitments. Pools are disjoint, integral, and nonnegative. `workers_total` and `workers_available` on a pile are ledger-backed values, never independent counters.

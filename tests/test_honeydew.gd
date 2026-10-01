@@ -33,7 +33,7 @@ func run(test: Object) -> bool:
 	var root := Root.new()
 	root.simulation = game
 	var outward: Dictionary = root.outward_status("home")
-	test.check(not outward.has("honeydew") and not outward.has("world"), "Normal OUTWARD does not expose hidden producer state")
+	test.check(outward.honeydew.relationship == "tended" and not outward.honeydew.has("condition") and not outward.has("world"), "Normal OUTWARD exposes known relationship without hidden producer condition")
 	root.free()
 	var saved: Dictionary = JSON.parse_string(JSON.stringify(game.run.to_dict(), "", true, true))
 	var copy := Controller.new()

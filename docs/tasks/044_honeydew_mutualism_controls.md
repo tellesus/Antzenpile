@@ -1,6 +1,6 @@
 # 044 — Honeydew relationship in OUTWARD
 
-Status: ready. Depends on [043](043_honeydew_mutualism_simulation.md) and the existing selected-trace OUTWARD context.
+Status: complete (2026-10-01). Depends on [043](043_honeydew_mutualism_simulation.md) and the existing selected-trace OUTWARD context.
 
 ## Goal
 
@@ -16,3 +16,10 @@ Make the first mutualism legible and controllable without exposing hidden produc
 ## Verification
 
 Use a command-driven scout→route→loaded return→tend→withdraw test, including normal-view snapshots before knowledge and after each transition, button hit/callback checks for mouse and touch, and labor rejection. Inspect the 1280×720 and 900×600 contexts in the pinned engine for overlap/readability. Run the full headless suite and Main smoke, update UI/data docs and this card with actual results, then commit one logical change.
+
+## Completion evidence and handoff
+
+- GameRoot now projects a honeydew identity only after a returned KnownNode exists and supplies detached relationship/labor facts. OUTWARD labels that trace and offers contextual protection or withdrawal after the loaded return. Insufficient labor gives a short rejection. Existing trail, Recheck and investigation actions remain available.
+- `tests/test_honeydew_controls.gd` covers discovery, evidence gate, semantic command rejection, mouse/touch actions, worker release, labor shortage, and data minimization. The full pinned headless suite passes with **4127 checks, 0 failures**. Pinned graphical probe captured selected tended contexts at 1280×720 and a 900×600 window (900×506 game image under the project aspect ratio); visual inspection found no overlap. Main headless smoke and import produced no script errors. This sandbox could not write Godot's user-level logs/editor settings and reported a missing root certificate store; those environment messages did not affect the run.
+- Changed files: GameRoot and OUTWARD view; honeydew state test and new control test/runner; graphical layout probe; README, architecture/data/UI/plan docs; this card.
+- Next: playtest the protection tradeoff with active trails and brood before tuning output, labor or predator pressure. Later ecology relationships and rivals need separate bounded cards.

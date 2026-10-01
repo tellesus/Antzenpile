@@ -13,6 +13,8 @@ var trail_create_command: Callable
 var trail_set_command: Callable
 var trail_recheck_command: Callable
 var investigate_command: Callable
+var honeydew_start_command: Callable
+var honeydew_stop_command: Callable
 var input_blocked: Callable
 var mode_command: Callable
 var save_command: Callable
@@ -119,6 +121,15 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 func _run_command(command: String) -> void:
 	match command:
+		"honeydew_start", "honeydew_stop":
+			var signal_data: Dictionary = _selected_signal()
+			if signal_data.is_empty() or not _is_honeydew(signal_data):
+				return
+			var action: Callable = honeydew_start_command if command == "honeydew_start" else honeydew_stop_command
+			if not action.is_valid():
+				return
+			var result: Dictionary = action.call(signal_data.source_knowledge_id)
+			_feedback = ("Producers protected" if command == "honeydew_start" else "Protection withdrawn") if result.get("accepted", false) else result.get("reason", "Protection unavailable")
 		"investigate":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty() or not investigate_command.is_valid():
@@ -190,6 +201,11 @@ func _button_rect(command: String) -> Rect2:
 
 func _button_at(at: Vector2) -> String:
 	if not _selected_signal().is_empty():
+		if _is_honeydew(_selected_signal()):
+			var relationship: String = _status.get("honeydew", {}).get("relationship", "unknown")
+			var honeydew_command: String = "honeydew_stop" if relationship == "tended" else "honeydew_start" if relationship == "exploited" else ""
+			if not honeydew_command.is_empty() and _honeydew_button_rect().has_point(at):
+				return honeydew_command
 		if _investigate_button_rect().has_point(at):
 			return "investigate"
 		var route: Dictionary = _selected_route(_selected_signal())
@@ -276,7 +292,7 @@ func _draw_signal(entry: Dictionary) -> void:
 		draw_arc(at, radius * 0.43, 0.45, 2.6, 24, line, 1.5)
 	if entry.id == selected_id:
 		draw_arc(at, radius + 7, 0, TAU, 48, Color(0.89, 0.91, 0.84, 0.48), 1.5)
-	var title: String = _signal_title(signal_data.category) + " · EMPTY" if reported_empty else _signal_title(signal_data.category)
+	var title: String = _signal_title_for(signal_data) + " · EMPTY" if reported_empty else _signal_title_for(signal_data)
 	_label(at + Vector2(0, radius + 22), title, color, 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
@@ -300,13 +316,16 @@ func _draw_context(size: Vector2) -> void:
 	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 344))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
-	_label(box.position + Vector2(16, 31), _signal_title(selected.category), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
+	_label(box.position + Vector2(16, 31), _signal_title_for(selected), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
 	_label(box.position + Vector2(16, 58), "A %s trace" % selected.confidence_label, Color("d4d8d1"), 15)
 	var distance_word: String = "nearby" if selected.estimated_distance < 6.0 else "within reach" if selected.estimated_distance < 14.0 else "distant"
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 14)
 	_label(box.position + Vector2(16, 109), "Last sensed %.0f s ago" % selected.age, Color("8fa1a8"), 13)
 	var hint: Dictionary = _status.get("temporal_hints", {}).get(selected.source_knowledge_id, {})
 	_label(box.position + Vector2(16, 137), hint.label if not hint.is_empty() else "Risk unknown", Color("8fa1a8"), 13)
+	if _is_honeydew(selected):
+		_draw_honeydew_context(selected, box)
+		return
 	var route: Dictionary = _selected_route(selected)
 	if route.is_empty() or route.status == "inactive":
 		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" and float(route.get("route_familiarity", 0.0)) < 0.1 else "No workers · scent " + _scent_label(route)
@@ -332,6 +351,38 @@ func _draw_context(size: Vector2) -> void:
 			_draw_trail_button("trail_more", "+ 1")
 		_draw_trail_button("trail_cancel", "CANCEL")
 	var scout_available: bool = _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
+	var investigate_box: Rect2 = _investigate_button_rect()
+	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
+	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), "INVESTIGATE SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
+	var relationship: String = _status.get("honeydew", {}).get("relationship", "unknown")
+	var required: int = int(_status.get("honeydew", {}).get("required_workers", 0))
+	var available: int = int(_status.get("available_workers", 0))
+	var relation_text: String = "Workers protecting producers" if relationship == "tended" else "Sweet source · protection possible" if relationship == "exploited" else "Sweet source · not yet harvested"
+	_label(box.position + Vector2(16, 162), relation_text, Color("d6b98c"), 13)
+	var route: Dictionary = _selected_route(selected)
+	var route_text: String = "Trail: no workers committed" if route.is_empty() or route.status == "inactive" else "Trail recalling · %d away" % route.active_workers if route.status == "recalling" else "Trail: source reported empty" if route.status == "depleted" else "Trail: %d committed · %d moving" % [route.allocated_workers, route.active_workers]
+	_label(box.position + Vector2(16, 184), route_text, Color("a8b8bd"), 12)
+	var labor_text: String = "Protection: %d committed · %d available" % [int(_status.honeydew.protection_workers), available] if relationship == "tended" else "Protection needs %d · %d available" % [required, available]
+	_label(box.position + Vector2(16, 201), labor_text, Color("8fa1a8"), 12)
+	if relationship in ["exploited", "tended"]:
+		var protect_box: Rect2 = _honeydew_button_rect()
+		var can_start: bool = relationship == "tended" or available >= required
+		draw_rect(protect_box, Color("3d3328") if can_start else Color("202326"))
+		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "WITHDRAW PROTECTION" if relationship == "tended" else "PROTECT PRODUCERS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	if route.is_empty() or route.status in ["inactive", "recalling"]:
+		_draw_trail_button("trail_create", "INVEST 5 WORKERS" if route.is_empty() or route.status == "inactive" else "REINVEST 5 WORKERS")
+	elif route.status == "depleted":
+		if route.active_workers == 0:
+			_draw_trail_button("trail_recheck", "RECHECK")
+		_draw_trail_button("trail_cancel", "CANCEL")
+	else:
+		_draw_trail_button("trail_less", "− 1")
+		_draw_trail_button("trail_more", "+ 1")
+		_draw_trail_button("trail_cancel", "CANCEL")
+	var scout_available: bool = available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
 	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), "INVESTIGATE SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
@@ -364,19 +415,32 @@ func _reported_empty(signal_data: Dictionary) -> bool:
 	return route.get("status", "") == "depleted"
 
 
+func _is_honeydew(signal_data: Dictionary) -> bool:
+	return not _status.get("honeydew", {}).is_empty() and signal_data.get("source_knowledge_id", "") == _status.honeydew.knowledge_id
+
+
 func _trail_button_rect(command: String) -> Rect2:
 	var x: float = get_viewport_rect().size.x - 300.0
+	var y: float = 398.0 if _is_honeydew(_selected_signal()) else 380.0
 	match command:
-		"trail_create": return Rect2(x, 380, 260, 44)
-		"trail_recheck": return Rect2(x, 380, 136, 44)
-		"trail_less": return Rect2(x, 380, 64, 44)
-		"trail_more": return Rect2(x + 72, 380, 64, 44)
-		"trail_cancel": return Rect2(x + 144, 380, 116, 44)
+		"trail_create": return Rect2(x, y, 260, 44)
+		"trail_recheck": return Rect2(x, y, 136, 44)
+		"trail_less": return Rect2(x, y, 64, 44)
+		"trail_more": return Rect2(x + 72, y, 64, 44)
+		"trail_cancel": return Rect2(x + 144, y, 116, 44)
 	return Rect2()
 
 
 func _investigate_button_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0, 438.0, 260.0, 44.0)
+	return Rect2(get_viewport_rect().size.x - 300.0, 444.0 if _is_honeydew(_selected_signal()) else 438.0, 260.0, 44.0)
+
+
+func _honeydew_button_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 350.0, 260.0, 44.0)
+
+
+func _signal_title_for(signal_data: Dictionary) -> String:
+	return "Honeydew trace" if _is_honeydew(signal_data) else _signal_title(signal_data.category)
 
 
 func _draw_trail_button(command: String, title: String) -> void:
