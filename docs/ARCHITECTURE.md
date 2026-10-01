@@ -137,3 +137,5 @@ docs/                            durable design and task cards
 ## Events and diagnostics
 
 Use sparse semantic events such as observation_added, known_node_created, trail_created, resource_delivered, brood_matured, chamber_online, and rain_started. Do not broadcast every field assignment. Diagnostic categories such as SCOUT/TRAIL/BROOD are switchable. Run history stores meaningful events for future history/replay, not log spam.
+
+Card 046 composes PredatorSystem in SimulationController and injects it into TrailSystem. One immutable ambush definition and run-owned PredatorState govern shared recovery. TrailSystem resolves stable aggregate crossings, applies pile/ledger mortality, truncates cargo to survivor capacity and reconciles true travelers. Cohorts retain private casualties until home/expected-home arrival, including a zero-traveler expectation after total loss. GameRoot projects expected population/commitments until reports arrive; only returned route loss history supplies normal alarm data. No predator scene node, hidden position or cooldown enters normal presentation.

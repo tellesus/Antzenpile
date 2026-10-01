@@ -12,6 +12,7 @@ const Trails = preload("res://src/sim/trails/trail_network.gd")
 const Rain = preload("res://src/sim/weather/rain_state.gd")
 const Honeydew = preload("res://src/sim/ecology/honeydew_state.gd")
 const HONEYDEW_CONFIG = preload("res://data/ecology/backyard_honeydew.tres")
+const Predator = preload("res://src/sim/ecology/predator_state.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 var world: WorldState
@@ -22,6 +23,7 @@ var knowledge: KnowledgeBase = Knowledge.new()
 var trails: TrailNetwork = Trails.new()
 var rain: RainState = Rain.new()
 var honeydew: HoneydewState = Honeydew.new()
+var predator: PredatorState = Predator.new()
 var delivered_observations: Dictionary[String, Observation] = {}
 
 var run_seed: int:
@@ -61,7 +63,7 @@ func to_dict() -> Dictionary:
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(),
-		"honeydew": honeydew.to_dict()}
+		"honeydew": honeydew.to_dict(), "predator": predator.to_dict()}
 
 
 func active_scout_count() -> int:
@@ -170,6 +172,25 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if not _valid_honeydew(restored_honeydew, restored_world, restored_colony, restored_knowledge, restored_trails):
 		return false
+	var restored_predator := Predator.new()
+	if data.has("predator") and (not data.predator is Dictionary or not restored_predator.restore(data.predator, restored_clock.tick_count)):
+		return false
+	var casualties: int = 0
+	var losses_by_pile: Dictionary[String, int] = {}
+	for route: TrailRouteState in restored_trails.routes.values():
+		var losses: int = route.reported_losses + restored_trails.pending_losses(route.id)
+		var pile_losses: int = losses_by_pile.get(route.origin_pile, 0)
+		if losses > restored_colony.piles[route.origin_pile].workers.lost_total - pile_losses or losses > restored_predator.kills_total - casualties:
+			return false
+		if route.reported_losses > 0 and route.last_loss_time < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL:
+			return false
+		losses_by_pile[route.origin_pile] = pile_losses + losses
+		casualties += losses
+	if casualties != restored_predator.kills_total:
+		return false
+	for pile: PileState in restored_colony.piles.values():
+		if restored_trails.pending_for_pile(pile.id, true) > pile.adapted_workers_lost or restored_trails.pending_for_pile(pile.id) > WorkerLedger.MAX_COUNT - pile.workers_total:
+			return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()
@@ -186,6 +207,7 @@ func restore(data: Dictionary) -> bool:
 	trails = restored_trails
 	rain = restored_rain
 	honeydew = restored_honeydew
+	predator = restored_predator
 	return true
 
 

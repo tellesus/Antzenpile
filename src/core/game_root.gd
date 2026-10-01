@@ -110,7 +110,11 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		return result
 	var origin: Vector2 = simulation.run.colony.piles[pile_id].position
 	for signal_data: PerceivedSignal in perception.project(simulation.run.knowledge.nodes.values(), origin, simulation.run.simulation_time):
-		result.append(signal_data.to_dict())
+		var record: Dictionary = signal_data.to_dict()
+		var route: TrailRouteState = simulation.run.trails.find_route(pile_id, signal_data.source_knowledge_id)
+		if route != null and route.reported_losses > 0:
+			record.risk = "reported_loss"
+		result.append(record)
 	return result
 
 
@@ -146,14 +150,16 @@ func inward_status(pile_id: String) -> Dictionary:
 	var trail_workers: int = 0
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile == pile_id:
-			trail_workers += route.allocated_workers
+			trail_workers += route.allocated_workers + simulation.run.trails.pending_losses(route.id)
+	var expected_total: int = pile.workers_total + simulation.run.trails.pending_for_pile(pile_id)
+	var expected_adapted: int = pile.adapted_workers_total + simulation.run.trails.pending_for_pile(pile_id, true)
 	return {"pile_id": pile_id, "queens": pile.queen_count,
-		"workers_total": pile.workers_total, "workers_available": pile.workers_available,
+		"workers_total": expected_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
 		"adaptation_repertoire": pile.adaptation_repertoire,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
-		"adapted_workers": pile.adapted_workers_total,
-		"adaptation_fraction": pile.adaptation_fraction(),
+		"adapted_workers": expected_adapted,
+		"adaptation_fraction": float(expected_adapted) / expected_total if expected_total > 0 else 0.0,
 		"adaptation_costs": AdaptationRules.COSTS.duplicate(),
 		"adaptation_nurses": AdaptationRules.NURSES,
 		"brood_batch_count": BROOD_CONFIG.starting_count,
@@ -252,9 +258,14 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 			for cohort: TransitCohort in simulation.run.trails.cohorts.values():
 				if cohort.route_id == route.id and cohort.detour != null:
 					checking += 1
+			var pending: int = simulation.run.trails.pending_losses(route.id)
+			var status: String = route.status
+			if pending > 0 and status == "inactive":
+				status = "recalling" if route.desired_workers == 0 else "depleted" if route.reported_depleted else "active"
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
-				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers,
-				"active_workers": route.active_workers, "checking_workers": checking, "status": route.status,
+				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers + pending,
+				"active_workers": route.active_workers + pending, "checking_workers": checking, "status": status,
+				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
 				"energy_limited": route.energy_limited,
 				"delivered_total": route.delivered_total,
 				"pheromone_strength": segment.pheromone_strength,

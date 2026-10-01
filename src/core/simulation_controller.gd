@@ -10,6 +10,7 @@ const FoodExchange = preload("res://src/sim/colony/food_exchange_system.gd")
 const Nursery = preload("res://src/sim/colony/nursery_development_system.gd")
 const Adaptation = preload("res://src/sim/colony/adaptation_system.gd")
 const Rain = preload("res://src/sim/weather/rain_system.gd")
+const Predator = preload("res://src/sim/ecology/predator_system.gd")
 const Ecology = preload("res://src/sim/ecology/ecology_system.gd")
 var run: RunState
 var scouting: RefCounted
@@ -20,6 +21,7 @@ var nursery: NurseryDevelopmentSystem
 var adaptation: RefCounted
 var rain: RainSystem
 var ecology: EcologySystem
+var predator: PredatorSystem
 
 
 func _init(seed_value: int = 482817) -> void:
@@ -39,7 +41,8 @@ func _attach_run(next_run: RunState) -> void:
 		run.clock.tick.disconnect(_tick)
 	run = next_run
 	scouting = Scouts.new(run)
-	trails = Trails.new(run)
+	predator = Predator.new(run)
+	trails = Trails.new(run, predator)
 	brood = Brood.new(run)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)

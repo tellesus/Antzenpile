@@ -7,13 +7,16 @@ const Cohort = preload("res://src/sim/trails/transit_cohort.gd")
 const Detour = preload("res://src/sim/trails/trail_detour.gd")
 const Pathfinder = preload("res://src/sim/scouting/scout_pathfinder.gd")
 const CONFIG = preload("res://data/trails/default_trails.tres")
+const PREDATOR_CONFIG = preload("res://data/ecology/backyard_predator.tres")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 var last_error: String = ""
 var _run: RunState
+var _predator: PredatorSystem
 
 
-func _init(run_state: RunState) -> void:
+func _init(run_state: RunState, predator_system: PredatorSystem = null) -> void:
 	_run = run_state
+	_predator = predator_system if predator_system != null else PredatorSystem.new(run_state)
 
 
 func create_route(origin_id: String, knowledge_id: String) -> bool:
@@ -68,11 +71,12 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "trail:" + route.id
 	var requested: int = int(target)
-	if requested == route.desired_workers:
+	var expected: int = route.allocated_workers + _run.trails.pending_losses(route.id)
+	if requested == route.desired_workers and requested <= expected:
 		last_error = ""
 		return true
-	if requested > route.allocated_workers:
-		var needed: int = requested - route.allocated_workers
+	if requested > expected:
+		var needed: int = requested - expected
 		if pile.workers_available < needed:
 			return _reject("Not enough available workers")
 		if route.status == "inactive" and not pile.workers.create_commitment(commitment, "trail", route.id):
@@ -92,8 +96,9 @@ func set_workers(route_id: String, target: Variant) -> bool:
 		route.reported_depleted = false
 	route.desired_workers = requested
 	if route.allocated_workers == 0:
-		var retired: bool = pile.workers.retire_commitment(commitment)
-		assert(retired)
+		if pile.workers.count(commitment) >= 0:
+			var retired: bool = pile.workers.retire_commitment(commitment)
+			assert(retired)
 		route.status = "inactive"
 		route.departure_cooldown_ticks = 0
 	else:
@@ -148,13 +153,15 @@ func tick(delta: float) -> void:
 				cohort.detour_report = cohort.detour.observation.detached_copy()
 				cohort.detour = null
 			continue
-		if cohort.direction == "outbound" and _maybe_detour(cohort, route):
+		_encounter(cohort, route)
+		if cohort.worker_count > 0 and cohort.direction == "outbound" and _maybe_detour(cohort, route):
 			continue
 		cohort.remaining_ticks -= 1
 		if cohort.remaining_ticks > 0:
 			continue
 		if cohort.direction == "outbound":
-			_collect(cohort, route)
+			if cohort.worker_count > 0:
+				_collect(cohort, route)
 			cohort.direction = "inbound"
 			cohort.remaining_ticks = _leg_ticks(route)
 		else:
@@ -166,6 +173,42 @@ func tick(delta: float) -> void:
 		var route: TrailRouteState = _run.trails.routes[id]
 		if route.status == "active" and route.departure_cooldown_ticks == 0:
 			_depart(route)
+
+
+func _encounter(cohort: TransitCohort, route: TrailRouteState) -> void:
+	if cohort.worker_count == 0 or cohort.predator_encountered or _run.clock.tick_count < PREDATOR_CONFIG.first_tick:
+		return
+	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
+	var progress: float = 1.0 - float(cohort.remaining_ticks) / _leg_ticks(route)
+	if cohort.direction == "inbound":
+		progress = 1.0 - progress
+	var point: Vector2 = segment.start.lerp(segment.end, progress)
+	if point.distance_to(PREDATOR_CONFIG.position) > PREDATOR_CONFIG.radius:
+		return
+	# Saturated encounters still consume this journey's one opportunity.
+	cohort.predator_encountered = true
+	if not _predator.encounter(point):
+		return
+	var pile: PileState = _run.colony.piles[route.origin_pile]
+	var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
+	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "ambush")
+	assert(removed)
+	route.allocated_workers -= 1
+	route.active_workers -= 1
+	cohort.worker_count -= 1
+	cohort.lost_workers = 1
+	cohort.adapted_lost_workers = adapted
+	cohort.payload = minf(cohort.payload, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
+	if cohort.payload == 0.0:
+		cohort.resource_id = ""
+	if cohort.worker_count == 0:
+		cohort.detour_report = null
+	if route.allocated_workers == 0:
+		var retired: bool = pile.workers.retire_commitment("trail:" + route.id)
+		assert(retired)
+		route.status = "inactive"
+		route.energy_limited = false
+		route.departure_cooldown_ticks = 0
 
 
 func _maybe_detour(cohort: TransitCohort, route: TrailRouteState) -> bool:
@@ -280,8 +323,13 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if cohort.detour_report != null:
 		assert(not _run.delivered_observations.has(cohort.detour_report.id))
 		_run.delivered_observations[cohort.detour_report.id] = cohort.detour_report.detached_copy()
+	if cohort.lost_workers > 0:
+		route.reported_losses += cohort.lost_workers
+		route.last_loss_time = _run.simulation_time
 	var source_id: String = _run.knowledge.nodes[route.destination_knowledge_id].source_node_id
-	assert(_run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail"))
+	if cohort.worker_count > 0:
+		var recorded: bool = _run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail")
+		assert(recorded)
 	if cohort.payload > 0.0:
 		var net_payload: float = maxf(0.0, cohort.payload - cohort.unpaid_energy_cost)
 		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload)
@@ -291,7 +339,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		segment.pheromone_strength = snappedf(clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.route_familiarity = snappedf(clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.traffic += mini(cohort.worker_count, WorkerLedger.MAX_COUNT - segment.traffic)
-	else:
+	elif cohort.worker_count > 0:
 		route.reported_depleted = true
 		route.energy_limited = false
 	route.active_workers -= cohort.worker_count
@@ -301,8 +349,9 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		assert(released)
 		route.allocated_workers -= release_count
 	if route.allocated_workers == 0:
-		var retired: bool = pile.workers.retire_commitment("trail:" + route.id)
-		assert(retired)
+		if pile.workers.count("trail:" + route.id) >= 0:
+			var retired: bool = pile.workers.retire_commitment("trail:" + route.id)
+			assert(retired)
 		route.status = "inactive"
 		route.departure_cooldown_ticks = 0
 	else:

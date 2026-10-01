@@ -19,6 +19,22 @@ func find_route(origin_id: String, knowledge_id: String) -> TrailRouteState:
 	return null
 
 
+func pending_losses(route_id: String) -> int:
+	var total: int = 0
+	for cohort: TransitCohort in cohorts.values():
+		if cohort.route_id == route_id:
+			total += cohort.lost_workers
+	return total
+
+
+func pending_for_pile(pile_id: String, adapted: bool = false) -> int:
+	var total: int = 0
+	for cohort: TransitCohort in cohorts.values():
+		if routes[cohort.route_id].origin_pile == pile_id:
+			total += cohort.adapted_lost_workers if adapted else cohort.lost_workers
+	return total
+
+
 func to_dict() -> Dictionary:
 	var route_records: Array[Dictionary] = []
 	var segment_records: Array[Dictionary] = []
@@ -48,7 +64,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 	var pairs: Dictionary[String, bool] = {}
 	for record: Variant in data.routes:
 		var route := Route.new()
-		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id):
+		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id) or route.last_loss_time > time:
 			return false
 		var suffix: String = route.id.trim_prefix("route_")
 		if route.id != "route_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_route_id or route.segment_id != "segment_" + suffix:
@@ -73,7 +89,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if cohort.id != "cohort_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_cohort_id:
 			return false
 		var route: TrailRouteState = restored_routes[cohort.route_id]
-		if not restored_segments.has(route.segment_id) or cohort.worker_count > CONFIG.workers_per_cohort:
+		if not restored_segments.has(route.segment_id) or cohort.worker_count + cohort.lost_workers > CONFIG.workers_per_cohort:
 			return false
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
 		if cohort.remaining_ticks > CONFIG.leg_ticks(segment.start.distance_to(segment.end)):
@@ -95,7 +111,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		# A journey keeps its departure phenotype even if adapted adults die meanwhile.
 		if fraction < -0.00002 or fraction > 1.0 + 0.00002 or absf(cohort.carry_multiplier - AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction)) > 0.00002:
 			return false
-		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end)) * cohort.energy_multiplier
+		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count + cohort.lost_workers, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end)) * cohort.energy_multiplier
 		if cohort.unpaid_energy_cost > maximum_energy_cost + 0.00001 or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):
 			return false
 		var source_id: String = knowledge.nodes[route.destination_knowledge_id].source_node_id
@@ -117,6 +133,12 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		used_segments[route.segment_id] = true
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
 		if segment.route_id != route.id or segment.start != colony.piles[route.origin_pile].position or segment.end != route.estimated_destination or not is_equal_approx(segment.exposure, Segment.exposure_for(world, segment.start, segment.end)):
+			return false
+		var pending: int = 0
+		for cohort: TransitCohort in restored_cohorts.values():
+			if cohort.route_id == route.id:
+				pending += cohort.lost_workers
+		if route.desired_workers > route.allocated_workers + pending + route.reported_losses or route.allocated_workers > WorkerLedger.MAX_COUNT - pending:
 			return false
 		var commitment: String = "trail:" + route.id
 		var ledger: WorkerLedger = colony.piles[route.origin_pile].workers

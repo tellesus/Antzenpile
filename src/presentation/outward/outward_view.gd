@@ -292,7 +292,11 @@ func _draw_signal(entry: Dictionary) -> void:
 		draw_arc(at, radius * 0.43, 0.45, 2.6, 24, line, 1.5)
 	if entry.id == selected_id:
 		draw_arc(at, radius + 7, 0, TAU, 48, Color(0.89, 0.91, 0.84, 0.48), 1.5)
+	if signal_data.get("risk") == "reported_loss":
+		draw_arc(at, radius + 2, -0.7, 0.15, 12, Color("c48c7c"), 1.5)
 	var title: String = _signal_title_for(signal_data) + " · EMPTY" if reported_empty else _signal_title_for(signal_data)
+	if signal_data.get("risk") == "reported_loss":
+		title += " · ALARM"
 	_label(at + Vector2(0, radius + 22), title, color, 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
@@ -322,7 +326,10 @@ func _draw_context(size: Vector2) -> void:
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 14)
 	_label(box.position + Vector2(16, 109), "Last sensed %.0f s ago" % selected.age, Color("8fa1a8"), 13)
 	var hint: Dictionary = _status.get("temporal_hints", {}).get(selected.source_knowledge_id, {})
-	_label(box.position + Vector2(16, 137), hint.label if not hint.is_empty() else "Risk unknown", Color("8fa1a8"), 13)
+	var loss_route: Dictionary = _selected_route(selected)
+	var losses: int = int(loss_route.get("reported_losses", 0))
+	var hint_text: String = "%d %s lost · cause uncertain" % [losses, "worker" if losses == 1 else "workers"] if losses > 0 else hint.label if not hint.is_empty() else "Risk unknown"
+	_label(box.position + Vector2(16, 137), hint_text, Color("c48c7c") if losses > 0 else Color("8fa1a8"), 13)
 	if _is_honeydew(selected):
 		_draw_honeydew_context(selected, box)
 		return
@@ -349,7 +356,7 @@ func _draw_context(size: Vector2) -> void:
 		else:
 			_draw_trail_button("trail_less", "− 1")
 			_draw_trail_button("trail_more", "+ 1")
-		_draw_trail_button("trail_cancel", "CANCEL")
+		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 else "CANCEL")
 	var scout_available: bool = _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
@@ -377,11 +384,11 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 	elif route.status == "depleted":
 		if route.active_workers == 0:
 			_draw_trail_button("trail_recheck", "RECHECK")
-		_draw_trail_button("trail_cancel", "CANCEL")
+		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 else "CANCEL")
 	else:
 		_draw_trail_button("trail_less", "− 1")
 		_draw_trail_button("trail_more", "+ 1")
-		_draw_trail_button("trail_cancel", "CANCEL")
+		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 else "CANCEL")
 	var scout_available: bool = available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))

@@ -16,6 +16,9 @@ var remaining_ticks: int = 1
 var unpaid_energy_cost: float = 0.0
 var energy_multiplier: float = 1.0
 var carry_multiplier: float = 1.0
+var lost_workers: int = 0
+var adapted_lost_workers: int = 0
+var predator_encountered: bool = false
 var detour_attempted: bool = false
 var detour: TrailDetour
 var detour_report: Observation
@@ -27,7 +30,8 @@ func to_dict() -> Dictionary:
 		"payload": payload, "remaining_ticks": remaining_ticks,
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
-		"detour_attempted": detour_attempted,
+		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
+		"predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
 		"detour_report": detour_report.to_dict() if detour_report != null else null}
 
@@ -40,7 +44,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 			return false
 	if data.id.is_empty() or data.route_id.is_empty() or not data.direction in ["outbound", "inbound"]:
 		return false
-	if not WorkerLedger.valid_count(data.worker_count) or data.worker_count < 1 or not WorkerLedger.valid_count(data.remaining_ticks) or data.remaining_ticks < 1:
+	if not WorkerLedger.valid_count(data.worker_count) or not WorkerLedger.valid_count(data.remaining_ticks) or data.remaining_ticks < 1:
 		return false
 	if not typeof(data.payload) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.payload)) or data.payload < 0.0:
 		return false
@@ -70,6 +74,13 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if (data.payload > 0.0) != (not data.resource_id.is_empty()):
 		return false
+	var losses: Variant = data.get("lost_workers", 0)
+	var adapted_losses: Variant = data.get("adapted_lost_workers", 0)
+	var encountered: Variant = data.get("predator_encountered", false)
+	if not WorkerLedger.valid_count(losses) or losses > 1 or not WorkerLedger.valid_count(adapted_losses) or adapted_losses > losses or typeof(encountered) != TYPE_BOOL or (losses > 0 and not encountered):
+		return false
+	if data.worker_count == 0 and (losses == 0 or data.payload != 0.0 or restored_detour != null or restored_report != null):
+		return false
 	id = data.id
 	route_id = data.route_id
 	direction = data.direction
@@ -80,6 +91,9 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	unpaid_energy_cost = float(data.get("unpaid_energy_cost", 0.0))
 	energy_multiplier = float(energy)
 	carry_multiplier = float(carry)
+	lost_workers = int(losses)
+	adapted_lost_workers = int(adapted_losses)
+	predator_encountered = encountered
 	detour_attempted = data.get("detour_attempted", false)
 	detour = restored_detour
 	detour_report = restored_report
