@@ -12,11 +12,13 @@ const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 var last_error: String = ""
 var _run: RunState
 var _predator: PredatorSystem
+var _rival: RivalSystem
 
 
-func _init(run_state: RunState, predator_system: PredatorSystem = null) -> void:
+func _init(run_state: RunState, predator_system: PredatorSystem = null, rival_system: RivalSystem = null) -> void:
 	_run = run_state
 	_predator = predator_system if predator_system != null else PredatorSystem.new(run_state)
+	_rival = rival_system if rival_system != null else RivalSystem.new(run_state)
 
 
 func create_route(origin_id: String, knowledge_id: String) -> bool:
@@ -153,6 +155,7 @@ func tick(delta: float) -> void:
 				cohort.detour_report = cohort.detour.observation.detached_copy()
 				cohort.detour = null
 			continue
+		_rival.sample_contact(cohort, route)
 		_encounter(cohort, route)
 		if cohort.worker_count > 0 and cohort.direction == "outbound" and _maybe_detour(cohort, route):
 			continue
@@ -323,6 +326,12 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if cohort.detour_report != null:
 		assert(not _run.delivered_observations.has(cohort.detour_report.id))
 		_run.delivered_observations[cohort.detour_report.id] = cohort.detour_report.detached_copy()
+	if cohort.foreign_contact:
+		if cohort.worker_count > 0:
+			route.foreign_reports += 1
+			route.last_foreign_time = _run.simulation_time
+		else:
+			_run.rival.unreturned_contacts += 1
 	if cohort.lost_workers > 0:
 		route.reported_losses += cohort.lost_workers
 		route.last_loss_time = _run.simulation_time
@@ -334,7 +343,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		var net_payload: float = maxf(0.0, cohort.payload - cohort.unpaid_energy_cost)
 		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload)
 		assert(deposited)
-		route.delivered_total += net_payload
+		route.delivered_total = roundf((route.delivered_total + net_payload) * 100000.0) / 100000.0
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 		segment.pheromone_strength = snappedf(clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.route_familiarity = snappedf(clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0), 0.0000000001)

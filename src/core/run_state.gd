@@ -12,6 +12,7 @@ const Trails = preload("res://src/sim/trails/trail_network.gd")
 const Rain = preload("res://src/sim/weather/rain_state.gd")
 const Honeydew = preload("res://src/sim/ecology/honeydew_state.gd")
 const HONEYDEW_CONFIG = preload("res://data/ecology/backyard_honeydew.tres")
+const Rival = preload("res://src/sim/ecology/rival_state.gd")
 const Predator = preload("res://src/sim/ecology/predator_state.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
@@ -23,6 +24,7 @@ var knowledge: KnowledgeBase = Knowledge.new()
 var trails: TrailNetwork = Trails.new()
 var rain: RainState = Rain.new()
 var honeydew: HoneydewState = Honeydew.new()
+var rival: RivalState = Rival.new()
 var predator: PredatorState = Predator.new()
 var delivered_observations: Dictionary[String, Observation] = {}
 
@@ -63,7 +65,7 @@ func to_dict() -> Dictionary:
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(),
-		"honeydew": honeydew.to_dict(), "predator": predator.to_dict()}
+		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict()}
 
 
 func active_scout_count() -> int:
@@ -172,6 +174,19 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if not _valid_honeydew(restored_honeydew, restored_world, restored_colony, restored_knowledge, restored_trails):
 		return false
+	var restored_rival := Rival.new()
+	if data.has("rival") and (not data.rival is Dictionary or not restored_rival.restore(data.rival, restored_world, restored_clock.tick_count)):
+		return false
+	var contacts: int = restored_rival.unreturned_contacts
+	for route: TrailRouteState in restored_trails.routes.values():
+		if route.foreign_reports > restored_rival.contacts_total - contacts or (route.foreign_reports > 0 and route.last_foreign_time < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL):
+			return false
+		contacts += route.foreign_reports
+	for cohort: TransitCohort in restored_trails.cohorts.values():
+		if cohort.foreign_contact:
+			contacts += 1
+	if contacts != restored_rival.contacts_total:
+		return false
 	var restored_predator := Predator.new()
 	if data.has("predator") and (not data.predator is Dictionary or not restored_predator.restore(data.predator, restored_clock.tick_count)):
 		return false
@@ -208,6 +223,7 @@ func restore(data: Dictionary) -> bool:
 	rain = restored_rain
 	honeydew = restored_honeydew
 	predator = restored_predator
+	rival = restored_rival
 	return true
 
 

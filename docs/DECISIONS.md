@@ -75,6 +75,8 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 
 | A35 | Card 046 introduces one stationary ambush at (29,27), radius 2 m, starting tick 1200, one worker lost per eligible aggregate journey and shared recovery of 120 ticks. Each cohort has one opportunity even if the predator is saturated. Adapted casualties use the seeded aggregate live share. Physical loss is immediate; survivors report at home, and fully lost groups become missing only at expected home time. Existing Stop Traffic plus another remembered source supplies the first avoidance response. Scouts, tending labor, rerouting and combat remain outside this prototype. These are provisional threat fixtures, not balance targets. |
 
+| A36 | Card 048 authors one hidden rival pile at (28,4) with 30 workers and a six-worker route to a flowering food node at (28,38). At tick 2400 the source blooms with 60 carbohydrate; subsequent 120-tick pulses add 3 up to 60. Rival outbound/inbound legs use existing travel timing, and loaded returns establish chemistry. Crossing within 0.8 m yields one private foreign trace per player journey, delivered only at home. The player can withdraw; swarm escalation/reinforcement is card 049. These are provisional ecological fixtures, not balance/session targets. |
+
 ## Details to resolve in their task
 
 Task 008 sensory defaults: 4 m chemical cue radius, 1 m proximity confirmation, uncertainty radius 0.25 m + half the closest sensed distance. Closer samples refine a seeded estimate; stationary repeats do not reroll. Scouts investigate estimates on their existing grid. Task 023 removes the former mission deadline. These are provisional game-scale parameters, not a biological model; wind/plume simulation is deferred.

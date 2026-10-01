@@ -55,6 +55,11 @@ static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool) -
 		var remnant: PackedVector2Array = membrane(center, radius * 0.7, phase)
 		canvas.draw_polyline(remnant.slice(2, 8), Color(color, 0.28), 1.0, true)
 		canvas.draw_polyline(remnant.slice(18, 23), Color(color, 0.28), 1.0, true)
+	if signal_data.get("foreign_contact", false):
+		var foreign: PackedVector2Array = membrane(center, radius * 0.96, -phase, 0.72)
+		canvas.draw_polyline(foreign.slice(15, 28), Color(0.8, 0.76, 0.67, 0.48), 1.0, true)
+		for index: int in 4:
+			canvas.draw_circle(foreign[16 + index * 3], 1.4, Color(0.8, 0.76, 0.67, 0.6))
 	if signal_data.get("risk") == "reported_loss":
 		var alarm: PackedVector2Array = membrane(center, radius * 1.05, phase)
 		canvas.draw_polyline(alarm.slice(1, 8), Color(0.82, 0.39, 0.27, 0.35 + 0.15 * sin(time * 2.0)), 1.5, true)

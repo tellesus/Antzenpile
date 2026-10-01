@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RivalDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/ecology/rival_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+pile_position = Vector2(28, 4)
+food_id = "rival_food_01"
+first_tick = 2400
+population = 30
+trail_workers = 6
+contact_radius = 0.8
+renewal_ticks = 120
+renewal_amount = 3.0
+food_capacity = 60.0

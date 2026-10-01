@@ -10,6 +10,7 @@ const FoodExchange = preload("res://src/sim/colony/food_exchange_system.gd")
 const Nursery = preload("res://src/sim/colony/nursery_development_system.gd")
 const Adaptation = preload("res://src/sim/colony/adaptation_system.gd")
 const Rain = preload("res://src/sim/weather/rain_system.gd")
+const Rival = preload("res://src/sim/ecology/rival_system.gd")
 const Predator = preload("res://src/sim/ecology/predator_system.gd")
 const Ecology = preload("res://src/sim/ecology/ecology_system.gd")
 var run: RunState
@@ -21,6 +22,7 @@ var nursery: NurseryDevelopmentSystem
 var adaptation: RefCounted
 var rain: RainSystem
 var ecology: EcologySystem
+var rival: RivalSystem
 var predator: PredatorSystem
 
 
@@ -41,8 +43,9 @@ func _attach_run(next_run: RunState) -> void:
 		run.clock.tick.disconnect(_tick)
 	run = next_run
 	scouting = Scouts.new(run)
+	rival = Rival.new(run)
 	predator = Predator.new(run)
-	trails = Trails.new(run, predator)
+	trails = Trails.new(run, predator, rival)
 	brood = Brood.new(run)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
@@ -113,6 +116,7 @@ func _tick(delta: float) -> void:
 	if not run.delivered_observations.is_empty():
 		if not run.knowledge.consume(run.delivered_observations, run.simulation_time):
 			push_error("Knowledge delivery rejected: " + run.knowledge.last_error)
+	rival.tick(delta)
 	trails.tick(delta)
 	rain.tick(delta)
 	ecology.tick(delta)

@@ -18,6 +18,7 @@ var energy_multiplier: float = 1.0
 var carry_multiplier: float = 1.0
 var lost_workers: int = 0
 var adapted_lost_workers: int = 0
+var foreign_contact: bool = false
 var predator_encountered: bool = false
 var detour_attempted: bool = false
 var detour: TrailDetour
@@ -31,7 +32,7 @@ func to_dict() -> Dictionary:
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
 		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
-		"predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
+		"foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
 		"detour_report": detour_report.to_dict() if detour_report != null else null}
 
@@ -54,7 +55,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	var carry: Variant = data.get("carry_multiplier", 1.0)
 	if not typeof(energy) in [TYPE_INT, TYPE_FLOAT] or not typeof(carry) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(energy)) or not is_finite(float(carry)) or energy < 0.7 or energy > 1.2 or carry < 0.85 or carry > 1.3:
 		return false
-	if typeof(data.get("detour_attempted", false)) != TYPE_BOOL:
+	if typeof(data.get("foreign_contact", false)) != TYPE_BOOL or typeof(data.get("detour_attempted", false)) != TYPE_BOOL:
 		return false
 	var restored_detour: TrailDetour
 	var restored_report: Observation
@@ -94,6 +95,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	lost_workers = int(losses)
 	adapted_lost_workers = int(adapted_losses)
 	predator_encountered = encountered
+	foreign_contact = data.get("foreign_contact", false)
 	detour_attempted = data.get("detour_attempted", false)
 	detour = restored_detour
 	detour_report = restored_report
