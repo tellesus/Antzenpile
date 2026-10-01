@@ -70,3 +70,5 @@ Task 025 also addresses the observed one-cycle population ceiling with a manual 
 The player chose to keep Food Exchange available early as a useful project. Task 026 measures the longer second-cycle path with that decision intact; it does not gate or retune development.
 
 The original slice evaluation and duration target above are historical. After tasks 027–028, the player tabled session-length judgment until more of Part 3's metabolism and chamber systems and Part 6's ecology exist. The [post-slice plan](POST_SLICE_PLAN.md) now guides the next bounded cards without a timing gate.
+
+The current backyard has a fifth, initially inactive picnic protein node in addition to the four original slice nodes, and later rain fronts recur. The one-front arc above remains the historical first-slice acceptance test. See the [post-slice systems evaluation](POST_SLICE_EVALUATION.md) for the longer combined run and present playtest limits.

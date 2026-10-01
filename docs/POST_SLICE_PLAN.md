@@ -1,6 +1,6 @@
 # Post-slice development plan
 
-Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) after tasks 027–028. Cards 029–033 and 035 are complete; card 034 is deferred after its conditional review. Card 036 remains proposed, not an approved balance pass. Expand one card against the current code before implementing it.
+Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) after tasks 027–028. Cards 029–033 and 035 are complete; card 034 is deferred after its conditional review. Card 036's automated review is complete, with current-build human playtesting still pending. The [post-slice evaluation](POST_SLICE_EVALUATION.md) records results. Further work needs a new bounded card; this is not an approved balance pass.
 
 ## What the original design clarifies
 

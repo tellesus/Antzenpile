@@ -34,6 +34,7 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_save_load.gd"),
 	preload("res://tests/test_slice_integration.gd"),
 	preload("res://tests/test_extended_slice.gd"),
+	preload("res://tests/test_post_slice_integration.gd"),
 ]
 
 var checks: int = 0

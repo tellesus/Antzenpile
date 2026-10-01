@@ -72,6 +72,10 @@ func run(test: Object) -> bool:
 		return {"accepted": false, "reason": "Test rejection"}
 	view._pointer_press(button, "mouse")
 	test.check(mouse_calls[0] == 1 and game.run.scouts.size() == 1, "Mouse uses the same contextual command path without changing the run on rejection")
+	var original_size: Vector2i = test.get_root().size
+	test.get_root().size = Vector2i(900, 600)
+	test.check(not view._investigate_button_rect().intersects(view._button_rect("inward")) and view._investigate_button_rect().end.y < view._button_rect("scout").position.y, "Compact viewport keeps Investigate clear of bottom controls")
+	test.get_root().size = original_size
 	view.free()
 	root.free()
 	test.check(_until(game, func() -> bool: return game.run.scouts.is_empty(), 80.0), "Scout returns from the later live source")

@@ -291,7 +291,7 @@ func _draw_context(size: Vector2) -> void:
 	var selected: Dictionary = _selected_signal()
 	if selected.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 404))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 344))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), _signal_title(selected.category), _signal_color(selected.category), 20)
@@ -299,7 +299,8 @@ func _draw_context(size: Vector2) -> void:
 	var distance_word: String = "nearby" if selected.estimated_distance < 6.0 else "within reach" if selected.estimated_distance < 14.0 else "distant"
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 14)
 	_label(box.position + Vector2(16, 109), "Last sensed %.0f s ago" % selected.age, Color("8fa1a8"), 13)
-	_label(box.position + Vector2(16, 137), "Risk unknown", Color("8fa1a8"), 13)
+	var hint: Dictionary = _status.get("temporal_hints", {}).get(selected.source_knowledge_id, {})
+	_label(box.position + Vector2(16, 137), hint.label if not hint.is_empty() else "Risk unknown", Color("8fa1a8"), 13)
 	var route: Dictionary = _selected_route(selected)
 	if route.is_empty() or route.status == "inactive":
 		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" and float(route.get("route_familiarity", 0.0)) < 0.1 else "No workers · scent " + _scent_label(route)
@@ -323,9 +324,6 @@ func _draw_context(size: Vector2) -> void:
 			_draw_trail_button("trail_less", "− 1")
 			_draw_trail_button("trail_more", "+ 1")
 		_draw_trail_button("trail_cancel", "CANCEL")
-	var hint: Dictionary = _status.get("temporal_hints", {}).get(selected.source_knowledge_id, {})
-	if not hint.is_empty():
-		_label(box.position + Vector2(16, 309), hint.label, Color("91aab0"), 12)
 	var scout_available: bool = _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
@@ -363,7 +361,7 @@ func _trail_button_rect(command: String) -> Rect2:
 
 
 func _investigate_button_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0, 492.0, 260.0, 44.0)
+	return Rect2(get_viewport_rect().size.x - 300.0, 438.0, 260.0, 44.0)
 
 
 func _draw_trail_button(command: String, title: String) -> void:
