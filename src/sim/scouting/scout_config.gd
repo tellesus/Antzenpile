@@ -1,7 +1,7 @@
 class_name ScoutConfig
 extends Resource
 
-@export var active_cap: int = 4
+@export var active_cap: int = 8
 @export var speed: float = 1.0
 @export var minimum_distance: float = 8.0
 @export var maximum_distance: float = 12.0

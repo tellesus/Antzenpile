@@ -65,6 +65,8 @@ Task 031 adds a selected-Nursery **DEVELOP NURSERY** action with authored costs 
 
 Task 033 places **INVESTIGATE SOURCE** in the selected OUTWARD trace context. It sends a scout to the colony's remembered estimate; no hidden location or source quantity is passed to the view. One short temporal line says an earlier source was found empty or may recur after an approximate, explicitly uncertain observed gap. This line appears only from returned colony evidence, never on physical appearance or expiry. The contextual button is touch-sized and uses the same mouse/touch command path.
 
+Card 037 supersedes the numerical temporal line: after returned positive–empty–positive evidence, say only that a source returned before and its timing is unknown. A most-recent empty return mutes and breaks the OUTWARD trace and labels it EMPTY even without selection. A hidden physical refill alone does not change the cue; a later positive return clears it. This is a report about last contact, not a live source meter.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

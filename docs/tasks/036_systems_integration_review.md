@@ -1,6 +1,6 @@
 # 036 — Systems integration review
 
-Status: automated review complete 2026-09-30; current-build human playtest pending. Expanded from [the post-slice plan](../POST_SLICE_PLAN.md) against cards 029–035.
+Status: automated review complete 2026-09-30; initial current-build player feedback received after review. Expanded from [the post-slice plan](../POST_SLICE_PLAN.md) against cards 029–035.
 
 ## Goal
 

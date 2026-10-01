@@ -1,6 +1,6 @@
 # Post-slice development plan
 
-Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) after tasks 027–028. Cards 029–033 and 035 are complete; card 034 is deferred after its conditional review. Card 036's automated review is complete, with current-build human playtesting still pending. The [post-slice evaluation](POST_SLICE_EVALUATION.md) records results. Further work needs a new bounded card; this is not an approved balance pass.
+Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035 and 037 are complete; card 034 is deferred after its conditional review. Card 036's automated review and initial player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md). The next bounded work is trail-side discovery, followed by an initial Adaptation Web choice.
 
 ## What the original design clarifies
 
@@ -25,6 +25,14 @@ The original GDD discussed a 20–30 minute session, but that target is **tabled
 
 ## Later expansion gate
 
-Once the core loop has clear growth and ecological tradeoffs, take a narrow Adaptation Web slice with a biological cost and trait tradeoff. It must distinguish genetic repertoire from current workforce expression and propagate through brood over time. Ecological relationships, rivals, satellite piles, dispersal, human attention and reality replay follow only when their dependencies and player-facing purpose are specified. Do not scaffold them all at once.
+The player finds four simultaneous scouts restrictive, asks for a visible depleted-source cue, rejects a numerical source-return forecast, and wants trail workers to sometimes investigate nearby unfamiliar cues before returning to their trail. They also want the Adaptation Web soon because the current game has few meaningful resource spends. Resource balance and the original session-length target remain tabled until more systems exist; surplus alone is not a storage-cap requirement.
+
+| Next card | Bounded outcome | Boundary |
+| --- | --- | --- |
+| [037 — Scout capacity and source signals](tasks/037_scout_capacity_and_source_signals.md) — complete | Raise the provisional cap to eight; visually mark a reported-empty source; replace timed recurrence text with qualitative memory. | Returned colony evidence only; no hidden renewal leak or resource-rate changes. |
+| [038 — Trail-side discovery](tasks/038_trail_side_discovery.md) | Let aggregate trail traffic automatically detect unfamiliar nearby cues and occasionally send one ledger-accounted worker to investigate, then rejoin the trail. | Use a bounded seeded chance; preserve aggregate traffic, hidden sensing and home-delivered colony knowledge. |
+| [039 — First Adaptation Web choice](tasks/039_first_adaptation_choice.md) | Implement one biologically costly trait tradeoff, expressed through new brood after development rather than instantly changing existing workers. | Define the first trait pair, costs and effects against the original GDD before coding; do not scaffold the full web. |
+
+Ecological relationships, rivals, satellite piles, dispersal, human attention and reality replay follow only when their dependencies and player-facing purpose are specified. Do not scaffold them all at once.
 
 Across every card, retain headless fixed-tick simulation, run-owned seeded state, aggregate workers except individual scouts, worker-ledger conservation, separate TrailRoute and TrailSegment, return-only knowledge, detached normal-view data, versioned saves, negative space and mobile-safe rendering.

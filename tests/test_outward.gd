@@ -79,7 +79,7 @@ func run(test: Object) -> bool:
 	touch._pointer_release(target[0].center, "touch")
 	test.check(mouse.selected_id == "tap" and touch.selected_id == "tap", "Mouse and touch tap select the same sensory trace")
 	var game := Controller.new(53)
-	mouse._status = {"available_workers": 40, "active_scouts": 0, "scout_cap": 4, "paused": false, "time_scale": 1, "time": 0.0}
+	mouse._status = {"available_workers": 40, "active_scouts": 0, "scout_cap": game.scouting.config.active_cap, "paused": false, "time_scale": 1, "time": 0.0}
 	mouse.dispatch_command = func(angle: float) -> bool: return game.dispatch_scout("home", angle)
 	mouse.pause_command = game.toggle_pause
 	mouse.speed_command = game.set_time_scale
@@ -103,7 +103,7 @@ func run(test: Object) -> bool:
 	var before: Dictionary = game.run.to_dict()
 	mouse.turn_pixels(150.0, 1280.0)
 	test.check(game.run.to_dict() == before, "Facing changes never modify simulation or RNG")
-	mouse._status.active_scouts = 4
+	mouse._status.active_scouts = game.scouting.config.active_cap
 	mouse._run_command("scout")
 	test.check(game.run.scouts.size() == 1, "Disabled scout action cannot exceed active cap")
 	mouse.input_blocked = func() -> bool: return true

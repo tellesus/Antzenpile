@@ -1,6 +1,6 @@
 # Post-slice systems review — 2026-09-30
 
-This is a deterministic command-driven integration run plus a Windows graphical probe, not a human playtest or balance approval. It uses the authored backyard, seed 3030, and ordinary game commands; it does not edit hidden nodes, worker totals or stores. The original 20–30 minute session target remains tabled.
+The automated review below is a deterministic command-driven integration run plus a Windows graphical probe, not a balance approval. It uses the authored backyard, seed 3030, and ordinary game commands; it does not edit hidden nodes, worker totals or stores. The player subsequently tried the current build and supplied qualitative feedback, recorded below. The original 20–30 minute session target remains tabled.
 
 ## Combined run
 
@@ -32,4 +32,8 @@ With VSync disabled, the selected OUTWARD probe measured **0.39 ms p95** at 1280
 
 ## Next design gate
 
-The combined mechanics work, but current resource surpluses make the long-run economic choice weak. Keep the session-duration target tabled. Before a broad balance pass or adding a new resource cap, use a current-build human playthrough to assess whether scouts, uncertain recurrence, labor recall, two-cohort care and repeat rain make interesting decisions. For subsequent implementation, the original GDD's next narrow expansion is one biologically costly Adaptation Web choice tied to brood, protein, nurses and time, with a trait tradeoff and delayed workforce expression. That needs its own executable card; do not scaffold rivals, daughter queens or the full web at once.
+The combined mechanics work, but current resource surpluses make the long-run economic choice weak. Keep the session-duration target tabled. For subsequent implementation, the original GDD's next narrow expansion is one biologically costly Adaptation Web choice tied to brood, protein, nurses and time, with a trait tradeoff and delayed workforce expression. That needs its own executable card; do not scaffold rivals, daughter queens or the full web at once.
+
+## Player feedback after the automated review
+
+The player finds the basic technology functional but sees too few things to spend gathered resources on, so balance tuning is premature. Four simultaneous scouts feel restrictive while all are away. A tapped-out source needs a visible trace cue, and a numerical "may replenish in X seconds" line suggests knowledge the colony cannot justify. The player wants trail workers near unfamiliar cues to sometimes send a temporary investigator that rejoins the route. They want an initial Adaptation Web choice soon because it adds a meaningful resource spend. Card 037 handles the scout/UI corrections; trail-side investigation and adaptation each need separate bounded specifications. This is qualitative playtest evidence, not a measured duration or economy verdict.

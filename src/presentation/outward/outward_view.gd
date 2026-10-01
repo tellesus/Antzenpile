@@ -259,19 +259,25 @@ func _draw_signal(entry: Dictionary) -> void:
 	var signal_data: Dictionary = entry.signal
 	var at: Vector2 = entry.center
 	var radius: float = entry.radius
-	var color: Color = _signal_color(signal_data.category)
-	for index: int in range(3):
+	var reported_empty: bool = _reported_empty(signal_data)
+	var color: Color = Color("819092") if reported_empty else _signal_color(signal_data.category)
+	for index: int in range(1 if reported_empty else 3):
 		var halo: Color = color
-		halo.a = (0.035 + 0.015 * index) * maxf(0.2, signal_data.strength) * (0.6 if _status.get("rain_phase", "") == "raining" else 1.0)
+		halo.a = (0.02 if reported_empty else 0.035 + 0.015 * index) * maxf(0.2, signal_data.strength) * (0.6 if _status.get("rain_phase", "") == "raining" else 1.0)
 		draw_circle(at + Vector2(index * 4 - 4, (index - 1) * 3), radius * (1.4 - index * 0.28), halo)
 	var line: Color = color
 	line.a = clampf(signal_data.strength * 0.85 + 0.1, 0.1, 0.8) * (0.6 if _status.get("rain_phase", "") == "raining" else 1.0)
-	draw_arc(at, radius * 0.66, -1.1, 1.5, 28, line, 2.0)
-	if signal_data.category == "water":
+	if reported_empty:
+		draw_arc(at, radius * 0.66, -1.1, -0.25, 12, line, 1.5)
+		draw_arc(at, radius * 0.66, 0.7, 1.5, 12, line, 1.5)
+	else:
+		draw_arc(at, radius * 0.66, -1.1, 1.5, 28, line, 2.0)
+	if signal_data.category == "water" and not reported_empty:
 		draw_arc(at, radius * 0.43, 0.45, 2.6, 24, line, 1.5)
 	if entry.id == selected_id:
 		draw_arc(at, radius + 7, 0, TAU, 48, Color(0.89, 0.91, 0.84, 0.48), 1.5)
-	_label(at + Vector2(0, radius + 22), _signal_title(signal_data.category), color, 13, HORIZONTAL_ALIGNMENT_CENTER)
+	var title: String = _signal_title(signal_data.category) + " · EMPTY" if reported_empty else _signal_title(signal_data.category)
+	_label(at + Vector2(0, radius + 22), title, color, 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_hud(size: Vector2) -> void:
@@ -294,7 +300,7 @@ func _draw_context(size: Vector2) -> void:
 	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 344))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
-	_label(box.position + Vector2(16, 31), _signal_title(selected.category), _signal_color(selected.category), 20)
+	_label(box.position + Vector2(16, 31), _signal_title(selected.category), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
 	_label(box.position + Vector2(16, 58), "A %s trace" % selected.confidence_label, Color("d4d8d1"), 15)
 	var distance_word: String = "nearby" if selected.estimated_distance < 6.0 else "within reach" if selected.estimated_distance < 14.0 else "distant"
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 14)
@@ -347,6 +353,14 @@ func _selected_route(signal_data: Dictionary) -> Dictionary:
 		if route.destination_knowledge_id == signal_data.source_knowledge_id:
 			return route
 	return {}
+
+
+func _reported_empty(signal_data: Dictionary) -> bool:
+	var hint: Dictionary = _status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {})
+	if hint.get("has_report", false):
+		return hint.get("last_return_empty", false)
+	var route: Dictionary = _selected_route(signal_data)
+	return route.get("status", "") == "depleted"
 
 
 func _trail_button_rect(command: String) -> Rect2:

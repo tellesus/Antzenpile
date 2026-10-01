@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1")
-active_cap = 4
+active_cap = 8
 speed = 1.0
 minimum_distance = 8.0
 maximum_distance = 12.0

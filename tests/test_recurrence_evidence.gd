@@ -23,6 +23,7 @@ func run(test: Object) -> bool:
 	var history: Array = game.run.knowledge.outcomes.get("protein_picnic", [])
 	test.check(history.size() >= 2 and history[0].available and not history.back().available, "Loaded and empty trail returns become source-specific evidence")
 	test.check(not game.run.knowledge.temporal_hint(known_id).possible_recurrence, "An empty report alone does not predict a return")
+	test.check(game.run.knowledge.temporal_hint(known_id).last_return_empty, "Returned empty report marks the remembered source as empty")
 	var other_id := "known:carb_exposed"
 	test.check(game.run.knowledge.temporal_hint(other_id).is_empty(), "Temporal evidence does not leak to another source")
 	game.advance(650.0 - game.run.simulation_time)
@@ -54,6 +55,7 @@ func run(test: Object) -> bool:
 	test.check(game.run.knowledge.outcomes.protein_picnic.back().available == false and game.run.knowledge.to_dict().observations == before_probe.knowledge.observations, "Empty investigation records absence without inventing a positive scout report")
 	game.advance(1050.0 - game.run.simulation_time)
 	test.check(game.run.world.nodes.protein_picnic.active and not game.run.knowledge.temporal_hint(known_id).possible_recurrence, "Unobserved reappearance creates no recurrence hint")
+	test.check(game.run.knowledge.temporal_hint(known_id).last_return_empty, "Hidden reappearance does not clear the empty cue")
 	var root := Root.new()
 	root.simulation = game
 	var view := Outward.new()
@@ -61,6 +63,11 @@ func run(test: Object) -> bool:
 	view._signals = root.sensory_snapshot("home")
 	view._status = root.outward_status("home")
 	view.selected_id = view._signals[0].id
+	var picnic_signal: Dictionary = {}
+	for signal_data: Dictionary in view._signals:
+		if signal_data.source_knowledge_id == known_id:
+			picnic_signal = signal_data
+	test.check(not picnic_signal.is_empty() and view._reported_empty(picnic_signal), "OUTWARD shows an empty cue from returned evidence even after hidden renewal")
 	view.investigate_command = root.investigate_known_source
 	var button: Vector2 = view._investigate_button_rect().get_center()
 	test.check(view._button_at(button) == "investigate" and view._investigate_button_rect().size.y >= 44.0, "Selected trace offers a touch-sized investigation action")
@@ -80,11 +87,15 @@ func run(test: Object) -> bool:
 	root.free()
 	test.check(_until(game, func() -> bool: return game.run.scouts.is_empty(), 80.0), "Scout returns from the later live source")
 	var hint: Dictionary = game.run.knowledge.temporal_hint(known_id)
-	test.check(hint.possible_recurrence and hint.label.contains("uncertain"), "Positive-empty-positive evidence yields an explicitly uncertain recurrence hint")
+	test.check(hint.possible_recurrence and not hint.last_return_empty and hint.label.contains("timing unknown") and not hint.label.contains(" s"), "Positive-empty-positive evidence reports past return without a timed forecast")
 	var normal := Root.new()
 	normal.simulation = game
 	var detached: Dictionary = normal.outward_status("home")
 	test.check(detached.temporal_hints.has(known_id) and detached.temporal_hints[known_id] == hint and not detached.has("world") and not detached.has("schedule"), "Normal view receives detached evidence language without world schedule")
+	var refreshed_view := Outward.new()
+	refreshed_view._status = detached
+	test.check(not refreshed_view._reported_empty(picnic_signal) and game.run.trails.routes.route_1.status == "depleted", "New positive scout report clears empty cue despite a stale stopped route")
+	refreshed_view.free()
 	normal.free()
 	var snapshot: Dictionary = JSON.parse_string(JSON.stringify(game.run.to_dict(), "", true, true))
 	var bad: Dictionary = snapshot.duplicate(true)

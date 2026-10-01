@@ -24,10 +24,13 @@ func run(test: Object) -> bool:
 			saw_return = saw_return or a.run.scouts.scout_1.phase == "returning"
 	test.check(saw_return and a.run.scouts.is_empty() and a.run.colony.piles.home.workers_available == 40 and a.run.colony.piles.home.workers.to_dict().commitments.is_empty(), "Return releases exactly one worker and retires commitment")
 	var capped := Controller.new()
-	for index: int in range(4):
+	for index: int in range(capped.scouting.config.active_cap):
 		test.check(capped.dispatch_scout("home"), "Scout within cap accepted")
+	test.check(capped.scouting.config.active_cap == 8 and capped.run.scouts.size() == 8 and capped.run.colony.piles.home.workers_available == 32 and capped.run.colony.piles.home.workers.invariant_holds(), "Eight individual scouts use eight conserved ledger workers")
 	var before: Dictionary = capped.run.to_dict()
 	test.check(not capped.dispatch_scout("home") and capped.run.to_dict() == before, "Cap rejection is atomic including RNG")
+	var capped_copy := Controller.new()
+	test.check(capped_copy.restore_snapshot(JSON.parse_string(JSON.stringify(before))) and capped_copy.run.to_dict() == capped.run.to_dict(), "Eight scouts preserve exact save continuation")
 	var invalid := Controller.new()
 	for bearing: Variant in [NAN, INF, true, "east"]:
 		before = invalid.run.to_dict()

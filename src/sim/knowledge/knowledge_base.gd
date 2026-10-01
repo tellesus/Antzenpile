@@ -55,20 +55,24 @@ func temporal_hint(knowledge_id: String) -> Dictionary:
 	if not nodes.has(knowledge_id):
 		return {}
 	var history: Array = outcomes.get(nodes[knowledge_id].source_node_id, [])
-	var first_positive: float = -1.0
+	var saw_positive: bool = false
 	var saw_gap: bool = false
-	var interval: float = -1.0
+	var returned_before: bool = false
 	for entry: Dictionary in history:
 		if entry.available:
-			if saw_gap and first_positive >= 0.0:
-				interval = entry.time - first_positive
-			first_positive = entry.time
+			if saw_gap and saw_positive:
+				returned_before = true
+			saw_positive = true
 			saw_gap = false
 		else:
 			saw_gap = true
-	if interval < 0.0:
-		return {"label": "Earlier report only" if history.is_empty() or history.back().available else "Last return found empty", "possible_recurrence": false}
-	return {"label": "May recur after ~%.0f s (uncertain)" % (roundf(interval / 25.0) * 25.0), "possible_recurrence": true}
+	var last_return_empty: bool = not history.is_empty() and not history.back().available
+	var label: String = "Earlier report only"
+	if last_return_empty:
+		label = "Last return found empty"
+	elif returned_before:
+		label = "Returned before · timing unknown"
+	return {"label": label, "possible_recurrence": returned_before, "has_report": not history.is_empty(), "last_return_empty": last_return_empty}
 
 
 static func _valid_evidence(evidence: Observation, time: float) -> bool:
