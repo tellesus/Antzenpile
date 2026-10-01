@@ -100,6 +100,10 @@ func run(test: Object) -> bool:
 	invalid = saved.duplicate(true)
 	invalid.knowledge.nodes[0].confidence = 1.0
 	test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Invented confidence rejects atomically")
+	for confidence: Variant in [saved.knowledge.nodes[0].confidence + 0.000000001, NAN, "uncertain"]:
+		invalid = saved.duplicate(true)
+		invalid.knowledge.nodes[0].confidence = confidence
+		test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Confidence edits beyond serialization noise reject atomically")
 	for time: float in [-1.0, saved.clock.time + 1, NAN]:
 		invalid = saved.duplicate(true)
 		invalid.knowledge.observations[0].received_at = time

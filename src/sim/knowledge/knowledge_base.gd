@@ -205,6 +205,12 @@ static func _matches_quantized_position(record: Dictionary, expected: Dictionary
 	var comparable: Dictionary = record.duplicate(true)
 	var position := Vector2(record.estimated_position[0], record.estimated_position[1])
 	comparable.estimated_position = [position.x, position.y]
+	# Derived division results can parse one float64 bit away even with full JSON
+	# precision. Rebuild from validated evidence; accept only representation noise.
+	if expected.has("confidence"):
+		if not comparable.has("confidence") or not typeof(comparable.confidence) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(comparable.confidence)) or absf(float(comparable.confidence) - float(expected.confidence)) > 0.000000000000001:
+			return false
+		comparable.confidence = expected.confidence
 	return comparable == expected
 
 
