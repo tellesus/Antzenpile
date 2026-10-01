@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SwarmConfig" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/ecology/swarm_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+reports_to_escalate = 2
+round_ticks = 16
+cooldown_ticks = 240
+retreat_ratio = 0.35
+rival_retreat_count = 2
+reinforcement_step = 4

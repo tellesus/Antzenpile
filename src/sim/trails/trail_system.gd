@@ -13,6 +13,7 @@ var last_error: String = ""
 var _run: RunState
 var _predator: PredatorSystem
 var _rival: RivalSystem
+var swarm: SwarmSystem
 
 
 func _init(run_state: RunState, predator_system: PredatorSystem = null, rival_system: RivalSystem = null) -> void:
@@ -155,7 +156,13 @@ func tick(delta: float) -> void:
 				cohort.detour_report = cohort.detour.observation.detached_copy()
 				cohort.detour = null
 			continue
+		if cohort.swarm_engaged:
+			continue
 		_rival.sample_contact(cohort, route)
+		if swarm != null:
+			swarm.consider(cohort, route)
+			if cohort.swarm_engaged:
+				continue
 		_encounter(cohort, route)
 		if cohort.worker_count > 0 and cohort.direction == "outbound" and _maybe_detour(cohort, route):
 			continue
@@ -192,20 +199,29 @@ func _encounter(cohort: TransitCohort, route: TrailRouteState) -> void:
 	cohort.predator_encountered = true
 	if not _predator.encounter(point):
 		return
+	apply_loss(cohort, route, "predator")
+
+
+func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) -> void:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
-	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "ambush")
+	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "ambush" if cause == "predator" else "foreign conflict")
 	assert(removed)
 	route.allocated_workers -= 1
 	route.active_workers -= 1
 	cohort.worker_count -= 1
-	cohort.lost_workers = 1
-	cohort.adapted_lost_workers = adapted
+	cohort.lost_workers += 1
+	cohort.adapted_lost_workers += adapted
+	if cause == "rival":
+		cohort.rival_losses += 1
 	cohort.payload = minf(cohort.payload, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
 	if cohort.payload == 0.0:
 		cohort.resource_id = ""
 	if cohort.worker_count == 0:
 		cohort.detour_report = null
+		cohort.swarm_engaged = false
+		cohort.conflict_report = ""
+		cohort.conflict_observed_at = 0.0
 	if route.allocated_workers == 0:
 		var retired: bool = pile.workers.retire_commitment("trail:" + route.id)
 		assert(retired)
@@ -332,11 +348,15 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 			route.last_foreign_time = _run.simulation_time
 		else:
 			_run.rival.unreturned_contacts += 1
+	if cohort.worker_count > 0 and cohort.conflict_report != "" and cohort.conflict_observed_at >= route.conflict_observed_at:
+		route.conflict_report = cohort.conflict_report
+		route.conflict_observed_at = cohort.conflict_observed_at
 	if cohort.lost_workers > 0:
 		route.reported_losses += cohort.lost_workers
+		route.reported_rival_losses += cohort.rival_losses
 		route.last_loss_time = _run.simulation_time
 	var source_id: String = _run.knowledge.nodes[route.destination_knowledge_id].source_node_id
-	if cohort.worker_count > 0:
+	if cohort.worker_count > 0 and cohort.reports_source_outcome:
 		var recorded: bool = _run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail")
 		assert(recorded)
 	if cohort.payload > 0.0:
@@ -348,7 +368,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		segment.pheromone_strength = snappedf(clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.route_familiarity = snappedf(clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.traffic += mini(cohort.worker_count, WorkerLedger.MAX_COUNT - segment.traffic)
-	elif cohort.worker_count > 0:
+	elif cohort.worker_count > 0 and cohort.reports_source_outcome:
 		route.reported_depleted = true
 		route.energy_limited = false
 	route.active_workers -= cohort.worker_count

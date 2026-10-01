@@ -29,25 +29,27 @@ func tick(delta: float) -> void:
 		state.remaining_ticks = leg
 		return
 	state.pheromone = snappedf(state.pheromone * pow(0.5, delta / TRAILS.pheromone_half_life_seconds), 0.0000000001)
+	if _run.swarm.active() and _run.swarm.rival_engaged:
+		return
 	state.remaining_ticks -= 1
 	if state.remaining_ticks > 0:
 		return
 	if state.direction == "outbound":
-		state.cargo = minf(food.quantity, CONFIG.trail_workers * TRAILS.carry_per_worker) if food.active else 0.0
+		state.cargo = minf(food.quantity, maxi(0, state.workers.count("rival:trail")) * TRAILS.carry_per_worker) if food.active else 0.0
 		food.quantity = maxf(0.0, food.quantity - state.cargo)
 		food.active = food.quantity > 0.0
 		state.direction = "inbound"
 	else:
 		state.stored_carbohydrate = roundf((state.stored_carbohydrate + state.cargo) * 100000.0) / 100000.0
 		if state.cargo > 0.0:
-			state.pheromone = snappedf(minf(1.0, state.pheromone + CONFIG.trail_workers * TRAILS.pheromone_per_returning_worker), 0.0000000001)
+			state.pheromone = snappedf(minf(1.0, state.pheromone + maxi(0, state.workers.count("rival:trail")) * TRAILS.pheromone_per_returning_worker), 0.0000000001)
 		state.cargo = 0.0
 		state.direction = "outbound"
 	state.remaining_ticks = leg
 
 
 func sample_contact(cohort: TransitCohort, route: TrailRouteState) -> void:
-	if cohort.worker_count <= 0 or cohort.foreign_contact or _run.rival.pheromone < 0.1 or _run.rival.contacts_total >= WorkerLedger.MAX_COUNT:
+	if cohort.worker_count <= 0 or cohort.foreign_sampled or _run.rival.pheromone < 0.1 or _run.rival.contacts_total >= WorkerLedger.MAX_COUNT:
 		return
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	var progress: float = 1.0 - float(cohort.remaining_ticks) / TRAILS.leg_ticks(segment.start.distance_to(segment.end))
@@ -62,4 +64,5 @@ func sample_contact(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var t: float = clampf((point - start).dot(span) / span.length_squared(), 0.0, 1.0)
 	if point.distance_to(start + span * t) <= CONFIG.contact_radius:
 		cohort.foreign_contact = true
+		cohort.foreign_sampled = true
 		_run.rival.contacts_total += 1

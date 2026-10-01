@@ -19,6 +19,9 @@ var delivered_total: float = 0.0
 var energy_limited: bool = false
 var foreign_reports: int = 0
 var last_foreign_time: float = 0.0
+var reported_rival_losses: int = 0
+var conflict_report: String = ""
+var conflict_observed_at: float = 0.0
 var reported_losses: int = 0
 var last_loss_time: float = 0.0
 
@@ -31,7 +34,8 @@ func to_dict() -> Dictionary:
 		"allocated_workers": allocated_workers, "active_workers": active_workers,
 		"status": status, "departure_cooldown_ticks": departure_cooldown_ticks,
 		"reported_depleted": reported_depleted, "delivered_total": delivered_total,
-		"foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time}
+		"reported_rival_losses": reported_rival_losses, "conflict_report": conflict_report,
+		"conflict_observed_at": conflict_observed_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time}
 
 
 func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bounds: Rect2) -> bool:
@@ -72,6 +76,11 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	var foreign_time: Variant = data.get("last_foreign_time", 0.0)
 	if not WorkerLedger.valid_count(reports) or not typeof(foreign_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(foreign_time)) or foreign_time < 0.0 or ((reports == 0) != (foreign_time == 0.0)):
 		return false
+	var rival_deaths: Variant = data.get("reported_rival_losses", 0)
+	var conflict: Variant = data.get("conflict_report", "")
+	var conflict_time: Variant = data.get("conflict_observed_at", 0.0)
+	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths > losses or not conflict in ["", "contested", "secured", "withdrew", "dispersed"] or not typeof(conflict_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(conflict_time)) or conflict_time < 0.0 or ((conflict == "") != (conflict_time == 0.0)):
+		return false
 	id = data.id
 	origin_pile = data.origin_pile
 	destination_knowledge_id = data.destination_knowledge_id
@@ -87,6 +96,9 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	energy_limited = data.get("energy_limited", false)
 	foreign_reports = int(reports)
 	last_foreign_time = float(foreign_time)
+	reported_rival_losses = int(rival_deaths)
+	conflict_report = conflict
+	conflict_observed_at = float(conflict_time)
 	reported_losses = int(losses)
 	last_loss_time = float(loss_time)
 	return true

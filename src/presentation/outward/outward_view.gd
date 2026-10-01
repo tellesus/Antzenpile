@@ -3,6 +3,7 @@ extends Node2D
 ## Normal-play sensorium. Providers deliver approved detached values only.
 
 const Panorama = preload("res://src/presentation/outward/outward_projection.gd")
+const SWARM_CONFIG = preload("res://data/ecology/default_swarm.tres")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 var signal_provider: Callable
@@ -157,7 +158,7 @@ func _run_command(command: String) -> void:
 			else:
 				if not trail_set_command.is_valid():
 					return
-				var target: int = 0 if command == "trail_cancel" else maxi(0, route.desired_workers - 1) if command == "trail_less" else route.desired_workers + 1
+				var target: int = 0 if command == "trail_cancel" else maxi(0, route.desired_workers - 1) if command == "trail_less" else route.desired_workers + (SWARM_CONFIG.reinforcement_step if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else 1)
 				result = trail_set_command.call(route.id, target)
 			_feedback = ("Workers sent to recheck" if command == "trail_recheck" else "Trail updated") if result.get("accepted", false) else result.get("reason", "Trail unavailable")
 		"scout":
@@ -340,6 +341,12 @@ func _draw_context(size: Vector2) -> void:
 	var loss_route: Dictionary = _selected_route(selected)
 	var losses: int = int(loss_route.get("reported_losses", 0))
 	var hint_text: String = "%d %s lost · cause uncertain" % [losses, "worker" if losses == 1 else "workers"] if losses > 0 else "Foreign chemistry reported on trail" if loss_route.get("foreign_reports", 0) > 0 else hint.label if not hint.is_empty() else "Risk unknown"
+	var conflict: String = str(loss_route.get("conflict_report", ""))
+	if conflict != "":
+		hint_text = "Contested · +4 reinforces" if conflict == "contested" else "Foreign workers withdrew" if conflict == "secured" else "Workers withdrew" if conflict == "withdrew" else "Contact dispersed"
+		if losses > 0:
+			hint_text += " · %d lost" % losses
+
 	_label(box.position + Vector2(16, 137), hint_text, Color("c48c7c") if losses > 0 else Color("8fa1a8"), 13)
 	if _is_honeydew(selected):
 		_draw_honeydew_context(selected, box)
@@ -366,7 +373,7 @@ func _draw_context(size: Vector2) -> void:
 				_draw_trail_button("trail_recheck", "RECHECK")
 		else:
 			_draw_trail_button("trail_less", "− 1")
-			_draw_trail_button("trail_more", "+ 1")
+			_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
 		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
 	var scout_available: bool = _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
@@ -398,7 +405,7 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
 	else:
 		_draw_trail_button("trail_less", "− 1")
-		_draw_trail_button("trail_more", "+ 1")
+		_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
 		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
 	var scout_available: bool = available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()

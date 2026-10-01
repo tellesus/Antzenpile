@@ -10,6 +10,7 @@ const FoodExchange = preload("res://src/sim/colony/food_exchange_system.gd")
 const Nursery = preload("res://src/sim/colony/nursery_development_system.gd")
 const Adaptation = preload("res://src/sim/colony/adaptation_system.gd")
 const Rain = preload("res://src/sim/weather/rain_system.gd")
+const Swarm = preload("res://src/sim/ecology/swarm_system.gd")
 const Rival = preload("res://src/sim/ecology/rival_system.gd")
 const Predator = preload("res://src/sim/ecology/predator_system.gd")
 const Ecology = preload("res://src/sim/ecology/ecology_system.gd")
@@ -22,6 +23,7 @@ var nursery: NurseryDevelopmentSystem
 var adaptation: RefCounted
 var rain: RainSystem
 var ecology: EcologySystem
+var swarm: SwarmSystem
 var rival: RivalSystem
 var predator: PredatorSystem
 
@@ -46,6 +48,8 @@ func _attach_run(next_run: RunState) -> void:
 	rival = Rival.new(run)
 	predator = Predator.new(run)
 	trails = Trails.new(run, predator, rival)
+	swarm = Swarm.new(run, trails.apply_loss)
+	trails.swarm = swarm
 	brood = Brood.new(run)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
@@ -118,6 +122,7 @@ func _tick(delta: float) -> void:
 			push_error("Knowledge delivery rejected: " + run.knowledge.last_error)
 	rival.tick(delta)
 	trails.tick(delta)
+	swarm.tick()
 	rain.tick(delta)
 	ecology.tick(delta)
 	food_exchange.tick(delta)

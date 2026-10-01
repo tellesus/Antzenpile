@@ -114,6 +114,7 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		var record: Dictionary = signal_data.to_dict()
 		var route: TrailRouteState = simulation.run.trails.find_route(pile_id, signal_data.source_knowledge_id)
 		record["foreign_contact"] = route != null and route.foreign_reports > 0
+		record["conflict_report"] = route.conflict_report if route != null else ""
 		if route != null and route.reported_losses > 0:
 			record.risk = "reported_loss"
 		result.append(record)
@@ -275,6 +276,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
 				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers + pending,
 				"active_workers": route.active_workers + pending, "checking_workers": checking, "status": status,
+				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
 				"energy_limited": route.energy_limited,

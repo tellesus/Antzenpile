@@ -19,6 +19,12 @@ var carry_multiplier: float = 1.0
 var lost_workers: int = 0
 var adapted_lost_workers: int = 0
 var foreign_contact: bool = false
+var foreign_sampled: bool = false
+var reports_source_outcome: bool = true
+var swarm_engaged: bool = false
+var rival_losses: int = 0
+var conflict_report: String = ""
+var conflict_observed_at: float = 0.0
 var predator_encountered: bool = false
 var detour_attempted: bool = false
 var detour: TrailDetour
@@ -32,7 +38,9 @@ func to_dict() -> Dictionary:
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
 		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
-		"foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
+		"foreign_sampled": foreign_sampled, "reports_source_outcome": reports_source_outcome,
+		"swarm_engaged": swarm_engaged, "rival_losses": rival_losses,
+		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
 		"detour_report": detour_report.to_dict() if detour_report != null else null}
 
@@ -77,10 +85,26 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	var losses: Variant = data.get("lost_workers", 0)
 	var adapted_losses: Variant = data.get("adapted_lost_workers", 0)
+	var rival_deaths: Variant = data.get("rival_losses", 0)
+	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths > losses:
+		return false
 	var encountered: Variant = data.get("predator_encountered", false)
-	if not WorkerLedger.valid_count(losses) or losses > 1 or not WorkerLedger.valid_count(adapted_losses) or adapted_losses > losses or typeof(encountered) != TYPE_BOOL or (losses > 0 and not encountered):
+	if not WorkerLedger.valid_count(losses) or losses > CONFIG.workers_per_cohort or losses - rival_deaths > 1 or not WorkerLedger.valid_count(adapted_losses) or adapted_losses > losses or typeof(encountered) != TYPE_BOOL or (losses > rival_deaths and not encountered):
 		return false
 	if data.worker_count == 0 and (losses == 0 or data.payload != 0.0 or restored_detour != null or restored_report != null):
+		return false
+	for key: String in ["foreign_sampled", "reports_source_outcome", "swarm_engaged"]:
+		if typeof(data.get(key, key == "reports_source_outcome")) != TYPE_BOOL:
+			return false
+	var report: Variant = data.get("conflict_report", "")
+	var report_time: Variant = data.get("conflict_observed_at", 0.0)
+	if not report in ["", "contested", "secured", "withdrew", "dispersed"] or not typeof(report_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(report_time)) or report_time < 0.0 or report_time > time or ((report == "") != (report_time == 0.0)):
+		return false
+	if not data.get("reports_source_outcome", true) and (data.direction != "inbound" or (data.worker_count > 0 and report == "")):
+		return false
+	if data.worker_count == 0 and (data.get("swarm_engaged", false) or report != ""):
+		return false
+	if data.get("foreign_contact", false) and not data.get("foreign_sampled", data.get("foreign_contact", false)):
 		return false
 	id = data.id
 	route_id = data.route_id
@@ -96,6 +120,12 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	adapted_lost_workers = int(adapted_losses)
 	predator_encountered = encountered
 	foreign_contact = data.get("foreign_contact", false)
+	foreign_sampled = data.get("foreign_sampled", foreign_contact)
+	reports_source_outcome = data.get("reports_source_outcome", true)
+	swarm_engaged = data.get("swarm_engaged", false)
+	rival_losses = int(rival_deaths)
+	conflict_report = report
+	conflict_observed_at = float(report_time)
 	detour_attempted = data.get("detour_attempted", false)
 	detour = restored_detour
 	detour_report = restored_report

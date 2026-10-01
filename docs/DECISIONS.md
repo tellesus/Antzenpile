@@ -77,6 +77,8 @@ These are scaffolding choices to remove routine ambiguity, not additional locked
 
 | A36 | Card 048 authors one hidden rival pile at (28,4) with 30 workers and a six-worker route to a flowering food node at (28,38). At tick 2400 the source blooms with 60 carbohydrate; subsequent 120-tick pulses add 3 up to 60. Rival outbound/inbound legs use existing travel timing, and loaded returns establish chemistry. Crossing within 0.8 m yields one private foreign trace per player journey, delivered only at home. The player can withdraw; swarm escalation/reinforcement is card 049. These are provisional ecological fixtures, not balance/session targets. |
 
+| A37 | Card 049 forms one stationary swarm after two returned foreign reports at a true crossing, with a 240-tick cooldown. A real messenger delivers contested evidence. Rival foragers travel to contact; each 16-tick round produces one seeded aggregate casualty weighted by current numbers. Player survivors withdraw below a 0.35 force ratio; rival survivors withdraw at two or fewer. Route +4 reinforcements travel normally; Stop Traffic recalls survivors. Outcomes/losses are delivered at home. These are provisional prototype values; no full rival strategy, castes or moving fronts yet. |
+
 ## Details to resolve in their task
 
 Task 008 sensory defaults: 4 m chemical cue radius, 1 m proximity confirmation, uncertainty radius 0.25 m + half the closest sensed distance. Closer samples refine a seeded estimate; stationary repeats do not reroll. Scouts investigate estimates on their existing grid. Task 023 removes the former mission deadline. These are provisional game-scale parameters, not a biological model; wind/plume simulation is deferred.

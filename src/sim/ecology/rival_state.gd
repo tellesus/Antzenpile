@@ -28,12 +28,12 @@ func restore(data: Dictionary, world: WorldState, tick: int) -> bool:
 	if not data.has_all(["workers", "direction", "remaining_ticks", "cargo", "stored_carbohydrate", "pheromone", "contacts_total", "unreturned_contacts"]) or not data.workers is Dictionary:
 		return false
 	var ledger := Ledger.new()
-	if not ledger.restore(data.workers) or ledger.total != CONFIG.population or ledger.lost_total != 0 or not data.direction in ["dormant", "outbound", "inbound"] or not WorkerLedger.valid_count(data.remaining_ticks):
+	if not ledger.restore(data.workers) or ledger.total + ledger.lost_total != CONFIG.population or not data.direction in ["dormant", "outbound", "inbound"] or not WorkerLedger.valid_count(data.remaining_ticks):
 		return false
 	for field: String in ["cargo", "stored_carbohydrate", "pheromone"]:
 		if not typeof(data[field]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data[field])) or data[field] < 0.0:
 			return false
-	if data.pheromone > 1.0 or data.cargo > CONFIG.trail_workers * TRAILS.carry_per_worker or (data.direction != "inbound" and data.cargo != 0.0) or not WorkerLedger.valid_count(data.contacts_total) or not WorkerLedger.valid_count(data.unreturned_contacts) or data.unreturned_contacts > data.contacts_total:
+	if data.pheromone > 1.0 or data.cargo > maxi(0, ledger.count("rival:trail")) * TRAILS.carry_per_worker or (data.direction != "inbound" and data.cargo != 0.0) or not WorkerLedger.valid_count(data.contacts_total) or not WorkerLedger.valid_count(data.unreturned_contacts) or data.unreturned_contacts > data.contacts_total:
 		return false
 	var commitments: Dictionary = ledger.to_dict().commitments
 	if data.direction == "dormant":
@@ -46,7 +46,7 @@ func restore(data: Dictionary, world: WorldState, tick: int) -> bool:
 		var maximum_store: float = floorf(float(tick - CONFIG.first_tick) / (leg * 2)) * CONFIG.trail_workers * TRAILS.carry_per_worker
 		if data.stored_carbohydrate > maximum_store + 0.00001 or world.nodes[CONFIG.food_id].quantity > CONFIG.food_capacity:
 			return false
-		if data.remaining_ticks < 1 or data.remaining_ticks > leg or commitments.size() != 1 or commitments.get("rival:trail", {}) != {"kind": "trail", "owner_id": "rival_route_1", "count": CONFIG.trail_workers}:
+		if data.remaining_ticks < 1 or data.remaining_ticks > leg or commitments.size() != 1 or commitments.get("rival:trail", {}).get("kind") != "trail" or commitments.get("rival:trail", {}).get("owner_id") != "rival_route_1" or ledger.count("rival:trail") > CONFIG.trail_workers:
 			return false
 	workers = ledger
 	direction = data.direction

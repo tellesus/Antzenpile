@@ -12,6 +12,7 @@ const Trails = preload("res://src/sim/trails/trail_network.gd")
 const Rain = preload("res://src/sim/weather/rain_state.gd")
 const Honeydew = preload("res://src/sim/ecology/honeydew_state.gd")
 const HONEYDEW_CONFIG = preload("res://data/ecology/backyard_honeydew.tres")
+const Swarm = preload("res://src/sim/ecology/swarm_state.gd")
 const Rival = preload("res://src/sim/ecology/rival_state.gd")
 const Predator = preload("res://src/sim/ecology/predator_state.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
@@ -24,6 +25,7 @@ var knowledge: KnowledgeBase = Knowledge.new()
 var trails: TrailNetwork = Trails.new()
 var rain: RainState = Rain.new()
 var honeydew: HoneydewState = Honeydew.new()
+var swarm: SwarmState = Swarm.new()
 var rival: RivalState = Rival.new()
 var predator: PredatorState = Predator.new()
 var delivered_observations: Dictionary[String, Observation] = {}
@@ -65,7 +67,7 @@ func to_dict() -> Dictionary:
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(),
-		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict()}
+		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict()}
 
 
 func active_scout_count() -> int:
@@ -179,29 +181,46 @@ func restore(data: Dictionary) -> bool:
 		return false
 	var contacts: int = restored_rival.unreturned_contacts
 	for route: TrailRouteState in restored_trails.routes.values():
-		if route.foreign_reports > restored_rival.contacts_total - contacts or (route.foreign_reports > 0 and route.last_foreign_time < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL):
+		if (route.conflict_report != "" and route.conflict_observed_at < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL) or route.foreign_reports > restored_rival.contacts_total - contacts or (route.foreign_reports > 0 and route.last_foreign_time < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL):
 			return false
 		contacts += route.foreign_reports
 	for cohort: TransitCohort in restored_trails.cohorts.values():
+		if cohort.conflict_report != "" and cohort.conflict_observed_at < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL:
+			return false
 		if cohort.foreign_contact:
 			contacts += 1
 	if contacts != restored_rival.contacts_total:
 		return false
+	var restored_swarm := Swarm.new()
+	if data.has("swarm") and (not data.swarm is Dictionary or not restored_swarm.restore(data.swarm, restored_trails, restored_rival, restored_world, restored_clock.tick_count)):
+		return false
+	if not data.has("swarm"):
+		for cohort: TransitCohort in restored_trails.cohorts.values():
+			if cohort.swarm_engaged or cohort.rival_losses > 0 or cohort.conflict_report != "":
+				return false
+		for route: TrailRouteState in restored_trails.routes.values():
+			if route.reported_rival_losses > 0 or route.conflict_report != "":
+				return false
 	var restored_predator := Predator.new()
 	if data.has("predator") and (not data.predator is Dictionary or not restored_predator.restore(data.predator, restored_clock.tick_count)):
 		return false
 	var casualties: int = 0
+	var predator_casualties: int = 0
 	var losses_by_pile: Dictionary[String, int] = {}
 	for route: TrailRouteState in restored_trails.routes.values():
 		var losses: int = route.reported_losses + restored_trails.pending_losses(route.id)
 		var pile_losses: int = losses_by_pile.get(route.origin_pile, 0)
-		if losses > restored_colony.piles[route.origin_pile].workers.lost_total - pile_losses or losses > restored_predator.kills_total - casualties:
+		if losses > restored_colony.piles[route.origin_pile].workers.lost_total - pile_losses or losses > restored_predator.kills_total + restored_swarm.player_losses - casualties:
 			return false
 		if route.reported_losses > 0 and route.last_loss_time < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL:
 			return false
 		losses_by_pile[route.origin_pile] = pile_losses + losses
 		casualties += losses
-	if casualties != restored_predator.kills_total:
+		predator_casualties += route.reported_losses - route.reported_rival_losses
+		for cohort: TransitCohort in restored_trails.cohorts.values():
+			if cohort.route_id == route.id:
+				predator_casualties += cohort.lost_workers - cohort.rival_losses
+	if predator_casualties != restored_predator.kills_total:
 		return false
 	for pile: PileState in restored_colony.piles.values():
 		if restored_trails.pending_for_pile(pile.id, true) > pile.adapted_workers_lost or restored_trails.pending_for_pile(pile.id) > WorkerLedger.MAX_COUNT - pile.workers_total:
@@ -224,6 +243,7 @@ func restore(data: Dictionary) -> bool:
 	honeydew = restored_honeydew
 	predator = restored_predator
 	rival = restored_rival
+	swarm = restored_swarm
 	return true
 
 
