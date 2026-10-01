@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="HoneydewDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/ecology/honeydew_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+source_id = "aphid_01"
+interval_ticks = 120
+untended_output = 3.0
+tended_output = 8.0
+source_capacity = 40.0
+protection_workers = 6
+initial_condition = 75.0
+minimum_condition = 50.0
+pressure_loss_per_interval = 2.0
+protected_gain_per_interval = 1.0

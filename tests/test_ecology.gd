@@ -14,7 +14,8 @@ func run(test: Object) -> bool:
 	nectar.active = false
 	var pulses: Array[Dictionary] = []
 	game.ecology.resource_pulsed.connect(func(id: String, amount: float) -> void:
-		pulses.append({"id": id, "amount": amount}))
+		if id == "carb_sheltered":
+			pulses.append({"id": id, "amount": amount}))
 	game.advance(299.75)
 	test.check(nectar.quantity == 0.0 and not nectar.active and pulses.is_empty(), "No nectar returns before the authored pulse")
 	game.toggle_pause()

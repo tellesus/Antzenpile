@@ -97,6 +97,14 @@ func start_adaptation(pile_id: String, trait_id: String) -> bool:
 	return adaptation.start(pile_id, trait_id)
 
 
+func start_honeydew_tending(pile_id: String) -> bool:
+	return ecology.start_tending(pile_id)
+
+
+func stop_honeydew_tending(pile_id: String) -> bool:
+	return ecology.stop_tending(pile_id)
+
+
 func _tick(delta: float) -> void:
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():

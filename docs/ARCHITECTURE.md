@@ -103,6 +103,8 @@ Task 039 adds one AdaptationSystem command that starts an ordinary eight-ant tri
 
 Task 042 extends RainSystem's authored fixed-tick effect to one backyard exterior water node. Its physical quantity/active status remain in WorldState and are saved normally; rain's phase/elapsed time supplies continuation without a second schedule. Source refill never writes KnowledgeBase or automatically reopens a depleted route. A normal returning scout or rechecked cohort is still the only path from changed reality to colony knowledge and presentation.
 
+Card 043 adds one authored honeydew producer source and a run-owned HoneydewState. EcologySystem makes its hidden physical carbohydrate on fixed 30-second pulses, applies simple condition pressure, and derives `exploited` only from a loaded return on its known route. Semantic start/stop tending commands reserve or release six workers through an `other` ledger commitment; protection raises output and producer condition. It is separate from transit workers. Normal views receive no producer state in this card; card 044 adds colony-evidence-based context and commands.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

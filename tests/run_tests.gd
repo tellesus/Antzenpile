@@ -30,6 +30,7 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_recurring_rain.gd"),
 	preload("res://tests/test_rain_fed_water.gd"),
 	preload("res://tests/test_ecology.gd"),
+	preload("res://tests/test_honeydew.gd"),
 	preload("res://tests/test_temporary_resource.gd"),
 	preload("res://tests/test_recurrence_evidence.gd"),
 	preload("res://tests/test_save_load.gd"),

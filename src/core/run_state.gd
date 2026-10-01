@@ -10,6 +10,8 @@ const Scout = preload("res://src/sim/scouting/scout_agent.gd")
 const Knowledge = preload("res://src/sim/knowledge/knowledge_base.gd")
 const Trails = preload("res://src/sim/trails/trail_network.gd")
 const Rain = preload("res://src/sim/weather/rain_state.gd")
+const Honeydew = preload("res://src/sim/ecology/honeydew_state.gd")
+const HONEYDEW_CONFIG = preload("res://data/ecology/backyard_honeydew.tres")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 var world: WorldState
@@ -19,6 +21,7 @@ var next_scout_id: int = 1
 var knowledge: KnowledgeBase = Knowledge.new()
 var trails: TrailNetwork = Trails.new()
 var rain: RainState = Rain.new()
+var honeydew: HoneydewState = Honeydew.new()
 var delivered_observations: Dictionary[String, Observation] = {}
 
 var run_seed: int:
@@ -57,7 +60,8 @@ func to_dict() -> Dictionary:
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "next_scout_id": next_scout_id, "delivered_observations": delivered,
-		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict()}
+		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(),
+		"honeydew": honeydew.to_dict()}
 
 
 func active_scout_count() -> int:
@@ -161,6 +165,11 @@ func restore(data: Dictionary) -> bool:
 	var restored_rain := Rain.new()
 	if not data.rain is Dictionary or not restored_rain.restore(data.rain, restored_clock.tick_count):
 		return false
+	var restored_honeydew := Honeydew.new()
+	if data.has("honeydew") and (not data.honeydew is Dictionary or not restored_honeydew.restore(data.honeydew)):
+		return false
+	if not _valid_honeydew(restored_honeydew, restored_world, restored_colony, restored_knowledge, restored_trails):
+		return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()
@@ -176,4 +185,33 @@ func restore(data: Dictionary) -> bool:
 	knowledge = restored_knowledge
 	trails = restored_trails
 	rain = restored_rain
+	honeydew = restored_honeydew
+	return true
+
+
+static func _valid_honeydew(state: HoneydewState, restored_world: WorldState, restored_colony: ColonyState, restored_knowledge: KnowledgeBase, restored_trails: TrailNetwork) -> bool:
+	var source_id: String = HONEYDEW_CONFIG.source_id
+	var commitment_id: String = "honeydew:home"
+	var has_source: bool = restored_world.nodes.has(source_id)
+	if has_source and restored_world.nodes[source_id].definition_id != "carbohydrate":
+		return false
+	if not has_source and state.relationship != "unknown":
+		return false
+	if state.relationship != "unknown":
+		if not restored_knowledge.nodes.has("known:" + source_id):
+			return false
+		var route: TrailRouteState = restored_trails.find_route("home", "known:" + source_id)
+		if route == null or route.delivered_total <= 0.0:
+			return false
+	for pile: PileState in restored_colony.piles.values():
+		var commitments: Dictionary = pile.workers.to_dict().commitments
+		for id: String in commitments:
+			if id.begins_with("honeydew:") and (pile.id != "home" or id != commitment_id):
+				return false
+		if pile.id == "home":
+			if state.relationship == "tended":
+				if not commitments.has(commitment_id) or commitments[commitment_id].kind != "other" or commitments[commitment_id].owner_id != source_id or commitments[commitment_id].count != state.protection_workers:
+					return false
+			elif commitments.has(commitment_id):
+				return false
 	return true
