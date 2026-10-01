@@ -71,6 +71,8 @@ Task 038 counts an active trail-side detour in the top-bar scout cap and says on
 
 Task 039 adds a fifth abstract INWARD function, Adaptation, connected to Queen and Nursery without implying chamber geography. Its selected context presents Lean Foragers and Load Bearers as one-time choices with their paired travel-energy/carry tradeoffs, 12 carbohydrate/12 protein/6 water cost, two committed nurses, and eight ordinary brood slots. During the trial it reports brood stage and delayed expression; afterward it reports the chosen repertoire and adapted share. Both choice buttons are touch-sized. The normal view receives detached pile summary values, never route geometry or a worker genome list.
 
+Task 040 makes all three on-hand resource stores visible in a single restrained INWARD header line even with no function selected. These are detached pile totals, not exterior source quantities. Adaptation Web has a distinct violet context and outlined brood-trial actions; the active trial names its chosen trait. Chamber development keeps its own green action treatment, and the Food Exchange button names the chamber. This clarifies what the colony is growing or developing without turning INWARD into a full inventory dashboard.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

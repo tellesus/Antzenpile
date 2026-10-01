@@ -29,6 +29,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D21 | User direction, 2026-09-30: table the original 20–30 minute session target until more game systems exist. Do not tune development toward a speculative session length now. |
 | D22 | User playtest feedback, 2026-09-30: resource balance remains deferred while there are few expenditures; four active scouts feels restrictive; returned depletion needs a visible cue; no numerical source-renewal forecast belongs in colony UI. Trail workers may investigate nearby cues and rejoin their route. Bring a bounded Adaptation Web choice forward as a biologically grounded resource spend. |
 | D23 | User choice, 2026-09-30: trail-side investigation is automatic with a bounded chance, not an approval prompt for every detour. The first Adaptation Web trait pair is left to implementation judgment within the original biological-cost and delayed-expression design. |
+| D24 | User playtest feedback after the first adaptation: depletion can make resources feel too quick to tap and difficult to find again, requiring a resource-access review. INWARD should show the colony's on-hand resource totals. Adaptation Web controls should be visibly separate from chamber development and name the brood trial or chamber project clearly. Do not treat this as authorization for an unmeasured balance sweep. |
 
 ## Provisional defaults for executable tasks
 

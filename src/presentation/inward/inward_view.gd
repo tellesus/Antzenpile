@@ -197,6 +197,8 @@ func _draw_hud(size: Vector2) -> void:
 	_label(Vector2(24, 38), "INWARD  /  HOME", Color("dad7c8"), 22)
 	_label(Vector2(24, 63), "Tap a function to listen.", Color("82939c"), 13)
 	if not _status.is_empty():
+		var stores: Dictionary = _status.get("resources", {})
+		_label(Vector2(24, 96), "STORES   Carb %.1f   ·   Protein %.1f   ·   Water %.1f" % [stores.get("carbohydrate", 0.0), stores.get("protein", 0.0), stores.get("water", 0.0)], Color("a9b9bc"), 13)
 		_label(Vector2(size.x - 24, 36), "%d available" % _status.workers_available, Color("c9d1c5"), 15, HORIZONTAL_ALIGNMENT_RIGHT)
 		var pause_word: String = "PAUSED" if _status.paused else "%dx" % _status.time_scale
 		_label(Vector2(size.x - 24, 61), "%s  ·  %.0fs" % [pause_word, _status.time], Color("83969d"), 13, HORIZONTAL_ALIGNMENT_RIGHT)
@@ -206,9 +208,10 @@ func _draw_context(size: Vector2) -> void:
 	if selected_id.is_empty() or _status.is_empty():
 		return
 	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 400 if selected_id == "nursery" else 344 if selected_id == "adaptation" else 284))
-	draw_rect(box, Color("111921"))
-	draw_rect(box, Color("41535a"), false, 1.0)
-	_label(box.position + Vector2(16, 31), _title(selected_id), Color("d9d3be"), 20)
+	var web: bool = selected_id == "adaptation"
+	draw_rect(box, Color("17141f") if web else Color("111921"))
+	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
+	_label(box.position + Vector2(16, 31), "Adaptation Web" if web else _title(selected_id), Color("decce8") if web else Color("d9d3be"), 20)
 	match selected_id:
 		"queen":
 			_detail_line(box, 65, "Queens: %d" % _status.queens)
@@ -252,9 +255,8 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 99, "Needs %.0f carb · %.0f protein" % [_status.food_exchange_costs.carbohydrate, _status.food_exchange_costs.protein])
 				_detail_line(box, 125, "%.0f water · %d workers" % [_status.food_exchange_costs.water, _status.food_exchange_workers_required])
 				_detail_line(box, 157, "Build: %.0f simulated seconds" % _status.food_exchange_duration)
-				_detail_line(box, 185, "Stores: %.1f / %.1f / %.1f" % [_status.resources.carbohydrate, _status.resources.protein, _status.resources.water])
 				draw_rect(_develop_rect(), Color("35483c"))
-				_label(_develop_rect().position + Vector2(130, 29), "DEVELOP", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+				_label(_develop_rect().position + Vector2(130, 29), "DEVELOP FOOD EXCHANGE", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 			elif _status.food_exchange_state == "developing":
 				_detail_line(box, 65, "Developing Food Exchange")
 				_detail_line(box, 99, "%.0f / %.0f simulated seconds" % [_status.food_exchange_progress, _status.food_exchange_duration])
@@ -272,18 +274,19 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 117, "Trail workers: %d" % _status.trail_workers)
 		"adaptation":
 			if not _status.adaptation_trial.is_empty():
-				_detail_line(box, 65, "Trial brood: %s" % _status.adaptation_trial.stage.capitalize())
-				_detail_line(box, 91, "%d nurses committed" % _status.adaptation_nurses)
-				_detail_line(box, 117, "Normal brood growth and food needs")
-				_detail_line(box, 151, "Existing workers remain unchanged")
+				_detail_line(box, 65, "%s trial" % ("Lean Foragers" if _status.adaptation_trial.adaptation_id == "lean" else "Load Bearers"))
+				_detail_line(box, 91, "Brood stage: %s" % _status.adaptation_trial.stage.capitalize())
+				_detail_line(box, 117, "%d nurses committed" % _status.adaptation_nurses)
+				_detail_line(box, 151, "Normal brood food and growth")
 				_detail_line(box, 177, "Trait emerges with this brood")
+				_detail_line(box, 207, "Existing workers unchanged")
 			elif _status.adaptation_repertoire != "":
 				_detail_line(box, 65, "Chosen: %s" % ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
 				_detail_line(box, 91, "Adapted workers: %d / %d" % [_status.adapted_workers, _status.workers_total])
 				_detail_line(box, 117, "Future brood inherits this trait")
 				_detail_line(box, 151, "Route effect follows adapted share")
 			else:
-				_detail_line(box, 65, "One choice for future brood")
+				_detail_line(box, 65, "One inherited trait for future brood")
 				_detail_line(box, 91, "Needs %.0f carb · %.0f protein · %.0f water" % [_status.adaptation_costs.carbohydrate, _status.adaptation_costs.protein, _status.adaptation_costs.water])
 				_detail_line(box, 117, "%d nurses · %d brood · normal growth" % [_status.adaptation_nurses, _status.brood_batch_count])
 				_detail_line(box, 151, "Lean: 30% less travel energy")
@@ -292,8 +295,10 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 218, "20% more travel energy")
 				for trait_id: String in ["lean", "load"]:
 					var rect: Rect2 = _adaptation_rect(trait_id)
-					draw_rect(rect, Color("40394a"))
-					_label(rect.position + Vector2(130, 29), "CHOOSE LEAN" if trait_id == "lean" else "CHOOSE LOAD", Color("e3dbe7"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+					draw_rect(rect, Color("28212f"))
+					draw_rect(rect, Color("a28aaf"), false, 1.5)
+					draw_arc(rect.position + Vector2(22, 22), 7.0, 0.0, TAU, 20, Color("bba6c8"), 1.5, true)
+					_label(rect.position + Vector2(42, 29), "START LEAN BROOD TRIAL" if trait_id == "lean" else "START LOAD BROOD TRIAL", Color("e3dbe7"), 13)
 
 
 func _detail_line(box: Rect2, y: float, value: String) -> void:
