@@ -45,8 +45,12 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 		restored[pile.id] = pile
 	if not restored.has("home") or restored.home.position != home_position:
 		return false
-	# This slice has no worker-loss mechanic; reported emergences must exist in the ledger.
-	if restored.home.workers_total < INITIAL_HOME_WORKERS + restored.home.brood_matured_total:
+	# Living workers plus recorded losses must account for the founding population and births.
+	if restored.home.brood_matured_total > WorkerLedger.MAX_COUNT - INITIAL_HOME_WORKERS:
+		return false
+	var required: int = INITIAL_HOME_WORKERS + restored.home.brood_matured_total
+	var losses: int = restored.home.workers.lost_total
+	if losses < required and restored.home.workers_total < required - losses:
 		return false
 	for pile: PileState in restored.values():
 		for commitment_id: String in pile.workers.to_dict().commitments:

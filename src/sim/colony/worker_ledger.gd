@@ -8,9 +8,12 @@ var total: int:
 	get: return _total
 var available: int:
 	get: return _available
+var lost_total: int:
+	get: return _lost_total
 var last_error: String = ""
 var _total: int = 0
 var _available: int = 0
+var _lost_total: int = 0
 var _commitments: Dictionary = {}
 var _population_reason: String = ""
 
@@ -74,8 +77,11 @@ func remove_living_workers(pool: String, amount: Variant, reason: String) -> boo
 	var value: int = int(amount)
 	if count(pool) < value:
 		return _reject("Cannot remove more workers than the pool contains")
+	if value > MAX_COUNT - _lost_total:
+		return _reject("Loss count exceeds exact snapshot range")
 	if value > 0:
 		_total -= value
+		_lost_total += value
 		_set_count(pool, count(pool) - value)
 		_population_reason = reason
 	return _success()
@@ -83,7 +89,7 @@ func remove_living_workers(pool: String, amount: Variant, reason: String) -> boo
 
 func invariant_holds() -> bool:
 	var sum: int = _available
-	if not valid_count(_total) or not valid_count(_available):
+	if not valid_count(_total) or not valid_count(_available) or not valid_count(_lost_total):
 		return false
 	for entry: Dictionary in _commitments.values():
 		if not valid_count(entry.count) or int(entry.count) > MAX_COUNT - sum:
@@ -93,13 +99,16 @@ func invariant_holds() -> bool:
 
 
 func to_dict() -> Dictionary:
-	return {"total": _total, "available": _available,
+	return {"total": _total, "available": _available, "lost_total": _lost_total,
 		"commitments": _commitments.duplicate(true), "population_reason": _population_reason}
 
 
 func restore(data: Dictionary) -> bool:
 	if not data.has_all(["total", "available", "commitments", "population_reason"]) or not valid_count(data.total) or not valid_count(data.available) or not data.commitments is Dictionary or not data.population_reason is String:
 		return _reject("Malformed ledger snapshot")
+	var losses: Variant = data.get("lost_total", 0)
+	if not valid_count(losses):
+		return _reject("Invalid cumulative loss count")
 	var entries: Dictionary = {}
 	var sum: int = int(data.available)
 	for id: Variant in data.commitments:
@@ -116,6 +125,7 @@ func restore(data: Dictionary) -> bool:
 		return _reject("Worker conservation failed")
 	_total = int(data.total)
 	_available = int(data.available)
+	_lost_total = int(losses)
 	_commitments = entries
 	_population_reason = data.population_reason
 	return _success()

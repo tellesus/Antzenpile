@@ -92,7 +92,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 			fraction = (cohort.energy_multiplier - 1.0) / 0.2
 		elif not is_equal_approx(cohort.energy_multiplier, 1.0) or not is_equal_approx(cohort.carry_multiplier, 1.0):
 			return false
-		if fraction < -0.00002 or fraction > pile.adaptation_fraction() + 0.00002 or absf(cohort.carry_multiplier - AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction)) > 0.00002:
+		# A journey keeps its departure phenotype even if adapted adults die meanwhile.
+		if fraction < -0.00002 or fraction > 1.0 + 0.00002 or absf(cohort.carry_multiplier - AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction)) > 0.00002:
 			return false
 		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end)) * cohort.energy_multiplier
 		if cohort.unpaid_energy_cost > maximum_energy_cost + 0.00001 or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):

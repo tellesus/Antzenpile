@@ -109,6 +109,8 @@ Card 044 projects the authored producer identity only when `known:aphid_01` exis
 
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
+Card 045 prepares mortality without adding a threat. WorkerLedger owns cumulative removals and PileState exposes an atomic loss API with an explicit adapted subset. A commitment owner must reconcile its own route/cohort/job counts in the same event; the population API cannot edit another system's state. Restore accounts for losses rather than assuming all founding/emerged adults survive. Journey phenotype stays captured at departure while live adaptation share may fall.
+
 ## Planned layout
 
 Create directories only when useful; this is a plan, not existing code.

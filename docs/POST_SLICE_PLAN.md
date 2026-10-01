@@ -12,6 +12,8 @@ Keep the next two to four cards executable against the code that exists; leave l
 
 The original 20–30 minute session target and broad resource balance stay tabled. Player feedback can reorder the next cards when it exposes a concrete failure; otherwise continue through the current feature without routine approval pauses.
 
+[045 — mortality accounting](tasks/045_worker_mortality_accounting.md) is complete as a prerequisite: loss-aware population/adaptation/save contracts now pass without adding deaths to live play. [046 — first predator interaction](tasks/046_first_predator_interaction.md) is the next card to expand against that API.
+
 ## What the original design clarifies
 
 GDD Part 3 §§20–28 and 66–68 give carbohydrate a role in adult energy and travel, protein in larvae and growth, and water in hydration and brood conditions. Long, difficult routes can consume enough energy to make a weak source a poor investment. It calls for aggregate energy sufficiency, not hunger meters for individual ants. Parts 3 §§37–49 and 62–64 describe chambers as functional organs: Nursery capacity and care, Food Exchange throughput, and Storage buffering. Growth pressure should emerge from those constraints rather than a single population cap. Part 6 §§22–29 ties resource renewal and temporary abundance to physical producers and schedules. Part 5 makes adaptation compete for real brood, protein, nurses and time rather than a research currency.

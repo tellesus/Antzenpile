@@ -16,6 +16,7 @@ var brood_cohorts: Array[BroodCohort] = []
 var brood_matured_total: int = 0
 var adaptation_repertoire: String = ""
 var adapted_workers_total: int = 0
+var adapted_workers_lost: int = 0
 var nursery_state: String = "primitive"
 var nursery_progress_seconds: float = 0.0
 var food_exchange_state: String = "primitive"
@@ -34,6 +35,7 @@ func to_dict() -> Dictionary:
 		"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
 		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
+		"adapted_workers_lost": adapted_workers_lost,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"food_exchange_state": food_exchange_state,
 		"food_exchange_progress_seconds": food_exchange_progress_seconds}
@@ -64,6 +66,19 @@ func trial_cohort() -> BroodCohort:
 
 func adaptation_fraction() -> float:
 	return float(adapted_workers_total) / workers_total if workers_total > 0 else 0.0
+
+
+func lose_workers(pool: String, amount: Variant, adapted_amount: Variant, reason: String) -> bool:
+	# The commitment owner reconciles its own travelers/jobs in this same event.
+	if not Ledger.valid_count(amount) or not Ledger.valid_count(adapted_amount) or adapted_amount > amount:
+		return false
+	if adapted_amount > adapted_workers_total or amount - adapted_amount > workers_total - adapted_workers_total or adapted_amount > Ledger.MAX_COUNT - adapted_workers_lost:
+		return false
+	if not workers.remove_living_workers(pool, amount, reason):
+		return false
+	adapted_workers_total -= int(adapted_amount)
+	adapted_workers_lost += int(adapted_amount)
+	return true
 
 
 func nursery_max_care_capacity() -> int:
@@ -143,11 +158,13 @@ func restore(data: Dictionary) -> bool:
 		return false
 	var repertoire: Variant = data.get("adaptation_repertoire", "")
 	var adapted: Variant = data.get("adapted_workers_total", 0)
-	if not repertoire is String or not (repertoire == "" or AdaptationRules.valid_trait(repertoire)) or not Ledger.valid_count(adapted) or adapted > emerged or adapted > restored.total:
+	var adapted_lost: Variant = data.get("adapted_workers_lost", 0)
+	if not repertoire is String or not (repertoire == "" or AdaptationRules.valid_trait(repertoire)) or not Ledger.valid_count(adapted) or not Ledger.valid_count(adapted_lost) or adapted > restored.total or adapted_lost > restored.lost_total or adapted > emerged or adapted_lost > emerged - adapted:
 		return false
-	if int(adapted) % BROOD_CONFIG.starting_count != 0:
+	var lifetime_adapted: int = int(adapted) + int(adapted_lost)
+	if lifetime_adapted % BROOD_CONFIG.starting_count != 0:
 		return false
-	if (repertoire == "") != (adapted == 0):
+	if (repertoire == "") != (lifetime_adapted == 0):
 		return false
 	var trials: int = 0
 	for cohort: BroodCohort in restored_brood:
@@ -189,6 +206,7 @@ func restore(data: Dictionary) -> bool:
 	brood_matured_total = int(data.brood_matured_total)
 	adaptation_repertoire = repertoire
 	adapted_workers_total = int(adapted)
+	adapted_workers_lost = int(adapted_lost)
 	nursery_state = restored_nursery_state
 	nursery_progress_seconds = float(restored_nursery_progress)
 	food_exchange_state = data.food_exchange_state
