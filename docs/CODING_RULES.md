@@ -2,7 +2,7 @@
 
 ## Scope and style
 
-- Implement one task card in a small logical commit. Avoid unrelated cleanup and unused future-system folders/classes. Expand roadmap cards against actual code before implementation.
+- Implement one bounded task card in a small logical commit. A card should usually end in a player-visible behavior with its simulation, presentation, and evidence together; split it when the pieces need separate verification or a useful independent handoff. Avoid unrelated cleanup and unused future-system folders/classes. Expand roadmap cards against actual code before implementation.
 - Prefer typed GDScript, explicit fields and ownership, short focused functions, and descriptive names. Use snake_case files/methods/fields and PascalCase class names. Comments explain invariants and non-obvious choices.
 - Data and balance live in authored definitions/configuration. Keep provisional values visibly tunable. Favor simple, inspectable algorithms over speculative optimization or framework building.
 - Do not introduce plugins, addons, or external libraries unless the task explicitly authorizes them; otherwise obtain approval. Keep the prototype nearly dependency-free. No engine upgrades as incidental cleanup.
@@ -38,8 +38,8 @@ See README for verified Windows setup. Tests should exercise behavior and invari
 | Save/load | Continued state equals saved/reloaded continuation |
 | Presentation | No truth leaks; bearing wrap; mouse/touch shared paths; debug isolation |
 
-Run relevant headless tests plus the full small suite when feasible. Manually verify visual/input/audio behavior where the card requires it. A headless pass does not prove renderer performance, touch usability, or music synchronization. Record platform and engine version for performance evidence; do not invent device budgets or claim Android validation from a desktop-only run.
+Run focused checks during implementation and the full headless suite once when code is final; at roughly four seconds today, that final suite is a cheap safety gate, not an optimization target. Repeat it when a subsequent fix can affect simulation or shared contracts. Run the editor import when adding or changing Godot resources, Main smoke for runtime/scene changes, and a graphical/manual probe for affected UI, art, input or audio. Do not routinely repeat all three for documentation-only changes or after an unchanged passing result. A headless pass does not prove renderer performance, touch usability, or music synchronization. Record platform and engine version for performance evidence; do not invent device budgets or claim Android validation from a desktop-only run.
 
 ## Handoff
 
-Record status, changed files, commands/checks and results, known limitations, and next bounded action in the task card. Update contracts/decisions when implementation resolves provisional details. Report a blocker precisely; do not substitute a different design silently. Keep meaningful gameplay history separate from switchable development logs.
+Record status, changed-file groups, checks/results, known limitations, and the next bounded action in the task card. Update only contracts/decisions actually changed; keep README as a milestone overview rather than duplicating every card's history. Make local commits per card and publish related commits as a group at a feature milestone or session end; publishing must be complete before a final handoff. Report progress to the player at milestones and blockers without pausing for routine approval. Keep meaningful gameplay history separate from switchable development logs.

@@ -4,18 +4,18 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-Tasks 001–033, 035, 037–040, 042–044 are implemented; card 041 records a source-recovery audit, card 036 has an automated review and player feedback, while 034 is deferred: Godot shell, fixed clock, isolated seeded runs, authored hidden world, conserved worker ledger, development-only truth view, up to eight individual scouts that search past their initial range for new sources, plus occasional bounded trail-side worker detours, nearby chemical sensing with progressive localization, private observations delivered on return, and colony Known Nodes with deterministic report merging and aging confidence. PerceivedSignals derive bearing, estimated distance, strength and qualitative confidence from colony memory. OUTWARD supports rotating sensory traces, scouting, time controls and invested worker trails. Successful returns reinforce short-lived pheromone and slower route familiarity. The Primitive Nursery supports eight brood and care slots; a resource-and-labor development project doubles both capacities, allowing two aggregate cohorts. Each aggregate brood cohort consumes food and can mature into eight living workers through the ledger; after emergence, the player can begin another cycle. INWARD shows Queen, Nursery, Food Exchange, Entrance and Adaptation as an abstract functional network, with the colony's on-hand carbohydrate, protein and water visible across selections. One Adaptation trial spends food, Nursery space and two nurses to choose leaner or stronger carrying workers; the trait enters the workforce only as brood emerges. Once trails bring sufficient food home, the Primitive Food Exchange can be developed with committed workers; completion makes larval food use 25% more efficient. An original synchronized placeholder music layer fades in on completion. Once exposed and sheltered trails both carry resources, recurring rain fronts wash out exposed chemistry while familiarity survives and each front steadily adds three water units to the home store. The sheltered carbohydrate source renews on a hidden periodic nectar schedule, and a temporary picnic crumb spill supplies protein only during authored episodes. Returned scout and forager evidence can suggest uncertain recurrence, and a selected trace can send a scout to investigate its remembered location. Aggregate trail journeys now spend carbohydrate according to workers, distance and terrain; known carbohydrate sources can replenish an empty pile. One local save slot resumes the full run, including work in flight. The documentation distills **GDD v0.2, Parts 1–8 and the Part 7A visual lock** from the Ant Game Brainstorm conversation.
+The first playable colony slice is implemented: scouts return uncertain evidence; the colony invests aggregate workers in trails, gathers resources, raises brood, develops functional chambers, and responds to rain. Later cards added repeat brood, a first Adaptation Web choice, recurring exterior resources, trail-side discovery, and a honeydew mutualism with player-controlled protection. Hidden reality, colony knowledge, and normal presentation remain separate. See the [task cards](docs/tasks/) for individual completion evidence.
 
-The task-022 integration baseline reaches the original arc in six simulated minutes. See the [slice evaluation](docs/SLICE_EVALUATION.md) for historical Windows performance and pacing measurements. Session-length evaluation is tabled until more systems exist. Playtest follow-ups 023–026 include a longer second-brood integration run, and tasks 027–028 begin exterior resource ecology. Food Exchange remains available early as a player project. The [source-recovery audit](docs/tasks/041_source_recovery_audit.md) found fast depletion under heavy labor but conditional recovery rather than a proven lock. [Card 042](docs/tasks/042_rain_fed_water_source.md) lets rain refill the exterior water source for ordinary Recheck; broad economy balance remains deferred. [Card 043](docs/tasks/043_honeydew_mutualism_simulation.md) adds a discoverable honeydew producer, worker-supported protection and contextual OUTWARD controls.
+Current development follows the [rolling post-slice roadmap](docs/POST_SLICE_PLAN.md). The original session-length target and broad resource balance are tabled until more systems are playable. The [first-slice evaluation](docs/SLICE_EVALUATION.md) and [post-slice evaluation](docs/POST_SLICE_EVALUATION.md) preserve earlier measurements and player feedback.
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
 ## Start here
 
-1. Read [AGENTS.md](AGENTS.md), the current task card, [architecture](docs/ARCHITECTURE.md), and [coding rules](docs/CODING_RULES.md).
+1. Read [AGENTS.md](AGENTS.md), the current task card, and relevant sections of the [architecture](docs/ARCHITECTURE.md) and [coding rules](docs/CODING_RULES.md).
 2. Consult the [decision register](docs/DECISIONS.md) for locked constraints and explicitly provisional defaults.
 3. Implement one task at a time; task cards record status and verification evidence.
-4. Review the working skeleton after [006: debug world view](docs/tasks/006_debug_world_view.md), before expanding the scouting cards.
+4. Use the [rolling roadmap](docs/POST_SLICE_PLAN.md) for the next feature; completed cards are historical records.
 
 | Document | Purpose |
 | --- | --- |
@@ -29,7 +29,7 @@ The task-022 integration baseline reaches the original arc in six simulated minu
 | [Task cards](docs/tasks/) | 001–033, 035, 037–040, 042–044 implemented; 034 deferred; 036 reviewed; 041 source-recovery audit complete |
 | [Slice evaluation](docs/SLICE_EVALUATION.md) | Measured arc, Windows workload and design questions |
 | [Post-slice evaluation](docs/POST_SLICE_EVALUATION.md) | Combined run, Windows visual/workload review, and remaining playtest questions |
-| [Post-slice plan](docs/POST_SLICE_PLAN.md) | Player feedback and resource-access follow-up; balance and session pacing tabled |
+| [Post-slice plan](docs/POST_SLICE_PLAN.md) | Current rolling roadmap and completed post-slice history |
 
 ## Running and testing
 

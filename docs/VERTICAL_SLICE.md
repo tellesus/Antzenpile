@@ -1,5 +1,7 @@
 # First vertical slice
 
+This is the historical scope and acceptance record for tasks 001–026. Its exclusions below describe that first slice, not current prohibitions; later completed cards have added adaptation and a honeydew mutualist. Use the [current rolling roadmap](POST_SLICE_PLAN.md) for new work.
+
 ## Question and arc
 
 **Is interpreting and shaping a living ant trail network interesting enough to carry the game?** The original GDD proposed an approximately **20–30 minute** developmental arc, not the full game. Session-length evaluation is now tabled until more systems exist; it is not an acceptance criterion for the next cards.
@@ -71,4 +73,4 @@ The player chose to keep Food Exchange available early as a useful project. Task
 
 The original slice evaluation and duration target above are historical. After tasks 027–028, the player tabled session-length judgment until more of Part 3's metabolism and chamber systems and Part 6's ecology exist. The [post-slice plan](POST_SLICE_PLAN.md) now guides the next bounded cards without a timing gate.
 
-The current backyard has a fifth, initially inactive picnic protein node in addition to the four original slice nodes, and later rain fronts recur. The one-front arc above remains the historical first-slice acceptance test. See the [post-slice systems evaluation](POST_SLICE_EVALUATION.md) for the longer combined run and present playtest limits.
+The backyard has since gained picnic protein and a honeydew source in addition to the four original slice nodes, and later rain fronts recur. The one-front arc above remains the historical first-slice acceptance test. See the [post-slice systems evaluation](POST_SLICE_EVALUATION.md) and [current plan](POST_SLICE_PLAN.md) for later work.

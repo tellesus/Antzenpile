@@ -2,6 +2,16 @@
 
 Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–044 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
 
+## Current rolling roadmap
+
+Keep the next two to four cards executable against the code that exists; leave later systems as milestones until their dependencies are clear. A feature is ready for playtest when its simulation, knowledge boundary, player response, and relevant visual/audio cue form one coherent interaction. Split those into separate cards only when each card leaves a useful, testable handoff. Preserve one local commit per bounded card; publish related commits and give a player-facing report at the feature milestone.
+
+1. **First predator interaction (GDD Part 4 §§57–63, 144):** specify worker-loss accounting, a stationary saturated threat, returned mortality evidence, and a meaningful way to avoid the risky route. Implement the headless contract and player response in bounded cards. Do not turn this into broad combat, individual worker AI, or an omniscient danger overlay.
+2. **Early visual-quality proof (Part 7A):** once mutualism and predation both produce distinct evidence, develop the sensory art language deliberately: organic signal clouds, trail animation, capped representative ants, responsive context and restrained sound. Compare the standard and compact layouts with bloom disabled; profile Compatibility rendering and preserve touch-sized controls. This is a graphics milestone, not permission to delay all visuals until the game's end or to replace the panorama with a map.
+3. **Next ecology relationships:** use the tested discovery/evidence/response pattern for one rival and one deceptive guest. Scope each against actual code, then review the combined ecology before adding more species, seasons, satellites or replay.
+
+The original 20–30 minute session target and broad resource balance stay tabled. Player feedback can reorder the next cards when it exposes a concrete failure; otherwise continue through the current feature without routine approval pauses.
+
 ## What the original design clarifies
 
 GDD Part 3 §§20–28 and 66–68 give carbohydrate a role in adult energy and travel, protein in larvae and growth, and water in hydration and brood conditions. Long, difficult routes can consume enough energy to make a weak source a poor investment. It calls for aggregate energy sufficiency, not hunger meters for individual ants. Parts 3 §§37–49 and 62–64 describe chambers as functional organs: Nursery capacity and care, Food Exchange throughput, and Storage buffering. Growth pressure should emerge from those constraints rather than a single population cap. Part 6 §§22–29 ties resource renewal and temporary abundance to physical producers and schedules. Part 5 makes adaptation compete for real brood, protein, nurses and time rather than a research currency.
@@ -36,6 +46,6 @@ The player finds four simultaneous scouts restrictive, asks for a visible deplet
 
 The [source-recovery audit](tasks/041_source_recovery_audit.md) reproduced quick depletion with high labor and delayed, conditional recovery, but not an irreversible lock. [Card 042](tasks/042_rain_fed_water_source.md) now lets rain refill the physical exterior water source, which a depleted route can Recheck through its existing returned-memory controls. Its command-driven test confirms recovery without revealing hidden source truth. [Cards 043–044](tasks/043_honeydew_mutualism_simulation.md) add the first honeydew producer, worker-supported tending and colony-evidence-based OUTWARD controls, as specified in original GDD Part 4 §§87–95 and 145. Evaluate these narrow additions in play before considering wider source quantities or collection rates.
 
-Ecological relationships, rivals, satellite piles, dispersal, human attention and reality replay follow only when their dependencies and player-facing purpose are specified. Do not scaffold them all at once.
+Further ecological relationships, satellites, dispersal, human attention and reality replay follow only when their dependencies and player-facing purpose are specified. Do not scaffold them all at once.
 
 Across every card, retain headless fixed-tick simulation, run-owned seeded state, aggregate workers except individual scouts, worker-ledger conservation, separate TrailRoute and TrailSegment, return-only knowledge, detached normal-view data, versioned saves, negative space and mobile-safe rendering.

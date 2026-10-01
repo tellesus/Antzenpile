@@ -4,10 +4,10 @@ Translate the design into code; do not invent major game systems.
 
 ## Begin each task
 
-- Read the assigned card, `docs/ARCHITECTURE.md`, `docs/CODING_RULES.md`, and relevant entries in `docs/DECISIONS.md`. Read `DATA_MODEL.md` for state changes and `UI_RULES.md` for presentation work.
+- Read the current card, `docs/CODING_RULES.md`, and the relevant sections of `docs/ARCHITECTURE.md` and `docs/DECISIONS.md`. Read the relevant `DATA_MODEL.md` and `UI_RULES.md` sections when state or presentation changes. Search for affected contracts; do not reread every completed card or the entire historical roadmap on each task.
 - Inspect the existing implementation and task dependencies. Work on one bounded task; do not implement later cards opportunistically.
-- Tasks 001–006 are executable specifications. Tasks 007–022 are roadmap cards to expand against the actual code before implementing. Review the skeleton after 006.
-- Consult README and task statuses for implemented scope. Do not claim future commands or tests exist until their task creates and verifies them.
+- Use the current section of `docs/POST_SLICE_PLAN.md` for order. Define a player-visible outcome and its verification before expanding a new card; split simulation and presentation only when each part has a useful independent handoff. Tasks 001–044 are historical records, including deferred 034.
+- Consult README for current scope. Do not claim future commands or tests exist until their task creates and verifies them.
 
 ## Preserve the design
 
@@ -21,7 +21,8 @@ Translate the design into code; do not invent major game systems.
 
 ## Finish each task
 
-- Run the card's relevant headless tests and manual checks. Report actual results, commands, and anything not run. Do not add dependencies or redesign systems to avoid a failing invariant.
-- Update the card with completion evidence, changed files, and a brief handoff. Keep the docs consistent with implemented contracts.
-- Use a small logical commit. Preserve unrelated work.
+- Run targeted checks while iterating, then the full headless suite once after the final code change. Run import for new/changed Godot resources, Main smoke for runtime or scene changes, and graphical/manual checks for affected presentation. Repeat a gate after a fix that could affect it; do not run every gate after each small edit. Record actual results and anything not run.
+- Update the card with concise completion evidence, changed-file groups, and a brief handoff. Update architecture/data/UI/decision docs only where a contract or decision changed; refresh README at a feature milestone, not for every card.
+- Use a small logical local commit per bounded card and preserve unrelated work. Publish related commits together after a feature milestone or at the end of the work session; keep their individual history.
 - Routine implementation choices may follow the documented defaults. If specifications conflict or a choice changes locked architecture/gameplay, isolate the conflict and ask for a design decision; continue independent work. Record accepted changes in `docs/DECISIONS.md`.
+- Keep working across cards without waiting for acknowledgement. Give the player a concise report at a feature milestone, a material change of direction, or a real blocker; ask for input only when the design sources cannot settle a consequential choice.
