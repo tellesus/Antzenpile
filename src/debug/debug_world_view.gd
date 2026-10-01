@@ -62,7 +62,7 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080c12"))
 	_label(Vector2(24, 34), "DEBUG: WORLD TRUTH", Color("ffd183"), 24)
 	var data: Dictionary = model.snapshot
-	_label(Vector2(24, 62), "Seed %s  |  time %.2fs  |  %sx  |  paused: %s  |  rain: %s / %.0fs" % [data.seed, data.clock.time, data.clock.scale, data.clock.paused, data.rain.phase, data.rain.elapsed_seconds])
+	_label(Vector2(24, 62), "Seed %s  |  time %.2fs  |  %sx  |  paused: %s  |  rain: %s / %.0fs  |  fronts: %d  |  next tick: %s" % [data.seed, data.clock.time, data.clock.scale, data.clock.paused, data.rain.phase, data.rain.elapsed_seconds, data.rain.fronts_completed, data.rain.next_start_tick])
 	_label(Vector2(24, 86), "F3 hide  |  select a marker  |  meters: east +x, south +y")
 	var carried: int = 0
 	for scout: Dictionary in data.scouts:

@@ -27,6 +27,7 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_food_exchange.gd"),
 	preload("res://tests/test_music.gd"),
 	preload("res://tests/test_rain.gd"),
+	preload("res://tests/test_recurring_rain.gd"),
 	preload("res://tests/test_ecology.gd"),
 	preload("res://tests/test_temporary_resource.gd"),
 	preload("res://tests/test_recurrence_evidence.gd"),

@@ -128,7 +128,7 @@ func restore(data: Dictionary) -> bool:
 	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world):
 		return false
 	var restored_rain := Rain.new()
-	if not data.rain is Dictionary or not restored_rain.restore(data.rain):
+	if not data.rain is Dictionary or not restored_rain.restore(data.rain, restored_clock.tick_count):
 		return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false

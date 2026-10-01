@@ -1,12 +1,12 @@
 # Post-slice development plan
 
-Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) after tasks 027–028. Cards 029–033 are complete; card 034 is deferred after its conditional review. Cards 035–036 remain proposed, not an approved balance pass. Expand one card against the current code before implementing it.
+Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) after tasks 027–028. Cards 029–033 and 035 are complete; card 034 is deferred after its conditional review. Card 036 remains proposed, not an approved balance pass. Expand one card against the current code before implementing it.
 
 ## What the original design clarifies
 
 GDD Part 3 §§20–28 and 66–68 give carbohydrate a role in adult energy and travel, protein in larvae and growth, and water in hydration and brood conditions. Long, difficult routes can consume enough energy to make a weak source a poor investment. It calls for aggregate energy sufficiency, not hunger meters for individual ants. Parts 3 §§37–49 and 62–64 describe chambers as functional organs: Nursery capacity and care, Food Exchange throughput, and Storage buffering. Growth pressure should emerge from those constraints rather than a single population cap. Part 6 §§22–29 ties resource renewal and temporary abundance to physical producers and schedules. Part 5 makes adaptation compete for real brood, protein, nurses and time rather than a research currency.
 
-The task-026 baseline had Food Exchange as its only developed chamber and free route travel, so carbohydrate and protein accumulated while water could stop brood. Cards 029–031 add route energy demand and a Nursery investment with a second supported cohort. Task 027 supplies one recurring nectar source, and task 028 lets workers recheck it. Rain remains one-shot. Evaluate the added choices before adjusting collection or brood rates.
+The task-026 baseline had Food Exchange as its only developed chamber and free route travel, so carbohydrate and protein accumulated while water could stop brood. Cards 029–031 add route energy demand and a Nursery investment with a second supported cohort. Task 027 supplies one recurring nectar source, and task 028 lets workers recheck it. Card 035 makes rain recur after the original first trigger. Evaluate the added choices before adjusting collection or brood rates.
 
 The original GDD discussed a 20–30 minute session, but that target is **tabled** at the player's request until the game has more of its intended systems. Do not use it as an acceptance criterion or tune simulated time to meet it in the cards below.
 

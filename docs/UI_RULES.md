@@ -49,6 +49,8 @@ Task 020 shows rain in OUTWARD as a brief semantic status label, sparse thin scr
 
 Task 024 lets the existing selected-context resource summaries show water gained during rain. OUTWARD retains its restrained rain status; INWARD Food Exchange shows the updated store. Neither view gains weather truth or a new collection panel.
 
+Task 035 repeats that same restrained OUTWARD rain status for later fronts. The visual interference remains sparse, and a later washout may prompt the player to adjust an exposed trail's workers. No normal view exposes a front count, next start tick or forecast; F3 truth may show those for diagnosis.
+
 Task 028 gives a selected depleted route a touch-sized **RECHECK** action beside Cancel once all travelers have returned. It asks workers to test the remembered source; the label does not promise renewal or show a schedule. A still-empty return reports unavailability again. The action shares the existing mouse/touch context path and introduces no map or live resource quantity.
 
 Task 029 lets a selected active route say **Waiting for carbohydrate** after a departure fails for lack of energy. This is an observed route condition; the context never displays exact hidden terrain cost, pending cargo or source quantity. The existing home store remains visible. A carbohydrate route can recover from an empty store through a cargo-paid trip, so it does not show this stall.

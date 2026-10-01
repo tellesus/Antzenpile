@@ -15,7 +15,12 @@ func _init(run_state: RunState) -> void:
 func tick(delta: float) -> void:
 	var state: RainState = _run.rain
 	if state.phase == "finished":
-		return
+		if _run.clock.tick_count < state.next_start_tick:
+			return
+		state.phase = "raining"
+		state.elapsed_seconds = 0.0
+		state.next_start_tick = 0
+		rain_started.emit()
 	if state.phase == "waiting":
 		var sheltered: bool = false
 		var exposed: bool = false
@@ -39,3 +44,5 @@ func tick(delta: float) -> void:
 	state.elapsed_seconds = next_elapsed
 	if state.elapsed_seconds >= CONFIG.duration_seconds:
 		state.phase = "finished"
+		state.fronts_completed += 1
+		state.next_start_tick = _run.clock.tick_count + CONFIG.dry_interval_ticks
