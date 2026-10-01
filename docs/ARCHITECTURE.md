@@ -101,6 +101,8 @@ Task 038 lets one outbound aggregate TransitCohort occasionally pause while one 
 
 Task 039 adds one AdaptationSystem command that starts an ordinary eight-ant trial brood with upfront stores and a two-nurse ledger commitment. BroodSystem alone matures it; on emergence it releases nurses, records the chosen repertoire, and counts adapted living workers. Later brood inherits the repertoire and contributes to that count only on emergence. TrailSystem captures energy/carry multipliers from the expressed aggregate workforce share when a cohort departs; TrailNetwork validates those saved multipliers without assigning genomes to individual workers. INWARD adds one abstract Adaptation node and receives only detached pile facts and a semantic choice callback. Optional fields preserve older version-5 saves.
 
+Task 042 extends RainSystem's authored fixed-tick effect to one backyard exterior water node. Its physical quantity/active status remain in WorldState and are saved normally; rain's phase/elapsed time supplies continuation without a second schedule. Source refill never writes KnowledgeBase or automatically reopens a depleted route. A normal returning scout or rechecked cohort is still the only path from changed reality to colony knowledge and presentation.
+
 Headless simulations must require no cameras, HUD, particles, ant graphics, or music. Debug inspection can compare all pipeline stages but must never feed truth back into player presentation.
 
 ## Planned layout

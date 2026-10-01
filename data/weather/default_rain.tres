@@ -6,6 +6,9 @@
 script = ExtResource("rain")
 duration_seconds = 60.0
 water_per_second = 0.05
+exterior_water_source_id = "water_01"
+exterior_water_per_second = 0.4
+exterior_water_capacity = 100.0
 dry_interval_ticks = 2400
 exposed_chemical_half_life_seconds = 12.0
 minimum_successful_workers = 5

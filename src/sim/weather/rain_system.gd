@@ -41,8 +41,21 @@ func tick(delta: float) -> void:
 	var raining_seconds: float = next_elapsed - state.elapsed_seconds
 	for pile: PileState in _run.colony.piles.values():
 		assert(pile.deposit_resource("water", CONFIG.water_per_second * raining_seconds))
+	_refill_exterior_water(raining_seconds)
 	state.elapsed_seconds = next_elapsed
 	if state.elapsed_seconds >= CONFIG.duration_seconds:
 		state.phase = "finished"
 		state.fronts_completed += 1
 		state.next_start_tick = _run.clock.tick_count + CONFIG.dry_interval_ticks
+
+
+func _refill_exterior_water(raining_seconds: float) -> void:
+	if _run.scenario_id != "backyard_slice" or not _run.world.nodes.has(CONFIG.exterior_water_source_id):
+		return
+	var source: WorldNodeState = _run.world.nodes[CONFIG.exterior_water_source_id]
+	assert(source.definition_id == "water")
+	var added: float = minf(CONFIG.exterior_water_per_second * raining_seconds, maxf(0.0, CONFIG.exterior_water_capacity - source.quantity))
+	if added <= 0.0:
+		return
+	source.quantity = minf(CONFIG.exterior_water_capacity, snappedf(source.quantity + added, 0.00001))
+	source.active = true
