@@ -52,6 +52,7 @@ func _ready() -> void:
 		inward.nursery_develop_command = start_nursery_development
 		inward.brood_command = start_brood
 		inward.guest_rejection_command = set_guest_rejection
+		inward.honeydew_command = set_honeydew_protection
 		inward.adaptation_command = start_adaptation
 		inward.input_blocked = debug_is_open
 		inward.save_command = quick_save
@@ -128,20 +129,23 @@ func outward_status(pile_id: String) -> Dictionary:
 	var temporal_hints: Dictionary = {}
 	for known_id: String in simulation.run.knowledge.nodes:
 		temporal_hints[known_id] = simulation.run.knowledge.temporal_hint(known_id)
-	var honeydew: Dictionary = {}
-	var producer_knowledge_id: String = "known:" + HONEYDEW_CONFIG.source_id
-	if pile_id == "home" and simulation.run.knowledge.nodes.has(producer_knowledge_id):
-		honeydew = {"knowledge_id": producer_knowledge_id,
-			"relationship": simulation.run.honeydew.relationship,
-			"protection_workers": simulation.run.honeydew.protection_workers,
-			"required_workers": HONEYDEW_CONFIG.protection_workers}
 	return {"available_workers": simulation.run.colony.piles[pile_id].workers_available,
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
-		"honeydew": honeydew}
+		"honeydew": honeydew_summary(pile_id)}
+
+
+func honeydew_summary(pile_id: String) -> Dictionary:
+	var producer_knowledge_id: String = "known:" + HONEYDEW_CONFIG.source_id
+	if pile_id == "home" and simulation.run.knowledge.nodes.has(producer_knowledge_id):
+		return {"knowledge_id": producer_knowledge_id,
+			"relationship": simulation.run.honeydew.relationship,
+			"protection_workers": simulation.run.honeydew.protection_workers,
+			"required_workers": HONEYDEW_CONFIG.protection_workers}
+	return {}
 
 
 func inward_status(pile_id: String) -> Dictionary:
@@ -161,6 +165,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"workers_total": expected_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
 		"brood_losses": pile.brood_lost_total, "guest": guest_summary(pile_id),
+		"honeydew": honeydew_summary(pile_id),
 		"adaptation_repertoire": pile.adaptation_repertoire,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
 		"adapted_workers": expected_adapted,
@@ -215,6 +220,7 @@ func quick_load() -> Dictionary:
 			_outward_view.selected_id = ""
 		if _inward_view != null:
 			_inward_view.selected_id = ""
+			_inward_view.web_selection = "foraging"
 		if _debug_view != null:
 			_debug_view.snapshot_provider = simulation.run.to_dict
 		if _audio_controller != null:
@@ -260,6 +266,11 @@ func start_adaptation(trait_id: String) -> Dictionary:
 func start_nursery_development() -> Dictionary:
 	var accepted: bool = simulation.start_nursery_development("home")
 	return {"accepted": accepted, "reason": simulation.nursery.last_error}
+
+
+func set_honeydew_protection(enabled: bool) -> Dictionary:
+	var knowledge_id: String = "known:" + HONEYDEW_CONFIG.source_id
+	return start_honeydew_tending(knowledge_id) if enabled else stop_honeydew_tending(knowledge_id)
 
 
 func start_honeydew_tending(knowledge_id: String) -> Dictionary:

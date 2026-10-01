@@ -3,6 +3,7 @@ extends Node2D
 ## Abstract functional network; consumes detached pile summaries only.
 
 const Art = preload("res://src/presentation/sensory_art.gd")
+const Web = preload("res://src/presentation/inward/adaptation_web.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
 var mode_command: Callable
@@ -13,10 +14,12 @@ var nursery_develop_command: Callable
 var brood_command: Callable
 var adaptation_command: Callable
 var guest_rejection_command: Callable
+var honeydew_command: Callable
 var input_blocked: Callable
 var save_command: Callable
 var load_command: Callable
 var selected_id: String = ""
+var web_selection: String = "foraging"
 var _animation_time: float = 0.0
 var _status: Dictionary = {}
 var _font: Font = ThemeDB.fallback_font
@@ -52,12 +55,22 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "adaptation" and _web_back_rect().has_point(at):
+		selected_id = ""
+		web_selection = "foraging"
+		queue_redraw()
+		return true
+	if selected_id == "adaptation" and web_selection == "honeydew" and _status.get("honeydew", {}).get("relationship", "unknown") in ["exploited", "tended"] and _honeydew_rect().has_point(at):
+		_run_command("honeydew")
+		return true
 	var guest: Dictionary = _status.get("guest", {})
 	if selected_id == "guest" and guest.get("reported_losses", 0) > 0 and guest.get("observation", "") != "purged" and _guest_rect().has_point(at):
 		_run_command("guest_rejection")
 		return true
-	if selected_id == "adaptation" and _can_choose_adaptation():
+	if selected_id == "adaptation" and web_selection != "honeydew" and _can_choose_adaptation():
 		for trait_id: String in ["lean", "load"]:
+			if web_selection in ["lean", "load"] and web_selection != trait_id:
+				continue
 			if _adaptation_rect(trait_id).has_point(at):
 				_run_command("adaptation_" + trait_id)
 				return true
@@ -74,9 +87,18 @@ func activate_at(at: Vector2) -> bool:
 		if _button_rect(command).has_point(at):
 			_run_command(command)
 			return true
+	if selected_id == "adaptation":
+		var leaf: String = Web.node_at(at, get_viewport_rect().size, _status)
+		if not leaf.is_empty():
+			web_selection = leaf
+			queue_redraw()
+			return true
+		return false
 	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty())
 	if not picked.is_empty():
 		selected_id = picked
+		if picked == "adaptation":
+			web_selection = "foraging"
 		queue_redraw()
 		return true
 	return false
@@ -84,6 +106,11 @@ func activate_at(at: Vector2) -> bool:
 
 func _run_command(command: String) -> void:
 	match command:
+		"honeydew":
+			if honeydew_command.is_valid():
+				var tending: bool = _status.get("honeydew", {}).get("relationship", "unknown") != "tended"
+				var result: Dictionary = honeydew_command.call(tending)
+				show_feedback(("Protection started" if tending else "Protection withdrawn") if result.get("accepted", false) else result.get("reason", "Relationship unavailable"))
 		"guest_rejection":
 			if guest_rejection_command.is_valid():
 				var enabled: bool = not _status.get("guest", {}).get("rejection_active", false)
@@ -181,6 +208,14 @@ func _guest_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
 
 
+func _web_back_rect() -> Rect2:
+	return Rect2(24, 116, 196, 44)
+
+
+func _honeydew_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
+
+
 func _can_choose_adaptation() -> bool:
 	return _status.get("adaptation_repertoire", "") == "" and _status.get("adaptation_trial", {}).is_empty()
 
@@ -192,6 +227,14 @@ func _can_lay_brood() -> bool:
 func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
+	if selected_id == "adaptation":
+		Web.draw_graph(self, size, _status, web_selection, _animation_time)
+		draw_rect(_web_back_rect(), Color("18252b"))
+		_label(_web_back_rect().position + Vector2(98, 29), "BACK TO COLONY", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+		_draw_hud(size)
+		_draw_context(size)
+		_draw_controls(size)
+		return
 	var centers: Dictionary = positions(size)
 	for pair: Array in [["queen", "nursery"], ["nursery", "food_exchange"], ["food_exchange", "entrance"], ["entrance", "queen"]]:
 		_draw_flow(centers[pair[0]], centers[pair[1]], pair[0] == "nursery" or pair[0] == "entrance")
@@ -259,8 +302,8 @@ func _draw_node(id: String, at: Vector2) -> void:
 
 
 func _draw_hud(size: Vector2) -> void:
-	_label(Vector2(24, 38), "INWARD  /  HOME", Color("dad7c8"), 22)
-	_label(Vector2(24, 63), "Tap a function to listen.", Color("82939c"), 13)
+	_label(Vector2(24, 38), "INWARD  /  ADAPTATION WEB" if selected_id == "adaptation" else "INWARD  /  HOME", Color("dad7c8"), 22)
+	_label(Vector2(24, 63), "Genes grow through brood; relationships through interaction." if selected_id == "adaptation" else "Tap a function to listen.", Color("82939c"), 13)
 	if not _status.is_empty():
 		var stores: Dictionary = _status.get("resources", {})
 		_label(Vector2(24, 96), "STORES   Carb %.1f   ·   Protein %.1f   ·   Water %.1f" % [stores.get("carbohydrate", 0.0), stores.get("protein", 0.0), stores.get("water", 0.0)], Color("a9b9bc"), 13)
@@ -277,6 +320,12 @@ func _draw_context(size: Vector2) -> void:
 	draw_rect(box, Color("17141f") if web else Color("111921"))
 	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), "Adaptation Web" if web else _title(selected_id), Color("decce8") if web else Color("d9d3be"), 20)
+	if web and web_selection == "honeydew":
+		_draw_relationship_context(box)
+		return
+	if web and web_selection in ["lean", "load"]:
+		_draw_genetic_context(box)
+		return
 	match selected_id:
 		"queen":
 			_detail_line(box, 65, "Queens: %d" % _status.queens)
@@ -380,6 +429,45 @@ func _draw_context(size: Vector2) -> void:
 					draw_rect(rect, Color("a28aaf"), false, 1.5)
 					draw_arc(rect.position + Vector2(22, 22), 7.0, 0.0, TAU, 20, Color("bba6c8"), 1.5, true)
 					_label(rect.position + Vector2(42, 29), "START LEAN BROOD TRIAL" if trait_id == "lean" else "START LOAD BROOD TRIAL", Color("e3dbe7"), 13)
+
+
+func _draw_genetic_context(box: Rect2) -> void:
+	_detail_line(box, 65, "Lean Foragers" if web_selection == "lean" else "Load Bearers")
+	_detail_line(box, 91, Web.trait_state(_status, web_selection))
+	_detail_line(box, 125, "30% less travel energy" if web_selection == "lean" else "30% more carrying")
+	_detail_line(box, 151, "15% less carrying" if web_selection == "lean" else "20% more travel energy")
+	if _can_choose_adaptation():
+		_detail_line(box, 185, "Needs %.0f carb · %.0f protein · %.0f water" % [_status.adaptation_costs.carbohydrate, _status.adaptation_costs.protein, _status.adaptation_costs.water])
+		_detail_line(box, 211, "%d nurses · %d brood slots" % [_status.adaptation_nurses, _status.brood_batch_count])
+		var rect: Rect2 = _adaptation_rect(web_selection)
+		draw_rect(rect, Color("28212f"))
+		draw_rect(rect, Color("a28aaf"), false, 1.5)
+		_label(rect.position + Vector2(130, 29), "START LEAN BROOD TRIAL" if web_selection == "lean" else "START LOAD BROOD TRIAL", Color("e3dbe7"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
+		_detail_line(box, 185, "Stage: " + str(_status.adaptation_trial.stage).capitalize())
+		_detail_line(box, 211, "Expresses only with surviving adults")
+	else:
+		var choice: String = _status.adaptation_repertoire if _status.adaptation_repertoire != "" else _status.adaptation_trial.get("adaptation_id", "")
+		_detail_line(box, 185, "Colony choice: " + ("Lean Foragers" if choice == "lean" else "Load Bearers"))
+		_detail_line(box, 211, "Choice waits for trial outcome" if not _status.adaptation_trial.is_empty() else "Inherited choice cannot be switched")
+
+
+func _draw_relationship_context(box: Rect2) -> void:
+	var relationship: Dictionary = _status.get("honeydew", {})
+	_detail_line(box, 65, "Honeydew relationship")
+	_detail_line(box, 91, "Ecological · learned by interaction")
+	var state: String = relationship.get("relationship", "unknown")
+	if state == "unknown":
+		_detail_line(box, 125, "Producer source observed")
+		_detail_line(box, 151, "Harvest it through an OUTWARD trail")
+		_detail_line(box, 185, "Protection follows a loaded return")
+	else:
+		_detail_line(box, 125, "Workers protect producers" if state == "tended" else "Honeydew successfully harvested")
+		_detail_line(box, 151, "%d workers committed" % relationship.protection_workers if state == "tended" else "Needs %d available workers" % relationship.required_workers)
+		_detail_line(box, 185, "Protection supports the producers")
+		_detail_line(box, 211, "No gene trial or research payment")
+		draw_rect(_honeydew_rect(), Color("35483c"))
+		_label(_honeydew_rect().position + Vector2(130, 29), "WITHDRAW PROTECTION" if state == "tended" else "PROTECT PRODUCERS", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _detail_line(box: Rect2, y: float, value: String) -> void:

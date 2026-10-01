@@ -1,6 +1,6 @@
 # 052 — Observed Adaptation Web
 
-Status: ready. Depends on 051. Sources: GDD Part 5 §§7–12, 63–66; Part 7 INWARD attention/context rules.
+Status: complete. Depends on 051. Sources: GDD Part 5 §§7–12, 63–66; Part 7 INWARD attention/context rules.
 
 ## Player outcome
 
@@ -17,3 +17,10 @@ Selecting Adaptation in INWARD focuses an abstract web: the existing Lean/Load g
 ## Verify
 
 Initial fork, selected leaf, pending trial, expressed choice, hidden/known/exploited/protected relationship, stale source memory, rejection feedback and detached data. Graphical 1280×720/900×600 checks with bloom disabled; appropriate final gates. No simulation or resource-rate changes under this card. Handoff is an actual web foundation for the next genetic-repertoire milestone.
+
+## Completion evidence
+
+- Focused organic graph within INWARD distinguishes inherited Lean/Load choice from the evidence-revealed Honeydew relationship. Selecting a leaf opens its actual context/actions; Back to Colony returns to the functional network. Existing brood costs/expression and six-worker protection validation remain authoritative.
+- 35 focused checks; final full suite 4446 checks, zero failures. Import/Main smoke have no script/resource failures, subject to host log/certificate/editor-settings restrictions. Ten graphical initial/selected/observed/protected/inherited contexts at 1280×720 and 900×600 inspected; labels, curves, focus marks and controls do not overlap. Drawing preserves the paused authoritative snapshot.
+- Changed groups: pure presentation graph and INWARD attention/context/input; shared detached Honeydew projection and semantic command wrapper; selection reset on load; tests/probe; milestone/contracts. Developed on a separate visual branch, then integrated after verification.
+- Handoff: the first inherited choice and ecological branch now form a usable web foundation. A second genetic axis requires a bounded multi-lineage expression/mortality/save contract before adding pressure-driven candidates; current single-choice limits remain explicit.
