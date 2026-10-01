@@ -40,6 +40,9 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 	for id: String in visible_nodes(status):
 		var ecological: bool = id == "honeydew"
 		var color: Color = Color("99b59c") if ecological else Color("bba6c8")
+		var state: String = trait_state(status, id) if id in ["lean", "load"] else ""
+		if state == "Alternative":
+			color = Color("776e80")
 		if id != "foraging":
 			if ecological:
 				view.draw_line(centers.foraging + Vector2(0, 84), centers[id] - Vector2(0, 36), Color(color, 0.24), 1.0, true)
@@ -57,6 +60,10 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 		var boundary: PackedVector2Array = Art.membrane(at, 28, phase * 0.18 + at.x * 0.01, 0.72 if ecological else 1.0)
 		view.draw_colored_polygon(boundary, Color(color, 0.07))
 		view.draw_polyline(boundary.slice(1, 27), Color(color, 0.48), 1.2, true)
+		if state.begins_with("Inherited"):
+			view.draw_circle(at, 18.0, Color(color, 0.15))
+		elif state == "Growing trial brood":
+			view.draw_arc(at, 33.0, -PI * 0.5, PI * 0.8, 24, Color(color, 0.72), 1.5, true)
 		if ecological:
 			for offset: int in [-1, 1]:
 				view.draw_arc(at + Vector2(offset * 7, 0), 7, 0.1, 4.6, 18, Color(color, 0.6), 1.0, true)

@@ -67,7 +67,7 @@ func activate_at(at: Vector2) -> bool:
 	if selected_id == "guest" and guest.get("reported_losses", 0) > 0 and guest.get("observation", "") != "purged" and _guest_rect().has_point(at):
 		_run_command("guest_rejection")
 		return true
-	if selected_id == "adaptation" and web_selection != "honeydew" and _can_choose_adaptation():
+	if selected_id == "adaptation" and web_selection in ["lean", "load"] and _can_choose_adaptation():
 		for trait_id: String in ["lean", "load"]:
 			if web_selection in ["lean", "load"] and web_selection != trait_id:
 				continue
@@ -200,8 +200,8 @@ func _nursery_develop_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 494.0, 260.0, 44.0)
 
 
-func _adaptation_rect(trait_id: String) -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0, 380.0 if trait_id == "lean" else 438.0, 260.0, 44.0)
+func _adaptation_rect(_trait_id: String) -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
 
 
 func _guest_rect() -> Rect2:
@@ -403,32 +403,21 @@ func _draw_context(size: Vector2) -> void:
 				draw_rect(_guest_rect(), Color("39323e"))
 				_label(_guest_rect().position + Vector2(130, 29), "STOP REJECTION" if guest.get("rejection_active", false) else "INCREASE REJECTION", Color("d9c9d7"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		"adaptation":
+			_detail_line(box, 65, "Colony repertoire · overview")
+			_detail_line(box, 91, "Select a trait to inspect its tradeoff")
+			_detail_line(box, 117, "Start its brood trial in this panel")
 			if not _status.adaptation_trial.is_empty():
-				_detail_line(box, 65, "%s trial" % ("Lean Foragers" if _status.adaptation_trial.adaptation_id == "lean" else "Load Bearers"))
-				_detail_line(box, 91, "Brood stage: %s" % _status.adaptation_trial.stage.capitalize())
-				_detail_line(box, 117, "%d nurses committed" % _status.adaptation_nurses)
-				_detail_line(box, 151, "Normal brood food and growth")
-				_detail_line(box, 177, "Trait emerges with this brood")
-				_detail_line(box, 207, "Existing workers unchanged")
+				_detail_line(box, 163, "%s trial" % ("Lean Foragers" if _status.adaptation_trial.adaptation_id == "lean" else "Load Bearers"))
+				_detail_line(box, 189, "Brood stage: %s" % _status.adaptation_trial.stage.capitalize())
+				_detail_line(box, 215, "Trait emerges with this brood")
 			elif _status.adaptation_repertoire != "":
-				_detail_line(box, 65, "Chosen: %s" % ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
-				_detail_line(box, 91, "Adapted workers: %d / %d" % [_status.adapted_workers, _status.workers_total])
-				_detail_line(box, 117, "Future brood inherits this trait")
-				_detail_line(box, 151, "Route effect follows adapted share")
+				_detail_line(box, 163, "Chosen: %s" % ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
+				_detail_line(box, 189, "Adapted workers: %d / %d" % [_status.adapted_workers, _status.workers_total])
+				_detail_line(box, 215, "Future brood inherits this trait")
 			else:
-				_detail_line(box, 65, "One inherited trait for future brood")
-				_detail_line(box, 91, "Needs %.0f carb · %.0f protein · %.0f water" % [_status.adaptation_costs.carbohydrate, _status.adaptation_costs.protein, _status.adaptation_costs.water])
-				_detail_line(box, 117, "%d nurses · %d brood · normal growth" % [_status.adaptation_nurses, _status.brood_batch_count])
-				_detail_line(box, 151, "Lean: 30% less travel energy")
-				_detail_line(box, 177, "15% less carrying")
-				_detail_line(box, 195, "Load: 30% more carrying")
-				_detail_line(box, 218, "20% more travel energy")
-				for trait_id: String in ["lean", "load"]:
-					var rect: Rect2 = _adaptation_rect(trait_id)
-					draw_rect(rect, Color("28212f"))
-					draw_rect(rect, Color("a28aaf"), false, 1.5)
-					draw_arc(rect.position + Vector2(22, 22), 7.0, 0.0, TAU, 20, Color("bba6c8"), 1.5, true)
-					_label(rect.position + Vector2(42, 29), "START LEAN BROOD TRIAL" if trait_id == "lean" else "START LOAD BROOD TRIAL", Color("e3dbe7"), 13)
+				_detail_line(box, 163, "One inherited trait for future brood")
+				_detail_line(box, 189, "Genes require food, nurses and brood")
+				_detail_line(box, 215, "Relationships grow through interaction")
 
 
 func _draw_genetic_context(box: Rect2) -> void:

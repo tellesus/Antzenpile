@@ -32,6 +32,8 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 | D24 | User playtest feedback after the first adaptation: depletion can make resources feel too quick to tap and difficult to find again, requiring a resource-access review. INWARD should show the colony's on-hand resource totals. Adaptation Web controls should be visibly separate from chamber development and name the brood trial or chamber project clearly. Do not treat this as authorization for an unmeasured balance sweep. |
 | D25 | Card 041 audit, 2026-10-01: high route labor quickly empties fixed water/protein nodes, but rain and episodic protein offer conditional recovery. No irreversible progression lock was demonstrated, so leave broad quantities/rates unchanged. A rain-fed exterior water source is the next narrow access candidate, subject to its own card and ordinary-command verification. |
 
+| D26 | Accepted playtest plan, 2026-10-01: Adaptation graph nodes inspect; trial purchase has one contextual location. Scout departure is finite; departure scent fades but remembered direction persists while awaiting return. Keep return-before-information: no live remote scout course/discovery. Returning witnesses may carry qualitative attack/contact evidence; unwitnessed losses remain unknown and journey danger is distinct from resource depletion. |
+
 ## Provisional defaults for executable tasks
 
 These are scaffolding choices to remove routine ambiguity, not additional locked game design.

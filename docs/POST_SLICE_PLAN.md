@@ -2,6 +2,10 @@
 
 Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–052 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
 
+## Accepted playtest fixes — current work
+
+Before the next genetic expansion, implement 053 Adaptation selection clarity, 054 finite scout departure and mission memory, then 055 returned loss evidence. These are accepted player feedback: graph selection with one contextual action; finite departure animation; fading departure scent with a remembered directional stub and simulated elapsed time; qualitative witness reports tied to journeys. Scout courses/discoveries remain private until information returns. Each card owns its verification and commit.
+
 ## Current rolling roadmap
 
 Keep the next two to four cards executable against the code that exists; leave later systems as milestones until their dependencies are clear. A feature is ready for playtest when its simulation, knowledge boundary, player response, and relevant visual/audio cue form one coherent interaction. Split those into separate cards only when each card leaves a useful, testable handoff. Preserve one local commit per bounded card; publish related commits and give a player-facing report at the feature milestone.

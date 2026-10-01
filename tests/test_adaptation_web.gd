@@ -27,6 +27,8 @@ func run(test: Object) -> bool:
 	view.adaptation_command = root.start_adaptation
 	view.honeydew_command = root.set_honeydew_protection
 	var before: Dictionary = root.simulation.run.to_dict()
+	for trait_id: String in ["lean", "load"]:
+		test.check(not view.activate_at(view._adaptation_rect(trait_id).get_center()) and root.simulation.run.to_dict() == before, "Overview cannot start either brood trial")
 	test.check(Web.visible_nodes(view._status) == ["foraging", "lean", "load"] and Web.node_at(Web.positions(Vector2(1280,720)).honeydew, Vector2(1280,720), view._status) == "", "Initial web shows genetic fork without a hidden ecological leaf")
 	var mouse := InputEventMouseButton.new()
 	mouse.button_index = MOUSE_BUTTON_LEFT
@@ -34,6 +36,7 @@ func run(test: Object) -> bool:
 	mouse.position = Web.positions(view.get_viewport_rect().size).lean
 	view._unhandled_input(mouse)
 	test.check(view.web_selection == "lean" and root.simulation.run.to_dict() == before, "Mouse selects a genetic leaf without buying or mutating gameplay")
+	test.check(view._adaptation_rect("lean") == view._adaptation_rect("load"), "Selected genetic choices share one consistent action location")
 	test.check(view.activate_at(view._adaptation_rect("lean").get_center()) and root.simulation.run.to_dict() == before and view._feedback.contains("space"), "Unavailable leaf action returns real Nursery rejection feedback")
 	root.simulation = known_fixture()
 	view._status = root.inward_status("home")

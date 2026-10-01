@@ -145,6 +145,9 @@ func _test_ui(test: Object) -> void:
 	test.check(not ui._status.has("world") and not ui._status.has("position") and ui._adaptation_rect("lean").size == Vector2(260, 44) and ui._adaptation_rect("load").size == Vector2(260, 44), "Adaptation UI receives detached colony facts and touch-sized choices")
 	var touch := InputEventScreenTouch.new()
 	touch.pressed = true
+	touch.position = AdaptationWeb.positions(ui.get_viewport_rect().size).load
+	ui._unhandled_input(touch)
+	test.check(ui.web_selection == "load" and pile.trial_cohort() == null, "Touch selects Load without purchasing brood")
 	touch.position = ui._adaptation_rect("load").get_center()
 	ui._unhandled_input(touch)
 	test.check(pile.trial_cohort() != null and pile.trial_cohort().adaptation_id == "load" and ui._feedback == "Adaptation brood started", "Touch choice starts a semantic trial without direct UI mutation")
