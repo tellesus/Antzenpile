@@ -2,7 +2,7 @@ class_name InwardView
 extends Node2D
 ## Abstract functional network; consumes detached pile summaries only.
 
-const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance"]
+const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
 var mode_command: Callable
 var pause_command: Callable
@@ -10,6 +10,7 @@ var speed_command: Callable
 var develop_command: Callable
 var nursery_develop_command: Callable
 var brood_command: Callable
+var adaptation_command: Callable
 var input_blocked: Callable
 var save_command: Callable
 var load_command: Callable
@@ -46,6 +47,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "adaptation" and _can_choose_adaptation():
+		for trait_id: String in ["lean", "load"]:
+			if _adaptation_rect(trait_id).has_point(at):
+				_run_command("adaptation_" + trait_id)
+				return true
 	if selected_id in ["queen", "nursery"] and _can_lay_brood() and _brood_rect().has_point(at):
 		_run_command("lay_brood")
 		return true
@@ -90,6 +96,11 @@ func _run_command(command: String) -> void:
 				var result: Dictionary = brood_command.call()
 				_feedback = "New brood started" if result.get("accepted", false) else result.get("reason", "Brood unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
+		"adaptation_lean", "adaptation_load":
+			if adaptation_command.is_valid():
+				var result: Dictionary = adaptation_command.call(command.trim_prefix("adaptation_"))
+				_feedback = "Adaptation brood started" if result.get("accepted", false) else result.get("reason", "Adaptation unavailable")
+				_feedback_until = Time.get_ticks_msec() + 3000
 		"save", "load":
 			var action: Callable = save_command if command == "save" else load_command
 			if action.is_valid():
@@ -108,7 +119,8 @@ static func positions(size: Vector2) -> Dictionary:
 	return {"queen": origin + Vector2(field_width * 0.28, field_height * 0.25),
 		"nursery": origin + Vector2(field_width * 0.72, field_height * 0.32),
 		"food_exchange": origin + Vector2(field_width * 0.72, field_height * 0.72),
-		"entrance": origin + Vector2(field_width * 0.28, field_height * 0.78)}
+		"entrance": origin + Vector2(field_width * 0.28, field_height * 0.78),
+		"adaptation": origin + Vector2(field_width * 0.5, field_height * 0.52)}
 
 
 static func node_at(at: Vector2, size: Vector2) -> String:
@@ -144,6 +156,14 @@ func _nursery_develop_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 494.0, 260.0, 44.0)
 
 
+func _adaptation_rect(trait_id: String) -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 380.0 if trait_id == "lean" else 438.0, 260.0, 44.0)
+
+
+func _can_choose_adaptation() -> bool:
+	return _status.get("adaptation_repertoire", "") == "" and _status.get("adaptation_trial", {}).is_empty()
+
+
 func _can_lay_brood() -> bool:
 	return _status.get("queens", 0) > 0 and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
 
@@ -154,6 +174,8 @@ func _draw() -> void:
 	var centers: Dictionary = positions(size)
 	for pair: Array in [["queen", "nursery"], ["nursery", "food_exchange"], ["food_exchange", "entrance"], ["entrance", "queen"]]:
 		draw_line(centers[pair[0]], centers[pair[1]], Color(0.33, 0.49, 0.49, 0.20), 1.0, true)
+	for id: String in ["queen", "nursery"]:
+		draw_line(centers[id], centers["adaptation"], Color(0.43, 0.40, 0.55, 0.20), 1.0, true)
 	for id: String in NODES:
 		_draw_node(id, centers[id])
 	_draw_hud(size)
@@ -162,7 +184,7 @@ func _draw() -> void:
 
 
 func _draw_node(id: String, at: Vector2) -> void:
-	var color: Color = Color("d5c4a1") if id == "queen" else Color("aebdb7") if id == "nursery" else Color("c7af86") if id == "food_exchange" else Color("8daeb3")
+	var color: Color = Color("d5c4a1") if id == "queen" else Color("aebdb7") if id == "nursery" else Color("c7af86") if id == "food_exchange" else Color("bba6c8") if id == "adaptation" else Color("8daeb3")
 	draw_circle(at, 32.0, Color(color.r, color.g, color.b, 0.035))
 	draw_arc(at, 25.0, -0.65, PI * 1.55, 36, Color(color.r, color.g, color.b, 0.55), 1.5, true)
 	draw_circle(at, 4.0, Color(color.r, color.g, color.b, 0.65))
@@ -183,7 +205,7 @@ func _draw_hud(size: Vector2) -> void:
 func _draw_context(size: Vector2) -> void:
 	if selected_id.is_empty() or _status.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 400 if selected_id == "nursery" else 284))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 400 if selected_id == "nursery" else 344 if selected_id == "adaptation" else 284))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), _title(selected_id), Color("d9d3be"), 20)
@@ -248,6 +270,30 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 65, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
 			_detail_line(box, 117, "Trail workers: %d" % _status.trail_workers)
+		"adaptation":
+			if not _status.adaptation_trial.is_empty():
+				_detail_line(box, 65, "Trial brood: %s" % _status.adaptation_trial.stage.capitalize())
+				_detail_line(box, 91, "%d nurses committed" % _status.adaptation_nurses)
+				_detail_line(box, 117, "Normal brood growth and food needs")
+				_detail_line(box, 151, "Existing workers remain unchanged")
+				_detail_line(box, 177, "Trait emerges with this brood")
+			elif _status.adaptation_repertoire != "":
+				_detail_line(box, 65, "Chosen: %s" % ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
+				_detail_line(box, 91, "Adapted workers: %d / %d" % [_status.adapted_workers, _status.workers_total])
+				_detail_line(box, 117, "Future brood inherits this trait")
+				_detail_line(box, 151, "Route effect follows adapted share")
+			else:
+				_detail_line(box, 65, "One choice for future brood")
+				_detail_line(box, 91, "Needs %.0f carb · %.0f protein · %.0f water" % [_status.adaptation_costs.carbohydrate, _status.adaptation_costs.protein, _status.adaptation_costs.water])
+				_detail_line(box, 117, "%d nurses · %d brood · normal growth" % [_status.adaptation_nurses, _status.brood_batch_count])
+				_detail_line(box, 151, "Lean: 30% less travel energy")
+				_detail_line(box, 177, "15% less carrying")
+				_detail_line(box, 195, "Load: 30% more carrying")
+				_detail_line(box, 218, "20% more travel energy")
+				for trait_id: String in ["lean", "load"]:
+					var rect: Rect2 = _adaptation_rect(trait_id)
+					draw_rect(rect, Color("40394a"))
+					_label(rect.position + Vector2(130, 29), "CHOOSE LEAN" if trait_id == "lean" else "CHOOSE LOAD", Color("e3dbe7"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _detail_line(box: Rect2, y: float, value: String) -> void:
@@ -281,6 +327,7 @@ static func _title(id: String) -> String:
 		"nursery": return "Nursery"
 		"food_exchange": return "Food Exchange"
 		"entrance": return "Entrance"
+		"adaptation": return "Adaptation"
 	return ""
 
 

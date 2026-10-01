@@ -84,13 +84,23 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 				return false
 		if cohort.detour_report != null and (cohort.detour_report.origin_pile != route.origin_pile or cohort.detour_report.source_node_id == knowledge.nodes[route.destination_knowledge_id].source_node_id):
 			return false
-		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end))
-		if cohort.unpaid_energy_cost > maximum_energy_cost or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):
+		var pile: PileState = colony.piles[route.origin_pile]
+		var fraction: float = 0.0
+		if pile.adaptation_repertoire == "lean":
+			fraction = (1.0 - cohort.energy_multiplier) / 0.3
+		elif pile.adaptation_repertoire == "load":
+			fraction = (cohort.energy_multiplier - 1.0) / 0.2
+		elif not is_equal_approx(cohort.energy_multiplier, 1.0) or not is_equal_approx(cohort.carry_multiplier, 1.0):
+			return false
+		if fraction < -0.00002 or fraction > pile.adaptation_fraction() + 0.00002 or absf(cohort.carry_multiplier - AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction)) > 0.00002:
+			return false
+		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end)) * cohort.energy_multiplier
+		if cohort.unpaid_energy_cost > maximum_energy_cost + 0.00001 or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):
 			return false
 		var source_id: String = knowledge.nodes[route.destination_knowledge_id].source_node_id
 		if not world.nodes.has(source_id):
 			return false
-		if cohort.payload > float(cohort.worker_count) * CONFIG.carry_per_worker or (not cohort.resource_id.is_empty() and cohort.resource_id != world.nodes[source_id].definition_id):
+		if cohort.payload > float(cohort.worker_count) * CONFIG.carry_per_worker * cohort.carry_multiplier + 0.00001 or (not cohort.resource_id.is_empty() and cohort.resource_id != world.nodes[source_id].definition_id):
 			return false
 		active_counts[route.id] = active_counts.get(route.id, 0) + cohort.worker_count
 		cohort_counts[route.id] = cohort_counts.get(route.id, 0) + 1

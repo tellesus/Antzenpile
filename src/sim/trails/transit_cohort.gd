@@ -14,6 +14,8 @@ var resource_id: String = ""
 var payload: float = 0.0
 var remaining_ticks: int = 1
 var unpaid_energy_cost: float = 0.0
+var energy_multiplier: float = 1.0
+var carry_multiplier: float = 1.0
 var detour_attempted: bool = false
 var detour: TrailDetour
 var detour_report: Observation
@@ -24,6 +26,7 @@ func to_dict() -> Dictionary:
 		"worker_count": worker_count, "resource_id": resource_id,
 		"payload": payload, "remaining_ticks": remaining_ticks,
 		"unpaid_energy_cost": unpaid_energy_cost,
+		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
 		"detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
 		"detour_report": detour_report.to_dict() if detour_report != null else null}
@@ -42,6 +45,10 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	if not typeof(data.payload) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.payload)) or data.payload < 0.0:
 		return false
 	if data.has("unpaid_energy_cost") and (not typeof(data.unpaid_energy_cost) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.unpaid_energy_cost)) or data.unpaid_energy_cost < 0.0):
+		return false
+	var energy: Variant = data.get("energy_multiplier", 1.0)
+	var carry: Variant = data.get("carry_multiplier", 1.0)
+	if not typeof(energy) in [TYPE_INT, TYPE_FLOAT] or not typeof(carry) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(energy)) or not is_finite(float(carry)) or energy < 0.7 or energy > 1.2 or carry < 0.85 or carry > 1.3:
 		return false
 	if typeof(data.get("detour_attempted", false)) != TYPE_BOOL:
 		return false
@@ -71,6 +78,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	payload = float(data.payload)
 	remaining_ticks = int(data.remaining_ticks)
 	unpaid_energy_cost = float(data.get("unpaid_energy_cost", 0.0))
+	energy_multiplier = float(energy)
+	carry_multiplier = float(carry)
 	detour_attempted = data.get("detour_attempted", false)
 	detour = restored_detour
 	detour_report = restored_report

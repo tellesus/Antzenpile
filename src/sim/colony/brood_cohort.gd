@@ -9,6 +9,8 @@ var count: int = CONFIG.starting_count
 var progress_seconds: float = 0.0
 var nutrition: float = 1.0
 var care: float = 1.0
+var adaptation_id: String = ""
+var adaptation_trial: bool = false
 
 
 static func next_id(matured_total: int, active_count: int = 0) -> String:
@@ -17,7 +19,8 @@ static func next_id(matured_total: int, active_count: int = 0) -> String:
 
 func to_dict() -> Dictionary:
 	return {"id": id, "stage": stage, "count": count, "progress_seconds": progress_seconds,
-		"nutrition": nutrition, "care": care}
+		"nutrition": nutrition, "care": care,
+		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial}
 
 
 func restore(data: Dictionary) -> bool:
@@ -30,10 +33,16 @@ func restore(data: Dictionary) -> bool:
 			return false
 	if data.progress_seconds >= CONFIG.stage_seconds(data.stage) or data.nutrition > 1.0 or data.care > 1.0:
 		return false
+	var trait_id: Variant = data.get("adaptation_id", "")
+	var trial: Variant = data.get("adaptation_trial", false)
+	if not trait_id is String or not (trait_id == "" or AdaptationRules.valid_trait(trait_id)) or typeof(trial) != TYPE_BOOL or (trial and trait_id == ""):
+		return false
 	id = data.id
 	stage = data.stage
 	count = int(data.count)
 	progress_seconds = float(data.progress_seconds)
 	nutrition = float(data.nutrition)
 	care = float(data.care)
+	adaptation_id = trait_id
+	adaptation_trial = trial
 	return true

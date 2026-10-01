@@ -225,8 +225,12 @@ func _depart(route: TrailRouteState) -> void:
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	var length: float = segment.start.distance_to(segment.end)
 	var terrain_cost: float = Segment.terrain_cost_for(_run.world, segment.start, segment.end)
-	var energy_cost: float = CONFIG.round_trip_energy_cost(worker_count, length, terrain_cost)
 	var pile: PileState = _run.colony.piles[route.origin_pile]
+	var fraction: float = pile.adaptation_fraction()
+	# Quantize captured phenotype to the same stable decimal precision used for resource debits.
+	var energy_multiplier: float = roundf(AdaptationRules.energy_multiplier(pile.adaptation_repertoire, fraction) * 100000.0) / 100000.0
+	var carry_multiplier: float = roundf(AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction) * 100000.0) / 100000.0
+	var energy_cost: float = CONFIG.round_trip_energy_cost(worker_count, length, terrain_cost) * energy_multiplier
 	var unpaid_energy_cost: float = 0.0
 	if pile.resources.carbohydrate < energy_cost:
 		# A carbohydrate trip can replenish an exhausted pile. Pay the available reserve
@@ -245,6 +249,8 @@ func _depart(route: TrailRouteState) -> void:
 	cohort.route_id = route.id
 	cohort.worker_count = worker_count
 	cohort.unpaid_energy_cost = unpaid_energy_cost
+	cohort.energy_multiplier = energy_multiplier
+	cohort.carry_multiplier = carry_multiplier
 	cohort.remaining_ticks = _leg_ticks(route)
 	_run.trails.cohorts[cohort.id] = cohort
 	_run.trails.next_cohort_id += 1
@@ -261,7 +267,7 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	if not node.active or node.quantity <= 0.0 or node.position.distance_to(route.estimated_destination) > CONFIG.interaction_radius * (1.0 + 0.5 * reliability(segment)):
 		return
-	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker)
+	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
 	node.quantity = maxf(0.0, node.quantity - amount)
 	if node.quantity == 0.0:
 		node.active = false

@@ -20,7 +20,7 @@ func run(test: Object) -> bool:
 	test.check(root.inward_status("home") == unchanged, "Changing hidden world truth never alters INWARD summary")
 	for size: Vector2 in [Vector2(1280, 720), Vector2(900, 600)]:
 		var centers: Dictionary = View.positions(size)
-		test.check(centers.size() == 4 and centers.food_exchange.x < size.x - 316.0 and centers.queen.y > 98.0 and centers.entrance.y < size.y - 110.0, "Four authored nodes fit beside context and above controls")
+		test.check(centers.size() == 5 and centers.food_exchange.x < size.x - 316.0 and centers.adaptation.x < size.x - 316.0 and centers.queen.y > 98.0 and centers.entrance.y < size.y - 110.0, "Five authored nodes fit beside context and above controls")
 		for id: String in View.NODES:
 			test.check(View.node_at(centers[id], size) == id, "Node hit target selects " + id)
 	var inward: InwardView = View.new()

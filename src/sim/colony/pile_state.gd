@@ -14,6 +14,8 @@ var workers: WorkerLedger = Ledger.new()
 var resources: Dictionary[String, float] = {"carbohydrate": 0.0, "protein": 0.0, "water": 0.0}
 var brood_cohorts: Array[BroodCohort] = []
 var brood_matured_total: int = 0
+var adaptation_repertoire: String = ""
+var adapted_workers_total: int = 0
 var nursery_state: String = "primitive"
 var nursery_progress_seconds: float = 0.0
 var food_exchange_state: String = "primitive"
@@ -31,6 +33,7 @@ func to_dict() -> Dictionary:
 	return {"id": id, "position": [position.x, position.y], "queen_count": queen_count,
 		"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
+		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"food_exchange_state": food_exchange_state,
 		"food_exchange_progress_seconds": food_exchange_progress_seconds}
@@ -48,7 +51,19 @@ func nursery_occupied_space() -> int:
 
 
 func nursery_care_capacity() -> int:
-	return mini(nursery_max_care_capacity(), floori(float(workers_available * BROOD_CONFIG.primitive_nursery_care_capacity) / BROOD_CONFIG.available_carers_required))
+	var carers: int = workers_available + (AdaptationRules.NURSES if trial_cohort() != null else 0)
+	return mini(nursery_max_care_capacity(), floori(float(carers * BROOD_CONFIG.primitive_nursery_care_capacity) / BROOD_CONFIG.available_carers_required))
+
+
+func trial_cohort() -> BroodCohort:
+	for cohort: BroodCohort in brood_cohorts:
+		if cohort.adaptation_trial:
+			return cohort
+	return null
+
+
+func adaptation_fraction() -> float:
+	return float(adapted_workers_total) / workers_total if workers_total > 0 else 0.0
 
 
 func nursery_max_care_capacity() -> int:
@@ -126,6 +141,31 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if restored_nursery_state != "developed" and not restored_brood.is_empty() and restored_brood[0].id != Brood.next_id(emerged):
 		return false
+	var repertoire: Variant = data.get("adaptation_repertoire", "")
+	var adapted: Variant = data.get("adapted_workers_total", 0)
+	if not repertoire is String or not (repertoire == "" or AdaptationRules.valid_trait(repertoire)) or not Ledger.valid_count(adapted) or adapted > emerged or adapted > restored.total:
+		return false
+	if int(adapted) % BROOD_CONFIG.starting_count != 0:
+		return false
+	if (repertoire == "") != (adapted == 0):
+		return false
+	var trials: int = 0
+	for cohort: BroodCohort in restored_brood:
+		if cohort.adaptation_trial:
+			trials += 1
+			if repertoire != "" or adapted != 0:
+				return false
+		elif cohort.adaptation_id != "" and cohort.adaptation_id != repertoire:
+			return false
+	if trials > 1:
+		return false
+	var adaptation_commitment: String = "adaptation:" + data.id
+	var adaptation_record: Dictionary = restored.to_dict().commitments.get(adaptation_commitment, {})
+	if trials == 1:
+		if adaptation_record.get("kind") != "internal" or adaptation_record.get("owner_id") != data.id or adaptation_record.get("count") != AdaptationRules.NURSES:
+			return false
+	elif not adaptation_record.is_empty():
+		return false
 	var nursery_commitment: String = "nursery:" + data.id
 	var nursery_record: Dictionary = restored.to_dict().commitments.get(nursery_commitment, {})
 	if restored_nursery_state == "developing":
@@ -147,6 +187,8 @@ func restore(data: Dictionary) -> bool:
 	resources = restored_resources
 	brood_cohorts = restored_brood
 	brood_matured_total = int(data.brood_matured_total)
+	adaptation_repertoire = repertoire
+	adapted_workers_total = int(adapted)
 	nursery_state = restored_nursery_state
 	nursery_progress_seconds = float(restored_nursery_progress)
 	food_exchange_state = data.food_exchange_state

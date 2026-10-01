@@ -69,6 +69,8 @@ Card 037 supersedes the numerical temporal line: after returned positive–empty
 
 Task 038 counts an active trail-side detour in the top-bar scout cap and says one worker is **checking** in the selected route context. It does not draw the detour's actual position, expose its target before the report returns, or turn the panorama into a route map. The returning evidence enters existing sensory traces through KnowledgeBase.
 
+Task 039 adds a fifth abstract INWARD function, Adaptation, connected to Queen and Nursery without implying chamber geography. Its selected context presents Lean Foragers and Load Bearers as one-time choices with their paired travel-energy/carry tradeoffs, 12 carbohydrate/12 protein/6 water cost, two committed nurses, and eight ordinary brood slots. During the trial it reports brood stage and delayed expression; afterward it reports the chosen repertoire and adapted share. Both choice buttons are touch-sized. The normal view receives detached pile summary values, never route geometry or a worker genome list.
+
 Expose brood, resources, labor, and Food Exchange development through appropriate selection/context. Prioritize selected chamber, major flows, condition, representative ants, other nodes, then texture. No literal tunnel cutaway or permanent Colony Overview panel.
 
 ## Input and diagnostics

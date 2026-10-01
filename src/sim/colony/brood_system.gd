@@ -31,6 +31,7 @@ func start(pile_id: String) -> bool:
 		return false
 	var cohort := BroodCohort.new()
 	cohort.id = BroodCohort.next_id(pile.brood_matured_total, pile.brood_cohorts.size())
+	cohort.adaptation_id = pile.adaptation_repertoire
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
 	return true
@@ -70,6 +71,15 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 		"larva": cohort.stage = "pupa"
 		"pupa":
 			if pile.workers.add_living_workers("available", cohort.count, "Brood emerged at " + pile.id):
+				if cohort.adaptation_trial:
+					var commitment: String = "adaptation:" + pile.id
+					var released: bool = pile.workers.release(commitment, AdaptationRules.NURSES)
+					assert(released)
+					var retired: bool = pile.workers.retire_commitment(commitment)
+					assert(retired)
+					pile.adaptation_repertoire = cohort.adaptation_id
+				if cohort.adaptation_id != "":
+					pile.adapted_workers_total += cohort.count
 				pile.brood_matured_total += cohort.count
 				pile.brood_cohorts.erase(cohort)
 			else:

@@ -54,5 +54,7 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 				return false
 			if commitment_id.begins_with("nursery:") and commitment_id != "nursery:" + pile.id:
 				return false
+			if commitment_id.begins_with("adaptation:") and commitment_id != "adaptation:" + pile.id:
+				return false
 	piles = restored
 	return true

@@ -1,6 +1,6 @@
 # Post-slice development plan
 
-Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035 and 037–038 are complete; card 034 is deferred after its conditional review. Card 036's automated review and initial player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md). The next bounded work is an initial Adaptation Web choice.
+Revised 2026-09-30 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035 and 037–039 are complete; card 034 is deferred after its conditional review. Card 036's automated review and initial player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md). Choose the next bounded expansion after playtesting the first Adaptation choice.
 
 ## What the original design clarifies
 
@@ -31,7 +31,7 @@ The player finds four simultaneous scouts restrictive, asks for a visible deplet
 | --- | --- | --- |
 | [037 — Scout capacity and source signals](tasks/037_scout_capacity_and_source_signals.md) — complete | Raise the provisional cap to eight; visually mark a reported-empty source; replace timed recurrence text with qualitative memory. | Returned colony evidence only; no hidden renewal leak or resource-rate changes. |
 | [038 — Trail-side discovery](tasks/038_trail_side_discovery.md) — complete | Let aggregate trail traffic automatically detect unfamiliar nearby cues and occasionally send one ledger-accounted worker to investigate, then rejoin the trail. | Use a bounded seeded chance; preserve aggregate traffic, hidden sensing and home-delivered colony knowledge. |
-| [039 — First Adaptation Web choice](tasks/039_first_adaptation_choice.md) | Implement one biologically costly trait tradeoff, expressed through new brood after development rather than instantly changing existing workers. | Define the first trait pair, costs and effects against the original GDD before coding; do not scaffold the full web. |
+| [039 — First Adaptation Web choice](tasks/039_first_adaptation_choice.md) — complete | One trial brood selects Lean Foragers or Load Bearers, spends food/nurses/Nursery space and expresses the result only as adapted brood emerges. | Inspect travel-energy/carry tradeoffs and whether the one-time cost feels useful; keep balance and the full web open. |
 
 Ecological relationships, rivals, satellite piles, dispersal, human attention and reality replay follow only when their dependencies and player-facing purpose are specified. Do not scaffold them all at once.
 

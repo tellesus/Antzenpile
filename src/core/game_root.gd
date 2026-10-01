@@ -48,6 +48,7 @@ func _ready() -> void:
 		inward.develop_command = start_food_exchange
 		inward.nursery_develop_command = start_nursery_development
 		inward.brood_command = start_brood
+		inward.adaptation_command = start_adaptation
 		inward.input_blocked = debug_is_open
 		inward.save_command = quick_save
 		inward.load_command = quick_load
@@ -138,6 +139,12 @@ func inward_status(pile_id: String) -> Dictionary:
 	return {"pile_id": pile_id, "queens": pile.queen_count,
 		"workers_total": pile.workers_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
+		"adaptation_repertoire": pile.adaptation_repertoire,
+		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
+		"adapted_workers": pile.adapted_workers_total,
+		"adaptation_fraction": pile.adaptation_fraction(),
+		"adaptation_costs": AdaptationRules.COSTS.duplicate(),
+		"adaptation_nurses": AdaptationRules.NURSES,
 		"brood_batch_count": BROOD_CONFIG.starting_count,
 		"nursery_state": pile.nursery_state, "nursery_brood_capacity": pile.nursery_brood_capacity(),
 		"nursery_occupied_space": pile.nursery_occupied_space(),
@@ -199,6 +206,11 @@ func start_food_exchange() -> Dictionary:
 func start_brood() -> Dictionary:
 	var accepted: bool = simulation.start_brood("home")
 	return {"accepted": accepted, "reason": simulation.brood.last_error}
+
+
+func start_adaptation(trait_id: String) -> Dictionary:
+	var accepted: bool = simulation.start_adaptation("home", trait_id)
+	return {"accepted": accepted, "reason": simulation.adaptation.last_error}
 
 
 func start_nursery_development() -> Dictionary:
