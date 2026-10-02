@@ -6,6 +6,7 @@ var seed_provider: Callable
 var scenario_provider: Callable
 var start_command: Callable
 var blocked: Callable
+var interaction_started: Callable
 var opened: bool = false
 var selected_scenario: String = "backyard_slice"
 var guide_open: bool = false
@@ -13,8 +14,8 @@ var guide_page: int = 0
 var _font: Font = ThemeDB.fallback_font
 const GUIDE: Array = [
 	{"title":"Read what returns", "lines":["OUTWARD is the colony's sensory memory.","Drag to turn; tap a trace to inspect it.","Exploration keeps scouts searching.","Findings become shared only after return.","Departure scents mark who is still away.","Remembered Sources revisits old reports."]},
-	{"title":"Commit living workers", "lines":["Gathering commits workers to real journeys.","Returns bring stores and new evidence.","An old source may be empty or changed.","Watch for Recovery needs fresh evidence.","Recall gatherers recalls workers over time.","Returned alarms give clues, not certainty."]},
-	{"title":"Support the inside", "lines":["INWARD shows functions, not a tunnel map.","Expand Nursery for up to four cohorts.","Queen's Grow repeats supported brood.","Climate carers use water to humidify.","Midden cleaners isolate accumulating refuse.","Adaptations grow through paid brood trials."]},
+	{"title":"Commit living workers", "lines":["Gathering commits workers to real journeys.","Returns bring stores and new evidence.","An old source may be empty or changed.","Recovery watches need scouts and fresh returns.","Recall releases workers when they reach home.","Returned alarms give clues, not certainty."]},
+	{"title":"Support the inside", "lines":["INWARD shows functions, not a tunnel map.","Expand Nursery for up to four cohorts.","Queen's Auto Brood repeats supported groups.","Climate care: water when dry, air when damp.","Midden cleaners isolate accumulating refuse.","Adaptations grow through paid brood trials."]},
 	{"title":"Keep your colony", "lines":["Pause and speed control simulation time.","Sound keeps music and cues independent.","Save keeps one colony; Load restores it.","A new colony retains that saved slot.","Repeat uses the selected setting and seed.","Fresh seed changes behavior, not layout."]}
 ]
 
@@ -22,6 +23,9 @@ func _process(_delta: float) -> void: queue_redraw()
 
 func button_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 436,78,100,64)
+
+func help_button_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 544, 78, 100, 64)
 
 func panel_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 432,156,408,390)
@@ -39,6 +43,11 @@ func scenario_rect() -> Rect2:
 
 func activate_at(at: Vector2) -> bool:
 	if blocked.is_valid() and blocked.call(): return false
+	if help_button_rect().has_point(at):
+		opened = true
+		guide_open = true
+		guide_page = 0
+		return true
 	if button_rect().has_point(at):
 		opened = not opened
 		guide_open = false
@@ -46,7 +55,9 @@ func activate_at(at: Vector2) -> bool:
 		return true
 	if not opened: return false
 	if guide_open:
-		if guide_rect("back").has_point(at): guide_open = false
+		if guide_rect("back").has_point(at):
+			guide_open = false
+			opened = false
 		elif guide_rect("previous").has_point(at): guide_page = maxi(0,guide_page - 1)
 		elif guide_rect("next").has_point(at): guide_page = (guide_page + 1) % GUIDE.size()
 		return true
@@ -77,13 +88,17 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	var press: bool = event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
-	if press and activate_at(event.position): get_viewport().set_input_as_handled()
+	if press and activate_at(event.position):
+		if interaction_started.is_valid(): interaction_started.call()
+		get_viewport().set_input_as_handled()
 	elif opened: get_viewport().set_input_as_handled()
 
 func _draw() -> void:
 	if blocked.is_valid() and blocked.call(): return
 	draw_rect(button_rect(),Color("18252b"))
-	_label(button_rect().position + Vector2(21,38),"COLONY",14,Color("d3dcd4"))
+	_label(button_rect().position + Vector2(5,38),"COLONY MENU",13,Color("d3dcd4"))
+	draw_rect(help_button_rect(), Color("18252b"))
+	_label(help_button_rect().position + Vector2(31,38), "HELP", 14, Color("d3dcd4"))
 	if not opened: return
 	draw_rect(get_viewport_rect(),Color(0.025,0.04,0.06,0.82))
 	var panel: Rect2 = panel_rect()
@@ -106,11 +121,11 @@ func _draw_guide(panel: Rect2) -> void:
 	var page: Dictionary = GUIDE[guide_page]
 	_label(panel.position + Vector2(24,32),page.title,22,Color("d9d3be"))
 	for index: int in page.lines.size():
-		_label(panel.position + Vector2(24,72 + index * 28),page.lines[index],14,Color("a9b9bc"))
-	_label(panel.position + Vector2(24,244),"HOW TO PLAY  ·  %d / %d" % [guide_page+1,GUIDE.size()],12,Color("82939c"))
+		_label(panel.position + Vector2(24,72 + index * 28),page.lines[index],15,Color("a9b9bc"))
+	_label(panel.position + Vector2(24,244),"HOW TO PLAY  ·  %d / %d" % [guide_page+1,GUIDE.size()],14,Color("82939c"))
 	for command: String in ["previous","next","back"]:
 		draw_rect(guide_rect(command),Color("263038"))
-		_label(guide_rect(command).position + Vector2(20,28),"BACK TO COLONY" if command == "back" else "PREVIOUS" if command == "previous" else "FIRST PAGE" if guide_page == GUIDE.size()-1 else "NEXT",14,Color("dce5d9"))
+		_label(guide_rect(command).position + Vector2(20,28),"CLOSE HELP" if command == "back" else "PREVIOUS" if command == "previous" else "FIRST PAGE" if guide_page == GUIDE.size()-1 else "NEXT",14,Color("dce5d9"))
 
 func _label(at: Vector2,text: String,size: int,color: Color) -> void:
 	draw_string(_font,at,text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)

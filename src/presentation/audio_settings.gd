@@ -5,6 +5,7 @@ extends Node2D
 var preferences: AudioPreferences
 var changed: Callable
 var blocked: Callable
+var interaction_started: Callable
 var opened: bool = false
 var feedback: String = ""
 var _font: Font = ThemeDB.fallback_font
@@ -47,6 +48,7 @@ func _input(event: InputEvent) -> void:
 		return
 	var press: bool = event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
 	if press and activate_at(event.position):
+		if interaction_started.is_valid(): interaction_started.call()
 		get_viewport().set_input_as_handled()
 	elif opened:
 		get_viewport().set_input_as_handled()

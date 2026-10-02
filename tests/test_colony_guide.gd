@@ -28,8 +28,8 @@ func run(test: Object) -> bool:
 	mouse.button_index = MOUSE_BUTTON_LEFT
 	mouse.position = controls.guide_rect("back").get_center()
 	controls._input(mouse)
-	test.check(not controls.guide_open and controls.opened, "Back returns to colony choices without closing or restarting")
-	controls.activate_at(controls.choice_rect("guide").get_center())
+	test.check(not controls.guide_open and not controls.opened, "Close Help returns to play without opening restart choices")
+	controls.activate_at(controls.help_button_rect().get_center())
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE
 	escape.pressed = true

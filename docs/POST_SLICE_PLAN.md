@@ -1,8 +1,8 @@
 # Post-slice development plan
 
-## Interface review — proposed next passes (2026-10-02)
+## Interface clarity — complete (2026-10-02)
 
-The player requested an interface wording/usability review and an improvement plan. [Review and proposed sequence](INTERFACE_REVIEW_PLAN.md) records a confirmed mouse/touch panel gesture leak, ambiguous job terminology, confusing historical/returned outcomes, and compact-layout/navigation improvements. No fixes are implemented by this review. If implementation is authorized, expand three bounded cards for input/action clarity, decision/report guidance, and readability/navigation before resuming the next larger gameplay milestone. Preserve the existing mechanics and return-before-information rule.
+The authorized [interface review](INTERFACE_REVIEW_PLAN.md) is implemented in [085 panel input/action wording](tasks/085_interface_actions_and_input.md), [086 local guidance/returned history](tasks/086_interface_guidance_and_history.md), and [087 readability/navigation](tasks/087_interface_readability_and_navigation.md). Panels absorb gestures; selected jobs/cost blockers and dated outcomes are distinct; Help opens directly; compact contexts have clearer typography/spacing. Existing mechanics and return-before-information remain unchanged. Cards record actual checks and desktop limits. Resume the next bounded original-design scout survivability/experience milestone when further development is requested; Android and human usability checks remain open.
 
 ## Current section — investigate journey losses and intervene (authorized 2026-10-02)
 

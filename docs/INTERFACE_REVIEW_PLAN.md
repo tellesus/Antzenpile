@@ -1,8 +1,8 @@
 # Interface review and improvement plan
 
-Reviewed 2026-10-02 against the published card-084 build. This is a review and proposed implementation sequence; the fixes below are not implemented.
+Reviewed 2026-10-02 against the published card-084 build. The review below records the original issues. Its three implementation passes are now complete: [085](tasks/085_interface_actions_and_input.md), [086](tasks/086_interface_guidance_and_history.md), and [087](tasks/087_interface_readability_and_navigation.md). Each card records changed groups and actual verification.
 
-## Findings
+## Original findings
 
 The selected-context approach, distinct chamber/trait treatments, visible INWARD stocks, and restrained sensory art work well. Improve clarity within that structure rather than adding a dashboard or changing the panorama.
 
@@ -20,9 +20,9 @@ The selected-context approach, distinct chamber/trait treatments, visible INWARD
 
 Related copy: standardize Carbs/Protein/Water terminology; clarify that FOOD attention means carbohydrate memories where that is its actual filter. Replace **Living workers** with wording that does not claim a certain census of ants still away. Normal counts continue to include unresolved travelers. Review short-lived footer messages so important blocking reasons remain visible in context.
 
-## Proposed implementation order
+## Implemented sequence
 
-Create one executable card for each bounded pass when implementation starts, against the code then present. These passes precede the next larger gameplay milestone; they do not authorize new mechanics or balance changes.
+The three bounded cards follow the sequence below. They introduce no mechanics or balance changes.
 
 1. **Panel input and action wording.** Fix the confirmed mouse/touch gesture leak; align tending, survey/recheck, labor assignment, rejection, brood and trait language across panels, feedback and help. Keep existing action routing and simulation validation. Use shared panel bounds rather than an interface-framework rewrite.
 2. **Decision guidance and returned history.** Group dated harvest, survey and defensive receipts; show the latest returned response on its source context. Improve delivery labels and local blocking reasons, including care/space/reserve constraints and required available workers. A dispatched reinforcement is a known command, not evidence that it arrived: do not infer arrival, eligibility or surviving strength from private combat state. If a request can be rejected only by private state, retain an honest request/result interaction rather than exposing that state through a disabled button.
@@ -44,4 +44,4 @@ For implementation, verify:
 
 No code changed during this review, so the full suite/import/Main gates were not repeated solely for this plan. Screenshots and temporary audit scripts are ignored development artifacts under `.godot`; their observations are recorded here. Human playtest and Android checks remain separate follow-up evidence.
 
-Handoff: when implementation starts, begin with pass 1. Keep the next original-design scout survivability/experience milestone pending this clarity work; no balance or art overhaul is proposed.
+Handoff: 085–087 complete this plan. Resume the next original-design milestone when further development is requested; human playtesting and Android usability are still separate from desktop evidence. No balance or art overhaul was included.

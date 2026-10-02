@@ -1,5 +1,6 @@
 class_name ReturnedLossEvidence
 extends RefCounted
+const Copy = preload("res://src/presentation/interface_text.gd")
 ## Words derived only from delivered journey reports, never hidden cause state.
 
 
@@ -23,5 +24,5 @@ static func lines(route: Dictionary, time: float) -> Array[String]:
 	var report_time: float = float(route.get("last_witness_time", 0.0)) if attacks + fights > 0 else float(route.get("last_loss_time", 0.0))
 	var conflict: String = str(route.get("conflict_report", ""))
 	var outcome: String = " · contested" if conflict == "contested" else " · foreign withdrew" if conflict == "secured" else " · withdrew" if conflict == "withdrew" else " · dispersed" if conflict == "dispersed" else ""
-	result.append("Report %.0fs ago%s" % [maxf(0.0, time - report_time), outcome])
+	result.append("Report %s ago%s" % [Copy.duration(time - report_time), outcome])
 	return result

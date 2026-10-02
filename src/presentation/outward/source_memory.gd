@@ -48,3 +48,7 @@ static func first_receipt_label(entry: Dictionary, time: float) -> String:
 
 static func defense_label(outcome: Dictionary) -> String:
 	return {"secured": "Ambusher driven off", "withdrew": "Defenders withdrew", "not_found": "No ambusher found"}.get(outcome.get("outcome", ""), "No defensive return yet")
+
+
+static func defense_is_latest(outcome: Dictionary, route: Dictionary) -> bool:
+	return not outcome.is_empty() and float(outcome.get("received_at", 0.0)) >= maxf(float(route.get("last_loss_time", 0.0)), float(route.get("last_witness_time", 0.0)))

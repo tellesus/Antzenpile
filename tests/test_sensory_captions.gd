@@ -37,7 +37,7 @@ func run(test: Object) -> bool:
 	test.check(view._caption_blocks.has(view._sources_panel_rect()), "Open source browser is reserved for resource and scout captions")
 	view.sources_open = false; view.exploration_open = true
 	view._prepare_signal_captions(Vector2(1280,720))
-	test.check(view._caption_blocks.has(Rect2(24,148,308,266)), "Open exploration controls are reserved")
+	test.check(view._caption_blocks.has(view._exploration_panel_rect()), "Open exploration controls are reserved")
 	# Edge text may hide, while geometry retains the original bearing and input target.
 	view.exploration_open = false
 	view._signals = [Fixture.new().signal_at("edge",-PI / 2)]

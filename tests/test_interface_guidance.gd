@@ -36,5 +36,6 @@ func run(test: Object) -> bool:
 	entry.receipt.earlier_unrecorded = true
 	test.check(Memory.first_receipt_label(entry, 100).begins_with("Records began"), "Incomplete legacy history does not invent first delivery")
 	test.check(Copy.duration(-5) == "0s" and Copy.duration(65) == "1m 05s", "Elapsed times remain readable and nonnegative")
+	test.check(Memory.defense_is_latest({"received_at": 100}, {"last_loss_time": 90}) and not Memory.defense_is_latest({"received_at": 100}, {"last_loss_time": 110}), "A later returned loss regains attention rather than being hidden beneath an older defense")
 	view.free(); root.free()
 	return true

@@ -226,7 +226,7 @@ static func positions(size: Vector2) -> Dictionary:
 		"food_exchange": origin + Vector2(field_width * 0.72, field_height * 0.72),
 		"entrance": origin + Vector2(field_width * 0.28, field_height * 0.78),
 		"adaptation": origin + Vector2(field_width * 0.5, field_height * 0.52),
-		"guest": origin + Vector2(field_width * 0.50, field_height * 0.89),
+		"guest": origin + Vector2(field_width * 0.50, field_height * 0.82),
 		"midden": origin + Vector2(field_width * 0.08, field_height * 0.52)}
 
 
@@ -277,7 +277,7 @@ func _brood_intent_rect(intent: String) -> Rect2:
 
 
 func _humidity_rect(target: int) -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0 + [0, 1, 2, 4].find(target) * 66.0, 398, 62, 44)
+	return Rect2(get_viewport_rect().size.x - 300.0 + [0, 1, 2, 4].find(target) * 66.0, 384, 62, 44)
 
 
 func _nursery_develop_rect() -> Rect2:
@@ -289,7 +289,7 @@ func _nursery_expand_rect() -> Rect2:
 
 
 func _food_source_rect(resource_id: String) -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0 + ["carbohydrate", "protein", "water"].find(resource_id) * 88, 550 if _status.get("food_sharing",{}).get("recent",false) else 470, 84, 44)
+	return Rect2(get_viewport_rect().size.x - 300.0 + ["carbohydrate", "protein", "water"].find(resource_id) * 88, 550 if _status.get("food_sharing",{}).get("recent",false) and _status.get("food_exchange_state", "") != "developed" else 470, 84, 44)
 
 
 func _adaptation_rect(_trait_id: String) -> Rect2:
@@ -326,7 +326,7 @@ func _draw() -> void:
 	if selected_id == "adaptation":
 		Web.draw_graph(self, size, _status, web_selection, _animation_time, web_family)
 		draw_rect(_web_back_rect(), Color("18252b"))
-		_label(_web_back_rect().position + Vector2(98, 29), "BACK TO COLONY", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(_web_back_rect().position + Vector2(98, 29), "COLONY NETWORK", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		if _status.get("adaptation_options", {}).has("security"):
 			draw_rect(_web_family_rect(), Color("28212f"))
 			_label(_web_family_rect().position + Vector2(110, 29), "OTHER TRAITS" if web_family == "recognition" else "INSPECT RECOGNITION", Color("d3c5df"), 14, HORIZONTAL_ALIGNMENT_CENTER)
@@ -455,13 +455,13 @@ func _draw_node(id: String, at: Vector2) -> void:
 
 func _draw_hud(size: Vector2) -> void:
 	_label(Vector2(24, 38), "INWARD  /  ADAPTATION WEB" if selected_id == "adaptation" else "INWARD  /  HOME", Color("dad7c8"), 22)
-	_label(Vector2(24, 63), "Genes grow through brood; relationships through interaction." if selected_id == "adaptation" else "Tap a function to listen.", Color("82939c"), 13)
+	_label(Vector2(24, 63), "Genes grow through brood; relationships through interaction." if selected_id == "adaptation" else "Tap a function to inspect it.", Color("82939c"), 13)
 	if not _status.is_empty():
 		var stores: Dictionary = _status.get("resources", {})
-		_label(Vector2(24, 96), "STORES   Carb %.1f   ·   Protein %.1f   ·   Water %.1f" % [stores.get("carbohydrate", 0.0), stores.get("protein", 0.0), stores.get("water", 0.0)], Color("a9b9bc"), 13)
+		_label(Vector2(24, 96), "STORES   Carbs %.1f   ·   Protein %.1f   ·   Water %.1f" % [stores.get("carbohydrate", 0.0), stores.get("protein", 0.0), stores.get("water", 0.0)], Color("a9b9bc"), 13)
 		_label(Vector2(size.x - 24, 36), "%d available" % _status.workers_available, Color("c9d1c5"), 15, HORIZONTAL_ALIGNMENT_RIGHT)
 		var pause_word: String = "PAUSED" if _status.paused else "%dx" % _status.time_scale
-		_label(Vector2(size.x - 24, 61), "%s  ·  %.0fs" % [pause_word, _status.time], Color("83969d"), 13, HORIZONTAL_ALIGNMENT_RIGHT)
+		_label(Vector2(size.x - 24, 61), "%s  ·  %s" % [pause_word, Copy.duration(_status.time)], Color("83969d"), 13, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 func _draw_context(size: Vector2) -> void:
@@ -472,7 +472,7 @@ func _draw_context(size: Vector2) -> void:
 	var food_attention: bool = selected_id == "food_exchange" and not Pressure.food_sources_needed(_status).is_empty()
 	var food_losses: Dictionary = _status.get("food_sharing",{})
 	var recent_food_losses: bool = food_losses.get("recent",false)
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses else 388 if food_attention or selected_id == "queen" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses and _status.food_exchange_state != "developed" else 388 if food_attention or selected_id == "queen" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	var web: bool = selected_id == "adaptation"
 	draw_rect(box, Color("17141f") if web else Color("111921"))
 	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
@@ -496,7 +496,7 @@ func _draw_context(size: Vector2) -> void:
 				_label(button.get_center() + Vector2(0, 6), str(target), Color("dce5d9"), 16, HORIZONTAL_ALIGNMENT_CENTER)
 			if midden.get("state") == "primitive":
 				_detail_line(box, 218, "Develop for twice the cleanup")
-				_detail_line(box, 244, "Needs %.0f carb · %.0f protein" % [midden.costs.carbohydrate, midden.costs.protein])
+				_detail_line(box, 244, "Needs %.0f carbs · %.0f protein" % [midden.costs.carbohydrate, midden.costs.protein])
 				_detail_line(box, 266, "%.0f water · %d workers · %.0fs" % [midden.costs.water, midden.build_workers, midden.build_seconds])
 				_draw_action(_midden_develop_rect(), "DEVELOP MIDDEN", Copy.local_shortage(_status, midden.costs, midden.build_workers))
 			elif midden.get("state") == "developing":
@@ -509,9 +509,10 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 65, "Queens: %d" % _status.queens)
 			_detail_line(box, 91, "Colony worker count: %d" % _status.workers_total)
 			_detail_line(box, 117, "Available workers: %d" % _status.workers_available)
+			_label(box.position + Vector2(16, 138), "Count includes ants awaiting return", Color("8fa1a8"), 15)
 			_detail_line(box, 157, "Nursery: %d / %d brood space" % [_status.nursery_occupied_space, _status.nursery_brood_capacity])
 			var production: Dictionary = _status.get("brood_production", {"intent":"manual", "waiting":"manual"})
-			_label(box.position + Vector2(16, 195), "Brood laying", Color("a9b9bc"), 13)
+			_label(box.position + Vector2(16, 195), "Brood laying", Color("a9b9bc"), 15)
 			for intent: String in ["manual", "grow"]:
 				var button: Rect2 = _brood_intent_rect(intent)
 				draw_rect(button, Color("354d55") if production.intent == intent else Color("263038"))
@@ -521,9 +522,9 @@ func _draw_context(size: Vector2) -> void:
 			if production.waiting in ["carbohydrate", "protein", "water"]:
 				var needed: float = _status.get("brood_reserve", {}).get(production.waiting, 0.0)
 				wait_text = "Auto needs %.1f %s; have %.1f" % [needed, Copy.resource(production.waiting), _status.resources.get(production.waiting, 0.0)]
-			_label(box.position + Vector2(16, 273), wait_text, Color("a9b9bc"), 13)
-			_label(box.position + Vector2(16, 294), "Auto repeats with food, care and space.", Color("8fa1a8"), 12)
-			_label(box.position + Vector2(16, 313), "Manual brood still needs food as it grows.", Color("8fa1a8"), 12)
+			_label(box.position + Vector2(16, 273), wait_text, Color("a9b9bc"), 15)
+			_label(box.position + Vector2(16, 294), "Auto checks food, care and space.", Color("8fa1a8"), 15)
+			_label(box.position + Vector2(16, 313), "Manual brood still needs feeding.", Color("8fa1a8"), 15)
 			_draw_brood_button()
 		"nursery":
 			var brood: Array = _status.brood
@@ -531,7 +532,7 @@ func _draw_context(size: Vector2) -> void:
 			for cohort: Dictionary in brood:
 				count += cohort.count
 			_detail_line(box, 65, "Brood space: %d / %d" % [count, _status.nursery_brood_capacity])
-			_detail_line(box, 91, "Care capacity: %d / %d" % [_status.nursery_care_capacity, _status.nursery_max_care_capacity])
+			_detail_line(box, 91, "Care supports %d / %d brood" % [_status.nursery_care_capacity, _status.nursery_max_care_capacity])
 			if not brood.is_empty():
 				var stages: String = "%s · %.0fs" % [brood[0].stage.capitalize(), brood[0].progress_seconds] if brood.size() == 1 else "2 cohorts: %s / %s" % [brood[0].stage, brood[1].stage]
 				if brood.size() > 2:
@@ -539,15 +540,15 @@ func _draw_context(size: Vector2) -> void:
 					for stage: String in ["egg", "larva", "pupa"]:
 						var amount: int = brood.filter(func(cohort): return cohort.stage == stage).size()
 						if amount > 0: groups.append("%s×%d" % [stage, amount])
-					stages = "%d cohorts: " % brood.size() + " / ".join(groups)
-				_label(box.position + Vector2(16, 117), stages, Color("a8b8bd"), 13)
+					stages = "%d groups: " % brood.size() + " / ".join(groups)
+				_label(box.position + Vector2(16, 117), stages, Color("a8b8bd"), 15)
 				var food_enough: bool = true
 				var care_enough: bool = true
 				for cohort: Dictionary in brood:
 					food_enough = food_enough and (cohort.care < 1.0 or cohort.nutrition >= 1.0)
 					care_enough = care_enough and cohort.care >= 1.0
 				var feeding: String = "Last short: " + Pressure.food_names(_status) if not Pressure.food_shortages(_status).is_empty() else "Brood waits for care" if not care_enough and food_enough else "Food %s · care %s" % ["enough" if food_enough else "short", "enough" if care_enough else "short"]
-				_label(box.position + Vector2(16, 143), feeding, Color("a9b9bc"), 13)
+				_label(box.position + Vector2(16, 143), feeding, Color("a9b9bc"), 15)
 			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)])
 			var dirty: bool = _status.get("midden", {}).get("larval_rate", 1.0) < 1.0
 			var climate: bool = _status.get("humidity", {}).get("larval_rate", 1.0) < 1.0
@@ -555,7 +556,7 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 162, "Climate + sanitation slow larvae" if dirty and climate else "Nest climate slows larvae" if climate else "Sanitation slows larvae · visit Midden")
 			if _status.nursery_state == "primitive":
 				_detail_line(box, 209, "Develop for %d brood space" % _status.nursery_developed_capacity)
-				_detail_line(box, 235, "Needs %.0f carb · %.0f protein" % [_status.nursery_costs.carbohydrate, _status.nursery_costs.protein])
+				_detail_line(box, 235, "Needs %.0f carbs · %.0f protein" % [_status.nursery_costs.carbohydrate, _status.nursery_costs.protein])
 				_detail_line(box, 261, "%.0f water · %d workers · %.0fs" % [_status.nursery_costs.water, _status.nursery_workers_required, _status.nursery_build_duration])
 				_draw_nursery_develop_button()
 			elif _status.nursery_state == "developing":
@@ -565,27 +566,27 @@ func _draw_context(size: Vector2) -> void:
 				var humidity: Dictionary = _status.get("humidity", {"moisture": 65.0, "carers": 0, "water_used": 0.0})
 				var condition: String = "dry" if humidity.moisture < 45.0 else "damp" if humidity.moisture > 80.0 else "steady"
 				_detail_line(box, 209, "Humidity: %.0f%% · %s" % [humidity.moisture, condition])
-				_detail_line(box, 235, "Climate carers: %d" % humidity.carers)
+				_detail_line(box, 235, "Climate workers: %d · water / air" % humidity.carers)
 				for target: int in [0, 1, 2, 4]:
 					var button: Rect2 = _humidity_rect(target)
 					draw_rect(button, Color("355059") if target == humidity.carers else Color("263038"))
 					_label(button.get_center() + Vector2(0, 6), str(target), Color("dce5d9"), 16, HORIZONTAL_ALIGNMENT_CENTER)
 				if expansion.get("state", "") == "available":
-					_detail_line(box, 310, "Expansion: %.0f carb · %.0f protein" % [expansion.costs.carbohydrate, expansion.costs.protein])
-					_detail_line(box, 332, "%.0f water · %d workers · %.0fs" % [expansion.costs.water, expansion.workers, expansion.duration])
+					_detail_line(box, 306, "Expansion: %.0f carbs · %.0f protein" % [expansion.costs.carbohydrate, expansion.costs.protein])
+					_detail_line(box, 330, "%.0f water · %d workers · %.0fs" % [expansion.costs.water, expansion.workers, expansion.duration])
 					var button: Rect2 = _nursery_expand_rect()
 					_draw_action(button, "EXPAND TO %d BROOD SPACE" % expansion.capacity, Copy.local_shortage(_status, expansion.costs, expansion.workers))
 				elif expansion.get("state", "") == "developing":
-					_detail_line(box, 310, "Expanding: %.0f / %.0fs" % [expansion.progress_seconds, expansion.duration])
-					_detail_line(box, 332, "%d workers · existing space online" % expansion.workers)
+					_detail_line(box, 306, "Expanding: %.0f / %.0fs" % [expansion.progress_seconds, expansion.duration])
+					_detail_line(box, 330, "%d workers · existing space online" % expansion.workers)
 				else:
-					_detail_line(box, 310, "Humidifying uses stored water")
-					_detail_line(box, 332, "%.1f water used · airing uses labor" % humidity.water_used)
+					_detail_line(box, 306, "Dry: humidify with stored water")
+					_detail_line(box, 330, "%.1f water used · damp brood is aired" % humidity.water_used)
 			_draw_brood_button()
 		"food_exchange":
 			if _status.food_exchange_state == "primitive":
 				_detail_line(box, 65, "Primitive Food Exchange")
-				_detail_line(box, 99, "Needs %.0f carb · %.0f protein" % [_status.food_exchange_costs.carbohydrate, _status.food_exchange_costs.protein])
+				_detail_line(box, 99, "Needs %.0f carbs · %.0f protein" % [_status.food_exchange_costs.carbohydrate, _status.food_exchange_costs.protein])
 				_detail_line(box, 125, "%.0f water · %d workers" % [_status.food_exchange_costs.water, _status.food_exchange_workers_required])
 				_detail_line(box, 157, "Build: %.0f simulated seconds" % _status.food_exchange_duration)
 				_draw_action(_develop_rect(), "DEVELOP FOOD EXCHANGE", Copy.local_shortage(_status, _status.food_exchange_costs, _status.food_exchange_workers_required))
@@ -602,19 +603,20 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 189, "Water: %.1f" % _status.resources.water)
 			if food_attention:
 				if recent_food_losses:
-					_label(box.position + Vector2(16, 300), "Workers lost after food sharing", Color("c7ad98"), 13)
-					_label(box.position + Vector2(16, 324), "%d lost at home · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("a9b9bc"), 13)
-					_label(box.position + Vector2(16, 348), "Cause remains uncertain", Color("8fa1a8"), 13)
-					_label(box.position + Vector2(16, 388), "Review returned food supplies", Color("8fa1a8"), 11)
+					var base: float = 230 if _status.food_exchange_state == "developed" else 300
+					_label(box.position + Vector2(16, base), "Workers lost after food sharing", Color("c7ad98"), 15)
+					_label(box.position + Vector2(16, base + 24), "%d lost at home · %s ago" % [food_losses.losses, Copy.duration(food_losses.age)], Color("a9b9bc"), 15)
+					_label(box.position + Vector2(16, base + 48), "Cause remains uncertain", Color("8fa1a8"), 15)
+					_label(box.position + Vector2(16, base + 74), "Review returned food supplies", Color("8fa1a8"), 15)
 				else:
-					_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 13)
-					_label(box.position + Vector2(16, 316), "Browse returned sources", Color("8fa1a8"), 11)
+					_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 15)
+					_label(box.position + Vector2(16, 316), "Browse returned sources", Color("8fa1a8"), 15)
 				for resource_id: String in Pressure.food_sources_needed(_status):
 					var button: Rect2 = _food_source_rect(resource_id)
 					draw_rect(button, Color("263038"))
 					_label(button.get_center() + Vector2(0, 5), "CARBS" if resource_id == "carbohydrate" else resource_id.to_upper(), Color("dce5d9"), 12, HORIZONTAL_ALIGNMENT_CENTER)
 			elif food_losses.get("losses",0) > 0:
-				_label(box.position + Vector2(16, 213), "Home losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 12)
+				_label(box.position + Vector2(16, 213), "Home losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 15)
 		"entrance":
 			_detail_line(box, 65, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
@@ -683,7 +685,7 @@ func _draw_genetic_context(box: Rect2) -> void:
 	_detail_line(box, 151, tradeoff)
 	if _can_choose_adaptation():
 		var costs: Dictionary = _status.get("adaptation_options", {}).get(web_selection, {}).get("costs", _status.adaptation_costs)
-		_detail_line(box, 185, "Needs %.0f carb · %.0f protein · %.0f water" % [costs.carbohydrate, costs.protein, costs.water])
+		_detail_line(box, 185, "%.0f carbs · %.0f protein · %.0f water" % [costs.carbohydrate, costs.protein, costs.water])
 		_detail_line(box, 211, "%d nurses · %d brood slots" % [_status.adaptation_nurses, _status.brood_batch_count])
 		var rect: Rect2 = _adaptation_rect(web_selection)
 		_draw_action(rect, "START SELECTED TRAIT TRIAL", _trial_shortage(costs), Color("28212f"))
@@ -695,15 +697,16 @@ func _draw_genetic_context(box: Rect2) -> void:
 		var expressed: int = _status.get("adaptation_options", {}).get(web_selection, {}).get("expressed", _status.adapted_workers)
 		_detail_line(box, 185, "%d / %d adults carry this trait" % [expressed, _status.workers_total])
 		_detail_line(box, 211, "Future brood inherits this trait")
+		_detail_line(box, 247, "Effects scale with adult carriers")
 	else:
 		if not _status.adaptation_trial.is_empty():
 			_detail_line(box, 185, "Focused trial already growing")
 			_detail_line(box, 211, "New selection waits for emergence")
 		else:
 			_detail_line(box, 185, "Other recognition choice inherited" if web_selection in ["security", "tolerance"] else "Colony choice: " + ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
-			_detail_line(box, 211, "Inherited family choice cannot switch")
+			_detail_line(box, 211, "Other branch already inherited")
 	if web_selection in ["security", "tolerance"]:
-		_detail_line(box, 302, "Earlier harm association" if web_selection == "security" else "Later harm association")
+		_detail_line(box, 302, "Associates Nursery harm sooner" if web_selection == "security" else "Associates Nursery harm later")
 		_detail_line(box, 326, "Reassign tenders for new staffing")
 
 
@@ -725,7 +728,7 @@ func _draw_relationship_context(box: Rect2) -> void:
 
 
 func _detail_line(box: Rect2, y: float, value: String) -> void:
-	_label(box.position + Vector2(16, y), value, Color("a9b9bc"), 14)
+	_label(box.position + Vector2(16, y), value, Color("a9b9bc"), 15)
 
 
 func _trial_shortage(costs: Dictionary) -> String:
@@ -742,9 +745,9 @@ func _brood_block_reason() -> String:
 
 func _draw_action(box: Rect2, title: String, shortage: String = "", color: Color = Color("35483c")) -> void:
 	draw_rect(box, color if shortage.is_empty() else Color("24272b"))
-	_label(box.position + Vector2(box.size.x * 0.5, 29 if shortage.is_empty() else 17), title, Color("dce5d9"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(box.position + Vector2(box.size.x * 0.5, 29 if shortage.is_empty() else 17), title, Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	if not shortage.is_empty():
-		_label(box.position + Vector2(box.size.x * 0.5, 36), shortage, Color("ccac91"), 12, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(box.position + Vector2(box.size.x * 0.5, 36), shortage, Color("ccac91"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_brood_button() -> void:

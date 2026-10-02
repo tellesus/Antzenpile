@@ -89,6 +89,7 @@ func _ready() -> void:
 		_audio_settings.preferences = audio_preferences
 		_audio_settings.changed = audio_preferences.save_file
 		_audio_settings.blocked = sound_controls_blocked
+		_audio_settings.interaction_started = cancel_field_gesture
 		_audio_settings.z_index = 100
 		add_child(_audio_settings)
 		_colony_controls = preload("res://src/presentation/colony_controls.gd").new()
@@ -96,6 +97,7 @@ func _ready() -> void:
 		_colony_controls.scenario_provider = current_scenario
 		_colony_controls.start_command = start_new_colony
 		_colony_controls.blocked = colony_controls_blocked
+		_colony_controls.interaction_started = cancel_field_gesture
 		_colony_controls.z_index = 101
 		add_child(_colony_controls)
 	# Lazy load keeps truth-view code out of the headless runtime and release input path.
@@ -143,6 +145,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func set_mode(next_mode: String) -> bool:
 	if not next_mode in ["outward", "inward"]:
 		return false
+	cancel_field_gesture()
 	mode = next_mode
 	if _outward_view != null:
 		_outward_view.visible = mode == "outward"
@@ -153,6 +156,10 @@ func set_mode(next_mode: String) -> bool:
 		_inward_view.set_process(mode == "inward")
 		_inward_view.set_process_unhandled_input(mode == "inward")
 	return true
+
+
+func cancel_field_gesture() -> void:
+	if _outward_view != null: _outward_view.cancel_pointer_gesture()
 
 
 func interaction_blocked() -> bool:
