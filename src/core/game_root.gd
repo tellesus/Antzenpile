@@ -22,6 +22,8 @@ var mode: String = "outward"
 var audio_preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
 var _audio_settings: AudioSettings
 var _colony_controls: ColonyControls
+var _discovery_notice: ReturnedDiscovery = preload("res://src/presentation/returned_discovery.gd").new()
+var _discovery_reports: int = 0
 
 
 func _ready() -> void:
@@ -73,6 +75,7 @@ func _ready() -> void:
 		audio.preferences = audio_preferences
 		audio.state_provider = music_state.bind("home")
 		audio.alarm_provider = returned_losses.bind("home")
+		audio.discovery_provider = discovery_report_count
 		add_child(audio)
 		_audio_controller = audio
 		set_mode("outward")
@@ -100,6 +103,20 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	simulation.advance(delta)
+	if _outward_view != null: poll_discovery_notice()
+
+
+func discovery_report_count() -> int:
+	return _discovery_reports
+
+
+func poll_discovery_notice() -> String:
+	var message: String = _discovery_notice.poll(sensory_snapshot("home"))
+	if not message.is_empty():
+		_discovery_reports += 1
+		var view: Node2D = _outward_view if mode == "outward" else _inward_view
+		if view != null: view.show_feedback(message)
+	return message
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -346,6 +363,8 @@ func quick_load() -> Dictionary:
 
 
 func _refresh_loaded_views() -> void:
+	_discovery_notice.baseline(sensory_snapshot("home"))
+	_discovery_reports = 0
 	if _outward_view != null:
 		_outward_view.facing = 0.0
 		_outward_view.selected_id = ""

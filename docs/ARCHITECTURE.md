@@ -1,5 +1,7 @@
 # Architecture
 
+Card 072 baselines detached sensory identities in ephemeral ReturnedDiscovery. Graphical GameRoot polls after simulation advancement; only new home-delivered IDs increment a presentation counter and set temporary view feedback. AudioController polls that counter for one short batched cue, separate from music/loss cues. Load/reset baselines known IDs and resets presentation counters before restarting audio. No RunState or RNG fields.
+
 Card 071 registers two authored layouts in ScenarioCatalog. RunState loads the requested resource path; fresh-run commands validate IDs before attachment and retain current scenario on unspecified repeat. The two layouts explicitly share backyard ecology and rain-water rules; snapshot identity/world remain authoritative and legacy restore acceptance stays unchanged. Colony selection shows only setting names, never source geometry.
 
 Card 070 attaches a fresh RunState to the existing SimulationController, disconnecting its old clock before recreating every run-scoped system. GameRoot keeps bound controller commands valid, resets transient views/debug selection and audio intent, preserves player preferences/save service, and enters OUTWARD. ColonyControls is an explicit graphical restart modal, mutually exclusive with Sound. Seed generation happens only on a player fresh-run choice, outside run RNG.

@@ -4,6 +4,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+Newly home-delivered traces now give a brief visual notice and delicate chime. Repeated reports and loaded knowledge stay quiet; discovery never turns or selects the view for you. The chime follows Information Cues volume.
+
 The Colony panel now selects **Backyard** or **Garden Edge** before starting. Garden Edge changes the hidden initial resource arrangement while reusing established ecology/rates. Repeat preserves the selected layout and seed; saves preserve scenario identity. [Three ordinary trials](docs/GARDEN_EVALUATION.md) demonstrate continued growth and meaningful differences in water discovery.
 
 **Colony** in either view starts a fresh colony with the current or a new seed without relaunching. Its explicit restart panel preserves your saved slot and sound settings. Seed selection controls stochastic behavior; the setting selector chooses an authored layout.

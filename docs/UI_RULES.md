@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 072 briefly says New food/water/protein trace(s) returned in the active view footer, with a delicate chime controlled by Information Cues. New-only sensory IDs batch into one event; private scout sensing/repeated reports/loaded old knowledge produce none. Notice never changes facing/selection; the new cloud and Remembered Sources entry supply persistent visual evidence. A later player action may replace transient feedback.
+
 Card 071 adds a 360x44 setting selector to Colony restart context. Opening defaults to the current setting; Change cycles Backyard/Garden Edge without changing the run. Repeat/fresh applies the selected authored layout and seed only on explicit start; cancel retains the colony. No source, threat or weather preview. A saved alternate setting loads and can be repeated without returning silently to Backyard.
 
 Card 070 adds Colony beside Sound/Save/Load. An explicit modal warns about replacing unsaved progress while retaining the saved slot/settings, then offers Repeat This Seed, Start With a Fresh Seed, and Cancel (360x44 logical targets). Escape/cancel does not change the colony. Both choices use the same authored backyard; seed changes stochastic behavior. No auto-restart or death/game-over model.

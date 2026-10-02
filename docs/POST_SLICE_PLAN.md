@@ -2,6 +2,8 @@
 
 ## Current section — source recovery and sanitation (approved 2026-10-02)
 
+Current [072 returned-discovery notice](tasks/072_returned_discovery_notice.md): new home-delivered traces produce one bounded chime/text notice with independent cue volume and reload baseline. Next 073: a short optional observation/control guide grounded in actual controls, with no resource preview, automatic choices or hidden knowledge. Prioritize the first-player interpretation gap before more ecological mechanics.
+
 Complete [071 Garden Edge](tasks/071_garden_edge_scenario.md): one second authored layout reuses established ecology/rates and the new in-game restart pathway. Validate ordinary returned-source growth and exact save continuation before proposing additional map/environment systems. Card 070 is complete/published; 071 does not introduce procedural maps, seasons, satellites, new lineages or a session target.
 
 Playable continuation: [068 chamber music](tasks/068_functional_chamber_music.md) and [069 sound preferences](tasks/069_audio_preferences.md) are complete/published. Current [070 new-colony controls](tasks/070_new_colony_controls.md) lets players repeat a seed or start fresh without relaunching, preserving saved slots and preferences. This retains the same backyard geometry. Card 071 supplies that authored variation. Next bounded work: home-delivered new-trace audio/visual notice from original Part 7 information cues, then a short optional control/observation guide. Continue without routine pauses; no session target or hidden-source preview.

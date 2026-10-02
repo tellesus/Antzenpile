@@ -7,11 +7,15 @@ const GROWTH_LOOP = preload("res://assets/audio/growth_loop.wav")
 const NURSERY_LOOP = preload("res://assets/audio/nursery_loop.wav")
 const MIDDEN_LOOP = preload("res://assets/audio/midden_loop.wav")
 const ALARM_CUE = preload("res://assets/audio/returned_alarm.wav")
+const DISCOVERY_CUE = preload("res://assets/audio/returned_discovery.wav")
 const FADE_SECONDS: float = 3.0
 const MIX_DB: float = -4.0
 
 var state_provider: Callable
 var alarm_provider: Callable
+var discovery_provider: Callable
+var discovery_player: AudioStreamPlayer
+var _reported_discoveries: int = 0
 var alarm_player: AudioStreamPlayer
 var _reported_losses: int = 0
 var stem_gain: float = 0.0
@@ -34,6 +38,10 @@ func _ready() -> void:
 		alarm_player.stream = ALARM_CUE
 		alarm_player.volume_db = -15.0
 		add_child(alarm_player)
+	if discovery_provider.is_valid():
+		discovery_player = AudioStreamPlayer.new()
+		discovery_player.stream = DISCOVERY_CUE
+		add_child(discovery_player)
 	restart_after_load()
 
 
@@ -41,8 +49,10 @@ func restart_after_load() -> void:
 	if base_player == null or growth_player == null:
 		return
 	_reported_losses = int(alarm_provider.call()) if alarm_provider.is_valid() else 0
+	_reported_discoveries = int(discovery_provider.call()) if discovery_provider.is_valid() else 0
 	if alarm_player != null:
 		alarm_player.stop()
+	if discovery_player != null: discovery_player.stop()
 	for player: AudioStreamPlayer in _music_players(): player.stop()
 	var state: MusicState = _current_state()
 	stem_gain = state.food_gain
@@ -61,6 +71,7 @@ func _process(delta: float) -> void:
 	midden_gain = move_toward(midden_gain, state.midden_gain, delta / FADE_SECONDS)
 	_update_growth_volume()
 	poll_returned_alarm()
+	poll_returned_discovery()
 
 
 func poll_returned_alarm() -> bool:
@@ -75,7 +86,7 @@ func poll_returned_alarm() -> bool:
 
 
 func _exit_tree() -> void:
-	for player: AudioStreamPlayer in _music_players() + [alarm_player]:
+	for player: AudioStreamPlayer in _music_players() + [alarm_player, discovery_player]:
 		if player != null:
 			player.stop()
 			player.stream = null
@@ -107,6 +118,16 @@ func _update_growth_volume() -> void:
 	nursery_player.volume_db = _level_db(nursery_gain * preferences.music, MIX_DB)
 	midden_player.volume_db = _level_db(midden_gain * preferences.music, MIX_DB)
 	if alarm_player != null: alarm_player.volume_db = _level_db(preferences.cues, -15.0)
+	if discovery_player != null: discovery_player.volume_db = _level_db(preferences.cues, -15.0)
+
+
+func poll_returned_discovery() -> bool:
+	if not discovery_provider.is_valid(): return false
+	var reports: int = discovery_provider.call()
+	var new_report: bool = reports > _reported_discoveries
+	_reported_discoveries = reports
+	if new_report and discovery_player != null and DisplayServer.get_name() != "headless": discovery_player.play()
+	return new_report
 
 
 func _level_db(level: float, authored_db: float) -> float:
