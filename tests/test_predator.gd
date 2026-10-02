@@ -14,13 +14,20 @@ func run(test: Object) -> bool:
 	return true
 
 
-func _fixture() -> SimulationController:
-	var game := Controller.new(3043)
+func _fixture(seed_value: int = 3043) -> SimulationController:
+	var game := Controller.new(seed_value)
 	game.dispatch_scout("home", PI / 4.0)
 	for tick: int in 1000:
 		if game.run.knowledge.nodes.has("known:aphid_01"):
 			break
 		game.advance(0.25)
+	if not game.run.knowledge.nodes.has("known:aphid_01"):
+		game.set_exploration(5); game.set_exploration_bias(PI / 4)
+		for tick: int in 4800:
+			if game.run.knowledge.nodes.has("known:aphid_01"): break
+			game.advance(0.25)
+		game.set_exploration(0)
+		while not game.run.scouts.is_empty(): game.advance(0.25)
 	game.advance(maxf(0.0, 300.0 - game.run.simulation_time))
 	game.create_trail("home", "known:aphid_01")
 	return game

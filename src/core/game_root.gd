@@ -197,7 +197,7 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		record["foreign_contact"] = route != null and route.foreign_reports > 0
 		record["conflict_report"] = route.conflict_report if route != null else ""
 		if route != null and route.reported_losses > 0:
-			record.risk = "reported_loss"
+			record.risk = "past_loss" if journey_addressed(route) else "reported_loss"
 		result.append(record)
 	for id: String in simulation.run.journey_response.reports:
 		var report: Dictionary = simulation.run.journey_response.reports[id]
@@ -308,8 +308,8 @@ func inward_status(pile_id: String) -> Dictionary:
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile == pile_id:
 			trail_workers += route.allocated_workers + simulation.run.trails.pending_losses(route.id)
-	var expected_total: int = pile.workers_total + simulation.run.trails.pending_for_pile(pile_id)
-	var expected_adapted: int = pile.adapted_workers_total + simulation.run.trails.pending_for_pile(pile_id, true)
+	var expected_total: int = pile.workers_total + simulation.run.pending_for_pile(pile_id)
+	var expected_adapted: int = pile.adapted_workers_total + simulation.run.pending_for_pile(pile_id, true)
 	var genetic_summary: Array[Dictionary] = []
 	var adaptation_options: Dictionary = {}
 	for trait_id: String in AdaptationRules.TRAITS:
@@ -319,9 +319,9 @@ func inward_status(pile_id: String) -> Dictionary:
 			continue
 		adaptation_options[trait_id] = {"available": AdaptationRules.can_select(pile, trait_id),
 			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.genetics.established,
-			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.trails.pending_trait(pile_id, trait_id)}
+			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)}
 	for trait_id: String in pile.genetics.established:
-		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.trails.pending_trait(pile_id, trait_id)
+		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
 	return {"pile_id": pile_id, "queens": pile.queen_count,
@@ -373,7 +373,7 @@ func inward_status(pile_id: String) -> Dictionary:
 
 
 func returned_losses(pile_id: String) -> int:
-	var total: int = 0
+	var total: int = simulation.run.journey_response.defense.reported_losses if pile_id == "home" else 0
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile == pile_id:
 			total += route.reported_losses
@@ -554,6 +554,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
+				"ambusher_addressed": journey_addressed(route),
 				"attack_reports": route.attack_reports, "fighting_reports": route.fighting_reports,
 				"missing_workers": route.missing_workers, "last_witness_time": route.last_witness_time,
 				"energy_limited": route.energy_limited,
@@ -565,6 +566,10 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"route_familiarity": segment.route_familiarity})
 	summaries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.id < b.id)
 	return summaries
+
+func journey_addressed(route: TrailRouteState) -> bool:
+	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
+	return outcome.get("outcome","") == "secured" and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
 
 
 func create_trail_for(knowledge_id: String) -> Dictionary:
@@ -584,7 +589,12 @@ func recheck_trail(route_id: String) -> Dictionary:
 
 func respond_to_journey(action: String, route_id: String) -> Dictionary:
 	var system: JourneyResponseSystem = simulation.journey_response
-	var accepted: bool = system.investigate(route_id) if action == "investigate" else system.recall() if action == "recall" and simulation.run.journey_response.route_id == route_id else false
+	var accepted: bool = false
+	match action:
+		"investigate": accepted = system.investigate(route_id)
+		"defend": accepted = system.defend(route_id)
+		"reinforce": accepted = system.reinforce(route_id)
+		"recall": accepted = system.recall() if simulation.run.journey_response.route_id == route_id else false
 	return {"accepted":accepted,"reason":system.last_error if not accepted else ""}
 
 

@@ -4,8 +4,8 @@ const Controller = preload("res://src/core/simulation_controller.gd")
 const Root = preload("res://src/core/game_root.gd")
 const View = preload("res://src/presentation/outward/outward_view.gd")
 
-func investigated_game() -> SimulationController:
-	var game: SimulationController = Fixture.new()._fixture()
+func investigated_game(seed_value: int = 3043) -> SimulationController:
+	var game: SimulationController = Fixture.new()._fixture(seed_value)
 	while game.run.trails.routes.route_1.reported_losses == 0: game.advance(0.25)
 	game.set_trail_workers("route_1",0)
 	while game.run.trails.routes.route_1.allocated_workers > 0: game.advance(0.25)
@@ -54,8 +54,11 @@ func run(test: Object) -> bool:
 	while game.run.journey_response.active(): game.advance(0.25)
 	test.check(game.run.journey_response.reports.route_1.finding == "inconclusive" and game.run.colony.piles.home.workers.invariant_holds(),"Early recall yields no fabricated threat evidence")
 	game = investigated_game(); game.advance(600); game.journey_response.investigate("route_1")
+	while not game.run.journey_response.foreign_seen: game.advance(0.25)
+	var foreign_copy := Controller.new()
+	test.check(foreign_copy.restore_snapshot(JSON.parse_string(JSON.stringify(game.run.to_dict(),"",true,true))),"Private survey foreign contact reconciles its distinct shared contact history")
 	while game.run.journey_response.active(): game.advance(0.25)
-	test.check(game.run.journey_response.reports.route_1.finding == "mixed","Physical survey independently samples established foreign traffic and ambusher")
+	test.check(game.run.journey_response.reports.route_1.finding == "mixed" and game.run.trails.routes.route_1.foreign_reports == 1,"Returning survey independently reports foreign contact into existing rival escalation")
 	root.simulation = investigated_game()
 	var view := View.new(); test.get_root().add_child(view)
 	view.journey_command = root.respond_to_journey

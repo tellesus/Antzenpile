@@ -97,10 +97,16 @@ func active_scout_count() -> int:
 func recognition_share(pile_id: String) -> float:
 	# Internal staffing decisions use colony-expected adults until journey losses return.
 	var pile: PileState = colony.piles[pile_id]
-	var expected: int = pile.workers_total + trails.pending_for_pile(pile_id)
-	var security: int = pile.genetics.count_trait("security") + trails.pending_trait(pile_id, "security")
-	var tolerance: int = pile.genetics.count_trait("tolerance") + trails.pending_trait(pile_id, "tolerance")
+	var expected: int = pile.workers_total + pending_for_pile(pile_id)
+	var security: int = pile.genetics.count_trait("security") + pending_trait(pile_id, "security")
+	var tolerance: int = pile.genetics.count_trait("tolerance") + pending_trait(pile_id, "tolerance")
 	return snappedf(float(security - tolerance) / expected, 0.00001) if expected > 0 else 0.0
+
+func pending_for_pile(pile_id: String, adapted: bool = false) -> int:
+	return trails.pending_for_pile(pile_id,adapted) + (journey_response.defense.adapted_lost if adapted else journey_response.defense.lost) if pile_id == "home" else trails.pending_for_pile(pile_id,adapted)
+
+func pending_trait(pile_id: String, trait_id: String) -> int:
+	return trails.pending_trait(pile_id,trait_id) + (journey_response.defense.pending_trait(trait_id) if pile_id == "home" else 0)
 
 
 func restore(data: Dictionary) -> bool:
@@ -247,7 +253,10 @@ func restore(data: Dictionary) -> bool:
 	var restored_rival := Rival.new()
 	if data.has("rival") and (not data.rival is Dictionary or not restored_rival.restore(data.rival, restored_world, restored_clock.tick_count)):
 		return false
-	var contacts: int = restored_rival.unreturned_contacts
+	var restored_response := JourneyResponseState.new()
+	var response_data: Variant = data.get("journey_response",restored_response.to_dict())
+	if not response_data is Dictionary or not restored_response.restore(response_data,restored_colony,restored_trails,restored_clock.simulation_time): return false
+	var contacts: int = restored_rival.unreturned_contacts + (1 if restored_response.foreign_seen else 0)
 	for route: TrailRouteState in restored_trails.routes.values():
 		if (route.conflict_report != "" and route.conflict_observed_at < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL) or route.foreign_reports > restored_rival.contacts_total - contacts or (route.foreign_reports > 0 and route.last_foreign_time < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL):
 			return false
@@ -272,9 +281,6 @@ func restore(data: Dictionary) -> bool:
 	var restored_predator := Predator.new()
 	if data.has("predator") and (not data.predator is Dictionary or not restored_predator.restore(data.predator, restored_clock.tick_count)):
 		return false
-	var restored_response := JourneyResponseState.new()
-	var response_data: Variant = data.get("journey_response",restored_response.to_dict())
-	if not response_data is Dictionary or not restored_response.restore(response_data,restored_colony,restored_trails,restored_clock.simulation_time): return false
 	var casualties: int = 0
 	var predator_casualties: int = 0
 	var losses_by_pile: Dictionary[String, int] = {}
@@ -293,15 +299,34 @@ func restore(data: Dictionary) -> bool:
 				predator_casualties += cohort.lost_workers - cohort.rival_losses
 	if predator_casualties != restored_predator.kills_total:
 		return false
+	var defense: JourneyDefenseState = restored_response.defense
+	if defense.reported_losses + defense.lost != restored_predator.defense_losses: return false
+	if restored_predator.defense_losses > restored_colony.piles.home.workers.lost_total - losses_by_pile.get("home",0): return false
+	losses_by_pile["home"] = losses_by_pile.get("home",0) + restored_predator.defense_losses
+	if defense.outcome == "secured" and defense.observed_at != restored_predator.defeated_at: return false
+	for record: Dictionary in defense.outcomes.values():
+		if record.outcome == "secured" and record.observed_at != restored_predator.defeated_at: return false
+	if restored_response.phase == "fighting":
+		var segment: TrailSegmentState = restored_trails.segments[restored_trails.routes[restored_response.route_id].segment_id]
+		var point: Vector2 = segment.start.lerp(segment.end,float(restored_response.elapsed_ticks) / JourneyResponseState.TRAILS.leg_ticks(segment.start.distance_to(segment.end)))
+		if restored_predator.defeated_at > 0 or restored_clock.tick_count < Predator.CONFIG.first_tick or point.distance_to(Predator.CONFIG.position) > Predator.CONFIG.radius: return false
 	for pile: PileState in restored_colony.piles.values():
-		if restored_trails.pending_for_pile(pile.id, true) > pile.adapted_workers_lost or restored_trails.pending_for_pile(pile.id) > WorkerLedger.MAX_COUNT - pile.workers_total:
+		var pending: int = restored_trails.pending_for_pile(pile.id) + (defense.lost if pile.id == "home" else 0)
+		var pending_adapted: int = restored_trails.pending_for_pile(pile.id,true) + (defense.adapted_lost if pile.id == "home" else 0)
+		if pending_adapted > pile.adapted_workers_lost or pending > WorkerLedger.MAX_COUNT - pile.workers_total:
 			return false
 		if pile.food_toxicity.last_loss_tick > restored_clock.tick_count or pile.food_toxicity.losses > pile.workers.lost_total - losses_by_pile.get(pile.id,0): return false
 		if pile.rain_trace_observed and restored_rain.phase == "waiting":
 			return false
 		for trait_id: String in pile.genetics.established:
-			if restored_trails.pending_trait(pile.id, trait_id) > pile.genetics.count_trait(trait_id, true):
+			if restored_trails.pending_trait(pile.id, trait_id) + (defense.pending_trait(trait_id) if pile.id == "home" else 0) > pile.genetics.count_trait(trait_id, true):
 				return false
+		var profiles: Dictionary[String,int] = defense.lost_profiles.duplicate() if pile.id == "home" else {}
+		for cohort: TransitCohort in restored_trails.cohorts.values():
+			if restored_trails.routes[cohort.route_id].origin_pile == pile.id:
+				for key: String in cohort.lost_profiles: profiles[key] = profiles.get(key,0) + cohort.lost_profiles[key]
+		for key: String in profiles:
+			if profiles[key] > pile.genetics.lost.get(key,0): return false
 	var restored_guest := Guest.new()
 	if data.has("guest") and (not data.guest is Dictionary or not restored_guest.restore(data.guest, restored_colony.piles.home, restored_clock.tick_count)):
 		return false

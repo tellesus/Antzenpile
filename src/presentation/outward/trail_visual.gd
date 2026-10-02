@@ -26,6 +26,7 @@ static func paths(routes: Array, placed: Array[Dictionary], viewport: Vector2) -
 			continue
 		var destination_id: String = str(route.get("destination_knowledge_id", ""))
 		for entry: Dictionary in placed:
+			if entry.signal.get("category") == "threat": continue
 			if entry.signal.source_knowledge_id != destination_id:
 				continue
 			var start := Vector2(viewport.x * 0.5, viewport.y * 0.78 - 18.0)
@@ -60,9 +61,10 @@ static func alarm_markers(routes: Array, placed: Array[Dictionary], viewport: Ve
 	var result: Array[Dictionary] = []
 	var home := Vector2(viewport.x * 0.5, viewport.y * 0.78 - 18.0)
 	for route: Dictionary in routes:
-		if route.get("reported_losses", 0) == 0 or result.size() >= MAX_LINKS:
+		if route.get("reported_losses", 0) == 0 or route.get("ambusher_addressed",false) or result.size() >= MAX_LINKS:
 			continue
 		for entry: Dictionary in placed:
+			if entry.signal.get("category") == "threat": continue
 			if entry.signal.source_knowledge_id == route.destination_knowledge_id:
 				# A route association, not an estimate of the hidden attack location.
 				var finish: Vector2 = entry.center + Vector2(0, entry.radius * 0.45)

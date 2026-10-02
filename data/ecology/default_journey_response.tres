@@ -2,3 +2,12 @@
 [ext_resource type="Script" path="res://src/sim/ecology/journey_response_config.gd" id="1"]
 [resource]
 script = ExtResource("1")
+investigation_workers = 3
+survey_radius = 1.5
+defense_workers = 12
+reinforcement_workers = 4
+dispatched_cap = 24
+resistance = 6
+round_ticks = 16
+retreat_workers = 3
+max_rounds = 48
