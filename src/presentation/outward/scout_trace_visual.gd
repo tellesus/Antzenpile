@@ -8,9 +8,9 @@ const MAX_TRACES: int = 8
 const DEPARTURE_SECONDS: float = 3.0
 
 
-static func caption_at(center: Vector2, text_size: Vector2, blocked: Array[Rect2], bounds: Rect2) -> Variant:
+static func caption_at(center: Vector2, text_size: Vector2, blocked: Array[Rect2], bounds: Rect2, offsets: Array = [-13.0, 17.0, 35.0, -31.0, -49.0]) -> Variant:
 	# Keep the marker/hit target fixed; only its secondary caption may move or hide.
-	for offset: float in [-13.0, 17.0, 35.0, -31.0, -49.0]:
+	for offset: float in offsets:
 		var baseline: Vector2 = center + Vector2(0, offset)
 		var rect := Rect2(baseline - Vector2(text_size.x * 0.5, text_size.y), text_size + Vector2(0, 4))
 		if bounds.encloses(rect) and not blocked.any(func(other: Rect2): return other.grow(3).intersects(rect)):

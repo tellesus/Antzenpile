@@ -36,6 +36,8 @@ var selected_id: String = ""
 
 var _animation_time: float = 0.0
 var _signals: Array[Dictionary] = []
+var _signal_labels: Dictionary = {}
+var _caption_blocks: Array[Rect2] = []
 var _status: Dictionary = {}
 var _placed: Array[Dictionary] = []
 var _mission_traces: Array[Dictionary] = []
@@ -340,6 +342,7 @@ func _button_at(at: Vector2) -> String:
 
 func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
+	_prepare_signal_captions(size)
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
 	_draw_rain(size)
 	_draw_trails(size)
@@ -404,14 +407,34 @@ func _draw_trails(size: Vector2) -> void:
 		_label(at + Vector2(0, -14), "JOURNEY ALARM", Color("b77d6c"), 10, HORIZONTAL_ALIGNMENT_CENTER)
 
 
-func _draw_scout_traces(size: Vector2) -> void:
-	var captions: Array[Rect2] = []
-	for placed: Dictionary in _placed:
-		var text_size: Vector2 = _font.get_string_size(_signal_caption(placed.signal), HORIZONTAL_ALIGNMENT_LEFT, -1, 13)
-		var baseline: Vector2 = placed.center + Vector2(0, placed.radius + 22)
-		captions.append(Rect2(baseline - Vector2(text_size.x * 0.5, text_size.y), text_size + Vector2(0, 4)))
+func _prepare_signal_captions(size: Vector2) -> void:
+	_signal_labels.clear()
+	_caption_blocks.clear()
+	for entry: Dictionary in _placed:
+		_caption_blocks.append(Rect2(entry.center - Vector2.ONE * entry.radius, Vector2.ONE * entry.radius * 2))
 	for marker: Dictionary in Scent.alarm_markers(_status.get("trails", []), _placed, size):
-		captions.append(Rect2(marker.center + Vector2(-48, -26), Vector2(96, 16)))
+		_caption_blocks.append(Rect2(marker.center + Vector2(-48, -26), Vector2(96, 16)))
+	if not _selected_mission().is_empty():
+		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 226))
+	elif not _selected_signal().is_empty():
+		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 344 + _evidence_offset()))
+	if sources_open: _caption_blocks.append(Rect2(24, 148, 308, 396))
+	if exploration_open: _caption_blocks.append(Rect2(24, 148, 308, 266))
+	var ordered: Array[Dictionary] = _placed.duplicate()
+	ordered.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if (a.id == selected_id) != (b.id == selected_id): return a.id == selected_id
+		return a.id < b.id)
+	for entry: Dictionary in ordered:
+		var text_size: Vector2 = _font.get_string_size(_signal_caption(entry.signal), HORIZONTAL_ALIGNMENT_LEFT, -1, 13)
+		var baseline: Variant = ScoutTrace.caption_at(entry.center + Vector2(0, entry.radius + 35), text_size,
+			_caption_blocks, Rect2(24, 148, size.x - 48, size.y - 266), [-13.0, 11.0, 35.0, 59.0, -37.0, -61.0, -85.0])
+		if baseline == null: continue
+		_signal_labels[entry.id] = baseline
+		_caption_blocks.append(Rect2(baseline - Vector2(text_size.x * 0.5, text_size.y), text_size + Vector2(0, 4)))
+
+
+func _draw_scout_traces(size: Vector2) -> void:
+	var captions: Array[Rect2] = _caption_blocks.duplicate()
 	for entry: Dictionary in _mission_traces:
 		var selected: bool = false
 		for mission: Dictionary in entry.missions:
@@ -472,7 +495,8 @@ func _draw_signal(entry: Dictionary) -> void:
 		var attention: PackedVector2Array = Art.membrane(at, radius + 8.0, 1.5)
 		draw_polyline(attention.slice(1, 7), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
 		draw_polyline(attention.slice(17, 23), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
-	_label(at + Vector2(0, radius + 22), _signal_caption(signal_data), color, 13, HORIZONTAL_ALIGNMENT_CENTER)
+	if _signal_labels.has(entry.id):
+		_label(_signal_labels[entry.id], _signal_caption(signal_data), color, 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _signal_caption(signal_data: Dictionary) -> String:
