@@ -13,6 +13,7 @@ var care: float = 1.0
 var adaptation_id: String = ""
 var adaptation_trial: bool = false
 var inherited_traits: Array[String] = []
+var rain_comparison: bool = false
 
 
 static func next_id(matured_total: int, active_count: int = 0) -> String:
@@ -23,7 +24,7 @@ func to_dict() -> Dictionary:
 	return {"id": id, "stage": stage, "count": count, "lost_count": lost_count, "progress_seconds": progress_seconds,
 		"nutrition": nutrition, "care": care,
 		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial,
-		"inherited_traits": inherited_traits.duplicate()}
+		"inherited_traits": inherited_traits.duplicate(), "rain_comparison": rain_comparison}
 
 
 func restore(data: Dictionary) -> bool:
@@ -51,6 +52,11 @@ func restore(data: Dictionary) -> bool:
 		parsed_traits.append(value)
 	if ("lean" in parsed_traits and "load" in parsed_traits) or (trait_id != "" and trait_id not in parsed_traits):
 		return false
+	var foraging_id: String = "lean" if "lean" in parsed_traits else "load" if "load" in parsed_traits else ""
+	if not trial and trait_id != foraging_id:
+		return false
+	if typeof(data.get("rain_comparison", false)) != TYPE_BOOL:
+		return false
 	id = data.id
 	stage = data.stage
 	count = int(data.count)
@@ -61,4 +67,5 @@ func restore(data: Dictionary) -> bool:
 	adaptation_id = trait_id
 	adaptation_trial = trial
 	inherited_traits = parsed_traits
+	rain_comparison = data.get("rain_comparison", false)
 	return true

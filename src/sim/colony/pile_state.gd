@@ -20,6 +20,8 @@ var adaptation_repertoire: String = ""
 var adapted_workers_total: int = 0
 var adapted_workers_lost: int = 0
 var genetics: GeneticRepertoire = GeneticRepertoire.new()
+var rain_trace_observed: bool = false
+var chemistry_candidate: bool = false
 var nursery_state: String = "primitive"
 var nursery_progress_seconds: float = 0.0
 var food_exchange_state: String = "primitive"
@@ -41,6 +43,7 @@ func to_dict() -> Dictionary:
 		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
 		"adapted_workers_lost": adapted_workers_lost,
 		"genetics": genetics.to_dict(),
+		"rain_trace_observed": rain_trace_observed, "chemistry_candidate": chemistry_candidate,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"food_exchange_state": food_exchange_state,
 		"food_exchange_progress_seconds": food_exchange_progress_seconds}
@@ -71,6 +74,10 @@ func trial_cohort() -> BroodCohort:
 
 func adaptation_fraction() -> float:
 	return float(adapted_workers_total) / workers_total if workers_total > 0 else 0.0
+
+
+func chemistry_fraction() -> float:
+	return float(genetics.count_trait("persistent")) / workers_total if workers_total > 0 else 0.0
 
 
 func lose_workers(pool: String, amount: Variant, adapted_amount: Variant, reason: String, exact_profile: Variant = null) -> bool:
@@ -203,6 +210,10 @@ func restore(data: Dictionary) -> bool:
 	if restored_nursery_state != "developed" and not restored_brood.is_empty() and restored_brood[0].id != "brood_%d" % total_started:
 		return false
 	var repertoire: Variant = data.get("adaptation_repertoire", "")
+	var rain_observed: Variant = data.get("rain_trace_observed", false)
+	var candidate: Variant = data.get("chemistry_candidate", false)
+	if typeof(rain_observed) != TYPE_BOOL or typeof(candidate) != TYPE_BOOL or (candidate and (not rain_observed or emerged < 1)):
+		return false
 	var adapted: Variant = data.get("adapted_workers_total", 0)
 	var adapted_lost: Variant = data.get("adapted_workers_lost", 0)
 	if not repertoire is String or not (repertoire == "" or AdaptationRules.valid_trait(repertoire)) or not Ledger.valid_count(adapted) or not Ledger.valid_count(adapted_lost) or adapted > restored.total or adapted_lost > restored.lost_total or adapted > emerged or adapted_lost > emerged - adapted:
@@ -218,17 +229,35 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if restored_genetics.count_trait(repertoire) != adapted or restored_genetics.count_trait(repertoire, true) != adapted_lost or ("lean" in restored_genetics.established or "load" in restored_genetics.established) != (repertoire != ""):
 		return false
+	if "persistent" in restored_genetics.established and not candidate:
+		return false
+	if brood_lost == 0:
+		var profiles: Array = restored_genetics.living.keys()
+		for key: String in restored_genetics.lost:
+			if key not in profiles:
+				profiles.append(key)
+		for key: String in profiles:
+			if (restored_genetics.living.get(key, 0) + restored_genetics.lost.get(key, 0)) % BROOD_CONFIG.starting_count != 0:
+				return false
 	var trials: int = 0
 	for cohort: BroodCohort in restored_brood:
 		if cohort.adaptation_trial:
 			trials += 1
 			if cohort.adaptation_id in restored_genetics.established or (cohort.adaptation_id in ["lean", "load"] and repertoire != ""):
 				return false
+			if cohort.adaptation_id == "persistent" and not candidate:
+				return false
+			var trial_traits: Array[String] = restored_genetics.established.duplicate()
+			trial_traits.append(cohort.adaptation_id)
+			if GeneticRepertoire.profile(cohort.inherited_traits) != GeneticRepertoire.profile(trial_traits):
+				return false
 		elif cohort.adaptation_id != "" and cohort.adaptation_id != repertoire:
 			return false
 		for trait_id: String in cohort.inherited_traits:
 			if trait_id not in restored_genetics.established and not (cohort.adaptation_trial and trait_id == cohort.adaptation_id):
 				return false
+		if cohort.rain_comparison and not rain_observed:
+			return false
 	if trials > 1:
 		return false
 	var adaptation_commitment: String = "adaptation:" + data.id
@@ -265,6 +294,8 @@ func restore(data: Dictionary) -> bool:
 	adapted_workers_total = int(adapted)
 	adapted_workers_lost = int(adapted_lost)
 	genetics = restored_genetics
+	rain_trace_observed = rain_observed
+	chemistry_candidate = candidate
 	nursery_state = restored_nursery_state
 	nursery_progress_seconds = float(restored_nursery_progress)
 	food_exchange_state = data.food_exchange_state

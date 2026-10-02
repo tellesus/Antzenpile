@@ -135,9 +135,7 @@ func recheck(route_id: String) -> bool:
 func tick(delta: float) -> void:
 	# Every existing segment fades, including inactive and depleted routes.
 	for segment: TrailSegmentState in _run.trails.segments.values():
-		segment.pheromone_strength = snappedf(segment.pheromone_strength * pow(0.5, delta / CONFIG.pheromone_half_life_seconds), 0.0000000001)
-		if segment.pheromone_strength < 0.0001:
-			segment.pheromone_strength = 0.0
+		segment.decay_chemistry(delta / CONFIG.pheromone_half_life_seconds)
 		segment.route_familiarity = snappedf(segment.route_familiarity * pow(0.5, delta / CONFIG.familiarity_half_life_seconds), 0.0000000001)
 		if segment.route_familiarity < 0.0001:
 			segment.route_familiarity = 0.0
@@ -300,7 +298,8 @@ func _depart(route: TrailRouteState) -> void:
 	# Quantize captured phenotype to the same stable decimal precision used for resource debits.
 	var energy_multiplier: float = roundf(AdaptationRules.energy_multiplier(pile.adaptation_repertoire, fraction) * 100000.0) / 100000.0
 	var carry_multiplier: float = roundf(AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction) * 100000.0) / 100000.0
-	var energy_cost: float = CONFIG.round_trip_energy_cost(worker_count, length, terrain_cost) * energy_multiplier
+	var chemistry: float = snappedf(pile.chemistry_fraction(), 0.00001)
+	var energy_cost: float = CONFIG.round_trip_energy_cost(worker_count, length, terrain_cost) * energy_multiplier * (1.0 + AdaptationRules.CHEMISTRY.extra_travel_energy * chemistry)
 	var unpaid_energy_cost: float = 0.0
 	if pile.resources.carbohydrate < energy_cost:
 		# A carbohydrate trip can replenish an exhausted pile. Pay the available reserve
@@ -321,6 +320,7 @@ func _depart(route: TrailRouteState) -> void:
 	cohort.unpaid_energy_cost = unpaid_energy_cost
 	cohort.energy_multiplier = energy_multiplier
 	cohort.carry_multiplier = carry_multiplier
+	cohort.chemistry_fraction = chemistry
 	cohort.remaining_ticks = _leg_ticks(route)
 	_run.trails.cohorts[cohort.id] = cohort
 	_run.trails.next_cohort_id += 1
@@ -380,7 +380,9 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		assert(deposited)
 		route.delivered_total = roundf((route.delivered_total + net_payload) * 100000.0) / 100000.0
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-		segment.pheromone_strength = snappedf(clampf(segment.pheromone_strength + cohort.worker_count * CONFIG.pheromone_per_returning_worker, 0.0, 1.0), 0.0000000001)
+		segment.reinforce_chemistry(cohort.worker_count * CONFIG.pheromone_per_returning_worker, cohort.chemistry_fraction)
+		if _run.rain.phase == "raining" and segment.exposure >= RainSystem.CONFIG.exposed_min_exposure:
+			pile.rain_trace_observed = true
 		segment.route_familiarity = snappedf(clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0), 0.0000000001)
 		segment.traffic += mini(cohort.worker_count, WorkerLedger.MAX_COUNT - segment.traffic)
 	elif cohort.worker_count > 0 and cohort.reports_source_outcome:

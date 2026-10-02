@@ -16,6 +16,7 @@ var remaining_ticks: int = 1
 var unpaid_energy_cost: float = 0.0
 var energy_multiplier: float = 1.0
 var carry_multiplier: float = 1.0
+var chemistry_fraction: float = 0.0
 var lost_workers: int = 0
 var adapted_lost_workers: int = 0
 var lost_profiles: Dictionary[String, int] = {}
@@ -40,6 +41,7 @@ func to_dict() -> Dictionary:
 		"payload": payload, "remaining_ticks": remaining_ticks,
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
+		"chemistry_fraction": chemistry_fraction,
 		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
 		"lost_profiles": lost_profiles.duplicate(),
 		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
@@ -66,6 +68,9 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	var energy: Variant = data.get("energy_multiplier", 1.0)
 	var carry: Variant = data.get("carry_multiplier", 1.0)
+	var chemistry: Variant = data.get("chemistry_fraction", 0.0)
+	if not typeof(chemistry) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(chemistry)) or chemistry < 0.0 or chemistry > 1.0:
+		return false
 	if not typeof(energy) in [TYPE_INT, TYPE_FLOAT] or not typeof(carry) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(energy)) or not is_finite(float(carry)) or energy < 0.7 or energy > 1.2 or carry < 0.85 or carry > 1.3:
 		return false
 	if typeof(data.get("foreign_contact", false)) != TYPE_BOOL or typeof(data.get("detour_attempted", false)) != TYPE_BOOL:
@@ -139,6 +144,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	unpaid_energy_cost = float(data.get("unpaid_energy_cost", 0.0))
 	energy_multiplier = float(energy)
 	carry_multiplier = float(carry)
+	chemistry_fraction = snappedf(float(chemistry), 0.00001)
 	lost_workers = int(losses)
 	adapted_lost_workers = int(adapted_losses)
 	lost_profiles = restored_profiles

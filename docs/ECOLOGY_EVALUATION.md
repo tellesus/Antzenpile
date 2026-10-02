@@ -35,3 +35,7 @@ A valid long-run save was rejected because JSON parsing moved a derived confiden
 ## Next handoff
 
 Make the existing Adaptation Web legible as different kinds of progression: inherited foraging choice versus evidence-established honeydew relationship. This uses working contracts and gives the web a graphical foundation before adding a second genetic axis. Broader genetic repertoires, pressure-revealed candidates and security/tolerance follow as a separate milestone; seasons/satellites/species expansion stay behind that review.
+
+## Genetic expansion handoff (056–057)
+
+The first repertoire expansion is complete: a returned wet-route report and later surviving brood comparison can reveal persistent chemistry, with nurse/brood/store costs and extra trail food demand. Both foraging combinations conserve joint expression and saved continuation. The original combined ecology fixture retains its events, stores and casualties because genetics uses a separate seeded stream. New combined runs include partial trial survival under the guest and ordinary rejection before healthy joint inheritance; wholly lost starved trials do not establish genes. Further recognition/security–tolerance choices need their own actual benefit/tradeoff contract. Full reproductive genetics and broader balance remain open.

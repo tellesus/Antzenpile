@@ -34,9 +34,7 @@ func tick(delta: float) -> void:
 		state.phase = "raining"
 		rain_started.emit()
 	for segment: TrailSegmentState in _run.trails.segments.values():
-		segment.pheromone_strength = snappedf(segment.pheromone_strength * pow(0.5, delta * segment.exposure / CONFIG.exposed_chemical_half_life_seconds), 0.0000000001)
-		if segment.pheromone_strength < 0.0001:
-			segment.pheromone_strength = 0.0
+		segment.decay_chemistry(delta * segment.exposure / CONFIG.exposed_chemical_half_life_seconds)
 	var next_elapsed: float = minf(CONFIG.duration_seconds, state.elapsed_seconds + delta)
 	var raining_seconds: float = next_elapsed - state.elapsed_seconds
 	for pile: PileState in _run.colony.piles.values():

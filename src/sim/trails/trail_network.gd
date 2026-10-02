@@ -111,6 +111,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if cohort.detour_report != null and (cohort.detour_report.origin_pile != route.origin_pile or cohort.detour_report.source_node_id == knowledge.nodes[route.destination_knowledge_id].source_node_id):
 			return false
 		var pile: PileState = colony.piles[route.origin_pile]
+		if cohort.chemistry_fraction > 0.0 and "persistent" not in pile.genetics.established:
+			return false
 		if not record.has("lost_profiles") and cohort.adapted_lost_workers > 0 and pile.adaptation_repertoire != "":
 			cohort.lost_profiles[pile.adaptation_repertoire] = cohort.adapted_lost_workers
 		var foraging_losses: int = 0
@@ -131,7 +133,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		# A journey keeps its departure phenotype even if adapted adults die meanwhile.
 		if fraction < -0.00002 or fraction > 1.0 + 0.00002 or absf(cohort.carry_multiplier - AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction)) > 0.00002:
 			return false
-		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count + cohort.lost_workers, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end)) * cohort.energy_multiplier
+		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count + cohort.lost_workers, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end)) * cohort.energy_multiplier * (1.0 + AdaptationRules.CHEMISTRY.extra_travel_energy * cohort.chemistry_fraction)
 		if cohort.unpaid_energy_cost > maximum_energy_cost + 0.00001 or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):
 			return false
 		var source_id: String = knowledge.nodes[route.destination_knowledge_id].source_node_id
@@ -153,6 +155,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		used_segments[route.segment_id] = true
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
 		if segment.route_id != route.id or segment.start != colony.piles[route.origin_pile].position or segment.end != route.estimated_destination or not is_equal_approx(segment.exposure, Segment.exposure_for(world, segment.start, segment.end)):
+			return false
+		if segment.persistent_chemistry > 0 and "persistent" not in colony.piles[route.origin_pile].genetics.established:
 			return false
 		var pending: int = 0
 		for cohort: TransitCohort in restored_cohorts.values():

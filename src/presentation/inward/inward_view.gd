@@ -67,13 +67,10 @@ func activate_at(at: Vector2) -> bool:
 	if selected_id == "guest" and guest.get("reported_losses", 0) > 0 and guest.get("observation", "") != "purged" and _guest_rect().has_point(at):
 		_run_command("guest_rejection")
 		return true
-	if selected_id == "adaptation" and web_selection in ["lean", "load"] and _can_choose_adaptation():
-		for trait_id: String in ["lean", "load"]:
-			if web_selection in ["lean", "load"] and web_selection != trait_id:
-				continue
-			if _adaptation_rect(trait_id).has_point(at):
-				_run_command("adaptation_" + trait_id)
-				return true
+	if selected_id == "adaptation" and web_selection in ["lean", "load", "persistent"] and _can_choose_adaptation():
+		if _adaptation_rect(web_selection).has_point(at):
+			_run_command("adaptation_" + web_selection)
+			return true
 	if selected_id in ["queen", "nursery"] and _can_lay_brood() and _brood_rect().has_point(at):
 		_run_command("lay_brood")
 		return true
@@ -137,7 +134,7 @@ func _run_command(command: String) -> void:
 				var result: Dictionary = brood_command.call()
 				_feedback = "New brood started" if result.get("accepted", false) else result.get("reason", "Brood unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
-		"adaptation_lean", "adaptation_load":
+		"adaptation_lean", "adaptation_load", "adaptation_persistent":
 			if adaptation_command.is_valid():
 				var result: Dictionary = adaptation_command.call(command.trim_prefix("adaptation_"))
 				_feedback = "Adaptation brood started" if result.get("accepted", false) else result.get("reason", "Adaptation unavailable")
@@ -217,7 +214,7 @@ func _honeydew_rect() -> Rect2:
 
 
 func _can_choose_adaptation() -> bool:
-	return _status.get("adaptation_repertoire", "") == "" and _status.get("adaptation_trial", {}).is_empty()
+	return _status.get("adaptation_options", {}).get(web_selection, {}).get("available", _status.get("adaptation_repertoire", "") == "" and _status.get("adaptation_trial", {}).is_empty() and web_selection in ["lean", "load"])
 
 
 func _can_lay_brood() -> bool:
@@ -323,7 +320,7 @@ func _draw_context(size: Vector2) -> void:
 	if web and web_selection == "honeydew":
 		_draw_relationship_context(box)
 		return
-	if web and web_selection in ["lean", "load"]:
+	if web and web_selection in ["lean", "load", "persistent"]:
 		_draw_genetic_context(box)
 		return
 	match selected_id:
@@ -407,41 +404,49 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 91, "Select a trait to inspect its tradeoff")
 			_detail_line(box, 117, "Start its brood trial in this panel")
 			if not _status.adaptation_trial.is_empty():
-				_detail_line(box, 163, "%s trial" % ("Lean Foragers" if _status.adaptation_trial.adaptation_id == "lean" else "Load Bearers"))
+				_detail_line(box, 163, "%s trial" % ("Lean" if _status.adaptation_trial.adaptation_id == "lean" else "Load" if _status.adaptation_trial.adaptation_id == "load" else "Persistent chemistry"))
 				_detail_line(box, 189, "Brood stage: %s" % _status.adaptation_trial.stage.capitalize())
 				_detail_line(box, 215, "Trait emerges with this brood")
-			elif _status.adaptation_repertoire != "":
-				_detail_line(box, 163, "Chosen: %s" % ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
-				_detail_line(box, 189, "Expressed in %d / %d adults" % [_status.adapted_workers, _status.workers_total])
-				_detail_line(box, 215, "Future brood inherits this trait")
+			elif not _status.get("genetic_repertoire", []).is_empty():
+				_detail_line(box, 163, "%d inherited traits" % _status.get("genetic_repertoire", []).size())
+				_detail_line(box, 189, "Inspect each leaf for adult expression")
+				_detail_line(box, 215, "Future brood inherits established traits")
 			else:
-				_detail_line(box, 163, "One inherited trait for future brood")
+				_detail_line(box, 163, "One focused brood trial at a time")
 				_detail_line(box, 189, "Genes require food, nurses and brood")
 				_detail_line(box, 215, "Relationships grow through interaction")
+			if _status.get("wet_trail_experience", false) and not _status.get("adaptation_options", {}).has("persistent"):
+				_detail_line(box, 249, "Wet journeys weakened scent")
+				_detail_line(box, 275, "New brood may reveal variation")
 
 
 func _draw_genetic_context(box: Rect2) -> void:
-	_detail_line(box, 65, "Lean Foragers" if web_selection == "lean" else "Load Bearers")
+	_detail_line(box, 65, "Lean Foragers" if web_selection == "lean" else "Load Bearers" if web_selection == "load" else "Persistent trail chemistry")
 	_detail_line(box, 91, Web.trait_state(_status, web_selection))
-	_detail_line(box, 125, "30% less travel energy" if web_selection == "lean" else "30% more carrying")
-	_detail_line(box, 151, "15% less carrying" if web_selection == "lean" else "20% more travel energy")
+	_detail_line(box, 125, "30% less travel energy" if web_selection == "lean" else "30% more carrying" if web_selection == "load" else "Up to %.0fx scent persistence" % _status.get("chemistry_persistence", 2.0))
+	_detail_line(box, 151, "15% less carrying" if web_selection == "lean" else "20% more travel energy" if web_selection == "load" else "Up to %.0f%% more trail food" % (_status.get("chemistry_extra_energy", 0.2) * 100))
 	if _can_choose_adaptation():
-		_detail_line(box, 185, "Needs %.0f carb · %.0f protein · %.0f water" % [_status.adaptation_costs.carbohydrate, _status.adaptation_costs.protein, _status.adaptation_costs.water])
+		var costs: Dictionary = _status.get("adaptation_options", {}).get(web_selection, {}).get("costs", _status.adaptation_costs)
+		_detail_line(box, 185, "Needs %.0f carb · %.0f protein · %.0f water" % [costs.carbohydrate, costs.protein, costs.water])
 		_detail_line(box, 211, "%d nurses · %d brood slots" % [_status.adaptation_nurses, _status.brood_batch_count])
 		var rect: Rect2 = _adaptation_rect(web_selection)
 		draw_rect(rect, Color("28212f"))
 		draw_rect(rect, Color("a28aaf"), false, 1.5)
-		_label(rect.position + Vector2(130, 29), "START LEAN BROOD TRIAL" if web_selection == "lean" else "START LOAD BROOD TRIAL", Color("e3dbe7"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(rect.position + Vector2(130, 29), "START LEAN BROOD TRIAL" if web_selection == "lean" else "START LOAD BROOD TRIAL" if web_selection == "load" else "START CHEMISTRY BROOD TRIAL", Color("e3dbe7"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
 		_detail_line(box, 185, "Stage: " + str(_status.adaptation_trial.stage).capitalize())
 		_detail_line(box, 211, "Expresses only with surviving adults")
-	elif _status.adaptation_repertoire == web_selection:
-		_detail_line(box, 185, "Expressed in %d / %d adults" % [_status.adapted_workers, _status.workers_total])
-		_detail_line(box, 211, "Future brood inherits; adults retain traits")
+	elif _status.get("adaptation_options", {}).get(web_selection, {}).get("inherited", _status.adaptation_repertoire == web_selection):
+		var expressed: int = _status.get("adaptation_options", {}).get(web_selection, {}).get("expressed", _status.adapted_workers)
+		_detail_line(box, 185, "Expressed in %d / %d adults" % [expressed, _status.workers_total])
+		_detail_line(box, 211, "Future brood inherits this trait")
 	else:
-		var choice: String = _status.adaptation_repertoire if _status.adaptation_repertoire != "" else _status.adaptation_trial.get("adaptation_id", "")
-		_detail_line(box, 185, "Colony choice: " + ("Lean Foragers" if choice == "lean" else "Load Bearers"))
-		_detail_line(box, 211, "Choice waits for trial outcome" if not _status.adaptation_trial.is_empty() else "Inherited choice cannot be switched")
+		if not _status.adaptation_trial.is_empty():
+			_detail_line(box, 185, "Focused trial already growing")
+			_detail_line(box, 211, "New selection waits for emergence")
+		else:
+			_detail_line(box, 185, "Colony choice: " + ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
+			_detail_line(box, 211, "Inherited foraging fork cannot switch")
 
 
 func _draw_relationship_context(box: Rect2) -> void:

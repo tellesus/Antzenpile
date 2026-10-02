@@ -11,10 +11,13 @@ static func positions(size: Vector2) -> Dictionary:
 	return {"foraging": origin + Vector2(width * 0.50, height * 0.25),
 		"lean": origin + Vector2(width * 0.27, height * 0.50),
 		"load": origin + Vector2(width * 0.73, height * 0.50),
-		"honeydew": origin + Vector2(width * 0.50, height * 0.80)}
+		"persistent": origin + Vector2(width * 0.27, height * 0.84),
+		"honeydew": origin + Vector2(width * 0.73, height * 0.84)}
 
 static func visible_nodes(status: Dictionary) -> Array[String]:
 	var result: Array[String] = ["foraging", "lean", "load"]
+	if status.get("adaptation_options", {}).has("persistent"):
+		result.append("persistent")
 	if not status.get("honeydew", {}).is_empty():
 		result.append("honeydew")
 	return result
@@ -29,8 +32,15 @@ static func node_at(at: Vector2, size: Vector2, status: Dictionary) -> String:
 static func trait_state(status: Dictionary, id: String) -> String:
 	if status.get("adaptation_trial", {}).get("adaptation_id", "") == id:
 		return "Growing trial brood"
+	if id == "persistent":
+		var option: Dictionary = status.get("adaptation_options", {}).get(id, {})
+		if option.get("inherited", false):
+			return "Inherited · %d expressed" % option.get("expressed", 0)
+		return "Candidate · variation observed" if status.get("adaptation_trial", {}).is_empty() else "Waiting for focused trial"
 	if status.get("adaptation_repertoire", "") == id:
 		return "Inherited · %d expressed" % status.get("adapted_workers", 0)
+	if status.get("adaptation_trial", {}).get("adaptation_id", "") == "persistent":
+		return "Waiting for focused trial"
 	if status.get("adaptation_repertoire", "") != "" or not status.get("adaptation_trial", {}).is_empty():
 		return "Alternative"
 	return "Brood trial available"
@@ -40,11 +50,11 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 	for id: String in visible_nodes(status):
 		var ecological: bool = id == "honeydew"
 		var color: Color = Color("99b59c") if ecological else Color("bba6c8")
-		var state: String = trait_state(status, id) if id in ["lean", "load"] else ""
+		var state: String = trait_state(status, id) if id in ["lean", "load", "persistent"] else ""
 		if state == "Alternative":
 			color = Color("776e80")
 		if id != "foraging":
-			if ecological:
+			if ecological or id == "persistent":
 				view.draw_line(centers.foraging + Vector2(0, 84), centers[id] - Vector2(0, 36), Color(color, 0.24), 1.0, true)
 			else:
 				var direction: float = -1.0 if id == "lean" else 1.0
@@ -74,7 +84,7 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 		if id == selected:
 			view.draw_arc(at, 39, 0.0, 0.65, 12, Color("dce5d9"), 1.0, true)
 			view.draw_arc(at, 39, PI, PI + 0.65, 12, Color("dce5d9"), 1.0, true)
-		var title: String = "Colony repertoire" if id == "foraging" else "Lean Foragers" if id == "lean" else "Load Bearers" if id == "load" else "Honeydew relationship"
+		var title: String = "Colony repertoire" if id == "foraging" else "Lean Foragers" if id == "lean" else "Load Bearers" if id == "load" else "Persistent chemistry" if id == "persistent" else "Honeydew relationship"
 		view._label(at + Vector2(0, 45), title, color, 15, HORIZONTAL_ALIGNMENT_CENTER)
 		var subtitle: String = "Genes and ecological experience" if id == "foraging" else trait_state(status, id) if not ecological else "Ecological · protection active" if status.honeydew.relationship == "tended" else "Ecological · harvested" if status.honeydew.relationship == "exploited" else "Ecological · source observed"
 		view._label(at + Vector2(0, 64), subtitle, Color(color, 0.75), 12, HORIZONTAL_ALIGNMENT_CENTER)

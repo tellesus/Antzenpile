@@ -7,6 +7,7 @@ var route_id: String
 var start: Vector2
 var end: Vector2
 var pheromone_strength: float = 0.0
+var persistent_chemistry: float = 0.0
 var route_familiarity: float = 0.0
 var traffic: int = 0
 var exposure: float = 0.0
@@ -42,6 +43,7 @@ func to_dict() -> Dictionary:
 	return {"id": id, "route_id": route_id,
 		"start": [start.x, start.y], "end": [end.x, end.y],
 		"pheromone_strength": pheromone_strength,
+		"persistent_chemistry": persistent_chemistry,
 		"route_familiarity": route_familiarity, "traffic": traffic, "exposure": exposure}
 
 
@@ -62,6 +64,9 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 		return false
 	if not typeof(data.pheromone_strength) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.pheromone_strength)) or data.pheromone_strength < 0.0 or data.pheromone_strength > 1.0:
 		return false
+	var durable: Variant = data.get("persistent_chemistry", 0.0)
+	if not typeof(durable) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(durable)) or durable < 0.0 or durable > data.pheromone_strength:
+		return false
 	if not typeof(data.route_familiarity) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.route_familiarity)) or data.route_familiarity < 0.0 or data.route_familiarity > 1.0:
 		return false
 	if not WorkerLedger.valid_count(data.traffic):
@@ -74,7 +79,26 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 	end = destination
 	# Match the tick quantization after JSON's decimal-to-binary conversion.
 	pheromone_strength = snappedf(float(data.pheromone_strength), 0.0000000001)
+	persistent_chemistry = snappedf(float(durable), 0.0000000001)
 	route_familiarity = snappedf(float(data.route_familiarity), 0.0000000001)
 	traffic = int(data.traffic)
 	exposure = float(data.exposure)
 	return true
+
+
+func reinforce_chemistry(amount: float, fraction: float) -> void:
+	# Blend incoming secretion before saturation; repeated returns cannot turn
+	# baseline chemistry durable without contributing expressed workers.
+	var total: float = pheromone_strength + amount
+	var durable: float = persistent_chemistry + amount * fraction
+	persistent_chemistry = snappedf(durable / total if total > 1.0 else durable, 0.0000000001)
+	pheromone_strength = snappedf(minf(1.0, total), 0.0000000001)
+
+
+func decay_chemistry(half_lives: float) -> void:
+	var ordinary: float = maxf(0.0, pheromone_strength - persistent_chemistry) * pow(0.5, half_lives)
+	persistent_chemistry = snappedf(persistent_chemistry * pow(0.5, half_lives / AdaptationRules.CHEMISTRY.persistence_multiplier), 0.0000000001)
+	pheromone_strength = snappedf(ordinary + persistent_chemistry, 0.0000000001)
+	if pheromone_strength < 0.0001:
+		pheromone_strength = 0.0
+		persistent_chemistry = 0.0

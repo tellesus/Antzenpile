@@ -179,6 +179,13 @@ func inward_status(pile_id: String) -> Dictionary:
 	var expected_total: int = pile.workers_total + simulation.run.trails.pending_for_pile(pile_id)
 	var expected_adapted: int = pile.adapted_workers_total + simulation.run.trails.pending_for_pile(pile_id, true)
 	var genetic_summary: Array[Dictionary] = []
+	var adaptation_options: Dictionary = {}
+	for trait_id: String in AdaptationRules.TRAITS:
+		if trait_id == "persistent" and not pile.chemistry_candidate:
+			continue
+		adaptation_options[trait_id] = {"available": AdaptationRules.can_select(pile, trait_id),
+			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.genetics.established,
+			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.trails.pending_trait(pile_id, trait_id)}
 	for trait_id: String in pile.genetics.established:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.trails.pending_trait(pile_id, trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
@@ -190,6 +197,9 @@ func inward_status(pile_id: String) -> Dictionary:
 		"honeydew": honeydew_summary(pile_id),
 		"adaptation_repertoire": pile.adaptation_repertoire,
 		"genetic_repertoire": genetic_summary,
+		"adaptation_options": adaptation_options, "wet_trail_experience": pile.rain_trace_observed,
+		"chemistry_persistence": AdaptationRules.CHEMISTRY.persistence_multiplier,
+		"chemistry_extra_energy": AdaptationRules.CHEMISTRY.extra_travel_energy,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
 		"adapted_workers": expected_adapted,
 		"adaptation_fraction": float(expected_adapted) / expected_total if expected_total > 0 else 0.0,

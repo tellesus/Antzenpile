@@ -99,3 +99,7 @@ Later trail balance, brood/resource consumption rates, compatibility policy once
 
 - Initial documentation pack: locked decisions distilled; foundation defaults labeled; implementation tasks remain unstarted.
 - 2026-09-28 / 001: A01–A02 resolved to `4.7.2.stable.official.ed1daf0bf` and Compatibility (`gl_compatibility`). Verified Windows import, runner, headless Main, and editor launch. No architecture change.
+
+## Genetic prototype expansion defaults
+
+A39 (cards 056–057): bound the prototype to the exclusive Lean/Load fork plus one independent Persistent Trail Chemistry axis, and one focused trial slot. Aggregate disjoint phenotype bundles conserve overlapping trait expression without individual genomes. Existing queen-backed worker-brood trials remain an establishment proxy; reproductive castes, genetic drift and latent-trait reselection are not implemented. A returned loaded exposed-route journey during rain enables later surviving-brood variation (0.65 chance scaled by survival on a separate saved seeded stream). The candidate trial costs 14 carbohydrate, 16 protein, 8 water and two nurses; full expression doubles secretion half-life and adds 20% trail food demand. Authored values are provisional; neither weather XP nor a balance/session-duration verdict.

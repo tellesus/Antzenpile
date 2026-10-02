@@ -71,6 +71,7 @@ func _messenger(cohort: TransitCohort, route: TrailRouteState) -> bool:
 	messenger.remaining_ticks = TRAILS.leg_ticks(segment.start.distance_to(state.position))
 	messenger.energy_multiplier = cohort.energy_multiplier
 	messenger.carry_multiplier = cohort.carry_multiplier
+	messenger.chemistry_fraction = cohort.chemistry_fraction
 	messenger.unpaid_energy_cost = roundf(cohort.unpaid_energy_cost / (cohort.worker_count + cohort.lost_workers) * 100000.0) / 100000.0
 	cohort.unpaid_energy_cost = roundf((cohort.unpaid_energy_cost - messenger.unpaid_energy_cost) * 100000.0) / 100000.0
 	messenger.payload = minf(cohort.payload, TRAILS.carry_per_worker * cohort.carry_multiplier)

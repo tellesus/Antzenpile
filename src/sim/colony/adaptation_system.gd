@@ -16,7 +16,7 @@ func start(pile_id: String, trait_id: String) -> bool:
 	if not _run.colony.piles.has(pile_id):
 		return _reject("Unknown pile")
 	var pile: PileState = _run.colony.piles[pile_id]
-	if pile.queen_count < 1 or pile.adaptation_repertoire != "" or pile.trial_cohort() != null:
+	if not AdaptationRules.can_select(pile, trait_id):
 		return _reject("Adaptation already chosen or unavailable")
 	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty() or pile.nursery_brood_capacity() - pile.nursery_occupied_space() < BROOD.starting_count:
 		return _reject("Nursery lacks brood space")
@@ -25,16 +25,17 @@ func start(pile_id: String, trait_id: String) -> bool:
 	var pending: int = pile.nursery_occupied_space() + BROOD.starting_count
 	if pile.brood_started_total >= WorkerLedger.MAX_COUNT or pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending or pile.workers_total > WorkerLedger.MAX_COUNT - pending:
 		return _reject("Population limit reached")
-	for resource_id: String in AdaptationRules.COSTS:
-		if pile.resources[resource_id] < AdaptationRules.COSTS[resource_id]:
-			return _reject("Needs 12 carbohydrate, 12 protein, 6 water")
+	var costs: Dictionary = AdaptationRules.costs(trait_id)
+	for resource_id: String in costs:
+		if pile.resources[resource_id] < costs[resource_id]:
+			return _reject("Needs %.0f carbohydrate, %.0f protein, %.0f water" % [costs.carbohydrate, costs.protein, costs.water])
 	var commitment: String = "adaptation:" + pile.id
 	if not pile.workers.create_commitment(commitment, "internal", pile.id):
 		return _reject("Nurse commitment unavailable")
 	if not pile.workers.allocate(commitment, AdaptationRules.NURSES):
 		pile.workers.retire_commitment(commitment)
 		return _reject("Two available nurses required")
-	if not pile.consume_resources(AdaptationRules.COSTS):
+	if not pile.consume_resources(costs):
 		pile.workers.release(commitment, AdaptationRules.NURSES)
 		pile.workers.retire_commitment(commitment)
 		return _reject("Resources unavailable")
@@ -46,6 +47,7 @@ func start(pile_id: String, trait_id: String) -> bool:
 	cohort.inherited_traits = pile.genetics.established.duplicate()
 	cohort.inherited_traits.append(trait_id)
 	cohort.inherited_traits.sort()
+	cohort.rain_comparison = pile.rain_trace_observed and not pile.chemistry_candidate
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
 	return true

@@ -40,6 +40,7 @@ var scenario_id: String:
 	get: return _scenario_id
 var clock: SimulationClock = Clock.new()
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var genetic_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var simulation_time: float:
 	get: return clock.simulation_time
 
@@ -51,6 +52,7 @@ func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> voi
 	_seed = seed_value
 	_scenario_id = scenario
 	rng.seed = _seed
+	genetic_rng.seed = _seed ^ 0x415450
 	world = Loader.new().load_scenario()
 	colony.initialize_home(world.home_position)
 
@@ -72,7 +74,7 @@ func to_dict() -> Dictionary:
 	for id: String in ids:
 		delivered.append(delivered_observations[id].to_dict())
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
-	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state),
+	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(),
@@ -95,6 +97,12 @@ func restore(data: Dictionary) -> bool:
 	for field: String in ["seed", "rng_state"]:
 		if not data[field] is String or not data[field].is_valid_int() or str(data[field].to_int()) != data[field]:
 			return false
+	var restored_genetic_rng := RandomNumberGenerator.new()
+	restored_genetic_rng.seed = data.seed.to_int() ^ 0x415450
+	if data.has("genetic_rng_state"):
+		if not data.genetic_rng_state is String or not data.genetic_rng_state.is_valid_int() or str(data.genetic_rng_state.to_int()) != data.genetic_rng_state:
+			return false
+		restored_genetic_rng.state = data.genetic_rng_state.to_int()
 	var restored_world := World.new()
 	var restored_clock := Clock.new()
 	if not data.clock is Dictionary or not restored_clock.restore(data.clock):
@@ -247,6 +255,8 @@ func restore(data: Dictionary) -> bool:
 	for pile: PileState in restored_colony.piles.values():
 		if restored_trails.pending_for_pile(pile.id, true) > pile.adapted_workers_lost or restored_trails.pending_for_pile(pile.id) > WorkerLedger.MAX_COUNT - pile.workers_total:
 			return false
+		if pile.rain_trace_observed and restored_rain.phase == "waiting":
+			return false
 		for trait_id: String in pile.genetics.established:
 			if restored_trails.pending_trait(pile.id, trait_id) > pile.genetics.count_trait(trait_id, true):
 				return false
@@ -266,6 +276,7 @@ func restore(data: Dictionary) -> bool:
 	# Seed first: assigning seed resets generator state.
 	rng.seed = _seed
 	rng.state = data.rng_state.to_int()
+	genetic_rng = restored_genetic_rng
 	world = restored_world
 	colony = restored_colony
 	scouts = restored_scouts
