@@ -124,7 +124,7 @@ func restore(data: Dictionary) -> bool:
 	if not data.colony is Dictionary or not restored_colony.restore(data.colony, restored_world.bounds, restored_world.home_position):
 		return false
 	var restored_exploration := Exploration.new()
-	if data.has("exploration") and (not data.exploration is Dictionary or not restored_exploration.restore(data.exploration)):
+	if data.has("exploration") and (not data.exploration is Dictionary or not restored_exploration.restore(data.exploration, restored_world, restored_clock.simulation_time)):
 		return false
 	if not data.scouts is Array or data.scouts.size() > SCOUT_CONFIG.active_cap or not WorkerLedger.valid_count(data.next_scout_id) or data.next_scout_id < 1:
 		return false
@@ -191,6 +191,9 @@ func restore(data: Dictionary) -> bool:
 	var restored_knowledge := Knowledge.new()
 	if not restored_knowledge.restore(data.knowledge, archived, restored_clock.simulation_time):
 		return false
+	for priority: String in restored_exploration.priorities:
+		if not restored_knowledge.nodes.has(priority):
+			return false
 	for agent: ScoutAgent in restored_scouts.values():
 		if not agent.investigation_source_id.is_empty() and not restored_knowledge.nodes.has("known:" + agent.investigation_source_id):
 			return false

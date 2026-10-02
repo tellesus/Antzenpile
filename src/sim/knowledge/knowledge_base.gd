@@ -110,7 +110,41 @@ func _rebuild_node(source_id: String) -> void:
 	node.selected_evidence_id = selected.id
 	var baseline: float = CONFIG.confirmed_confidence if selected.proximity_confirmed else CONFIG.cue_confidence
 	node.confidence = clampf(baseline / (1.0 + selected.uncertainty_radius / CONFIG.uncertainty_scale), 0.0, 1.0)
+	if selected.collective_search:
+		_corroborate(node, selected)
 	nodes[node.id] = node
+
+
+func _corroborate(node: KnownNode, selected: Observation) -> void:
+	var recent: Array[Observation] = []
+	for id: String in node.evidence_ids:
+		var evidence: Observation = observations[id]
+		if evidence.collective_search and selected.observed_at - evidence.observed_at <= CONFIG.corroboration_window:
+			recent.append(evidence)
+	recent.sort_custom(func(a: Observation, b: Observation) -> bool: return _preferred(a,b))
+	var weight: float = 0.0
+	var estimate: Vector2 = Vector2.ZERO
+	var count: int = 0
+	var conflict: bool = false
+	var baseline: float = CONFIG.cue_confidence
+	for evidence: Observation in recent:
+		if selected.estimated_position.distance_to(evidence.estimated_position) > selected.uncertainty_radius + evidence.uncertainty_radius:
+			conflict = true
+			continue
+		if count >= CONFIG.corroboration_limit:
+			continue
+		var contribution: float = 1.0 / (evidence.uncertainty_radius * evidence.uncertainty_radius)
+		weight += contribution
+		estimate += evidence.estimated_position * contribution
+		count += 1
+		if evidence.proximity_confirmed:
+			baseline = CONFIG.confirmed_confidence
+	if count > 1:
+		node.estimated_position = estimate / weight
+		node.uncertainty_radius = roundf(maxf(CONFIG.uncertainty_floor, sqrt(1.0 / weight)) * 1e10) / 1e10
+		node.confidence = minf(CONFIG.confidence_ceiling, baseline / (1.0 + node.uncertainty_radius / CONFIG.uncertainty_scale) + CONFIG.corroboration_bonus * (count - 1))
+	if conflict:
+		node.confidence *= CONFIG.conflicting_confidence_multiplier
 
 
 static func _preferred(candidate: Observation, current: Observation) -> bool:
@@ -203,6 +237,8 @@ static func _matches_quantized_position(record: Dictionary, expected: Dictionary
 		if not typeof(value) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(value)):
 			return false
 	var comparable: Dictionary = record.duplicate(true)
+	if expected.has("collective_search") and not comparable.has("collective_search"):
+		comparable.collective_search = false
 	var position := Vector2(record.estimated_position[0], record.estimated_position[1])
 	comparable.estimated_position = [position.x, position.y]
 	# Derived division results can parse one float64 bit away even with full JSON

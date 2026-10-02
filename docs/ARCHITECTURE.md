@@ -1,5 +1,7 @@
 # Architecture
 
+Card 061 collective search is owned by ExplorationState and ScoutSystem. Away breadcrumbs/senses remain private; only home arrival adds coarse coverage/evidence. Controller consumes delivered knowledge before scheduling replacements. Departures copy known ground, source familiarity and colony need; priority investigations alternate with general exploration. KnowledgeBase corroborates returned collective provenance deterministically, without truth queries or mandatory visit counts. Normal UI receives detached intent/priority summaries only.
+
 ## Stack and dependency direction
 
 Godot 4.x/GDScript; target stable 4.7.x and pin the tested patch in task 001. Windows first; Android compatibility is a design constraint now. Use inexpensive 2D presentation and a mobile-compatible renderer, with no dependency on Forward+ effects. Specific renderer selection is a bootstrap decision recorded in [DECISIONS](DECISIONS.md).

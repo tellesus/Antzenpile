@@ -74,6 +74,10 @@ func set_exploration_bias(bearing: Variant) -> bool:
 	return scouting.set_bias(bearing)
 
 
+func set_investigation_priority(knowledge_id: String, enabled: bool) -> bool:
+	return scouting.set_priority(knowledge_id, enabled)
+
+
 func investigate_known_source(origin_id: String, knowledge_id: String) -> bool:
 	return scouting.dispatch_investigation(origin_id, knowledge_id)
 
@@ -139,6 +143,7 @@ func _tick(delta: float) -> void:
 	if not run.delivered_observations.is_empty():
 		if not run.knowledge.consume(run.delivered_observations, run.simulation_time):
 			push_error("Knowledge delivery rejected: " + run.knowledge.last_error)
+	scouting.maintain_effort()
 	rival.tick(delta)
 	trails.tick(delta)
 	swarm.tick()

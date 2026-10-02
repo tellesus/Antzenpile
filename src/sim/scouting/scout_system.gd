@@ -14,7 +14,7 @@ func _init(run_state: RunState) -> void:
 	_run = run_state
 
 
-func dispatch(origin_id: String, bearing: Variant = null) -> bool:
+func dispatch(origin_id: String, bearing: Variant = null, standing: bool = false) -> bool:
 	last_error = ""
 	if not _run.colony.piles.has(origin_id) or _run.active_scout_count() >= config.active_cap:
 		return _reject("Unknown origin or scout cap reached")
@@ -35,6 +35,9 @@ func dispatch(origin_id: String, bearing: Variant = null) -> bool:
 		var target: Vector2 = (origin.position + Vector2.from_angle(angle) * distance).round()
 		route = finder.path(origin.position, target)
 		if route.size() > 1:
+			var freshness: float = _run.exploration.coverage.get(_run.exploration.cell_key(target, _run.world.bounds), 0.0) if standing else 0.0
+			if freshness > 0 and _run.rng.randf() < freshness * config.novelty_rejection and attempt < config.target_attempts - 1:
+				continue
 			break
 	if route.size() < 2:
 		_run.rng.state = saved_rng
@@ -42,6 +45,7 @@ func dispatch(origin_id: String, bearing: Variant = null) -> bool:
 	var agent := Agent.new()
 	agent.id = id
 	agent.origin_pile = origin_id
+	agent.standing = standing
 	agent.position = origin.position
 	agent.path = route
 	agent.mission_target = route.back()
@@ -86,7 +90,7 @@ func standing_count() -> int:
 	return count
 
 
-func _maintain_effort() -> void:
+func maintain_effort() -> void:
 	var policy: ExplorationState = _run.exploration
 	policy.cooldown_ticks = maxi(0, policy.cooldown_ticks - 1)
 	if policy.cooldown_ticks > 0 or standing_count() >= policy.target or _run.active_scout_count() >= config.active_cap or _run.colony.piles.home.workers_available < 1:
@@ -94,11 +98,60 @@ func _maintain_effort() -> void:
 	var saved_rng: int = _run.rng.state
 	var bearing: Variant = policy.bias if policy.bias != null and _run.rng.randf() < config.directional_share else null
 	var id: String = "scout_%d" % _run.next_scout_id
-	if dispatch("home", bearing):
+	var priority: String = _next_investigation() if policy.investigation_turn else ""
+	var accepted: bool = dispatch_investigation("home", priority) if not priority.is_empty() else dispatch("home", bearing, true)
+	if not accepted and not priority.is_empty():
+		priority = ""
+		accepted = dispatch("home", bearing, true)
+	if accepted:
 		_run.scouts[id].standing = true
+		_run.scouts[id].search_memory = policy.coverage.duplicate()
+		for known: KnownNode in _run.knowledge.nodes.values():
+			if known.confidence_at(_run.simulation_time) >= config.verification_confidence:
+				_run.scouts[id].known_sources.append(known.source_node_id)
+		_run.scouts[id].known_sources.sort()
+		for resource: String in PileState.RESOURCE_IDS:
+			_run.scouts[id].need_weights[resource] = roundf((1.0 + config.need_weight / (1.0 + _run.colony.piles.home.resources[resource])) * 1e8) / 1e8
+		policy.investigation_turn = not policy.investigation_turn
+		if not priority.is_empty():
+			policy.priority_last_sent[priority] = _run.simulation_time
 	else:
 		_run.rng.state = saved_rng
 	policy.cooldown_ticks = config.departure_interval_ticks
+
+
+func set_priority(knowledge_id: String, enabled: bool) -> bool:
+	if not _run.knowledge.nodes.has(knowledge_id):
+		return _reject("Investigation needs a returned source report")
+	var policy: ExplorationState = _run.exploration
+	if enabled and knowledge_id not in policy.priorities:
+		if policy.priorities.size() >= config.active_cap:
+			return _reject("Investigation priorities full")
+		policy.priorities.append(knowledge_id)
+	elif not enabled:
+		policy.priorities.erase(knowledge_id)
+		policy.priority_last_sent.erase(knowledge_id)
+	policy.priority_cursor %= maxi(1, policy.priorities.size())
+	last_error = ""
+	return true
+
+
+func _next_investigation() -> String:
+	var policy: ExplorationState = _run.exploration
+	var investigating: int = 0
+	var busy: Array[String] = []
+	for agent: ScoutAgent in _run.scouts.values():
+		if agent.standing and not agent.investigation_source_id.is_empty():
+			investigating += 1
+			busy.append("known:" + agent.investigation_source_id)
+	if investigating >= maxi(1, policy.target / 2):
+		return ""
+	for attempt: int in policy.priorities.size():
+		var id: String = policy.priorities[policy.priority_cursor]
+		policy.priority_cursor = (policy.priority_cursor + 1) % policy.priorities.size()
+		if id not in busy and _run.simulation_time - policy.priority_last_sent.get(id, -config.verification_interval) >= config.verification_interval:
+			return id
+	return ""
 
 
 func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
@@ -135,6 +188,7 @@ func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 
 
 func tick(delta: float) -> void:
+	_run.exploration.decay(delta, _run.rain.phase == "raining")
 	for memory: ScoutMissionMemory in _run.scout_missions.values():
 		var half_life: float = config.rain_scent_half_life if _run.rain.phase == "raining" else config.departure_scent_half_life
 		memory.scent = roundf(memory.scent * pow(0.5, delta / half_life) * 1e10) / 1e10
@@ -178,7 +232,10 @@ func tick(delta: float) -> void:
 			var home: PileState = _run.colony.piles[agent.origin_pile]
 			assert(agent.position == home.position)
 			_remember_return(agent, home.position)
+			if agent.standing:
+				_run.exploration.record_return(agent.return_path, _run.world.bounds)
 			for observation: Observation in agent.observations.values():
+				observation.collective_search = agent.standing
 				assert(not _run.delivered_observations.has(observation.id))
 				var delivered := Evidence.new()
 				var valid: bool = delivered.restore(observation.to_dict(), _run.world, _run.colony, _run.simulation_time)
@@ -194,7 +251,6 @@ func tick(delta: float) -> void:
 		if agent.standing and agent.phase in ["exploring", "blocked_exploring"] and _at_breadcrumb(agent) and agent.elapsed >= config.standing_search_seconds:
 			if agent.investigating.is_empty() or agent.elapsed >= config.standing_search_seconds + config.cue_extension_seconds:
 				_start_return(agent)
-	_maintain_effort()
 
 
 func _remember_departure(agent: ScoutAgent, bearing: float) -> void:
@@ -237,7 +293,7 @@ static func _memory_bearing(value: float) -> float:
 
 func _confirmed_new_source(agent: ScoutAgent) -> bool:
 	for source_id: String in agent.observations:
-		if agent.observations[source_id].proximity_confirmed and not _run.knowledge.nodes.has("known:" + source_id):
+		if agent.observations[source_id].proximity_confirmed and _needs_confirmation(source_id, agent):
 			return true
 	return false
 
@@ -253,12 +309,19 @@ func _new_source_cue(agent: ScoutAgent) -> String:
 	var chosen: String = ""
 	for source_id: String in ids:
 		var evidence: Observation = agent.observations[source_id]
-		if _run.knowledge.nodes.has("known:" + source_id) or evidence.proximity_confirmed:
+		if not _needs_confirmation(source_id, agent) or evidence.proximity_confirmed:
 			continue
-		if evidence.closest_distance < closest:
-			closest = evidence.closest_distance
+		var need: float = agent.need_weights.get(evidence.definition_id, 1.0) if agent.standing else 1.0
+		var distance: float = evidence.closest_distance / need
+		if distance < closest:
+			closest = distance
 			chosen = source_id
 	return chosen
+
+
+func _needs_confirmation(source_id: String, agent: ScoutAgent) -> bool:
+	var id: String = "known:" + source_id
+	return source_id not in agent.known_sources if agent.standing else not _run.knowledge.nodes.has(id)
 
 
 func _at_breadcrumb(agent: ScoutAgent) -> bool:
@@ -335,6 +398,8 @@ func _frontier_path(agent: ScoutAgent, center: Vector2, radius: int) -> Array[Ve
 				if route.size() < 2:
 					continue
 				var score: float = -candidate.distance_to(center) if radius >= 0 else (candidate - current).dot(outward)
+				if agent.standing and radius < 0:
+					score -= config.coverage_frontier_penalty * agent.search_memory.get(_run.exploration.cell_key(candidate, _run.world.bounds), 0.0) * pow(0.5, agent.elapsed / config.coverage_half_life)
 				if score > best_score:
 					best_score = score
 					best_path = route

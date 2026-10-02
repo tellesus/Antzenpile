@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 061: selecting a returned resource trace offers Prioritize Investigation / Remove Investigation Priority. This toggles persistent intent, shares existing exploration labor and remains editable during shortage; off effort queues it with clear feedback. The Exploration panel shows priority count. No live coverage map, private scout path, remote need update or resource schedule reaches normal presentation.
+
 Card 060 replaces normal Send Scout with an Exploration panel: off/2/5/8 targets, current away count, Favor This Direction and General Exploration. Target is desired labor, not instantaneous staffing. Reducing target recalls travelers; rotating the view leaves explicit bias unchanged. Controls share mouse/touch paths above bottom time controls at standard/compact sizes. One-shot dispatch remains compatible for development/legacy fixtures, not normal primary play.
 
 Part 7A is the locked visual amendment and supersedes ambiguous earlier concepts. Images establish mood and hierarchy, not pixel-accurate implementation targets.

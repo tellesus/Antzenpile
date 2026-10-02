@@ -15,6 +15,9 @@ var mission_target: Vector2
 var investigating: String = ""
 var investigation_source_id: String = ""
 var standing: bool = false
+var need_weights: Dictionary[String, float] = {}
+var search_memory: Dictionary[String, float] = {}
+var known_sources: Array[String] = []
 var observations: Dictionary[String, Observation] = {}
 
 
@@ -28,7 +31,8 @@ func to_dict() -> Dictionary:
 		"position": [position.x, position.y], "phase": phase, "elapsed": elapsed,
 		"path": _points(path), "cursor": cursor, "return_path": _points(return_path),
 		"mission_target": [mission_target.x, mission_target.y], "investigating": investigating,
-		"investigation_source_id": investigation_source_id, "standing": standing, "observations": evidence}
+		"investigation_source_id": investigation_source_id, "standing": standing, "observations": evidence,
+		"need_weights": need_weights.duplicate(), "search_memory": search_memory.duplicate(), "known_sources": known_sources.duplicate()}
 
 
 static func _points(points: Array[Vector2]) -> Array:
@@ -90,6 +94,26 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if not data.get("standing", false) is bool or data.get("standing", false) and data.origin_pile != "home":
 		return false
+	var needs: Variant = data.get("need_weights", {})
+	var memory: Variant = data.get("search_memory", {})
+	var familiar: Variant = data.get("known_sources", [])
+	if not familiar is Array:
+		return false
+	var restored_familiar: Array[String] = []
+	for key: Variant in familiar:
+		if not key is String or not world.nodes.has(key) or key in restored_familiar or not data.get("standing", false):
+			return false
+		restored_familiar.append(key)
+	if not needs is Dictionary or not memory is Dictionary or not data.get("standing", false) and (not needs.is_empty() or not memory.is_empty()):
+		return false
+	var restored_needs: Dictionary[String, float] = {}
+	for key: Variant in needs:
+		if key not in PileState.RESOURCE_IDS or not typeof(needs[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(needs[key])) or needs[key] < 1 or needs[key] > 1 + load("res://data/scouting/default_scouts.tres").need_weight:
+			return false
+		restored_needs[key] = roundf(float(needs[key]) * 1e8) / 1e8
+	var memory_check := ExplorationState.new()
+	if not memory_check.restore({"target": 0, "bias": null, "cooldown_ticks": 0, "coverage": memory}, world, time):
+		return false
 	var restored_evidence: Dictionary[String, Observation] = {}
 	for value: Variant in data.observations:
 		var evidence := Evidence.new()
@@ -112,6 +136,9 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	investigating = data.investigating
 	investigation_source_id = data.get("investigation_source_id", "")
 	standing = data.get("standing", false)
+	need_weights = restored_needs
+	search_memory = memory_check.coverage
+	known_sources = restored_familiar
 	observations = restored_evidence
 	return true
 

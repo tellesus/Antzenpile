@@ -13,6 +13,7 @@ var estimated_position: Vector2
 var uncertainty_radius: float
 var closest_distance: float
 var proximity_confirmed: bool = false
+var collective_search: bool = false
 
 
 func detached_copy() -> Observation:
@@ -28,6 +29,7 @@ func detached_copy() -> Observation:
 	copy.uncertainty_radius = uncertainty_radius
 	copy.closest_distance = closest_distance
 	copy.proximity_confirmed = proximity_confirmed
+	copy.collective_search = collective_search
 	return copy
 
 
@@ -37,7 +39,7 @@ func to_dict() -> Dictionary:
 		"first_observed_at": first_observed_at, "observed_at": observed_at,
 		"estimated_position": [estimated_position.x, estimated_position.y],
 		"uncertainty_radius": uncertainty_radius, "closest_distance": closest_distance,
-		"proximity_confirmed": proximity_confirmed}
+		"proximity_confirmed": proximity_confirmed, "collective_search": collective_search}
 
 
 func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: float) -> bool:
@@ -55,6 +57,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		if not typeof(data[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data[key])) or data[key] < 0:
 			return false
 	if data.first_observed_at > data.observed_at or data.observed_at > time or data.uncertainty_radius <= 0 or not data.proximity_confirmed is bool:
+		return false
+	if not data.get("collective_search", false) is bool:
 		return false
 	if not data.estimated_position is Array or data.estimated_position.size() != 2:
 		return false
@@ -75,4 +79,5 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	uncertainty_radius = data.uncertainty_radius
 	closest_distance = data.closest_distance
 	proximity_confirmed = data.proximity_confirmed
+	collective_search = data.get("collective_search", false)
 	return true

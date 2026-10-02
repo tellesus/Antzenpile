@@ -1,5 +1,7 @@
 # Data model
 
+Card 061 extends optional ExplorationState with finite coarse-cell coverage, unique known-source priorities, round-robin cursor/alternation and bounded departure timestamps. ScoutAgent captures needs, search memory and confidently known source IDs at departure; these never refresh remotely. Observation.collective_search distinguishes returned standing accounts from legacy evidence. Compatible independent accounts within 300 seconds combine (at most three, confidence ≤0.95, uncertainty ≥0.25); incompatible accounts reduce certainty. Atomic restore validates cell bounds, priority references, snapshot ranges and provenance; legacy fields default empty/false.
+
 Card 060 adds optional RunState.exploration (home target 0–8, nullable normalized bearing and bounded departure cooldown) and ScoutAgent.standing. Every away scout has one matching ledger commitment. Restore validates policy, home ownership, active standing count versus target and travel paths; recalled surplus may exceed target while returning. Missing policy defaults to off and old agents to manual. Standing missions return after 120 seconds of search, or at most 180 while following a cue; observations stay private until arrival.
 
 Contracts below describe the slice destination. Implement each object only when its task arrives. Names are durable vocabulary; fields are minimum responsibilities, not a mandate to prebuild unused systems. IDs identify objects and definitions across serialization; views must not hold mutable authoritative references.

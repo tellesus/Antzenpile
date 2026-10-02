@@ -36,7 +36,7 @@ func _ready() -> void:
 		outward.trail_create_command = create_trail_for
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
-		outward.investigate_command = investigate_known_source
+		outward.investigate_command = toggle_investigation_priority
 		outward.honeydew_start_command = start_honeydew_tending
 		outward.honeydew_stop_command = stop_honeydew_tending
 		outward.input_blocked = debug_is_open
@@ -143,7 +143,14 @@ func outward_status(pile_id: String) -> Dictionary:
 
 func exploration_summary() -> Dictionary:
 	return {"target": simulation.run.exploration.target, "bias": simulation.run.exploration.bias,
-		"away": simulation.scouting.standing_count()}
+		"away": simulation.scouting.standing_count(), "priorities": simulation.run.exploration.priorities.duplicate()}
+
+
+func toggle_investigation_priority(knowledge_id: String) -> Dictionary:
+	var enabled: bool = knowledge_id not in simulation.run.exploration.priorities
+	var accepted: bool = simulation.set_investigation_priority(knowledge_id, enabled)
+	return {"accepted": accepted, "reason": simulation.scouting.last_error,
+		"standing_priority": true, "enabled": enabled, "exploration_off": simulation.run.exploration.target == 0}
 
 
 func set_exploration(target: int) -> Dictionary:

@@ -12,6 +12,8 @@ static func sample(agent: ScoutAgent, world: WorldState, config: ScoutConfig, rn
 	for id: String in ids:
 		var node: WorldNodeState = world.nodes[id]
 		var distance: float = agent.position.distance_to(node.position)
+		if agent.standing:
+			distance = roundf(distance * 1e8) / 1e8
 		if not node.active or node.quantity <= 0 or distance > config.sense_radius:
 			continue
 		var evidence: Observation = agent.observations.get(id)
@@ -29,6 +31,8 @@ static func sample(agent: ScoutAgent, world: WorldState, config: ScoutConfig, rn
 			evidence.closest_distance = distance
 			evidence.observed_at = time
 			evidence.uncertainty_radius = config.localization_floor + distance * config.distance_uncertainty
+			if agent.standing:
+				evidence.uncertainty_radius = roundf(evidence.uncertainty_radius * 1e8) / 1e8
 			var error: Vector2 = Vector2.from_angle(rng.randf_range(-PI, PI)) * evidence.uncertainty_radius
 			evidence.estimated_position = (node.position + error).clamp(world.bounds.position, world.bounds.end - Vector2(0.001, 0.001))
 			evidence.proximity_confirmed = distance <= config.confirmation_radius

@@ -4,6 +4,12 @@
 
 [resource]
 script = ExtResource("1")
+corroboration_window = 300.0
+corroboration_limit = 3
+corroboration_bonus = 0.06
+confidence_ceiling = 0.95
+uncertainty_floor = 0.25
+conflicting_confidence_multiplier = 0.75
 confirmed_confidence = 0.9
 cue_confidence = 0.55
 uncertainty_scale = 4.0

@@ -185,6 +185,8 @@ func _run_command(command: String) -> void:
 				return
 			var result: Dictionary = investigate_command.call(signal_data.source_knowledge_id)
 			_feedback = "Scout investigating remembered source" if result.get("accepted", false) else result.get("reason", "Investigation unavailable")
+			if result.get("accepted", false) and result.get("standing_priority", false):
+				_feedback = "Investigation priority removed" if not result.enabled else "Priority queued · set Exploration effort" if result.exploration_off else "Source prioritized for recurring investigation"
 		"trail_create", "trail_less", "trail_more", "trail_cancel", "trail_recheck":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty():
@@ -479,10 +481,10 @@ func _draw_context(size: Vector2) -> void:
 			_draw_trail_button("trail_less", "− 1")
 			_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
 		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
-	var scout_available: bool = _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
+	var scout_available: bool = _status.has("exploration") or _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
-	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), "INVESTIGATE SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), _investigation_title(selected), Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
@@ -513,10 +515,16 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 		_draw_trail_button("trail_less", "− 1")
 		_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
 		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
-	var scout_available: bool = available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
+	var scout_available: bool = _status.has("exploration") or available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
-	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), "INVESTIGATE SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), _investigation_title(selected), Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+func _investigation_title(selected: Dictionary) -> String:
+	if not _status.has("exploration"):
+		return "INVESTIGATE SOURCE"
+	return "REMOVE INVESTIGATION PRIORITY" if selected.source_knowledge_id in _status.exploration.get("priorities", []) else "PRIORITIZE INVESTIGATION"
 
 
 func _scent_label(route: Dictionary) -> String:
@@ -656,6 +664,7 @@ func _draw_exploration() -> void:
 		draw_rect(box, Color("283b3f"))
 		var title: String = "FAVOR THIS DIRECTION" if command == "exploration_bias" else "GENERAL EXPLORATION" if policy.bias == null else "CLEAR BIAS · %03d°" % roundi(rad_to_deg(policy.bias))
 		_label(box.position + Vector2(137,29), title, Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(Vector2(40, 387), "%d investigation priorities · shares effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 12)
 
 func _signal_title(category: String) -> String:
 	match category:
