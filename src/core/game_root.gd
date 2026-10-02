@@ -55,6 +55,7 @@ func _ready() -> void:
 		inward.nursery_develop_command = start_nursery_development
 		inward.midden_develop_command = start_midden
 		inward.sanitation_command = set_sanitation_workers
+		inward.humidity_command = set_humidity_workers
 		inward.brood_command = start_brood
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
@@ -225,6 +226,9 @@ func inward_status(pile_id: String) -> Dictionary:
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
 	return {"pile_id": pile_id, "queens": pile.queen_count,
+		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
+			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
+			"water_used": pile.humidity.water_used_units / 100000.0},
 		"midden": midden_summary(pile_id),
 		"workers_total": expected_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
@@ -334,6 +338,11 @@ func start_midden() -> Dictionary:
 func set_sanitation_workers(target: int) -> Dictionary:
 	var accepted: bool = simulation.set_sanitation_workers("home", target)
 	return {"accepted": accepted, "reason": simulation.sanitation.last_error}
+
+
+func set_humidity_workers(target: int) -> Dictionary:
+	var accepted: bool = simulation.set_humidity_workers("home", target)
+	return {"accepted": accepted, "reason": simulation.humidity.last_error}
 
 
 func guest_summary(pile_id: String) -> Dictionary:

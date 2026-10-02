@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="HumidityConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/sim/colony/humidity_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+starting = 650000
+dry_ambient = 350000
+wet_ambient = 850000
+dry_step = 125
+wet_step = 250
+care_step = 250
+favorable_low = 450000
+favorable_high = 800000
+extreme_low = 250000
+extreme_high = 950000
+strained_rate = 0.75
+extreme_rate = 0.5
+water_units_per_worker_tick = 250
+care_cap = 4

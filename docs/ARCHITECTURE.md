@@ -1,5 +1,7 @@
 # Architecture
 
+Card 066: each PileState owns HumidityState; HumiditySystem owns humidity:pile internal labor and paid regulation. Only developed Nurseries drift on the local rain/fixed clock. It follows Nursery completion and sanitation, before brood advancement. BroodSystem takes the worse sanitation/humidity rate for larvae and proportional food costs. GameRoot detaches internal condition/use/staff summaries; INWARD keeps climate staffing separate from laying brood. No external source query becomes knowledge, and primitive climate remains stable.
+
 Card 065 adds SourceMemory, a pure projection of detached returned signals/outcomes and route staffing/danger summaries. OUTWARD browsing only selects a remembered bearing; no gameplay command or world lookup. Private standing scout provenance is captured at sensing to preserve eight-decimal observation continuation; observations still enter KnowledgeBase only on return.
 
 Card 064: PileState owns SanitationState. SanitationSystem generates conserved refuse on fixed ticks, owns internal cleaner/excavator ledger jobs and prepaid Midden development, and runs before BroodSystem. BroodSystem scales larval progress and proportional food demand by burden, independently of care/nutrition. GameRoot supplies detached burden, staffing, project and rate summaries; InwardView issues commands. No disease, new deaths, remote corpse retrieval or audio asset.

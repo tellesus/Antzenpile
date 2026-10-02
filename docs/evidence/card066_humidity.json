@@ -1,0 +1,110 @@
+{
+	"duration_seconds": 2400,
+	"engine": "4.7.2-stable (official)",
+	"platform": "Windows",
+	"policy": "Same unfunded returned-source-choice policy as 065 with real nursery/brood/sanitation costs, compare zero climate workers with one developed-Nursery carer when five workers remain available. No injected knowledge/resources or suppressed deaths.",
+	"rows": [
+		{
+			"adult_losses": 10,
+			"brood_emerged": 63,
+			"climate_care": false,
+			"climate_water_used": 0.0,
+			"climate_workers": 0,
+			"moisture": 35.0,
+			"save_exact": true,
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 205.98931,
+				"protein": 47.83808,
+				"water": 132.71656
+			},
+			"strained_seconds": 1821.25,
+			"workers": 93
+		},
+		{
+			"adult_losses": 10,
+			"brood_emerged": 70,
+			"climate_care": true,
+			"climate_water_used": 10.23,
+			"climate_workers": 1,
+			"moisture": 65.0,
+			"save_exact": true,
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 200.57086,
+				"protein": 47.03426,
+				"water": 121.16874
+			},
+			"strained_seconds": 0.0,
+			"workers": 100
+		},
+		{
+			"adult_losses": 11,
+			"brood_emerged": 63,
+			"climate_care": false,
+			"climate_water_used": 0.0,
+			"climate_workers": 0,
+			"moisture": 35.0,
+			"save_exact": true,
+			"seed": 591,
+			"stores": {
+				"carbohydrate": 220.50445,
+				"protein": 47.66128,
+				"water": 137.42096
+			},
+			"strained_seconds": 1821.25,
+			"workers": 92
+		},
+		{
+			"adult_losses": 11,
+			"brood_emerged": 70,
+			"climate_care": true,
+			"climate_water_used": 10.23,
+			"climate_workers": 1,
+			"moisture": 65.0,
+			"save_exact": true,
+			"seed": 591,
+			"stores": {
+				"carbohydrate": 215.60512,
+				"protein": 47.03426,
+				"water": 126.16874
+			},
+			"strained_seconds": 0.0,
+			"workers": 99
+		},
+		{
+			"adult_losses": 11,
+			"brood_emerged": 62,
+			"climate_care": false,
+			"climate_water_used": 0.0,
+			"climate_workers": 0,
+			"moisture": 35.0,
+			"save_exact": true,
+			"seed": 202603,
+			"stores": {
+				"carbohydrate": 195.5635,
+				"protein": 48.51916,
+				"water": 114.84988
+			},
+			"strained_seconds": 1780.25,
+			"workers": 91
+		},
+		{
+			"adult_losses": 10,
+			"brood_emerged": 70,
+			"climate_care": true,
+			"climate_water_used": 10.105,
+			"climate_workers": 1,
+			"moisture": 65.0,
+			"save_exact": true,
+			"seed": 202603,
+			"stores": {
+				"carbohydrate": 188.97326,
+				"protein": 46.52726,
+				"water": 125.45074
+			},
+			"strained_seconds": 0.0,
+			"workers": 100
+		}
+	]
+}

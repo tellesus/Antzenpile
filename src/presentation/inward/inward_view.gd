@@ -13,6 +13,7 @@ var develop_command: Callable
 var nursery_develop_command: Callable
 var midden_develop_command: Callable
 var sanitation_command: Callable
+var humidity_command: Callable
 var brood_command: Callable
 var adaptation_command: Callable
 var guest_rejection_command: Callable
@@ -58,6 +59,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "nursery" and _status.get("nursery_state", "primitive") == "developed":
+		for target: int in [0, 1, 2, 4]:
+			if _humidity_rect(target).has_point(at):
+				_run_command("climate_" + str(target))
+				return true
 	if selected_id == "midden" and _status.get("midden", {}).get("revealed", false):
 		for target: int in [0, 1, 2, 5]:
 			if _cleaner_rect(target).has_point(at):
@@ -119,6 +125,10 @@ func activate_at(at: Vector2) -> bool:
 
 func _run_command(command: String) -> void:
 	match command:
+		"climate_0", "climate_1", "climate_2", "climate_4":
+			if humidity_command.is_valid():
+				var result: Dictionary = humidity_command.call(int(command.trim_prefix("climate_")))
+				show_feedback("Climate carers reassigned" if result.get("accepted", false) else result.get("reason", "Climate care unavailable"))
 		"cleanup_0", "cleanup_1", "cleanup_2", "cleanup_5":
 			if sanitation_command.is_valid():
 				var result: Dictionary = sanitation_command.call(int(command.trim_prefix("cleanup_")))
@@ -225,7 +235,12 @@ func _midden_develop_rect() -> Rect2:
 
 
 func _brood_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0, 438.0 if selected_id == "nursery" else 380.0, 260.0, 44.0)
+	var y: float = 494.0 if selected_id == "nursery" and _status.get("nursery_state", "primitive") == "developed" else 438.0 if selected_id == "nursery" else 380.0
+	return Rect2(get_viewport_rect().size.x - 300.0, y, 260.0, 44.0)
+
+
+func _humidity_rect(target: int) -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0 + [0, 1, 2, 4].find(target) * 66.0, 398, 62, 44)
 
 
 func _nursery_develop_rect() -> Rect2:
@@ -419,8 +434,10 @@ func _draw_context(size: Vector2) -> void:
 					care_enough = care_enough and cohort.care >= 1.0
 				_detail_line(box, 143, "Food %s · care %s" % ["enough" if food_enough else "short", "enough" if care_enough else "short"])
 			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)])
-			if _status.get("midden", {}).get("larval_rate", 1.0) < 1.0:
-				_detail_line(box, 162, "Sanitation slows larvae · visit Midden")
+			var dirty: bool = _status.get("midden", {}).get("larval_rate", 1.0) < 1.0
+			var climate: bool = _status.get("humidity", {}).get("larval_rate", 1.0) < 1.0
+			if dirty or climate:
+				_detail_line(box, 162, "Climate + sanitation slow larvae" if dirty and climate else "Nest climate slows larvae" if climate else "Sanitation slows larvae · visit Midden")
 			if _status.nursery_state == "primitive":
 				_detail_line(box, 209, "Develop for %d brood space" % _status.nursery_developed_capacity)
 				_detail_line(box, 235, "Needs %.0f carb · %.0f protein" % [_status.nursery_costs.carbohydrate, _status.nursery_costs.protein])
@@ -430,7 +447,16 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 209, "Developing: %.0f / %.0fs" % [_status.nursery_progress, _status.nursery_build_duration])
 				_detail_line(box, 235, "%d workers committed" % _status.nursery_workers_required)
 			else:
-				_detail_line(box, 209, "Developed: room for two cohorts")
+				var humidity: Dictionary = _status.get("humidity", {"moisture": 65.0, "carers": 0, "water_used": 0.0})
+				var condition: String = "dry" if humidity.moisture < 45.0 else "damp" if humidity.moisture > 80.0 else "steady"
+				_detail_line(box, 209, "Humidity: %.0f%% · %s" % [humidity.moisture, condition])
+				_detail_line(box, 235, "Climate carers: %d" % humidity.carers)
+				for target: int in [0, 1, 2, 4]:
+					var button: Rect2 = _humidity_rect(target)
+					draw_rect(button, Color("355059") if target == humidity.carers else Color("263038"))
+					_label(button.get_center() + Vector2(0, 6), str(target), Color("dce5d9"), 16, HORIZONTAL_ALIGNMENT_CENTER)
+				_detail_line(box, 310, "Humidifying uses stored water")
+				_detail_line(box, 332, "%.1f water used · airing uses labor" % humidity.water_used)
 			if _can_lay_brood():
 				_draw_brood_button()
 		"food_exchange":
