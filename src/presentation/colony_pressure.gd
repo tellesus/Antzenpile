@@ -11,11 +11,27 @@ static func nursery_causes(status: Dictionary) -> Array[String]:
 	var food: bool = false
 	var care: bool = false
 	for cohort: Dictionary in status.get("brood", []):
-		food = food or cohort.get("nutrition", 1.0) < 1.0
+		food = food or cohort.get("nutrition", 1.0) < 1.0 and cohort.get("care", 1.0) >= 1.0
 		care = care or cohort.get("care", 1.0) < 1.0
-	if food: causes.append("FOOD")
+	var shortages: Array[String] = food_shortages(status)
+	for resource_id: String in shortages: causes.append("CARB" if resource_id == "carbohydrate" else resource_id.to_upper())
+	if food and shortages.is_empty(): causes.append("FOOD") # Older reports may have no specific cause.
 	if care: causes.append("CARE")
 	return causes
+
+static func food_shortages(status: Dictionary) -> Array[String]:
+	var result: Array[String] = []
+	for resource_id: String in ["carbohydrate", "protein", "water"]:
+		for cohort: Dictionary in status.get("brood", []):
+			if cohort.get("care", 1.0) >= 1.0 and cohort.get("nutrition", 1.0) < 1.0 and resource_id in cohort.get("nutrition_shortfalls", []):
+				result.append(resource_id)
+				break
+	return result
+
+static func food_names(status: Dictionary) -> String:
+	var labels: Array[String] = []
+	for resource_id: String in food_shortages(status): labels.append("Carb" if resource_id == "carbohydrate" else resource_id.capitalize())
+	return " + ".join(labels)
 
 static func attention(status: Dictionary) -> Dictionary:
 	var causes: Array[String] = nursery_causes(status)

@@ -62,6 +62,7 @@ func _ready() -> void:
 		inward.develop_command = start_food_exchange
 		inward.nursery_develop_command = start_nursery_development
 		inward.nursery_expand_command = start_nursery_expansion
+		inward.food_sources_command = browse_food_sources
 		inward.midden_develop_command = start_midden
 		inward.sanitation_command = set_sanitation_workers
 		inward.humidity_command = set_humidity_workers
@@ -479,6 +480,18 @@ func start_nursery_development() -> Dictionary:
 func start_nursery_expansion() -> Dictionary:
 	var accepted: bool = simulation.start_nursery_expansion("home")
 	return {"accepted": accepted, "reason": simulation.nursery.last_error}
+
+
+func browse_food_sources(resource_id: String) -> Dictionary:
+	if resource_id not in Pressure.food_shortages(inward_status("home")) or _outward_view == null:
+		return {"accepted": false, "reason": "Feeding needs changed"}
+	_outward_view.exploration_open = false
+	_outward_view.sources_open = true
+	_outward_view.source_category = resource_id
+	_outward_view.source_page = 0
+	_outward_view._process(0)
+	set_mode("outward")
+	return {"accepted": true, "reason": ""}
 
 
 func set_honeydew_protection(enabled: bool) -> Dictionary:

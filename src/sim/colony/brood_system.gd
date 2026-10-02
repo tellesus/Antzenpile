@@ -75,6 +75,7 @@ func tick(delta: float) -> void:
 
 
 func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction: float) -> void:
+	cohort.nutrition_shortfalls.clear()
 	cohort.care = care_fraction
 	if cohort.care < 1.0:
 		cohort.nutrition = 0.0 if cohort.stage == "larva" else 1.0
@@ -87,6 +88,8 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 			"protein": cohort.count * CONFIG.protein_per_larva_second * effective_delta * food_multiplier,
 			"water": cohort.count * CONFIG.water_per_larva_second * effective_delta * food_multiplier}
 		if not pile.consume_resources(costs):
+			for resource_id: String in BroodCohort.RESOURCE_IDS:
+				if pile.resources[resource_id] < costs[resource_id]: cohort.nutrition_shortfalls.append(resource_id)
 			cohort.nutrition = 0.0
 			return
 	cohort.nutrition = 1.0

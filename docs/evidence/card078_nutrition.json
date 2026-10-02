@@ -1,0 +1,38 @@
+{
+	"engine": "4.7.2-stable (official)",
+	"policy": "Same paid expanded-colony command policy as 077; stop at first actual nutrient shortage. No injected food/knowledge or suppressed danger.",
+	"rows": [
+		{
+			"capacity": 32,
+			"cohorts": 4,
+			"missing": [
+				"carbohydrate"
+			],
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 0.01178,
+				"protein": 29.85789,
+				"water": 38.04836
+			},
+			"time": 1829.5,
+			"workers_conserved": true
+		},
+		{
+			"capacity": 32,
+			"cohorts": 4,
+			"missing": [
+				"protein"
+			],
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 31.26752,
+				"protein": 0.00327,
+				"water": 45.95623
+			},
+			"time": 1545.25,
+			"workers_conserved": true
+		}
+	]
+}

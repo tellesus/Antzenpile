@@ -1,5 +1,7 @@
 # Architecture
 
+Card 078 records the specific resource failures of BroodSystem's existing atomic larval debit in typed cohort state. ColonyPressure projects only known, care-assessed local shortages; care-only waiting no longer claims FOOD. GameRoot's free source-attention command revalidates that diagnosis and opens the existing returned-memory browser/category without a simulation command, rotation or source selection. Saves default absent legacy diagnosis to unknown until the next feeding assessment.
+
 Card 077 extends NurseryDevelopmentSystem with one latched need and prepaid expansion, separate from initial development. Pile owns typed state/progress; the ledger owns eight excavators. Existing developed capacity/climate remain active until completion increases brood/care capacity. Root detaches the project state/price/progress; capped presentation represents four cohort groups with six glyphs and one excavation role. No new individual agents, RNG or engine dependency.
 
 Card 076 shares pure ColonyPressure causes between local organ art and OUTWARD internal_attention. GameRoot derives that small detached dictionary from approved inward_status, and revalidates it for explicit context navigation. The normal view receives no pile/world references; attention adds no saved field or simulation mutation.

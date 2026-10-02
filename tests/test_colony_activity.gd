@@ -10,7 +10,7 @@ func stress() -> Dictionary:
 		"midden": {"revealed": true, "cleaners": 5, "burden": 30.0, "larval_rate": 0.5, "state": "developing", "progress": 0.4},
 		"food_exchange_state": "developing", "food_exchange_progress": 15.0, "food_exchange_duration": 60.0,
 		"guest": {"rejection_active": true},
-		"brood": [{"count": 8, "stage": "larva", "nutrition": 0.7, "care": 0.5}, {"count": 8, "stage": "pupa", "nutrition": 1.0, "care": 1.0}]}
+		"brood": [{"count": 8, "stage": "larva", "nutrition": 0.7, "care": 1.0}, {"count": 8, "stage": "pupa", "nutrition": 1.0, "care": 0.5}]}
 
 func run(test: Object) -> bool:
 	var status: Dictionary = stress()

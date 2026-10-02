@@ -3,6 +3,7 @@ extends RefCounted
 ## One aggregate immature cohort; never part of the living-worker ledger.
 
 const CONFIG = preload("res://data/resources/default_brood.tres")
+const RESOURCE_IDS: Array[String] = ["carbohydrate", "protein", "water"]
 var id: String = "brood_1"
 var stage: String = "egg"
 var count: int = CONFIG.starting_count
@@ -10,6 +11,7 @@ var lost_count: int = 0
 var progress_seconds: float = 0.0
 var nutrition: float = 1.0
 var care: float = 1.0
+var nutrition_shortfalls: Array[String] = []
 var adaptation_id: String = ""
 var adaptation_trial: bool = false
 var inherited_traits: Array[String] = []
@@ -24,6 +26,7 @@ static func next_id(matured_total: int, active_count: int = 0) -> String:
 func to_dict() -> Dictionary:
 	return {"id": id, "stage": stage, "count": count, "lost_count": lost_count, "progress_seconds": progress_seconds,
 		"nutrition": nutrition, "care": care,
+		"nutrition_shortfalls": nutrition_shortfalls.duplicate(),
 		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial,
 		"inherited_traits": inherited_traits.duplicate(), "rain_comparison": rain_comparison,
 		"recognition_comparison": recognition_comparison}
@@ -40,6 +43,13 @@ func restore(data: Dictionary) -> bool:
 			return false
 	if data.progress_seconds >= CONFIG.stage_seconds(data.stage) or data.nutrition > 1.0 or data.care > 1.0:
 		return false
+	var shortfalls: Variant = data.get("nutrition_shortfalls", [])
+	if not shortfalls is Array: return false
+	var parsed_shortfalls: Array[String] = []
+	for value: Variant in shortfalls:
+		if not value is String or value not in RESOURCE_IDS or value in parsed_shortfalls: return false
+		parsed_shortfalls.append(value)
+	if not parsed_shortfalls.is_empty() and (data.stage != "larva" or data.care < 1.0 or data.nutrition >= 1.0): return false
 	var trait_id: Variant = data.get("adaptation_id", "")
 	var trial: Variant = data.get("adaptation_trial", false)
 	if not trait_id is String or not (trait_id == "" or AdaptationRules.valid_trait(trait_id)) or typeof(trial) != TYPE_BOOL or (trial and trait_id == ""):
@@ -68,6 +78,7 @@ func restore(data: Dictionary) -> bool:
 	progress_seconds = float(data.progress_seconds)
 	nutrition = float(data.nutrition)
 	care = float(data.care)
+	nutrition_shortfalls = parsed_shortfalls
 	adaptation_id = trait_id
 	adaptation_trial = trial
 	inherited_traits = parsed_traits

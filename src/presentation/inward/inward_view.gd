@@ -5,6 +5,7 @@ extends Node2D
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Web = preload("res://src/presentation/inward/adaptation_web.gd")
 const Activity = preload("res://src/presentation/inward/colony_activity.gd")
+const Pressure = preload("res://src/presentation/colony_pressure.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
 var mode_command: Callable
@@ -13,6 +14,7 @@ var speed_command: Callable
 var develop_command: Callable
 var nursery_develop_command: Callable
 var nursery_expand_command: Callable
+var food_sources_command: Callable
 var midden_develop_command: Callable
 var sanitation_command: Callable
 var humidity_command: Callable
@@ -66,6 +68,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "food_exchange":
+		for resource_id: String in Pressure.food_shortages(_status):
+			if _food_source_rect(resource_id).has_point(at):
+				if food_sources_command.is_valid():
+					var result: Dictionary = food_sources_command.call(resource_id)
+					if not result.get("accepted", false): show_feedback(result.get("reason", "Sources unavailable"))
+				return true
 	if selected_id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "available" and _nursery_expand_rect().has_point(at):
 		_run_command("expand_nursery")
 		return true
@@ -265,6 +274,10 @@ func _nursery_expand_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 550.0, 260.0, 44.0)
 
 
+func _food_source_rect(resource_id: String) -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0 + ["carbohydrate", "protein", "water"].find(resource_id) * 88, 470, 84, 44)
+
+
 func _adaptation_rect(_trait_id: String) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
 
@@ -442,7 +455,8 @@ func _draw_context(size: Vector2) -> void:
 		return
 	var expansion: Dictionary = _status.get("nursery_expansion", {})
 	var expansion_action: bool = expansion.get("state", "") == "available"
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
+	var food_attention: bool = selected_id == "food_exchange" and not Pressure.food_shortages(_status).is_empty()
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 388 if food_attention else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	var web: bool = selected_id == "adaptation"
 	draw_rect(box, Color("17141f") if web else Color("111921"))
 	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
@@ -502,9 +516,10 @@ func _draw_context(size: Vector2) -> void:
 				var food_enough: bool = true
 				var care_enough: bool = true
 				for cohort: Dictionary in brood:
-					food_enough = food_enough and cohort.nutrition >= 1.0
+					food_enough = food_enough and (cohort.care < 1.0 or cohort.nutrition >= 1.0)
 					care_enough = care_enough and cohort.care >= 1.0
-				_detail_line(box, 143, "Food %s · care %s" % ["enough" if food_enough else "short", "enough" if care_enough else "short"])
+				var feeding: String = "Last short: " + Pressure.food_names(_status) if not Pressure.food_shortages(_status).is_empty() else "Brood waits for care" if not care_enough and food_enough else "Food %s · care %s" % ["enough" if food_enough else "short", "enough" if care_enough else "short"]
+				_label(box.position + Vector2(16, 143), feeding, Color("a9b9bc"), 13)
 			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)])
 			var dirty: bool = _status.get("midden", {}).get("larval_rate", 1.0) < 1.0
 			var climate: bool = _status.get("humidity", {}).get("larval_rate", 1.0) < 1.0
@@ -560,6 +575,13 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 137, "Carbohydrate: %.1f" % _status.resources.carbohydrate)
 				_detail_line(box, 163, "Protein: %.1f" % _status.resources.protein)
 				_detail_line(box, 189, "Water: %.1f" % _status.resources.water)
+			if food_attention:
+				_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 13)
+				_label(box.position + Vector2(16, 316), "Browse returned sources", Color("8fa1a8"), 11)
+				for resource_id: String in Pressure.food_shortages(_status):
+					var button: Rect2 = _food_source_rect(resource_id)
+					draw_rect(button, Color("263038"))
+					_label(button.get_center() + Vector2(0, 5), "FOOD" if resource_id == "carbohydrate" else resource_id.to_upper(), Color("dce5d9"), 12, HORIZONTAL_ALIGNMENT_CENTER)
 		"entrance":
 			_detail_line(box, 65, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
