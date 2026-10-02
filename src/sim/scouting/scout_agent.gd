@@ -18,6 +18,8 @@ var standing: bool = false
 var need_weights: Dictionary[String, float] = {}
 var search_memory: Dictionary[String, float] = {}
 var known_sources: Array[String] = []
+var trunk_route_id: String = ""
+var trunk_path: Array[Vector2] = []
 var observations: Dictionary[String, Observation] = {}
 
 
@@ -32,7 +34,8 @@ func to_dict() -> Dictionary:
 		"path": _points(path), "cursor": cursor, "return_path": _points(return_path),
 		"mission_target": [mission_target.x, mission_target.y], "investigating": investigating,
 		"investigation_source_id": investigation_source_id, "standing": standing, "observations": evidence,
-		"need_weights": need_weights.duplicate(), "search_memory": search_memory.duplicate(), "known_sources": known_sources.duplicate()}
+		"need_weights": need_weights.duplicate(), "search_memory": search_memory.duplicate(), "known_sources": known_sources.duplicate(),
+		"trunk_route_id": trunk_route_id, "trunk_path": _points(trunk_path)}
 
 
 static func _points(points: Array[Vector2]) -> Array:
@@ -47,7 +50,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if not data.id is String or not data.id.begins_with("scout_") or data.mission_id != data.id or not data.origin_pile is String or not colony.piles.has(data.origin_pile):
 		return false
-	if not data.phase in ["departing", "exploring", "returning", "blocked_exploring", "blocked_returning"] or not _point(data.position, world.bounds):
+	if not data.phase in ["departing", "following_trail", "blocked_following_trail", "exploring", "returning", "blocked_exploring", "blocked_returning"] or not _point(data.position, world.bounds):
 		return false
 	if not typeof(data.elapsed) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.elapsed)) or data.elapsed < 0 or not WorkerLedger.valid_count(data.cursor):
 		return false
@@ -114,6 +117,26 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	var memory_check := ExplorationState.new()
 	if not memory_check.restore({"target": 0, "bias": null, "cooldown_ticks": 0, "coverage": memory}, world, time):
 		return false
+	var trunk_id: Variant = data.get("trunk_route_id", "")
+	var trunk: Variant = data.get("trunk_path", [])
+	if not trunk_id is String or not trunk is Array or trunk_id.is_empty() != trunk.is_empty():
+		return false
+	var restored_trunk: Array[Vector2] = []
+	if not trunk.is_empty():
+		if not data.get("standing", false) or not data.get("investigation_source_id", "").is_empty() or trunk.size() < 2:
+			return false
+		for point: Variant in trunk:
+			if not _point(point, world.bounds):
+				return false
+			var step := Vector2(point[0], point[1])
+			if step != step.round() or step in restored_trunk or not restored_trunk.is_empty() and absf((step - restored_trunk.back()).abs().x + (step - restored_trunk.back()).abs().y - 1.0) > 0.0001:
+				return false
+			restored_trunk.append(step)
+		if restored_trunk[0] != home:
+			return false
+	if data.phase in ["following_trail", "blocked_following_trail"] or data.phase == "departing" and not restored_trunk.is_empty():
+		if restored_trunk.is_empty() or restored_path != restored_trunk or data.elapsed != 0 or restored_return != restored_trunk.slice(0, restored_return.size()):
+			return false
 	var restored_evidence: Dictionary[String, Observation] = {}
 	for value: Variant in data.observations:
 		var evidence := Evidence.new()
@@ -139,6 +162,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	need_weights = restored_needs
 	search_memory = memory_check.coverage
 	known_sources = restored_familiar
+	trunk_route_id = trunk_id
+	trunk_path = restored_trunk
 	observations = restored_evidence
 	return true
 

@@ -651,7 +651,7 @@ func _exploration_rect(command: String) -> Rect2:
 
 
 func _draw_exploration() -> void:
-	draw_rect(Rect2(24, 148, 308, 244), Color("111921"))
+	draw_rect(Rect2(24, 148, 308, 266), Color("111921"))
 	var policy: Dictionary = _status.get("exploration", {"target": 0, "away": 0, "bias": null})
 	_label(Vector2(40, 177), "Exploration labor", Color("d3dcd4"), 20)
 	_label(Vector2(40, 203), "%d target · %d away · replaces on return" % [policy.target, policy.away], Color("a8b9b6"), 13)
@@ -665,6 +665,7 @@ func _draw_exploration() -> void:
 		var title: String = "FAVOR THIS DIRECTION" if command == "exploration_bias" else "GENERAL EXPLORATION" if policy.bias == null else "CLEAR BIAS · %03d°" % roundi(rad_to_deg(policy.bias))
 		_label(box.position + Vector2(137,29), title, Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	_label(Vector2(40, 387), "%d investigation priorities · shares effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 12)
+	_label(Vector2(40, 406), "Established trails extend search reach", Color("a8b9b6"), 12)
 
 func _signal_title(category: String) -> String:
 	match category:

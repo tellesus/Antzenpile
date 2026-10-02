@@ -195,11 +195,21 @@ func restore(data: Dictionary) -> bool:
 		if not restored_knowledge.nodes.has(priority):
 			return false
 	for agent: ScoutAgent in restored_scouts.values():
+		for source_id: String in agent.known_sources:
+			if not restored_knowledge.nodes.has("known:" + source_id):
+				return false
 		if not agent.investigation_source_id.is_empty() and not restored_knowledge.nodes.has("known:" + agent.investigation_source_id):
 			return false
 	var restored_trails := Trails.new()
 	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time):
 		return false
+	for agent: ScoutAgent in restored_scouts.values():
+		if not agent.trunk_route_id.is_empty():
+			if not restored_trails.routes.has(agent.trunk_route_id):
+				return false
+			var route: TrailRouteState = restored_trails.routes[agent.trunk_route_id]
+			if route.origin_pile != agent.origin_pile or route.delivered_total <= 0 or route.estimated_destination.round() != agent.trunk_path.back():
+				return false
 	var used_scout_ids: Dictionary[String, bool] = {}
 	for id: String in restored_scouts:
 		used_scout_ids[id] = true

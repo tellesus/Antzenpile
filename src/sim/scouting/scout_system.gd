@@ -42,22 +42,55 @@ func dispatch(origin_id: String, bearing: Variant = null, standing: bool = false
 	if route.size() < 2:
 		_run.rng.state = saved_rng
 		return _reject("No reachable scout target")
+	return _dispatch_route(origin, route, standing, (route.back() - origin.position).angle() if bearing == null else float(bearing))
+
+
+func _dispatch_route(origin: PileState, route: Array[Vector2], standing: bool, bearing: float, source_id: String = "", trunk_id: String = "") -> bool:
+	if origin.workers_available < 1 or _run.active_scout_count() >= config.active_cap or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
+		return _reject("Scout labor or capacity unavailable")
+	var id: String = "scout_%d" % _run.next_scout_id
+	if origin.workers.count(id) >= 0 or not origin.workers.create_commitment(id, "scout", id):
+		return _reject("Scout commitment unavailable")
+	var allocated: bool = origin.workers.allocate(id, 1)
+	assert(allocated)
 	var agent := Agent.new()
 	agent.id = id
-	agent.origin_pile = origin_id
+	agent.origin_pile = origin.id
 	agent.standing = standing
 	agent.position = origin.position
 	agent.path = route
 	agent.mission_target = route.back()
 	agent.return_path.append(origin.position)
-	var created: bool = origin.workers.create_commitment(id, "scout", id)
-	assert(created)
-	var allocated: bool = origin.workers.allocate(id, 1)
-	assert(allocated)
+	agent.investigation_source_id = source_id
+	agent.trunk_route_id = trunk_id
+	if not trunk_id.is_empty():
+		agent.trunk_path = route.duplicate()
 	_run.scouts[id] = agent
-	_remember_departure(agent, (agent.mission_target - origin.position).angle() if bearing == null else float(bearing))
+	_remember_departure(agent, bearing)
 	_run.next_scout_id += 1
+	last_error = ""
 	return true
+
+
+func _dispatch_general(origin_id: String, bearing: Variant) -> bool:
+	var candidates: Array[TrailRouteState] = []
+	for route: TrailRouteState in _run.trails.routes.values():
+		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
+		if route.origin_pile != origin_id or route.delivered_total <= 0 or segment.route_familiarity < config.established_trail_familiarity or route.reported_losses > 0 or route.conflict_report not in ["", "secured", "dispersed"] or route.foreign_reports > 0:
+			continue
+		var direction: float = (route.estimated_destination - _run.colony.piles[origin_id].position).angle()
+		if bearing != null and absf(wrapf(direction - float(bearing), -PI, PI)) > config.cone_radians:
+			continue
+		candidates.append(route)
+	candidates.sort_custom(func(a: TrailRouteState, b: TrailRouteState) -> bool: return a.id < b.id)
+	if not candidates.is_empty() and _run.rng.randf() < config.trail_exploration_share:
+		var selected: TrailRouteState = candidates[_run.rng.randi_range(0, candidates.size() - 1)]
+		var origin: PileState = _run.colony.piles[origin_id]
+		var path: Array[Vector2] = Pathfinder.new(_run.world).path(origin.position, selected.estimated_destination.round())
+		if path.size() > 1:
+			return _dispatch_route(origin, path, true, (path.back() - origin.position).angle(), "", selected.id)
+	return dispatch(origin_id, bearing, true)
+
 
 
 func set_effort(target: Variant) -> bool:
@@ -99,16 +132,20 @@ func maintain_effort() -> void:
 	var bearing: Variant = policy.bias if policy.bias != null and _run.rng.randf() < config.directional_share else null
 	var id: String = "scout_%d" % _run.next_scout_id
 	var priority: String = _next_investigation() if policy.investigation_turn else ""
-	var accepted: bool = dispatch_investigation("home", priority) if not priority.is_empty() else dispatch("home", bearing, true)
+	var accepted: bool = dispatch_investigation("home", priority) if not priority.is_empty() else _dispatch_general("home", bearing)
 	if not accepted and not priority.is_empty():
 		priority = ""
-		accepted = dispatch("home", bearing, true)
+		accepted = _dispatch_general("home", bearing)
 	if accepted:
 		_run.scouts[id].standing = true
 		_run.scouts[id].search_memory = policy.coverage.duplicate()
 		for known: KnownNode in _run.knowledge.nodes.values():
 			if known.confidence_at(_run.simulation_time) >= config.verification_confidence:
 				_run.scouts[id].known_sources.append(known.source_node_id)
+		if not _run.scouts[id].trunk_route_id.is_empty():
+			var source_id: String = _run.knowledge.nodes[_run.trails.routes[_run.scouts[id].trunk_route_id].destination_knowledge_id].source_node_id
+			if source_id not in _run.scouts[id].known_sources:
+				_run.scouts[id].known_sources.append(source_id)
 		_run.scouts[id].known_sources.sort()
 		for resource: String in PileState.RESOURCE_IDS:
 			_run.scouts[id].need_weights[resource] = roundf((1.0 + config.need_weight / (1.0 + _run.colony.piles.home.resources[resource])) * 1e8) / 1e8
@@ -168,23 +205,8 @@ func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 	var route: Array[Vector2] = Pathfinder.new(_run.world).path(pile.position, target)
 	if route.size() < 2:
 		return _reject("No reachable known estimate")
-	var id: String = "scout_%d" % _run.next_scout_id
-	if pile.workers.count(id) >= 0 or not pile.workers.create_commitment(id, "scout", id):
-		return _reject("Scout commitment unavailable")
-	var allocated: bool = pile.workers.allocate(id, 1)
-	assert(allocated)
-	var agent := Agent.new()
-	agent.id = id
-	agent.origin_pile = origin_id
-	agent.position = pile.position
-	agent.path = route
-	agent.mission_target = target
-	agent.return_path.append(pile.position)
-	agent.investigation_source_id = known.source_node_id
-	_run.scouts[id] = agent
-	_remember_departure(agent, (target - pile.position).angle())
-	_run.next_scout_id += 1
-	return true
+	return _dispatch_route(pile, route, false, (target - pile.position).angle(), known.source_node_id)
+
 
 
 func tick(delta: float) -> void:
@@ -199,7 +221,16 @@ func tick(delta: float) -> void:
 	for id: String in ids:
 		var agent: ScoutAgent = _run.scouts[id]
 		if agent.phase == "departing":
-			agent.phase = "exploring"
+			agent.phase = "following_trail" if not agent.trunk_route_id.is_empty() else "exploring"
+			continue
+		if agent.phase in ["following_trail", "blocked_following_trail"]:
+			Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
+			_move(agent, delta, true)
+			Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
+			if agent.phase == "blocked_exploring":
+				agent.phase = "blocked_following_trail"
+			elif agent.cursor >= agent.path.size() and not _continue_search(agent):
+				_start_return(agent)
 			continue
 		var exploring: bool = agent.phase in ["exploring", "blocked_exploring"]
 		Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
@@ -423,7 +454,8 @@ func _move(agent: ScoutAgent, delta: float, exploring: bool) -> void:
 		if not is_finite(cost):
 			agent.phase = "blocked_exploring" if exploring else "blocked_returning"
 			return
-		var needed: float = distance * cost / config.speed
+		var speed: float = config.speed * (config.trail_travel_multiplier if _on_trunk_edge(agent, target) else 1.0)
+		var needed: float = distance * cost / speed
 		if needed <= budget:
 			agent.position = target
 			agent.cursor += 1
@@ -431,8 +463,17 @@ func _move(agent: ScoutAgent, delta: float, exploring: bool) -> void:
 			if exploring:
 				agent.return_path.append(target)
 		else:
-			agent.position = agent.position.move_toward(target, budget * config.speed / cost)
+			agent.position = agent.position.move_toward(target, budget * speed / cost)
 			budget = 0.0
+
+
+func _on_trunk_edge(agent: ScoutAgent, target: Vector2) -> bool:
+	for index: int in range(1, agent.trunk_path.size()):
+		var a: Vector2 = agent.trunk_path[index - 1]
+		var b: Vector2 = agent.trunk_path[index]
+		if target in [a, b] and absf(agent.position.distance_to(a) + agent.position.distance_to(b) - 1.0) < 0.0001:
+			return true
+	return false
 
 
 func _reject(reason: String) -> bool:

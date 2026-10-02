@@ -241,6 +241,9 @@ static func _matches_quantized_position(record: Dictionary, expected: Dictionary
 		comparable.collective_search = false
 	var position := Vector2(record.estimated_position[0], record.estimated_position[1])
 	comparable.estimated_position = [position.x, position.y]
+	for field: String in ["uncertainty_radius", "closest_distance"]:
+		if expected.has(field) and comparable.has(field) and typeof(comparable[field]) in [TYPE_INT, TYPE_FLOAT] and absf(float(comparable[field]) - float(expected[field])) <= 1e-15:
+			comparable[field] = expected[field]
 	# Derived division results can parse one float64 bit away even with full JSON
 	# precision. Rebuild from validated evidence; accept only representation noise.
 	if expected.has("confidence"):
