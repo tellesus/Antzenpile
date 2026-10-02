@@ -1,5 +1,7 @@
 # Architecture
 
+Card 081 records one bounded receipt summary per route only after a positive net home deposit. Root detaches it into approved trail summaries; SourceMemory renders sensing and home intake separately. Browser rows remain free attention, with stable order/IDs and existing pagination. No new RNG, chemistry projection or event-log growth.
+
 Card 080 composes FoodToxicitySystem after brood on fixed ticks. Hidden contaminant travels in actual aggregate cargo and enters the liquid-food pool through net home delivery. Consumption/cargo losses remove proportional material; fixed decay/dose can remove only available home adults through existing ledger/genetics. Root exposes locally observed loss count/age/recent evidence, never chemistry or source attribution. Roadside is an optional third authored setting sharing established ecology; old settings acquire no contaminated source.
 
 Card 079 keeps standing brood intent in typed pile state and all production decisions in BroodSystem. Controller accepts semantic Manual/Grow commands; setting intent never produces immediately, and paused simulation does no laying. Fixed ticks start at most one eligible ordinary cohort after existing development. Detached production_status explains a local waiting reason in Queen context; no UI scheduler, new RNG or automatic adaptation/exterior command. Food reserve checks intrinsic remaining larval demand, with existing work still free to compete for stores.

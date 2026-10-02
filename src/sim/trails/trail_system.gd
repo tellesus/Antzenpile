@@ -393,6 +393,12 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		var net_contaminant: float = cohort.contaminant_mass * net_payload / cohort.payload
 		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload, net_contaminant)
 		assert(deposited)
+		var recorded_amount: float = roundf(net_payload * 100000.0) / 100000.0
+		if recorded_amount > 0:
+			if route.receipt.is_empty():
+				route.receipt = {"first_at": _run.simulation_time, "earlier_unrecorded": route.delivered_total > 0}
+			route.receipt.last_at = _run.simulation_time
+			route.receipt.last_amount = recorded_amount
 		route.delivered_total = roundf((route.delivered_total + net_payload) * 100000.0) / 100000.0
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 		segment.reinforce_chemistry(cohort.worker_count * CONFIG.pheromone_per_returning_worker, cohort.chemistry_fraction)

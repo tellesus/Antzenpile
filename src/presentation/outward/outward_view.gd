@@ -296,7 +296,7 @@ func _button_rect(command: String) -> Rect2:
 func _button_at(at: Vector2) -> String:
 	if not _status.get("internal_attention", {}).is_empty() and _button_rect("internal_pressure").has_point(at):
 		return "internal_pressure"
-	if sources_open and Rect2(24, 148, 308, 336).has_point(at):
+	if sources_open and Rect2(24, 148, 308, 396).has_point(at):
 		for category: String in ["carbohydrate", "protein", "water"]:
 			if _source_filter_rect(category).has_point(at):
 				return "source_filter_" + category
@@ -737,15 +737,15 @@ func _source_filter_rect(category: String) -> Rect2:
 
 
 func _source_row_rect(index: int) -> Rect2:
-	return Rect2(40, 244 + index * 60, 274, 54)
+	return Rect2(40, 244 + index * 76, 274, 70)
 
 
 func _source_page_rect() -> Rect2:
-	return Rect2(40, 430, 274, 44)
+	return Rect2(40, 490, 274, 44)
 
 
 func _draw_sources() -> void:
-	draw_rect(Rect2(24, 148, 308, 336), Color("111921"))
+	draw_rect(Rect2(24, 148, 308, 396), Color("111921"))
 	_label(Vector2(40, 177), "Remembered sources", Color("d3dcd4"), 20)
 	for category: String in ["carbohydrate", "protein", "water"]:
 		var button: Rect2 = _source_filter_rect(category)
@@ -763,6 +763,7 @@ func _draw_sources() -> void:
 		var title: String = "Honeydew" if entry.honeydew else "Memory %d" % (offset + 1)
 		_label(box.position + Vector2(10, 20), "%s · sensed %.0fs ago" % [title, entry.age], Color("d4c6a8"), 13)
 		_label(box.position + Vector2(10, 42), "%s · %d gathering%s" % [entry.state, entry.workers, " · ALARM" if entry.danger else ""], Color("c48c7c") if entry.danger else Color("96aab0"), 12)
+		_label(box.position + Vector2(10, 61), Memories.receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 11)
 	if entries.is_empty():
 		_label(Vector2(40, 275), "No returned memory of this resource", Color("96aab0"), 13)
 	draw_rect(_source_page_rect(), Color("18252b"))
