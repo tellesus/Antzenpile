@@ -467,6 +467,10 @@ func _draw_trails(size: Vector2) -> void:
 	for path: Dictionary in Scent.paths(routes, _placed, size):
 		if path.ghost:
 			continue
+		if path.chemical >= 0.45:
+			for branch: PackedVector2Array in path.branches:
+				draw_polyline(branch.slice(0, 3), Color(Art.color_for(path.category), 0.13 * path.strength), 0.8, true)
+				draw_polyline(branch.slice(2, 4), Color(Art.color_for(path.category), 0.045 * path.strength), 0.7, true)
 		for index: int in 8:
 			var sample: float = fposmod(_animation_time * 0.025 + index / 8.0, 0.96) * Scent.STEPS
 			var first: int = int(sample)
@@ -474,6 +478,11 @@ func _draw_trails(size: Vector2) -> void:
 			at += Vector2(sin(index * 2.7 + _animation_time), cos(index * 1.8 + _animation_time * 0.7)) * 3.5
 			draw_circle(at, 0.75, Color(Art.color_for(path.category), 0.12 * path.strength))
 	for rep: Dictionary in Scent.representatives(routes, _placed, size, _animation_time):
+		var obscured: bool = false
+		var ant_bounds := Rect2(rep.position - Vector2(10,10), Vector2(20,20))
+		for reserved: Rect2 in _caption_blocks:
+			obscured = obscured or reserved.intersects(ant_bounds)
+		if obscured: continue
 		Art.ant(self, rep.position, rep.direction, Color(Art.color_for(rep.category).lightened(0.25), 0.62), _animation_time, 0.82)
 	for marker: Dictionary in Scent.alarm_markers(routes, _placed, size):
 		var at: Vector2 = marker.center

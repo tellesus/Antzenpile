@@ -48,6 +48,10 @@ Card 060 replaces normal Send Scout with an Exploration panel: off/2/5/8 targets
 
 Part 7A is the locked visual amendment and supersedes ambiguous earlier concepts. Images establish mood and hierarchy, not pixel-accurate implementation targets.
 
+Card 088 adds bounded cached organic sensory centerlines and three fading decorative tributaries per strong route. These are neither physical TrailSegments nor selectable junctions. Moving representatives and returned journey markers share the same centerline; an alarm survives chemistry/familiarity loss. Existing caps, touch targets, facing and weak/ghost distinctions remain. Sprites avoid reserved cloud/caption/context regions; INWARD ant bounds avoid organ captions.
+
+The first release-style proof uses three reusable cloud-mask layers and up to twelve motes per known signal. Approved confidence gates category structure and a smoky water-surface impression; low confidence stays undifferentiated, and empty reports retain hollow remnants. A shared twelve-pose anatomically authored worker atlas supplies glowing exterior silhouettes and shaded interior workers. One bounded earthen Nursery vignette stays inside its functional footprint; no surveyed tunnel locations, remote scenery or hidden identities are added. Bloom is unnecessary. See the graphics evaluation for actual desktop evidence and mobile limits.
+
 ## Shared rules
 
 - Near-black background; large meaningful negative space. When nothing relevant is known or happening, render almost nothing. No filler stars, mist, particles, roots, noise, or ornamental HUD.

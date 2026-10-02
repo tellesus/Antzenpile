@@ -343,6 +343,7 @@ func _draw() -> void:
 		_draw_flow(centers.entrance, centers.midden, false)
 	if not _status.get("guest", {}).is_empty():
 		draw_line(centers.guest, centers.nursery, Color(0.65, 0.53, 0.64, 0.18), 1.0, true)
+	Art.nursery_earth(self, centers.nursery, float(_focus_gains.get("nursery", 0.0)))
 	_draw_activity(centers)
 	for id: String in NODES:
 		_draw_node(id, centers[id])
@@ -368,10 +369,10 @@ func _draw_activity(centers: Dictionary) -> void:
 	for ant: Dictionary in Activity.representatives(_status, centers, _animation_time):
 		var under_label: bool = false
 		for center: Vector2 in centers.values():
-			under_label = under_label or Rect2(center + Vector2(-90, 40), Vector2(180, 44)).has_point(ant.position)
+			under_label = under_label or Rect2(center + Vector2(-90, 40), Vector2(180, 44)).grow(10.0).has_point(ant.position)
 		if under_label:
 			continue
-		Art.ant(self, ant.position, ant.direction, Color(ant.color, 0.62), _animation_time, 0.8)
+		Art.ant(self, ant.position, ant.direction, Color(ant.color, 0.62), _animation_time, 0.9, true)
 		if ant.role in ["climate", "cleanup"]:
 			draw_circle(ant.position + ant.direction.normalized() * 6, 1.6, Color(ant.color, 0.65))
 

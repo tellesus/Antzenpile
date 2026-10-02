@@ -1,5 +1,11 @@
 # Post-slice development plan
 
+## Current section — measured graphics development (authorized 2026-10-02)
+
+The player approved organic sensory trails, colored clouds resolving into smoky impressions from returned knowledge, luminous exterior ants, shaded interior ants, and earthen functional interiors. [088 release-style graphics proof](tasks/088_release_graphics_proof.md) is complete: cached organic routes, cloud/water masks, shared shaded/luminous worker atlases and a bounded Nursery vignette passed desktop graphics/input checks and 5979 full-suite checks. [Comparable measurements](GRAPHICS_EVALUATION.md) show lower draw counts/frame intervals on the named desktop, with about 3.20 MiB more monitored texture memory. Preserve Part 7A's darkness, rotating panorama and abstract INWARD relationships. Blender/Krita are free authoring tools, not runtime dependencies; keep generated assets reproducible.
+
+After 088: expand approved report-derived target impressions and the bounded chamber/ant treatment, then verify combined quality tiers and an actual Android device. Choose minimum hardware before declaring release performance. The original scout survivability/experience milestone resumes after this explicitly reprioritized graphics section; the session-duration target stays tabled.
+
 ## Interface clarity — complete (2026-10-02)
 
 The authorized [interface review](INTERFACE_REVIEW_PLAN.md) is implemented in [085 panel input/action wording](tasks/085_interface_actions_and_input.md), [086 local guidance/returned history](tasks/086_interface_guidance_and_history.md), and [087 readability/navigation](tasks/087_interface_readability_and_navigation.md). Panels absorb gestures; selected jobs/cost blockers and dated outcomes are distinct; Help opens directly; compact contexts have clearer typography/spacing. Existing mechanics and return-before-information remain unchanged. Cards record actual checks and desktop limits. Resume the next bounded original-design scout survivability/experience milestone when further development is requested; Android and human usability checks remain open.

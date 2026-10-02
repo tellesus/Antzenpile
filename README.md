@@ -50,6 +50,8 @@ Current development follows the [rolling post-slice roadmap](docs/POST_SLICE_PLA
 
 **Pinned engine:** `4.7.2.stable.official.ed1daf0bf`, standard/GDScript Windows x64 build. **Renderer:** Compatibility (`gl_compatibility`) on desktop/mobile. Windows first, Android-compatible architecture now, iOS later. Do not casually upgrade.
 
+The [first release-style graphics proof](docs/tasks/088_release_graphics_proof.md) adds stable organic scent filaments, confidence-gated smoky water, luminous exterior ant silhouettes, shaded worker walk sprites and a bounded earthen Nursery. [Graphics measurements](docs/GRAPHICS_EVALUATION.md) compare current Windows rendering against the previous commit; this is an initial art/performance sample, not completed production graphics or Android validation. Reproducible authoring sources and tool instructions live with the [proof assets](assets/graphics/proof/README.md).
+
 ## Start here
 
 1. Read [AGENTS.md](AGENTS.md), the current task card, and relevant sections of the [architecture](docs/ARCHITECTURE.md) and [coding rules](docs/CODING_RULES.md).

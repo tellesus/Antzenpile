@@ -8,6 +8,8 @@ A45 (068, implementation discretion): retain eight-second/22,050-Hz arrangement;
 
 Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding earlier visual ambiguity. This file separates locked design from implementation defaults; changing a lock requires an explicit design decision.
 
+Graphics clarification accepted 2026-10-02: confident returned knowledge may develop smoky object/category impressions from undifferentiated colored clouds. This does not authorize literal remote scenery or live world identity/stock. INWARD may use soil/cavity vignettes and shaded anatomically coherent ants around functional organs; connections remain functional, not surveyed tunnel geometry. Organic sensory filaments may have decorative fading tributaries, with no new route/junction semantics. The current Compatibility engine remains pinned. Minimum performance hardware and mobile measurements remain open; 60 FPS desktop / 30 FPS lower-end Android are provisional planning targets.
+
 ## Locked
 
 | ID | Decision |
