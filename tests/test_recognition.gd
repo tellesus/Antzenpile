@@ -165,8 +165,9 @@ func _test_three_axes(test: Object) -> void:
 	test.check(game.start_adaptation("home", "security") and pile.trial_cohort().inherited_traits == ["lean", "persistent", "security"], "Third-axis trial captures existing foraging and chemistry traits")
 	advance_cared(game, 360)
 	var copy := Controller.new()
-	test.check(pile.genetics.living.get("lean+persistent+security", 0) == 8 and copy.restore_snapshot(snapshot(game)), "Three traits share one eight-ant phenotype with valid lifetime accounting")
-	test.check(pile.lose_workers("available", 1, 1, "Known joint loss", "lean+persistent+security") and pile.genetics.count_trait("security") == 7 and pile.workers.lost_total == 1, "One third-axis worker casualty removes one ant while changing all its trait counts")
+	var survivors: int = pile.genetics.living.get("lean+persistent+security", 0)
+	test.check(survivors > 0 and survivors <= 8 and copy.restore_snapshot(snapshot(game)), "Three traits share one surviving phenotype with valid lifetime accounting")
+	test.check(pile.lose_workers("available", 1, 1, "Known joint loss", "lean+persistent+security") and pile.genetics.count_trait("security") == survivors - 1 and pile.workers.lost_total == 1, "One third-axis worker casualty removes one ant while changing all its trait counts")
 	test.check(copy.restore_snapshot(snapshot(game)), "Third-axis mortality remains saveable")
 
 

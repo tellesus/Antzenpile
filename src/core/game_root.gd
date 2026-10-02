@@ -283,7 +283,8 @@ func guest_summary(pile_id: String) -> Dictionary:
 	if pile_id != "home" or simulation.run.guest.observation == "":
 		return {}
 	var state: GuestState = simulation.run.guest
-	return {"observation": state.observation, "reported_losses": state.reported_losses,
+	return {"observation": state.observation, "reported_losses": state.encounter_losses,
+		"total_reported_losses": state.reported_losses,
 		"rejection_active": state.phase == "rejecting", "workers_required": simulation.guest.CONFIG.rejection_workers,
 		"workers_committed": simulation.run.colony.piles.home.workers.count("rejection:home")}
 

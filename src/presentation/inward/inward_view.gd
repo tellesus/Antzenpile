@@ -400,7 +400,7 @@ func _draw_context(size: Vector2) -> void:
 			var guest: Dictionary = _status.get("guest", {})
 			var observation: String = guest.get("observation", "")
 			_detail_line(box, 65, "Guest purged" if observation == "purged" else "Internal foreignness · Nursery" if observation == "foreign" else "Nursery losses · cause uncertain" if observation == "loss" else "Guest tolerated at home")
-			_detail_line(box, 99, "%d brood lost" % guest.get("reported_losses", 0) if observation != "tolerated" else "No harmful effect observed")
+			_detail_line(box, 99, "%d brood lost this encounter" % guest.get("reported_losses", 0) if observation != "tolerated" else "No harmful effect observed")
 			if guest.get("rejection_active", false):
 				_detail_line(box, 137, "%d workers on rejection effort" % guest.workers_committed)
 				_detail_line(box, 163, "Recognition and clearing take time")

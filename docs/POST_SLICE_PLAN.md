@@ -1,6 +1,6 @@
 # Post-slice development plan
 
-Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–057 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
+Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–059 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
 
 ## Accepted playtest fixes — complete
 
@@ -58,4 +58,6 @@ Across every card, retain headless fixed-tick simulation, run-owned seeded state
 
 ## Genetic milestone — first expansion complete
 
-[056 — repertoire foundation](tasks/056_genetic_repertoire_foundation.md) and [057 — pressure-revealed persistent chemistry](tasks/057_pressure_revealed_trail_chemistry.md) are complete. The exclusive foraging fork can coexist with one experienced-rain candidate, funded through real brood and expressed by surviving adults. Combined tests cover mortality, guest pressure, saves and the ongoing food tradeoff. Next milestone: scope the original recognition/security–tolerance branch against actual guest and mutualism interactions, with a useful benefit and cost on each side before expanding another executable card. Full reproductive lineages, drift and latent-trait reselection remain future scope; balance/session duration stay tabled.
+[056 — repertoire foundation](tasks/056_genetic_repertoire_foundation.md), [057 — pressure-revealed persistent chemistry](tasks/057_pressure_revealed_trail_chemistry.md) and [058 — recognition/security–tolerance](tasks/058_recognition_security_tolerance.md) are complete. Three bounded axes coexist through disjoint phenotype accounting, real brood costs and surviving expression. Recognition trades guest detection/clearing against honeydew protection labor. [059 — measured balance/gameplay pass](tasks/059_balance_gameplay_pass.md) is complete: recurring fresh guest intrusions keep that tradeoff relevant after later brood, while unfunded resource measurements did not justify a broad rate sweep. See [evaluation](BALANCE_EVALUATION.md).
+
+Next review priority is a bounded source-access/recheck usability outcome using colony evidence, then additional internal functions/resource uses from the original chamber design to give larger colonies useful labor decisions. Define the next executable cards against these measurements before adding systems. Full reproductive lineages, drift, latent-trait reselection and broader relationships remain future milestones; session duration stays tabled.

@@ -10,3 +10,5 @@ water_cost = 8.0
 variation_chance = 0.65
 clearing_change = 0.40
 protection_worker_change = 2
+security_losses = 1
+tolerance_losses = 3

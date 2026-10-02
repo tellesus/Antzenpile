@@ -40,7 +40,8 @@ static func rejection_duration(integration: int, share: float) -> int:
 
 
 static func evidence_losses(share: float) -> int:
-	return 1 if share > 0.0 else 3 if share < 0.0 else 2
+	var guest = preload("res://data/ecology/backyard_guest.tres")
+	return RECOGNITION.security_losses if share > 0.0 else RECOGNITION.tolerance_losses if share < 0.0 else guest.recognition_losses
 
 
 static func energy_multiplier(id: String, fraction: float) -> float:

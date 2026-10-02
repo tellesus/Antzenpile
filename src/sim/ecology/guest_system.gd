@@ -1,6 +1,6 @@
 class_name GuestSystem
 extends RefCounted
-## One aggregate internal guest; workers observe symptoms before association.
+## At most one aggregate guest; fresh external intrusion can follow a quiet interval.
 
 const CONFIG = preload("res://data/ecology/backyard_guest.tres")
 var _run: RunState
@@ -16,7 +16,7 @@ func _init(run_state: RunState, brood_loss: Callable) -> void:
 func start_rejection() -> bool:
 	var state: GuestState = _run.guest
 	var pile: PileState = _run.colony.piles.home
-	if state.phase != "tolerated" or state.reported_losses < 1:
+	if state.phase != "tolerated" or state.encounter_losses < 1:
 		return _reject("No unresolved nursery loss evidence")
 	if pile.workers_available < CONFIG.rejection_workers:
 		return _reject("Four available workers required")
@@ -30,9 +30,7 @@ func start_rejection() -> bool:
 	state.rejection_duration_ticks = AdaptationRules.rejection_duration(state.integration_ticks, state.recognition_share)
 	if state.rejection_ticks >= state.rejection_duration_ticks:
 		state.rejection_ticks = state.rejection_duration_ticks
-		state.phase = "purged"
-		state.observation = "purged"
-		_release()
+		_purge()
 	last_error = ""
 	return true
 
@@ -51,11 +49,11 @@ func tick() -> void:
 	if state.phase == "absent":
 		if _run.clock.tick_count < CONFIG.first_tick:
 			return
-		state.phase = "tolerated"
-		state.observation = "tolerated"
-		_run.colony.piles.home.recognition_experience = true
+		_enter()
 	if state.phase == "purged":
-		return
+		if _run.clock.tick_count < state.next_entry_tick or state.encounters_total >= WorkerLedger.MAX_COUNT:
+			return
+		_enter()
 	if state.phase == "tolerated":
 		state.integration_ticks = mini(CONFIG.integration_ticks, state.integration_ticks + 1)
 		# Retained work, but the longer-tolerated guest can acquire more odor before restart.
@@ -64,9 +62,7 @@ func tick() -> void:
 	else:
 		state.rejection_ticks += 1
 		if state.rejection_ticks >= state.rejection_duration_ticks:
-			state.phase = "purged"
-			state.observation = "purged"
-			_release()
+			_purge()
 			return
 	state.damage_ticks += 1
 	if state.damage_ticks < CONFIG.damage_ticks:
@@ -74,9 +70,35 @@ func tick() -> void:
 	state.damage_ticks = 0
 	if _brood_loss.call("home"):
 		state.reported_losses += 1
+		state.encounter_losses += 1
 		var threshold: int = AdaptationRules.evidence_losses(_run.recognition_share("home"))
 		state.recognition_threshold = mini(state.recognition_threshold, threshold) if state.observation == "foreign" else threshold
-		state.observation = "foreign" if state.reported_losses >= state.recognition_threshold else "loss"
+		state.observation = "foreign" if state.encounter_losses >= state.recognition_threshold else "loss"
+
+
+func _enter() -> void:
+	var state: GuestState = _run.guest
+	state.phase = "tolerated"
+	state.observation = "tolerated"
+	state.entry_tick = _run.clock.tick_count
+	state.next_entry_tick = 0
+	state.encounters_total += 1
+	state.encounter_losses = 0
+	state.integration_ticks = 0
+	state.damage_ticks = 0
+	state.rejection_ticks = 0
+	state.rejection_duration_ticks = 0
+	state.recognition_share = 0.0
+	state.recognition_threshold = CONFIG.recognition_losses
+	_run.colony.piles.home.recognition_experience = true
+
+
+func _purge() -> void:
+	var state: GuestState = _run.guest
+	state.phase = "purged"
+	state.observation = "purged"
+	state.next_entry_tick = _run.clock.tick_count + CONFIG.quiet_interval_ticks
+	_release()
 
 
 func _release() -> void:

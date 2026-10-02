@@ -8,6 +8,8 @@ extends Resource
 @export var variation_chance: float = 0.65
 @export var clearing_change: float = 0.40
 @export var protection_worker_change: int = 2
+@export var security_losses: int = 1
+@export var tolerance_losses: int = 3
 
 
 func costs() -> Dictionary:
