@@ -1,5 +1,7 @@
 # Architecture
 
+Card 069 owns AudioPreferences outside RunState and save slots, persisted to user://audio_preferences.cfg. GameRoot shares it with graphical AudioController and AudioSettings. Independent music/cue gains do not stop loops or affect semantic intent. The modal overlay consumes input before normal views and blocks direct view commands/keyboard actions. Headless composition skips preference disk access and graphical controls.
+
 Card 068 extends MusicState from detached internal function/condition summaries and INWARD selection. Four persistent equal-length loops remain synchronized; developed Nursery/Midden add melody/pulse, known Nursery condition gently thins its layer, and attention modestly reduces other organ layers. Three-second fades use real time; phase-zero reload recreates audio without saved gameplay fields. Returned-loss cues remain separate and headless runs stay silent.
 
 Card 066: each PileState owns HumidityState; HumiditySystem owns humidity:pile internal labor and paid regulation. Only developed Nurseries drift on the local rain/fixed clock. It follows Nursery completion and sanitation, before brood advancement. BroodSystem takes the worse sanitation/humidity rate for larvae and proportional food costs. GameRoot detaches internal condition/use/staff summaries; INWARD keeps climate staffing separate from laying brood. No external source query becomes knowledge, and primitive climate remains stable.

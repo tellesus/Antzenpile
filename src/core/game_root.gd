@@ -19,6 +19,8 @@ var _inward_view: Node2D
 var _audio_controller: AudioController
 var save_service: SaveService = Save.new()
 var mode: String = "outward"
+var audio_preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
+var _audio_settings: AudioSettings
 
 
 func _ready() -> void:
@@ -26,6 +28,7 @@ func _ready() -> void:
 	if OS.is_debug_build():
 		print("[RUN] seed=%d scenario=%s time=%.2f" % [simulation.run.run_seed, simulation.run.scenario_id, simulation.run.simulation_time])
 	if DisplayServer.get_name() != "headless":
+		audio_preferences.load_file()
 		var outward: OutwardView = Outward.new()
 		outward.signal_provider = sensory_snapshot.bind("home")
 		outward.status_provider = outward_status.bind("home")
@@ -40,7 +43,7 @@ func _ready() -> void:
 		outward.investigate_command = toggle_investigation_priority
 		outward.honeydew_start_command = start_honeydew_tending
 		outward.honeydew_stop_command = stop_honeydew_tending
-		outward.input_blocked = debug_is_open
+		outward.input_blocked = interaction_blocked
 		outward.mode_command = set_mode.bind("inward")
 		outward.save_command = quick_save
 		outward.load_command = quick_load
@@ -60,17 +63,24 @@ func _ready() -> void:
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
 		inward.adaptation_command = start_adaptation
-		inward.input_blocked = debug_is_open
+		inward.input_blocked = interaction_blocked
 		inward.save_command = quick_save
 		inward.load_command = quick_load
 		add_child(inward)
 		_inward_view = inward
 		var audio: AudioController = Audio.new()
+		audio.preferences = audio_preferences
 		audio.state_provider = music_state.bind("home")
 		audio.alarm_provider = returned_losses.bind("home")
 		add_child(audio)
 		_audio_controller = audio
 		set_mode("outward")
+		_audio_settings = preload("res://src/presentation/audio_settings.gd").new()
+		_audio_settings.preferences = audio_preferences
+		_audio_settings.changed = audio_preferences.save_file
+		_audio_settings.blocked = debug_is_open
+		_audio_settings.z_index = 100
+		add_child(_audio_settings)
 	# Lazy load keeps truth-view code out of the headless runtime and release input path.
 	if OS.is_debug_build() and DisplayServer.get_name() != "headless":
 		_debug_view = load("res://src/debug/debug_world_view.gd").new()
@@ -85,6 +95,7 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _audio_settings != null and _audio_settings.opened: return
 	if not debug_is_open() and event.is_action_pressed("save_run"):
 		_show_save_feedback(quick_save(), "Run saved")
 		get_viewport().set_input_as_handled()
@@ -111,6 +122,10 @@ func set_mode(next_mode: String) -> bool:
 		_inward_view.set_process(mode == "inward")
 		_inward_view.set_process_unhandled_input(mode == "inward")
 	return true
+
+
+func interaction_blocked() -> bool:
+	return debug_is_open() or _audio_settings != null and _audio_settings.opened
 
 
 func sensory_snapshot(pile_id: String) -> Array[Dictionary]:

@@ -4,6 +4,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+Developed Nursery and Midden now add synchronized melody/rhythm to the colony soundtrack. Known Nursery strain gently thins its voice; selected musical organs come forward. **Sound** in either view independently adjusts Music and Information Cues; settings persist locally outside colony saves. The arrangement remains original prototype audio awaiting listening/composition review.
+
 INWARD now shows sparse job activity, distinct aggregate brood stages, developing-organ arcs and local climate/refuse/food/care pressure. Selecting a function sharpens its contours while preserving the abstract network and darkness. Representatives suggest committed work rather than physical cargo or individual workers.
 
 Developing Nursery now opens **humidity care**: assign climate workers to humidify or air the larger brood environment. Water and labor support slow environmental regulation; dry/damp conditions can slow larvae without adding deaths. Climate staffing and Lay Brood are separate controls. See the [ordinary colony trials](docs/HUMIDITY_EVALUATION.md).

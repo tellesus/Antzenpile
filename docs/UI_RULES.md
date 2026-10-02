@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 069 adds Sound beside Save/Load in both views. A modal panel offers independent Music/Information Cue off/25/50/75/100% presets (60x44 logical targets), Close and Escape; background input is absorbed without pausing the game. Local levels survive colony loading and mode switches. No unused Ambient control; muted cues retain the existing visual returned-loss evidence.
+
 Card 068 adds soft Nursery melody and a sparse developed-Midden rhythm to the synchronized arrangement. Known brood/climate/refuse strain thins Nursery contribution; selecting a musical organ modestly foregrounds it without restarting loops. Hidden ecology never changes musical intent. These are long-term function cues with visual equivalents; immediate returned-loss audio stays separate. Audio continues at real tempo through pause/speed.
 
 Card 067 projects known internal jobs into at most twelve representative ants, two per job, with nursing/food circulation/cleanup/climate/excavation/rejection colors. These suggest abstract committed activity, never private cargo or physical tunnels. Nursery shows at most six stage glyphs (egg dots, curled larvae, pupal envelopes); organ construction uses known progress arcs. Local pressure labels distinguish dry/damp/refuse/food/care and rejection; selected contours sharpen without moving hit areas. Labels mask representative traffic; pause freezes decoration and speed leaves it readable. No bloom, new simulation fields or RNG.

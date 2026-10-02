@@ -21,6 +21,7 @@ var nursery_player: AudioStreamPlayer
 var midden_player: AudioStreamPlayer
 var nursery_gain: float = 0.0
 var midden_gain: float = 0.0
+var preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
 
 
 func _ready() -> void:
@@ -101,9 +102,15 @@ func _make_player(source: AudioStreamWAV, volume: float) -> AudioStreamPlayer:
 
 
 func _update_growth_volume() -> void:
-	growth_player.volume_db = MIX_DB + linear_to_db(maxf(stem_gain, 0.0001))
-	nursery_player.volume_db = MIX_DB + linear_to_db(maxf(nursery_gain, 0.0001))
-	midden_player.volume_db = MIX_DB + linear_to_db(maxf(midden_gain, 0.0001))
+	base_player.volume_db = _level_db(preferences.music, MIX_DB)
+	growth_player.volume_db = _level_db(stem_gain * preferences.music, MIX_DB)
+	nursery_player.volume_db = _level_db(nursery_gain * preferences.music, MIX_DB)
+	midden_player.volume_db = _level_db(midden_gain * preferences.music, MIX_DB)
+	if alarm_player != null: alarm_player.volume_db = _level_db(preferences.cues, -15.0)
+
+
+func _level_db(level: float, authored_db: float) -> float:
+	return -80.0 if level <= 0 else authored_db + linear_to_db(level)
 
 
 func _music_players() -> Array[AudioStreamPlayer]:
