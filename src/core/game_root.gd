@@ -161,7 +161,7 @@ func honeydew_summary(pile_id: String) -> Dictionary:
 		return {"knowledge_id": producer_knowledge_id,
 			"relationship": simulation.run.honeydew.relationship,
 			"protection_workers": simulation.run.honeydew.protection_workers,
-			"required_workers": HONEYDEW_CONFIG.protection_workers}
+			"required_workers": AdaptationRules.protection_workers(HONEYDEW_CONFIG.protection_workers, simulation.run.recognition_share(pile_id))}
 	return {}
 
 
@@ -183,6 +183,8 @@ func inward_status(pile_id: String) -> Dictionary:
 	for trait_id: String in AdaptationRules.TRAITS:
 		if trait_id == "persistent" and not pile.chemistry_candidate:
 			continue
+		if trait_id in ["security", "tolerance"] and not pile.recognition_candidate:
+			continue
 		adaptation_options[trait_id] = {"available": AdaptationRules.can_select(pile, trait_id),
 			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.genetics.established,
 			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.trails.pending_trait(pile_id, trait_id)}
@@ -200,6 +202,9 @@ func inward_status(pile_id: String) -> Dictionary:
 		"adaptation_options": adaptation_options, "wet_trail_experience": pile.rain_trace_observed,
 		"chemistry_persistence": AdaptationRules.CHEMISTRY.persistence_multiplier,
 		"chemistry_extra_energy": AdaptationRules.CHEMISTRY.extra_travel_energy,
+		"recognition_experience": pile.recognition_experience,
+		"recognition_clearing_change": AdaptationRules.RECOGNITION.clearing_change,
+		"recognition_labor_change": AdaptationRules.RECOGNITION.protection_worker_change,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
 		"adapted_workers": expected_adapted,
 		"adaptation_fraction": float(expected_adapted) / expected_total if expected_total > 0 else 0.0,
@@ -255,6 +260,7 @@ func quick_load() -> Dictionary:
 		if _inward_view != null:
 			_inward_view.selected_id = ""
 			_inward_view.web_selection = "foraging"
+			_inward_view.web_family = "foraging"
 		if _debug_view != null:
 			_debug_view.snapshot_provider = simulation.run.to_dict
 		if _audio_controller != null:

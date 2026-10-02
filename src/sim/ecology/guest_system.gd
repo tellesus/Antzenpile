@@ -26,7 +26,13 @@ func start_rejection() -> bool:
 	assert(allocated)
 	state.phase = "rejecting"
 	# Odor acquisition pauses during effort. Recalculate only when restarting after toleration.
-	state.rejection_duration_ticks = ceili((CONFIG.purge_seconds + CONFIG.integrated_extra_seconds * float(state.integration_ticks) / CONFIG.integration_ticks) / SimulationClock.TICK_INTERVAL)
+	state.recognition_share = _run.recognition_share("home")
+	state.rejection_duration_ticks = AdaptationRules.rejection_duration(state.integration_ticks, state.recognition_share)
+	if state.rejection_ticks >= state.rejection_duration_ticks:
+		state.rejection_ticks = state.rejection_duration_ticks
+		state.phase = "purged"
+		state.observation = "purged"
+		_release()
 	last_error = ""
 	return true
 
@@ -47,13 +53,14 @@ func tick() -> void:
 			return
 		state.phase = "tolerated"
 		state.observation = "tolerated"
+		_run.colony.piles.home.recognition_experience = true
 	if state.phase == "purged":
 		return
 	if state.phase == "tolerated":
 		state.integration_ticks = mini(CONFIG.integration_ticks, state.integration_ticks + 1)
 		# Retained work, but the longer-tolerated guest can acquire more odor before restart.
 		if state.rejection_duration_ticks > 0:
-			state.rejection_duration_ticks = ceili((CONFIG.purge_seconds + CONFIG.integrated_extra_seconds * float(state.integration_ticks) / CONFIG.integration_ticks) / SimulationClock.TICK_INTERVAL)
+			state.rejection_duration_ticks = AdaptationRules.rejection_duration(state.integration_ticks, state.recognition_share)
 	else:
 		state.rejection_ticks += 1
 		if state.rejection_ticks >= state.rejection_duration_ticks:
@@ -67,7 +74,9 @@ func tick() -> void:
 	state.damage_ticks = 0
 	if _brood_loss.call("home"):
 		state.reported_losses += 1
-		state.observation = "foreign" if state.reported_losses >= CONFIG.recognition_losses else "loss"
+		var threshold: int = AdaptationRules.evidence_losses(_run.recognition_share("home"))
+		state.recognition_threshold = mini(state.recognition_threshold, threshold) if state.observation == "foreign" else threshold
+		state.observation = "foreign" if state.reported_losses >= state.recognition_threshold else "loss"
 
 
 func _release() -> void:

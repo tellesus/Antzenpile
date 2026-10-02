@@ -27,16 +27,20 @@ func start_tending(pile_id: String) -> bool:
 	if route == null or route.delivered_total <= 0.0:
 		return _reject("A loaded honeydew return is required")
 	var pile: PileState = _run.colony.piles[pile_id]
-	if pile.workers_available < HONEYDEW.protection_workers:
+	var share: float = _run.recognition_share(pile_id)
+	var required: int = AdaptationRules.protection_workers(HONEYDEW.protection_workers, share)
+	if pile.workers_available < required:
 		return _reject("Not enough workers to protect the producers")
 	var commitment: String = "honeydew:" + pile_id
 	if not pile.workers.create_commitment(commitment, "other", HONEYDEW.source_id):
 		return _reject("Protection commitment unavailable")
-	if not pile.workers.allocate(commitment, HONEYDEW.protection_workers):
+	if not pile.workers.allocate(commitment, required):
 		assert(pile.workers.retire_commitment(commitment))
 		return _reject("Could not commit protection workers")
 	_run.honeydew.relationship = "tended"
-	_run.honeydew.protection_workers = HONEYDEW.protection_workers
+	_run.honeydew.protection_workers = required
+	_run.honeydew.recognition_share = share
+	pile.recognition_experience = true
 	last_error = ""
 	return true
 
@@ -50,6 +54,7 @@ func stop_tending(pile_id: String) -> bool:
 	assert(pile.workers.retire_commitment(commitment))
 	_run.honeydew.relationship = "exploited"
 	_run.honeydew.protection_workers = 0
+	_run.honeydew.recognition_share = 0.0
 	last_error = ""
 	return true
 

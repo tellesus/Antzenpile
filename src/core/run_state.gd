@@ -89,6 +89,15 @@ func active_scout_count() -> int:
 	return count
 
 
+func recognition_share(pile_id: String) -> float:
+	# Internal staffing decisions use colony-expected adults until journey losses return.
+	var pile: PileState = colony.piles[pile_id]
+	var expected: int = pile.workers_total + trails.pending_for_pile(pile_id)
+	var security: int = pile.genetics.count_trait("security") + trails.pending_trait(pile_id, "security")
+	var tolerance: int = pile.genetics.count_trait("tolerance") + trails.pending_trait(pile_id, "tolerance")
+	return snappedf(float(security - tolerance) / expected, 0.00001) if expected > 0 else 0.0
+
+
 func restore(data: Dictionary) -> bool:
 	if not data.has_all(["version", "seed", "rng_state", "scenario_id", "clock", "world", "colony", "scouts", "next_scout_id", "delivered_observations", "knowledge", "trails", "rain"]):
 		return false
@@ -263,6 +272,10 @@ func restore(data: Dictionary) -> bool:
 	var restored_guest := Guest.new()
 	if data.has("guest") and (not data.guest is Dictionary or not restored_guest.restore(data.guest, restored_colony.piles.home, restored_clock.tick_count)):
 		return false
+	if restored_colony.piles.home.recognition_experience and restored_guest.phase == "absent" and restored_honeydew.relationship != "tended":
+		# A withdrawn relationship still has an observable loaded route history.
+		if restored_honeydew.relationship == "unknown":
+			return false
 	for pile: PileState in restored_colony.piles.values():
 		for commitment: String in pile.workers.to_dict().commitments:
 			if commitment.begins_with("rejection:") and (pile.id != "home" or commitment != "rejection:home" or restored_guest.phase != "rejecting"):
@@ -314,6 +327,8 @@ static func _valid_honeydew(state: HoneydewState, restored_world: WorldState, re
 			if id.begins_with("honeydew:") and (pile.id != "home" or id != commitment_id):
 				return false
 		if pile.id == "home":
+			if state.recognition_share > 0 and "security" not in pile.genetics.established or state.recognition_share < 0 and "tolerance" not in pile.genetics.established:
+				return false
 			if state.relationship == "tended":
 				if not commitments.has(commitment_id) or commitments[commitment_id].kind != "other" or commitments[commitment_id].owner_id != source_id or commitments[commitment_id].count != state.protection_workers:
 					return false

@@ -94,7 +94,7 @@ func restore(data: Dictionary, adults: int, losses: int, emerged: int) -> bool:
 		if not id is String or not AdaptationRules.valid_trait(id) or id in genes:
 			return false
 		genes.append(id)
-	if "lean" in genes and "load" in genes:
+	if not AdaptationRules.compatible(genes):
 		return false
 	var populations: Array[Dictionary] = []
 	for records: Dictionary in [data.living, data.lost]:
@@ -103,7 +103,7 @@ func restore(data: Dictionary, adults: int, losses: int, emerged: int) -> bool:
 			if not key is String or key == "" or not WorkerLedger.valid_count(records[key]) or records[key] < 1:
 				return false
 			var traits: Array[String] = traits_for(key)
-			if profile(traits) != key or ("lean" in traits and "load" in traits):
+			if profile(traits) != key or not AdaptationRules.compatible(traits):
 				return false
 			var unique: Array[String] = []
 			for id: String in traits:

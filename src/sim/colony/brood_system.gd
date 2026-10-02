@@ -35,6 +35,7 @@ func start(pile_id: String) -> bool:
 	cohort.adaptation_id = pile.adaptation_repertoire
 	cohort.inherited_traits = pile.genetics.established.duplicate()
 	cohort.rain_comparison = pile.rain_trace_observed and not pile.chemistry_candidate
+	cohort.recognition_comparison = pile.recognition_experience and not pile.recognition_candidate
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
 	return true
@@ -106,6 +107,9 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 				if cohort.rain_comparison and not pile.chemistry_candidate:
 					var chance: float = AdaptationRules.CHEMISTRY.variation_chance * float(cohort.count) / CONFIG.starting_count
 					pile.chemistry_candidate = _run.genetic_rng.randf() < chance
+				if cohort.recognition_comparison and not pile.recognition_candidate:
+					var chance: float = AdaptationRules.RECOGNITION.variation_chance * float(cohort.count) / CONFIG.starting_count
+					pile.recognition_candidate = _run.genetic_rng.randf() < chance
 				pile.brood_matured_total += cohort.count
 				pile.brood_cohorts.erase(cohort)
 			else:

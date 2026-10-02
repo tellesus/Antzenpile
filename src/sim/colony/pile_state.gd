@@ -22,6 +22,8 @@ var adapted_workers_lost: int = 0
 var genetics: GeneticRepertoire = GeneticRepertoire.new()
 var rain_trace_observed: bool = false
 var chemistry_candidate: bool = false
+var recognition_experience: bool = false
+var recognition_candidate: bool = false
 var nursery_state: String = "primitive"
 var nursery_progress_seconds: float = 0.0
 var food_exchange_state: String = "primitive"
@@ -44,6 +46,7 @@ func to_dict() -> Dictionary:
 		"adapted_workers_lost": adapted_workers_lost,
 		"genetics": genetics.to_dict(),
 		"rain_trace_observed": rain_trace_observed, "chemistry_candidate": chemistry_candidate,
+		"recognition_experience": recognition_experience, "recognition_candidate": recognition_candidate,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"food_exchange_state": food_exchange_state,
 		"food_exchange_progress_seconds": food_exchange_progress_seconds}
@@ -212,6 +215,10 @@ func restore(data: Dictionary) -> bool:
 	var repertoire: Variant = data.get("adaptation_repertoire", "")
 	var rain_observed: Variant = data.get("rain_trace_observed", false)
 	var candidate: Variant = data.get("chemistry_candidate", false)
+	var recognition_seen: Variant = data.get("recognition_experience", false)
+	var recognition_available: Variant = data.get("recognition_candidate", false)
+	if typeof(recognition_seen) != TYPE_BOOL or typeof(recognition_available) != TYPE_BOOL or (recognition_available and (not recognition_seen or emerged < 1)):
+		return false
 	if typeof(rain_observed) != TYPE_BOOL or typeof(candidate) != TYPE_BOOL or (candidate and (not rain_observed or emerged < 1)):
 		return false
 	var adapted: Variant = data.get("adapted_workers_total", 0)
@@ -231,6 +238,8 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if "persistent" in restored_genetics.established and not candidate:
 		return false
+	if ("security" in restored_genetics.established or "tolerance" in restored_genetics.established) and not recognition_available:
+		return false
 	if brood_lost == 0:
 		var profiles: Array = restored_genetics.living.keys()
 		for key: String in restored_genetics.lost:
@@ -247,6 +256,8 @@ func restore(data: Dictionary) -> bool:
 				return false
 			if cohort.adaptation_id == "persistent" and not candidate:
 				return false
+			if cohort.adaptation_id in ["security", "tolerance"] and (not recognition_available or "security" in restored_genetics.established or "tolerance" in restored_genetics.established):
+				return false
 			var trial_traits: Array[String] = restored_genetics.established.duplicate()
 			trial_traits.append(cohort.adaptation_id)
 			if GeneticRepertoire.profile(cohort.inherited_traits) != GeneticRepertoire.profile(trial_traits):
@@ -257,6 +268,8 @@ func restore(data: Dictionary) -> bool:
 			if trait_id not in restored_genetics.established and not (cohort.adaptation_trial and trait_id == cohort.adaptation_id):
 				return false
 		if cohort.rain_comparison and not rain_observed:
+			return false
+		if cohort.recognition_comparison and not recognition_seen:
 			return false
 	if trials > 1:
 		return false
@@ -296,6 +309,8 @@ func restore(data: Dictionary) -> bool:
 	genetics = restored_genetics
 	rain_trace_observed = rain_observed
 	chemistry_candidate = candidate
+	recognition_experience = recognition_seen
+	recognition_candidate = recognition_available
 	nursery_state = restored_nursery_state
 	nursery_progress_seconds = float(restored_nursery_progress)
 	food_exchange_state = data.food_exchange_state

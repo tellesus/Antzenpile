@@ -20,6 +20,7 @@ var save_command: Callable
 var load_command: Callable
 var selected_id: String = ""
 var web_selection: String = "foraging"
+var web_family: String = "foraging"
 var _animation_time: float = 0.0
 var _status: Dictionary = {}
 var _font: Font = ThemeDB.fallback_font
@@ -58,7 +59,12 @@ func activate_at(at: Vector2) -> bool:
 	if selected_id == "adaptation" and _web_back_rect().has_point(at):
 		selected_id = ""
 		web_selection = "foraging"
+		web_family = "foraging"
 		queue_redraw()
+		return true
+	if selected_id == "adaptation" and _status.get("adaptation_options", {}).has("security") and _web_family_rect().has_point(at):
+		web_family = "recognition" if web_family == "foraging" else "foraging"
+		web_selection = "foraging"
 		return true
 	if selected_id == "adaptation" and web_selection == "honeydew" and _status.get("honeydew", {}).get("relationship", "unknown") in ["exploited", "tended"] and _honeydew_rect().has_point(at):
 		_run_command("honeydew")
@@ -67,7 +73,7 @@ func activate_at(at: Vector2) -> bool:
 	if selected_id == "guest" and guest.get("reported_losses", 0) > 0 and guest.get("observation", "") != "purged" and _guest_rect().has_point(at):
 		_run_command("guest_rejection")
 		return true
-	if selected_id == "adaptation" and web_selection in ["lean", "load", "persistent"] and _can_choose_adaptation():
+	if selected_id == "adaptation" and web_selection in ["lean", "load", "persistent", "security", "tolerance"] and _can_choose_adaptation():
 		if _adaptation_rect(web_selection).has_point(at):
 			_run_command("adaptation_" + web_selection)
 			return true
@@ -85,7 +91,7 @@ func activate_at(at: Vector2) -> bool:
 			_run_command(command)
 			return true
 	if selected_id == "adaptation":
-		var leaf: String = Web.node_at(at, get_viewport_rect().size, _status)
+		var leaf: String = Web.node_at(at, get_viewport_rect().size, _status, web_family)
 		if not leaf.is_empty():
 			web_selection = leaf
 			queue_redraw()
@@ -134,7 +140,7 @@ func _run_command(command: String) -> void:
 				var result: Dictionary = brood_command.call()
 				_feedback = "New brood started" if result.get("accepted", false) else result.get("reason", "Brood unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
-		"adaptation_lean", "adaptation_load", "adaptation_persistent":
+		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance":
 			if adaptation_command.is_valid():
 				var result: Dictionary = adaptation_command.call(command.trim_prefix("adaptation_"))
 				_feedback = "Adaptation brood started" if result.get("accepted", false) else result.get("reason", "Adaptation unavailable")
@@ -209,6 +215,10 @@ func _web_back_rect() -> Rect2:
 	return Rect2(24, 116, 196, 44)
 
 
+func _web_family_rect() -> Rect2:
+	return Rect2(236, 116, 220, 44)
+
+
 func _honeydew_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
 
@@ -225,9 +235,12 @@ func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
 	if selected_id == "adaptation":
-		Web.draw_graph(self, size, _status, web_selection, _animation_time)
+		Web.draw_graph(self, size, _status, web_selection, _animation_time, web_family)
 		draw_rect(_web_back_rect(), Color("18252b"))
 		_label(_web_back_rect().position + Vector2(98, 29), "BACK TO COLONY", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+		if _status.get("adaptation_options", {}).has("security"):
+			draw_rect(_web_family_rect(), Color("28212f"))
+			_label(_web_family_rect().position + Vector2(110, 29), "OTHER TRAITS" if web_family == "recognition" else "INSPECT RECOGNITION", Color("d3c5df"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		_draw_hud(size)
 		_draw_context(size)
 		_draw_controls(size)
@@ -320,7 +333,7 @@ func _draw_context(size: Vector2) -> void:
 	if web and web_selection == "honeydew":
 		_draw_relationship_context(box)
 		return
-	if web and web_selection in ["lean", "load", "persistent"]:
+	if web and web_selection in ["lean", "load", "persistent", "security", "tolerance"]:
 		_draw_genetic_context(box)
 		return
 	match selected_id:
@@ -400,11 +413,11 @@ func _draw_context(size: Vector2) -> void:
 				draw_rect(_guest_rect(), Color("39323e"))
 				_label(_guest_rect().position + Vector2(130, 29), "STOP REJECTION" if guest.get("rejection_active", false) else "INCREASE REJECTION", Color("d9c9d7"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		"adaptation":
-			_detail_line(box, 65, "Colony repertoire · overview")
+			_detail_line(box, 65, "Security / tolerance · overview" if web_family == "recognition" else "Colony repertoire · overview")
 			_detail_line(box, 91, "Select a trait to inspect its tradeoff")
 			_detail_line(box, 117, "Start its brood trial in this panel")
 			if not _status.adaptation_trial.is_empty():
-				_detail_line(box, 163, "%s trial" % ("Lean" if _status.adaptation_trial.adaptation_id == "lean" else "Load" if _status.adaptation_trial.adaptation_id == "load" else "Persistent chemistry"))
+				_detail_line(box, 163, "%s trial" % str(_status.adaptation_trial.adaptation_id).capitalize())
 				_detail_line(box, 189, "Brood stage: %s" % _status.adaptation_trial.stage.capitalize())
 				_detail_line(box, 215, "Trait emerges with this brood")
 			elif not _status.get("genetic_repertoire", []).is_empty():
@@ -418,13 +431,34 @@ func _draw_context(size: Vector2) -> void:
 			if _status.get("wet_trail_experience", false) and not _status.get("adaptation_options", {}).has("persistent"):
 				_detail_line(box, 249, "Wet journeys weakened scent")
 				_detail_line(box, 275, "New brood may reveal variation")
+			elif _status.get("recognition_experience", false) and not _status.get("adaptation_options", {}).has("security"):
+				_detail_line(box, 249, "Foreign / partner chemistry observed")
+				_detail_line(box, 275, "New brood may reveal variation")
 
 
 func _draw_genetic_context(box: Rect2) -> void:
-	_detail_line(box, 65, "Lean Foragers" if web_selection == "lean" else "Load Bearers" if web_selection == "load" else "Persistent trail chemistry")
+	_detail_line(box, 65, Web.title(web_selection))
 	_detail_line(box, 91, Web.trait_state(_status, web_selection))
-	_detail_line(box, 125, "30% less travel energy" if web_selection == "lean" else "30% more carrying" if web_selection == "load" else "Up to %.0fx scent persistence" % _status.get("chemistry_persistence", 2.0))
-	_detail_line(box, 151, "15% less carrying" if web_selection == "lean" else "20% more travel energy" if web_selection == "load" else "Up to %.0f%% more trail food" % (_status.get("chemistry_extra_energy", 0.2) * 100))
+	var benefits: String = ""
+	var tradeoff: String = ""
+	match web_selection:
+		"lean":
+			benefits = "30% less travel energy"
+			tradeoff = "15% less carrying"
+		"load":
+			benefits = "30% more carrying"
+			tradeoff = "20% more travel energy"
+		"persistent":
+			benefits = "Up to %.0fx scent persistence" % _status.get("chemistry_persistence", 2.0)
+			tradeoff = "Up to %.0f%% more trail food" % (_status.get("chemistry_extra_energy", 0.2) * 100)
+		"security":
+			benefits = "Up to %.0f%% less clearing time" % (_status.get("recognition_clearing_change", 0.4) * 100)
+			tradeoff = "Up to %d extra protection workers" % _status.get("recognition_labor_change", 2)
+		"tolerance":
+			benefits = "Up to %d fewer protection workers" % _status.get("recognition_labor_change", 2)
+			tradeoff = "Up to %.0f%% more clearing time" % (_status.get("recognition_clearing_change", 0.4) * 100)
+	_detail_line(box, 125, benefits)
+	_detail_line(box, 151, tradeoff)
 	if _can_choose_adaptation():
 		var costs: Dictionary = _status.get("adaptation_options", {}).get(web_selection, {}).get("costs", _status.adaptation_costs)
 		_detail_line(box, 185, "Needs %.0f carb · %.0f protein · %.0f water" % [costs.carbohydrate, costs.protein, costs.water])
@@ -432,7 +466,7 @@ func _draw_genetic_context(box: Rect2) -> void:
 		var rect: Rect2 = _adaptation_rect(web_selection)
 		draw_rect(rect, Color("28212f"))
 		draw_rect(rect, Color("a28aaf"), false, 1.5)
-		_label(rect.position + Vector2(130, 29), "START LEAN BROOD TRIAL" if web_selection == "lean" else "START LOAD BROOD TRIAL" if web_selection == "load" else "START CHEMISTRY BROOD TRIAL", Color("e3dbe7"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(rect.position + Vector2(130, 29), "START %s BROOD TRIAL" % ("CHEMISTRY" if web_selection == "persistent" else web_selection.to_upper()), Color("e3dbe7"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
 		_detail_line(box, 185, "Stage: " + str(_status.adaptation_trial.stage).capitalize())
 		_detail_line(box, 211, "Expresses only with surviving adults")
@@ -445,8 +479,11 @@ func _draw_genetic_context(box: Rect2) -> void:
 			_detail_line(box, 185, "Focused trial already growing")
 			_detail_line(box, 211, "New selection waits for emergence")
 		else:
-			_detail_line(box, 185, "Colony choice: " + ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
-			_detail_line(box, 211, "Inherited foraging fork cannot switch")
+			_detail_line(box, 185, "Other recognition choice inherited" if web_selection in ["security", "tolerance"] else "Colony choice: " + ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
+			_detail_line(box, 211, "Inherited family choice cannot switch")
+	if web_selection in ["security", "tolerance"]:
+		_detail_line(box, 302, "Earlier harm association" if web_selection == "security" else "Later harm association")
+		_detail_line(box, 326, "Reassign protection for new staffing")
 
 
 func _draw_relationship_context(box: Rect2) -> void:

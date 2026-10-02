@@ -48,6 +48,7 @@ func start(pile_id: String, trait_id: String) -> bool:
 	cohort.inherited_traits.append(trait_id)
 	cohort.inherited_traits.sort()
 	cohort.rain_comparison = pile.rain_trace_observed and not pile.chemistry_candidate
+	cohort.recognition_comparison = pile.recognition_experience and not pile.recognition_candidate
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
 	return true
