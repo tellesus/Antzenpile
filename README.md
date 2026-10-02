@@ -4,6 +4,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+**Queen → Grow** repeats ordinary brood when current food reserves, care and Nursery space support it. **Manual** stops new automatic laying while existing brood continues; **Lay 8 Brood Now** remains an explicit choice. Growth checks remaining larval food, with real travel/project/climate competition still possible. Old saves default to Manual. [Ordinary trials](docs/STANDING_BROOD_EVALUATION.md) exercised repeated production in both settings without repeated laying commands.
+
 Nursery feeding feedback now identifies the resource missing from the last feeding attempt. **Food Exchange → Browse returned sources** opens remembered food/protein/water sources for that need, without dispatching workers. Lack of care leaves food unassessed and displays **Brood waits for care**. Ordinary expanded-colony examples showed carbohydrate shortage in Backyard and protein shortage in Garden Edge; amounts and rates remain unchanged.
 
 After repeated brood growth fills the developed Nursery, **Expand to 32 Brood Space** becomes available in its context. The project spends stores, eight workers and time while existing brood/climate remain online. Four aggregate groups then fit; additional food/care must support them. [Paired ordinary trials](docs/NURSERY_EXPANSION_EVALUATION.md) demonstrate affordability and increased resource demand.

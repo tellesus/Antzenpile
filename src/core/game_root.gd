@@ -67,6 +67,7 @@ func _ready() -> void:
 		inward.sanitation_command = set_sanitation_workers
 		inward.humidity_command = set_humidity_workers
 		inward.brood_command = start_brood
+		inward.brood_intent_command = set_brood_intent
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
 		inward.adaptation_command = start_adaptation
@@ -333,6 +334,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"adaptation_costs": AdaptationRules.COSTS.duplicate(),
 		"adaptation_nurses": AdaptationRules.NURSES,
 		"brood_batch_count": BROOD_CONFIG.starting_count,
+		"brood_production": simulation.brood.production_status(pile_id),
 		"nursery_state": pile.nursery_state, "nursery_brood_capacity": pile.nursery_brood_capacity(),
 		"nursery_occupied_space": pile.nursery_occupied_space(),
 		"nursery_care_capacity": pile.nursery_care_capacity(),
@@ -464,6 +466,11 @@ func set_guest_rejection(enabled: bool) -> Dictionary:
 
 func start_brood() -> Dictionary:
 	var accepted: bool = simulation.start_brood("home")
+	return {"accepted": accepted, "reason": simulation.brood.last_error}
+
+
+func set_brood_intent(intent: String) -> Dictionary:
+	var accepted: bool = simulation.set_brood_intent("home", intent)
 	return {"accepted": accepted, "reason": simulation.brood.last_error}
 
 

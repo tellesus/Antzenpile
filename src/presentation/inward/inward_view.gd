@@ -19,6 +19,7 @@ var midden_develop_command: Callable
 var sanitation_command: Callable
 var humidity_command: Callable
 var brood_command: Callable
+var brood_intent_command: Callable
 var adaptation_command: Callable
 var guest_rejection_command: Callable
 var honeydew_command: Callable
@@ -68,6 +69,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "queen":
+		for intent: String in ["manual", "grow"]:
+			if _brood_intent_rect(intent).has_point(at):
+				if brood_intent_command.is_valid():
+					var result: Dictionary = brood_intent_command.call(intent)
+					show_feedback(("Growth intent set" if intent == "grow" else "Manual laying selected") if result.get("accepted", false) else result.get("reason", "Intent unavailable"))
+				return true
 	if selected_id == "food_exchange":
 		for resource_id: String in Pressure.food_shortages(_status):
 			if _food_source_rect(resource_id).has_point(at):
@@ -258,8 +266,12 @@ func _midden_develop_rect() -> Rect2:
 
 
 func _brood_rect() -> Rect2:
-	var y: float = 494.0 if selected_id == "nursery" and _status.get("nursery_state", "primitive") == "developed" else 438.0 if selected_id == "nursery" else 380.0
+	var y: float = 494.0 if selected_id == "nursery" and _status.get("nursery_state", "primitive") == "developed" else 438.0 if selected_id == "nursery" else 466.0
 	return Rect2(get_viewport_rect().size.x - 300.0, y, 260.0, 44.0)
+
+
+func _brood_intent_rect(intent: String) -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0 + (132 if intent == "grow" else 0), 352, 128, 44)
 
 
 func _humidity_rect(target: int) -> Rect2:
@@ -303,7 +315,7 @@ func _can_choose_adaptation() -> bool:
 
 
 func _can_lay_brood() -> bool:
-	return _status.get("queens", 0) > 0 and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
+	return _status.get("queens", 0) > 0 and _status.get("brood", []).size() < _status.get("nursery_brood_capacity", 0) / maxi(1, _status.get("brood_batch_count", 8)) and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
 
 
 func _draw() -> void:
@@ -456,7 +468,7 @@ func _draw_context(size: Vector2) -> void:
 	var expansion: Dictionary = _status.get("nursery_expansion", {})
 	var expansion_action: bool = expansion.get("state", "") == "available"
 	var food_attention: bool = selected_id == "food_exchange" and not Pressure.food_shortages(_status).is_empty()
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 388 if food_attention else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 388 if food_attention or selected_id == "queen" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	var web: bool = selected_id == "adaptation"
 	draw_rect(box, Color("17141f") if web else Color("111921"))
 	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
@@ -495,6 +507,16 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 91, "Living workers: %d" % _status.workers_total)
 			_detail_line(box, 117, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 157, "Nursery: %d / %d brood space" % [_status.nursery_occupied_space, _status.nursery_brood_capacity])
+			var production: Dictionary = _status.get("brood_production", {"intent":"manual", "waiting":"manual"})
+			_label(box.position + Vector2(16, 195), "Brood intent", Color("a9b9bc"), 13)
+			for intent: String in ["manual", "grow"]:
+				var button: Rect2 = _brood_intent_rect(intent)
+				draw_rect(button, Color("354d55") if production.intent == intent else Color("263038"))
+				_label(button.get_center() + Vector2(0, 5), intent.to_upper(), Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+			var waiting_labels: Dictionary = {"manual":"Manual cohorts", "ready":"Ready on next simulation tick", "space":"Waiting for Nursery space", "care":"Waiting for care workers", "queen":"No queen can lay", "population":"Population limit reached", "carbohydrate":"Waiting for carbohydrate reserve", "protein":"Waiting for protein reserve", "water":"Waiting for water reserve"}
+			_label(box.position + Vector2(16, 273), waiting_labels.get(production.waiting, ""), Color("a9b9bc"), 13)
+			_label(box.position + Vector2(16, 294), "Grow repeats when food/care/space fit.", Color("8fa1a8"), 12)
+			_label(box.position + Vector2(16, 313), "Manual laying skips the food check.", Color("8fa1a8"), 12)
 			if _can_lay_brood():
 				_draw_brood_button()
 		"nursery":
@@ -700,7 +722,7 @@ func _detail_line(box: Rect2, y: float, value: String) -> void:
 
 func _draw_brood_button() -> void:
 	draw_rect(_brood_rect(), Color("35483c"))
-	_label(_brood_rect().position + Vector2(130, 29), "LAY %d BROOD" % _status.brood_batch_count, Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(_brood_rect().position + Vector2(130, 29), "LAY %d BROOD NOW" % _status.brood_batch_count, Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_nursery_develop_button() -> void:

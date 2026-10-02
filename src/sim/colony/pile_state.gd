@@ -19,6 +19,7 @@ var brood_cohorts: Array[BroodCohort] = []
 var brood_matured_total: int = 0
 var brood_started_total: int = 1
 var brood_lost_total: int = 0
+var brood_intent: String = "manual"
 var adaptation_repertoire: String = ""
 var adapted_workers_total: int = 0
 var adapted_workers_lost: int = 0
@@ -47,6 +48,7 @@ func to_dict() -> Dictionary:
 		"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
 		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
+		"brood_intent": brood_intent,
 		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
 		"adapted_workers_lost": adapted_workers_lost,
 		"genetics": genetics.to_dict(),
@@ -168,6 +170,8 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if not typeof(data.food_exchange_progress_seconds) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.food_exchange_progress_seconds)) or data.food_exchange_progress_seconds < 0.0:
 		return false
+	var restored_intent: Variant = data.get("brood_intent", "manual")
+	if not restored_intent is String or restored_intent not in ["manual", "grow"]: return false
 	if not data.position is Array or data.position.size() != 2 or not data.workers is Dictionary:
 		return false
 	for value: Variant in data.position:
@@ -339,6 +343,7 @@ func restore(data: Dictionary) -> bool:
 	brood_matured_total = int(data.brood_matured_total)
 	brood_started_total = int(started)
 	brood_lost_total = int(brood_lost)
+	brood_intent = restored_intent
 	adaptation_repertoire = repertoire
 	adapted_workers_total = int(adapted)
 	adapted_workers_lost = int(adapted_lost)

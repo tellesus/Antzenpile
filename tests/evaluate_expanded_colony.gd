@@ -67,7 +67,7 @@ func policy(root: Node, row: Dictionary) -> void:
 		if inside.adaptation_options.get(trait_id, {}).get("available", false):
 			_event(root, row, "trial " + trait_id, root.start_adaptation(trait_id))
 			break
-	_event(root, row, "lay brood", root.start_brood())
+	if not row.get("standing_growth", false): _event(root, row, "lay brood", root.start_brood())
 	if inside.midden.revealed and inside.midden.larval_rate < 1.0 and inside.midden.cleaners == 0:
 		_event(root, row, "assign cleanup 2", root.set_sanitation_workers(2))
 	if inside.midden.revealed and inside.midden.state == "primitive" and inside.midden.cleaners > 0:

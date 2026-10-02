@@ -127,6 +127,10 @@ func start_brood(pile_id: String) -> bool:
 	return brood.start(pile_id)
 
 
+func set_brood_intent(pile_id: String, intent: Variant) -> bool:
+	return brood.set_intent(pile_id, intent)
+
+
 func start_nursery_development(pile_id: String) -> bool:
 	return nursery.start(pile_id)
 

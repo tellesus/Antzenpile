@@ -1,5 +1,7 @@
 # Architecture
 
+Card 079 keeps standing brood intent in typed pile state and all production decisions in BroodSystem. Controller accepts semantic Manual/Grow commands; setting intent never produces immediately, and paused simulation does no laying. Fixed ticks start at most one eligible ordinary cohort after existing development. Detached production_status explains a local waiting reason in Queen context; no UI scheduler, new RNG or automatic adaptation/exterior command. Food reserve checks intrinsic remaining larval demand, with existing work still free to compete for stores.
+
 Card 078 records the specific resource failures of BroodSystem's existing atomic larval debit in typed cohort state. ColonyPressure projects only known, care-assessed local shortages; care-only waiting no longer claims FOOD. GameRoot's free source-attention command revalidates that diagnosis and opens the existing returned-memory browser/category without a simulation command, rotation or source selection. Saves default absent legacy diagnosis to unknown until the next feeding assessment.
 
 Card 077 extends NurseryDevelopmentSystem with one latched need and prepaid expansion, separate from initial development. Pile owns typed state/progress; the ledger owns eight excavators. Existing developed capacity/climate remain active until completion increases brood/care capacity. Root detaches the project state/price/progress; capped presentation represents four cohort groups with six glyphs and one excavation role. No new individual agents, RNG or engine dependency.

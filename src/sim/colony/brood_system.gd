@@ -22,7 +22,7 @@ func start(pile_id: String) -> bool:
 	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty():
 		last_error = "Nursery already has brood"
 		return false
-	if pile.nursery_brood_capacity() - pile.nursery_occupied_space() < CONFIG.starting_count:
+	if pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pile.nursery_brood_capacity() - pile.nursery_occupied_space() < CONFIG.starting_count:
 		last_error = "Nursery lacks brood space"
 		return false
 	var pending_brood: int = pile.nursery_occupied_space() + CONFIG.starting_count
@@ -39,6 +39,46 @@ func start(pile_id: String) -> bool:
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
 	return true
+
+
+func set_intent(pile_id: String, intent: Variant) -> bool:
+	if not _run.colony.piles.has(pile_id) or not intent is String or intent not in ["manual", "grow"]:
+		last_error = "Unknown pile or brood intent"
+		return false
+	_run.colony.piles[pile_id].brood_intent = intent
+	last_error = ""
+	return true
+
+
+func production_status(pile_id: String) -> Dictionary:
+	if not _run.colony.piles.has(pile_id): return {}
+	var pile: PileState = _run.colony.piles[pile_id]
+	var waiting: String = "ready"
+	var pending: int = pile.nursery_occupied_space() + CONFIG.starting_count
+	if pile.brood_intent == "manual": waiting = "manual"
+	elif pile.queen_count < 1: waiting = "queen"
+	elif pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pending > pile.nursery_brood_capacity(): waiting = "space"
+	elif pending > pile.nursery_care_capacity(): waiting = "care"
+	elif pile.brood_started_total >= WorkerLedger.MAX_COUNT or pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending or pile.workers_total > WorkerLedger.MAX_COUNT - pending: waiting = "population"
+	else:
+		var reserve: Dictionary = remaining_food_reserve(pile)
+		for resource_id: String in PileState.RESOURCE_IDS:
+			if pile.resources[resource_id] < reserve[resource_id]:
+				waiting = resource_id
+				break
+	return {"intent": pile.brood_intent, "waiting": waiting}
+
+
+func remaining_food_reserve(pile: PileState) -> Dictionary:
+	# Intrinsic remaining larval demand, not a forecast of routes/weather/deliveries.
+	var ant_seconds: float = CONFIG.starting_count * CONFIG.larva_seconds
+	for cohort: BroodCohort in pile.brood_cohorts:
+		if cohort.stage == "egg": ant_seconds += cohort.count * CONFIG.larva_seconds
+		elif cohort.stage == "larva": ant_seconds += cohort.count * (CONFIG.larva_seconds - cohort.progress_seconds)
+	var multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0
+	return {"carbohydrate": ant_seconds * CONFIG.carbohydrate_per_larva_second * multiplier,
+		"protein": ant_seconds * CONFIG.protein_per_larva_second * multiplier,
+		"water": ant_seconds * CONFIG.water_per_larva_second * multiplier}
 
 
 func lose_one(pile_id: String) -> bool:
@@ -72,6 +112,8 @@ func tick(delta: float) -> void:
 		var care_fraction: float = minf(1.0, float(pile.nursery_care_capacity()) / occupied) if occupied > 0 else 1.0
 		for cohort: BroodCohort in pile.brood_cohorts.duplicate():
 			_advance(pile, cohort, delta, care_fraction)
+		if pile.brood_intent == "grow" and production_status(id).waiting == "ready":
+			start(id)
 
 
 func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction: float) -> void:

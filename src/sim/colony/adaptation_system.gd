@@ -18,7 +18,7 @@ func start(pile_id: String, trait_id: String) -> bool:
 	var pile: PileState = _run.colony.piles[pile_id]
 	if not AdaptationRules.can_select(pile, trait_id):
 		return _reject("Adaptation already chosen or unavailable")
-	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty() or pile.nursery_brood_capacity() - pile.nursery_occupied_space() < BROOD.starting_count:
+	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty() or pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / BROOD.starting_count or pile.nursery_brood_capacity() - pile.nursery_occupied_space() < BROOD.starting_count:
 		return _reject("Nursery lacks brood space")
 	if pile.workers_available < AdaptationRules.NURSES:
 		return _reject("Two available nurses required")
