@@ -74,7 +74,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 	var pairs: Dictionary[String, bool] = {}
 	for record: Variant in data.routes:
 		var route := Route.new()
-		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id) or route.last_loss_time > time or route.last_foreign_time > time or route.conflict_observed_at > time:
+		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id) or route.last_loss_time > time or route.last_foreign_time > time or route.conflict_observed_at > time or route.last_empty_report_at > time:
 			return false
 		var suffix: String = route.id.trim_prefix("route_")
 		if route.id != "route_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_route_id or route.segment_id != "segment_" + suffix:

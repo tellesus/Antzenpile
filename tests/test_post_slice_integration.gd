@@ -80,7 +80,7 @@ func run(test: Object) -> bool:
 	test.check(game.investigate_known_source("home", "known:protein_picnic"), "Player deliberately investigates the remembered source")
 	test.check(_until(game, func() -> bool: return game.run.scouts.is_empty(), 120.0), "All scouts return before the final review")
 	var hint: Dictionary = game.run.knowledge.temporal_hint("known:protein_picnic")
-	test.check(hint.possible_recurrence and hint.label.contains("timing unknown") and not hint.label.contains(" s"), "Returned evidence suggests recurrence without a timed forecast")
+	test.check(hint.possible_recurrence and (hint.renewed_report or hint.label.contains("timing unknown")) and not hint.label.contains(" s"), "Returned evidence suggests recurrence or reports confirmed renewal without a timed forecast")
 	test.check(pile.brood_matured_total >= 16 and pile.workers_total >= 56 and pile.workers.invariant_holds(), "Overlapping brood yields a larger conserved workforce")
 	var outward: Dictionary = root.outward_status("home")
 	var inward: Dictionary = root.inward_status("home")

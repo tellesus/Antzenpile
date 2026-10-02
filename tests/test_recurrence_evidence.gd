@@ -87,7 +87,7 @@ func run(test: Object) -> bool:
 	root.free()
 	test.check(_until(game, func() -> bool: return game.run.scouts.is_empty(), 80.0), "Scout returns from the later live source")
 	var hint: Dictionary = game.run.knowledge.temporal_hint(known_id)
-	test.check(hint.possible_recurrence and not hint.last_return_empty and hint.label.contains("timing unknown") and not hint.label.contains(" s"), "Positive-empty-positive evidence reports past return without a timed forecast")
+	test.check(hint.possible_recurrence and not hint.last_return_empty and hint.renewed_report and hint.label.contains("found again") and not hint.label.contains(" s"), "Positive-empty-positive evidence reports a confirmed renewal without a timed forecast")
 	var normal := Root.new()
 	normal.simulation = game
 	var detached: Dictionary = normal.outward_status("home")

@@ -187,6 +187,8 @@ func _run_command(command: String) -> void:
 			_feedback = "Scout investigating remembered source" if result.get("accepted", false) else result.get("reason", "Investigation unavailable")
 			if result.get("accepted", false) and result.get("standing_priority", false):
 				_feedback = "Investigation priority removed" if not result.enabled else "Priority queued · set Exploration effort" if result.exploration_off else "Source prioritized for recurring investigation"
+				if result.get("recovery_watch", false):
+					_feedback = "Recovery watch stopped" if not result.enabled else "Watch queued · set Exploration effort" if result.exploration_off else "Watch set · fresh return can resume gathering"
 		"trail_create", "trail_less", "trail_more", "trail_cancel", "trail_recheck":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty():
@@ -206,7 +208,7 @@ func _run_command(command: String) -> void:
 					return
 				var target: int = 0 if command == "trail_cancel" else maxi(0, route.desired_workers - 1) if command == "trail_less" else route.desired_workers + (SWARM_CONFIG.reinforcement_step if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else 1)
 				result = trail_set_command.call(route.id, target)
-			_feedback = ("Workers sent to recheck" if command == "trail_recheck" else "Trail updated") if result.get("accepted", false) else result.get("reason", "Trail unavailable")
+			_feedback = ("Gatherers resumed from returned evidence" if route.get("recovery_ready", false) else "Gatherers sent · availability still uncertain") if command == "trail_recheck" and result.get("accepted", false) else "Trail updated" if result.get("accepted", false) else result.get("reason", "Trail unavailable")
 		"scout":
 			if exploration_command.is_valid():
 				exploration_open = not exploration_open
@@ -402,6 +404,8 @@ func _draw_signal(entry: Dictionary) -> void:
 		draw_polyline(attention.slice(1, 7), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
 		draw_polyline(attention.slice(17, 23), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
 	var title: String = _signal_title_for(signal_data) + " · EMPTY" if reported_empty else _signal_title_for(signal_data)
+	if not reported_empty and _status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {}).get("renewed_report", false):
+		title += " · FOUND AGAIN"
 	if signal_data.get("foreign_contact", false):
 		title += " · FOREIGN"
 	_label(at + Vector2(0, radius + 22), title, color, 13, HORIZONTAL_ALIGNMENT_CENTER)
@@ -468,7 +472,7 @@ func _draw_context(size: Vector2) -> void:
 		_label(body.position + Vector2(16, 187), "Scent %s · Delivered %.1f" % [_scent_label(route), route.delivered_total], Color("8fa1a8"), 13)
 		_draw_trail_button("trail_create", "REINVEST 5 WORKERS")
 	else:
-		var route_note: String = "Source unavailable · scent " + _scent_label(route) if route.status == "depleted" else "Waiting for carbohydrate" if route.get("energy_limited", false) else "Trail scent: " + _scent_label(route)
+		var route_note: String = "Report renewed · gathering paused" if route.status == "depleted" and route.get("recovery_ready", false) else "Waiting for confirming scout report" if route.status == "depleted" and route.get("resume_on_report", false) else "Source reported empty · scent " + _scent_label(route) if route.status == "depleted" else "Waiting for carbohydrate" if route.get("energy_limited", false) else "Trail scent: " + _scent_label(route)
 		_label(body.position + Vector2(16, 165), route_note, Color("a8b8bd"), 14)
 		_label(body.position + Vector2(16, 185), "Wanted %d · Committed %d" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 14)
 		var traffic: String = "%d travelling · %d checking" % [route.active_workers, route.checking_workers] if route.get("checking_workers", 0) > 0 else "%d workers travelling" % route.active_workers
@@ -476,7 +480,7 @@ func _draw_context(size: Vector2) -> void:
 		_label(body.position + Vector2(16, 225), "Returned %.1f · Home %.1f" % [route.delivered_total, _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 14)
 		if route.status == "depleted":
 			if route.active_workers == 0:
-				_draw_trail_button("trail_recheck", "RECHECK")
+				_draw_trail_button("trail_recheck", _recheck_title(route))
 		else:
 			_draw_trail_button("trail_less", "− 1")
 			_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
@@ -496,7 +500,7 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 	var relation_text: String = "Workers protecting producers" if relationship == "tended" else "Sweet source · protection possible" if relationship == "exploited" else "Sweet source · not yet harvested"
 	_label(body.position + Vector2(16, 162), relation_text, Color("d6b98c"), 13)
 	var route: Dictionary = _selected_route(selected)
-	var route_text: String = "Trail: no workers committed" if route.is_empty() or route.status == "inactive" else "Trail recalling · %d away" % route.active_workers if route.status == "recalling" else "Trail: source reported empty" if route.status == "depleted" else "Trail: %d committed · %d moving" % [route.allocated_workers, route.active_workers]
+	var route_text: String = "Trail: no workers committed" if route.is_empty() or route.status == "inactive" else "Trail recalling · %d away" % route.active_workers if route.status == "recalling" else "Report renewed · gathering paused" if route.status == "depleted" and route.get("recovery_ready", false) else "Trail: source reported empty" if route.status == "depleted" else "Trail: %d committed · %d moving" % [route.allocated_workers, route.active_workers]
 	_label(body.position + Vector2(16, 184), route_text, Color("a8b8bd"), 12)
 	var labor_text: String = "Protection: %d committed · %d available" % [int(_status.honeydew.protection_workers), available] if relationship == "tended" else "Protection needs %d · %d available" % [required, available]
 	_label(body.position + Vector2(16, 201), labor_text, Color("8fa1a8"), 12)
@@ -509,7 +513,7 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 		_draw_trail_button("trail_create", "INVEST 5 WORKERS" if route.is_empty() or route.status == "inactive" else "REINVEST 5 WORKERS")
 	elif route.status == "depleted":
 		if route.active_workers == 0:
-			_draw_trail_button("trail_recheck", "RECHECK")
+			_draw_trail_button("trail_recheck", _recheck_title(route))
 		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
 	else:
 		_draw_trail_button("trail_less", "− 1")
@@ -524,7 +528,16 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 func _investigation_title(selected: Dictionary) -> String:
 	if not _status.has("exploration"):
 		return "INVESTIGATE SOURCE"
+	var route: Dictionary = _selected_route(selected)
+	if route.get("resume_on_report", false):
+		return "STOP RECOVERY WATCH"
+	if route.get("status", "") == "depleted":
+		return "WATCH FOR RECOVERY"
 	return "REMOVE INVESTIGATION PRIORITY" if selected.source_knowledge_id in _status.exploration.get("priorities", []) else "PRIORITIZE INVESTIGATION"
+
+
+func _recheck_title(route: Dictionary) -> String:
+	return "RESUME GATHERING" if route.get("recovery_ready", false) else "TRY GATHERING"
 
 
 func _scent_label(route: Dictionary) -> String:

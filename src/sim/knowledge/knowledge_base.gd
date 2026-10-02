@@ -71,8 +71,33 @@ func temporal_hint(knowledge_id: String) -> Dictionary:
 	if last_return_empty:
 		label = "Last return found empty"
 	elif returned_before:
-		label = "Returned before · timing unknown"
-	return {"label": label, "possible_recurrence": returned_before, "has_report": not history.is_empty(), "last_return_empty": last_return_empty}
+		label = "Source found again · reported" if recovery_report(knowledge_id, last_empty_report(knowledge_id)) else "Returned before · timing unknown"
+	return {"label": label, "possible_recurrence": returned_before, "has_report": not history.is_empty(), "last_return_empty": last_return_empty,
+		"renewed_report": returned_before and recovery_report(knowledge_id, last_empty_report(knowledge_id))}
+
+
+func last_empty_report(knowledge_id: String) -> float:
+	if not nodes.has(knowledge_id):
+		return 0.0
+	var result: float = 0.0
+	for entry: Dictionary in outcomes.get(nodes[knowledge_id].source_node_id, []):
+		if not entry.available:
+			result = entry.time
+	return result
+
+
+func recovery_report(knowledge_id: String, after: float) -> bool:
+	if not nodes.has(knowledge_id):
+		return false
+	var node: KnownNode = nodes[knowledge_id]
+	var history: Array = outcomes.get(node.source_node_id, [])
+	if history.is_empty() or not history.back().available:
+		return false
+	for id: String in node.evidence_ids:
+		var evidence: Observation = observations[id]
+		if evidence.proximity_confirmed and evidence.observed_at > after and _received_at[id] > after:
+			return true
+	return false
 
 
 static func _valid_evidence(evidence: Observation, time: float) -> bool:

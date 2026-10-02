@@ -15,6 +15,8 @@ var active_workers: int = 0
 var status: String = "inactive"
 var departure_cooldown_ticks: int = 0
 var reported_depleted: bool = false
+var resume_on_report: bool = false
+var last_empty_report_at: float = 0.0
 var delivered_total: float = 0.0
 var energy_limited: bool = false
 var foreign_reports: int = 0
@@ -37,6 +39,7 @@ func to_dict() -> Dictionary:
 		"segment_id": segment_id, "desired_workers": desired_workers,
 		"allocated_workers": allocated_workers, "active_workers": active_workers,
 		"status": status, "departure_cooldown_ticks": departure_cooldown_ticks,
+		"resume_on_report": resume_on_report, "last_empty_report_at": last_empty_report_at,
 		"reported_depleted": reported_depleted, "delivered_total": delivered_total,
 		"reported_rival_losses": reported_rival_losses, "conflict_report": conflict_report,
 		"conflict_observed_at": conflict_observed_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
@@ -98,6 +101,10 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 		return false
 	if not typeof(witness_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(witness_time)) or witness_time < 0.0 or witness_time > loss_time or ((attacks + fights == 0) != (witness_time == 0.0)):
 		return false
+	var resume: Variant = data.get("resume_on_report", false)
+	var empty_at: Variant = data.get("last_empty_report_at", knowledge.last_empty_report(data.destination_knowledge_id) if data.reported_depleted else 0.0)
+	if not resume is bool or not typeof(empty_at) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(empty_at)) or empty_at < 0:
+		return false
 	id = data.id
 	origin_pile = data.origin_pile
 	destination_knowledge_id = data.destination_knowledge_id
@@ -109,6 +116,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	status = data.status
 	departure_cooldown_ticks = int(data.departure_cooldown_ticks)
 	reported_depleted = data.reported_depleted
+	resume_on_report = resume
+	last_empty_report_at = float(empty_at)
 	delivered_total = float(data.delivered_total)
 	energy_limited = data.get("energy_limited", false)
 	foreign_reports = int(reports)

@@ -132,6 +132,14 @@ func recheck(route_id: String) -> bool:
 	return true
 
 
+func set_recovery_watch(route_id: String, enabled: bool) -> bool:
+	if not _run.trails.routes.has(route_id):
+		return _reject("Unknown trail")
+	_run.trails.routes[route_id].resume_on_report = enabled
+	last_error = ""
+	return true
+
+
 func tick(delta: float) -> void:
 	# Every existing segment fades, including inactive and depleted routes.
 	for segment: TrailSegmentState in _run.trails.segments.values():
@@ -143,6 +151,9 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var route: TrailRouteState = _run.trails.routes[id]
+		if route.resume_on_report and route.status == "depleted" and route.active_workers == 0 and route.reported_losses == 0 and route.foreign_reports == 0 and _run.knowledge.recovery_report(route.destination_knowledge_id, route.last_empty_report_at):
+			var resumed: bool = recheck(id)
+			assert(resumed)
 		route.departure_cooldown_ticks = maxi(0, route.departure_cooldown_ticks - 1)
 	ids = _run.trails.cohorts.keys()
 	ids.sort_custom(func(a: String, b: String) -> bool: return a.trim_prefix("cohort_").to_int() < b.trim_prefix("cohort_").to_int())
@@ -387,6 +398,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		segment.traffic += mini(cohort.worker_count, WorkerLedger.MAX_COUNT - segment.traffic)
 	elif cohort.worker_count > 0 and cohort.reports_source_outcome:
 		route.reported_depleted = true
+		route.last_empty_report_at = _run.simulation_time
 		route.energy_limited = false
 	route.active_workers -= cohort.worker_count
 	var release_count: int = mini(route.allocated_workers - route.desired_workers, route.allocated_workers - route.active_workers)

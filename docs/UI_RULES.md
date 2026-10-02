@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 063 distinguishes Try Gathering (uncertain trip), Resume Gathering (confirming returned evidence) and Watch for Recovery (standing investigation plus opt-in resumption of existing gathering). Stop Recovery Watch removes that intent; Cancel still recalls gatherers. Off exploration shows a queued message. Found Again is a returned-source marker; a renewed source can still have gathering paused. Returned danger requires manual gathering. Existing contextual rows are reused at standard/compact sizes.
+
 Card 062 adds one short Exploration-panel hint that established trails extend reach. Automatic trunk travel still shows only home-known departure scent/age while away; the existing bounded coarse course appears after physical return. No new map, live branch path or hidden-resource marker is added.
 
 Card 061: selecting a returned resource trace offers Prioritize Investigation / Remove Investigation Priority. This toggles persistent intent, shares existing exploration labor and remains editable during shortage; off effort queues it with clear feedback. The Exploration panel shows priority count. No live coverage map, private scout path, remote need update or resource schedule reaches normal presentation.

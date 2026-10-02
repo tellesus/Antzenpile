@@ -1,5 +1,7 @@
 # Architecture
 
+Card 063: KnowledgeBase checks returned confirming observations after a route's last empty receipt. TrailSystem alone resumes opt-in depleted gathering once travelers are home, without reallocating or consulting source truth. UI combines source investigation with a saved recovery watch; off exploration leaves it queued. Cancel/returned danger retain authority. Normal summaries carry recovery readiness and watch intent, never hidden quantities.
+
 Card 062 selects explorer trunks from colony-known route estimates and returned traffic/danger evidence. A scout physically walks its captured home-to-endpoint grid path, searches beyond it, then retraces branch/trunk breadcrumbs. TrailRoute/TrailSegment and aggregate travelers remain separate from the scout's own ledger commitment. The trunk path stays private; normal presentation retains departure facts and home-delivered coarse courses. Stopping trail traffic does not erase an away scout's remembered path.
 
 Card 061 collective search is owned by ExplorationState and ScoutSystem. Away breadcrumbs/senses remain private; only home arrival adds coarse coverage/evidence. Controller consumes delivered knowledge before scheduling replacements. Departures copy known ground, source familiarity and colony need; priority investigations alternate with general exploration. KnowledgeBase corroborates returned collective provenance deterministically, without truth queries or mandatory visit counts. Normal UI receives detached intent/priority summaries only.

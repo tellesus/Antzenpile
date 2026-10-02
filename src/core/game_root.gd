@@ -147,10 +147,15 @@ func exploration_summary() -> Dictionary:
 
 
 func toggle_investigation_priority(knowledge_id: String) -> Dictionary:
-	var enabled: bool = knowledge_id not in simulation.run.exploration.priorities
+	var route: TrailRouteState = simulation.run.trails.find_route("home", knowledge_id)
+	var recovery: bool = route != null and (route.status == "depleted" or route.resume_on_report)
+	var enabled: bool = not route.resume_on_report if recovery else knowledge_id not in simulation.run.exploration.priorities
 	var accepted: bool = simulation.set_investigation_priority(knowledge_id, enabled)
+	if accepted and recovery:
+		var watched: bool = simulation.trails.set_recovery_watch(route.id, enabled)
+		assert(watched)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error,
-		"standing_priority": true, "enabled": enabled, "exploration_off": simulation.run.exploration.target == 0}
+		"standing_priority": true, "recovery_watch": recovery, "enabled": enabled, "exploration_off": simulation.run.exploration.target == 0}
 
 
 func set_exploration(target: int) -> Dictionary:
@@ -374,6 +379,8 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"attack_reports": route.attack_reports, "fighting_reports": route.fighting_reports,
 				"missing_workers": route.missing_workers, "last_witness_time": route.last_witness_time,
 				"energy_limited": route.energy_limited,
+				"resume_on_report": route.resume_on_report,
+				"recovery_ready": simulation.run.knowledge.recovery_report(route.destination_knowledge_id, route.last_empty_report_at),
 				"delivered_total": route.delivered_total,
 				"pheromone_strength": segment.pheromone_strength,
 				"route_familiarity": segment.route_familiarity})
