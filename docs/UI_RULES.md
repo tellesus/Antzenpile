@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 073 adds optional How to Play within Colony: four concise observation/journey/internal-function/save pages, Previous/Next/Back to Colony and Escape. Guide buttons absorb coordinates of the restart controls beneath them; reading never changes simulation or opens automatically. Its modal remains mutually exclusive with Sound, with fixed 44-pixel logical targets and no map/resource preview.
+
 Card 072 briefly says New food/water/protein trace(s) returned in the active view footer, with a delicate chime controlled by Information Cues. New-only sensory IDs batch into one event; private scout sensing/repeated reports/loaded old knowledge produce none. Notice never changes facing/selection; the new cloud and Remembered Sources entry supply persistent visual evidence. A later player action may replace transient feedback.
 
 Card 071 adds a 360x44 setting selector to Colony restart context. Opening defaults to the current setting; Change cycles Backyard/Garden Edge without changing the run. Repeat/fresh applies the selected authored layout and seed only on explicit start; cancel retains the colony. No source, threat or weather preview. A saved alternate setting loads and can be repeated without returning silently to Backyard.
