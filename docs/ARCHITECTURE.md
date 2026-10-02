@@ -49,6 +49,8 @@ These are responsibilities, not a requirement to create every class during boots
 
 WorldNode → scout interaction → Observation → delivered KnowledgeBase evidence → KnownNode → PerceivedSignal → OUTWARD.
 
+Card 060 adds run-owned ExplorationState for home standing intent. ScoutSystem maintains individually ledger-committed explorers with saved departure spacing and an explicit mixed directional bias. Standing cycles bring partial/empty evidence home after bounded search; manual continued-new-source dispatch remains compatible. Reducing target recalls surplus along breadcrumbs, including fractional-step travel. Views only inspect target/bearing/away count; camera rotation never changes intent.
+
 In the slice, a scout's private observations do not become colony knowledge until it returns. A world change does not silently refresh old knowledge. Perception uses known/estimated positions, never live hidden coordinates. INWARD uses an approved colony summary. Views receive snapshots or read-only values, not mutable hidden objects.
 
 Implemented through 009: SimulationController ticks ScoutSystem, then consumes the delivered inbox into RunState.knowledge. KnowledgeBase receives evidence and simulation time only; it owns archived reports and derives Known Nodes. Restore validates source identities at the RunState boundary without refreshing historical coordinates or quantity. Confidence aging is a query, not a mutable second clock.

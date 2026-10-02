@@ -29,6 +29,8 @@ func _ready() -> void:
 		outward.signal_provider = sensory_snapshot.bind("home")
 		outward.status_provider = outward_status.bind("home")
 		outward.dispatch_command = dispatch_facing
+		outward.exploration_command = set_exploration
+		outward.exploration_bias_command = set_exploration_bias
 		outward.pause_command = simulation.toggle_pause
 		outward.speed_command = simulation.set_time_scale
 		outward.trail_create_command = create_trail_for
@@ -136,7 +138,22 @@ func outward_status(pile_id: String) -> Dictionary:
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
 		"scout_missions": scout_mission_summaries(pile_id),
-		"honeydew": honeydew_summary(pile_id)}
+		"honeydew": honeydew_summary(pile_id), "exploration": exploration_summary()}
+
+
+func exploration_summary() -> Dictionary:
+	return {"target": simulation.run.exploration.target, "bias": simulation.run.exploration.bias,
+		"away": simulation.scouting.standing_count()}
+
+
+func set_exploration(target: int) -> Dictionary:
+	var accepted: bool = simulation.set_exploration(target)
+	return {"accepted": accepted, "reason": simulation.scouting.last_error}
+
+
+func set_exploration_bias(bearing: Variant) -> Dictionary:
+	var accepted: bool = simulation.set_exploration_bias(bearing)
+	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func scout_mission_summaries(pile_id: String) -> Array[Dictionary]:

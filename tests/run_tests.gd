@@ -54,6 +54,7 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_persistent_chemistry.gd"),
 	preload("res://tests/test_recognition.gd"),
 	preload("res://tests/test_guest_recurrence.gd"),
+	preload("res://tests/test_standing_exploration.gd"),
 ]
 
 var checks: int = 0

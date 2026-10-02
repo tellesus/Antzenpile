@@ -34,6 +34,7 @@ Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding e
 
 | D26 | Accepted playtest plan, 2026-10-01: Adaptation graph nodes inspect; trial purchase has one contextual location. Scout departure is finite; departure scent fades but remembered direction persists while awaiting return. Keep return-before-information: no live remote scout course/discovery. Returning witnesses may carry qualitative attack/contact evidence; unwitnessed losses remain unknown and journey danger is distinct from resource depletion. |
 | D27 | User direction, 2026-10-01: implement the recognition/security–tolerance branch, then perform a measured balance and gameplay pass. This authorizes resource/labor tuning where ordinary-command evidence identifies a problem; the original session-duration target remains tabled. |
+| D28 | User-approved scouting revision, 2026-10-02: standing exploration labor with cycling/staggered departures; explicit directional bias independent of camera rotation; returned collective coverage, persistent investigation and corroborated knowledge; physical exploration along established trunks. Preserve return-before-information, shared detailed-agent cap and real ledger/travel costs. A convincing single encounter may establish a source. Scout experience/mortality expansion remains later scope. Standing cycles may return partial/empty accounts; D16's continued-new-source behavior remains available for manual missions. |
 
 ## Provisional defaults for executable tasks
 

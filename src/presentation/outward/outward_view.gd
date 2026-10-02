@@ -11,6 +11,9 @@ const LossEvidence = preload("res://src/presentation/returned_loss_evidence.gd")
 var signal_provider: Callable
 var status_provider: Callable
 var dispatch_command: Callable
+var exploration_command: Callable
+var exploration_bias_command: Callable
+var exploration_open: bool = false
 var pause_command: Callable
 var speed_command: Callable
 var trail_create_command: Callable
@@ -203,6 +206,9 @@ func _run_command(command: String) -> void:
 				result = trail_set_command.call(route.id, target)
 			_feedback = ("Workers sent to recheck" if command == "trail_recheck" else "Trail updated") if result.get("accepted", false) else result.get("reason", "Trail unavailable")
 		"scout":
+			if exploration_command.is_valid():
+				exploration_open = not exploration_open
+				return
 			if not dispatch_command.is_valid() or _status.get("available_workers", 0) < 1 or _status.get("active_scouts", 0) >= _status.get("scout_cap", 0):
 				_feedback = "No scout available"
 			else:
@@ -219,6 +225,12 @@ func _run_command(command: String) -> void:
 				var result: Dictionary = action.call()
 				_feedback = ("Run saved" if command == "save" else "Run loaded") if result.get("accepted", false) else result.get("reason", "Save unavailable")
 		_:
+			if command.begins_with("explore_") and exploration_command.is_valid():
+				var result: Dictionary = exploration_command.call(int(command.trim_prefix("explore_")))
+				_feedback = "Exploration effort updated · surplus returns home" if result.get("accepted", false) else result.get("reason", "Exploration unavailable")
+			elif command in ["exploration_bias", "exploration_general"] and exploration_bias_command.is_valid():
+				var result: Dictionary = exploration_bias_command.call(facing if command == "exploration_bias" else null)
+				_feedback = "Exploration attention updated" if result.get("accepted", false) else result.get("reason", "Attention unavailable")
 			if command.begins_with("speed_") and speed_command.is_valid():
 				speed_command.call(int(command.trim_prefix("speed_")))
 	if not _feedback.is_empty():
@@ -246,6 +258,10 @@ func _button_rect(command: String) -> Rect2:
 
 
 func _button_at(at: Vector2) -> String:
+	if exploration_open:
+		for command: String in ["explore_0", "explore_2", "explore_5", "explore_8", "exploration_bias", "exploration_general"]:
+			if _exploration_rect(command).has_point(at):
+				return command
 	if not _selected_signal().is_empty():
 		if _is_honeydew(_selected_signal()):
 			var relationship: String = _status.get("honeydew", {}).get("relationship", "unknown")
@@ -283,6 +299,8 @@ func _draw() -> void:
 	for entry: Dictionary in _placed:
 		_draw_signal(entry)
 	_draw_hud(size)
+	if exploration_open:
+		_draw_exploration()
 	_draw_context(size)
 	_draw_controls(size)
 
@@ -596,7 +614,7 @@ func _draw_controls(size: Vector2) -> void:
 	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale
-		var unavailable: bool = command == "scout" and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)
+		var unavailable: bool = command == "scout" and not exploration_command.is_valid() and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)
 		var color: Color = Color("28342f") if command == "scout" else Color("18252b")
 		if active:
 			color = Color("31505a")
@@ -604,6 +622,8 @@ func _draw_controls(size: Vector2) -> void:
 			color = Color("202326")
 		draw_rect(box, color)
 		var title: String = "SEND SCOUT" if command == "scout" else "INWARD" if command == "inward" else "SAVE" if command == "save" else "LOAD" if command == "load" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
+		if command == "scout" and exploration_command.is_valid():
+			title = "EXPLORATION"
 		_label(box.position + Vector2(box.size.x * 0.5, 40), title, Color("d3dcd4") if not unavailable else Color("78817e"), 14 if command in ["save", "load"] else 16, HORIZONTAL_ALIGNMENT_CENTER)
 	if not _feedback.is_empty() and Time.get_ticks_msec() < _feedback_until:
 		_label(Vector2(24, size.y - 17), _feedback, Color("b6c8b2"), 13)
@@ -613,6 +633,29 @@ func _draw_controls(size: Vector2) -> void:
 
 func _signal_color(category: String) -> Color:
 	return Art.color_for(category)
+
+
+func _exploration_rect(command: String) -> Rect2:
+	var index: int = ["explore_0", "explore_2", "explore_5", "explore_8"].find(command)
+	if index >= 0:
+		return Rect2(40 + index * 70, 220, 64, 44)
+	return Rect2(40, 280 if command == "exploration_bias" else 334, 274, 44)
+
+
+func _draw_exploration() -> void:
+	draw_rect(Rect2(24, 148, 308, 244), Color("111921"))
+	var policy: Dictionary = _status.get("exploration", {"target": 0, "away": 0, "bias": null})
+	_label(Vector2(40, 177), "Exploration labor", Color("d3dcd4"), 20)
+	_label(Vector2(40, 203), "%d target · %d away · replaces on return" % [policy.target, policy.away], Color("a8b9b6"), 13)
+	for target: int in [0, 2, 5, 8]:
+		var box: Rect2 = _exploration_rect("explore_%d" % target)
+		draw_rect(box, Color("31505a") if target == policy.target else Color("18252b"))
+		_label(box.position + Vector2(32,29), "OFF" if target == 0 else str(target), Color("d3dcd4"), 15, HORIZONTAL_ALIGNMENT_CENTER)
+	for command: String in ["exploration_bias", "exploration_general"]:
+		var box: Rect2 = _exploration_rect(command)
+		draw_rect(box, Color("283b3f"))
+		var title: String = "FAVOR THIS DIRECTION" if command == "exploration_bias" else "GENERAL EXPLORATION" if policy.bias == null else "CLEAR BIAS · %03d°" % roundi(rad_to_deg(policy.bias))
+		_label(box.position + Vector2(137,29), title, Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 func _signal_title(category: String) -> String:
 	match category:

@@ -56,6 +56,51 @@ func dispatch(origin_id: String, bearing: Variant = null) -> bool:
 	return true
 
 
+func set_effort(target: Variant) -> bool:
+	if typeof(target) != TYPE_INT or not WorkerLedger.valid_count(target) or target > config.active_cap:
+		return _reject("Exploration target must fit the scout capacity")
+	_run.exploration.target = target
+	var active: Array[ScoutAgent] = []
+	for agent: ScoutAgent in _run.scouts.values():
+		if agent.standing and agent.phase not in ["returning", "blocked_returning"]:
+			active.append(agent)
+	active.sort_custom(func(a: ScoutAgent, b: ScoutAgent) -> bool: return a.id.trim_prefix("scout_").to_int() > b.id.trim_prefix("scout_").to_int())
+	while active.size() > target:
+		_start_return(active.pop_front())
+	last_error = ""
+	return true
+
+
+func set_bias(bearing: Variant) -> bool:
+	if bearing != null and (not typeof(bearing) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(bearing))):
+		return _reject("Exploration bearing must be finite")
+	_run.exploration.bias = null if bearing == null else _memory_bearing(float(bearing))
+	last_error = ""
+	return true
+
+
+func standing_count() -> int:
+	var count: int = 0
+	for agent: ScoutAgent in _run.scouts.values():
+		count += 1 if agent.standing else 0
+	return count
+
+
+func _maintain_effort() -> void:
+	var policy: ExplorationState = _run.exploration
+	policy.cooldown_ticks = maxi(0, policy.cooldown_ticks - 1)
+	if policy.cooldown_ticks > 0 or standing_count() >= policy.target or _run.active_scout_count() >= config.active_cap or _run.colony.piles.home.workers_available < 1:
+		return
+	var saved_rng: int = _run.rng.state
+	var bearing: Variant = policy.bias if policy.bias != null and _run.rng.randf() < config.directional_share else null
+	var id: String = "scout_%d" % _run.next_scout_id
+	if dispatch("home", bearing):
+		_run.scouts[id].standing = true
+	else:
+		_run.rng.state = saved_rng
+	policy.cooldown_ticks = config.departure_interval_ticks
+
+
 func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 	last_error = ""
 	if not _run.colony.piles.has(origin_id) or not _run.knowledge.nodes.has(knowledge_id):
@@ -146,6 +191,10 @@ func tick(delta: float) -> void:
 			var retired: bool = home.workers.retire_commitment(id)
 			assert(retired)
 			_run.scouts.erase(id)
+		if agent.standing and agent.phase in ["exploring", "blocked_exploring"] and _at_breadcrumb(agent) and agent.elapsed >= config.standing_search_seconds:
+			if agent.investigating.is_empty() or agent.elapsed >= config.standing_search_seconds + config.cue_extension_seconds:
+				_start_return(agent)
+	_maintain_effort()
 
 
 func _remember_departure(agent: ScoutAgent, bearing: float) -> void:

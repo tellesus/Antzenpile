@@ -19,6 +19,8 @@ const Rival = preload("res://src/sim/ecology/rival_state.gd")
 const Predator = preload("res://src/sim/ecology/predator_state.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
+const Exploration = preload("res://src/sim/scouting/exploration_state.gd")
+var exploration: ExplorationState = Exploration.new()
 var world: WorldState
 var colony: ColonyState = Colony.new()
 var scouts: Dictionary[String, ScoutAgent] = {}
@@ -77,7 +79,7 @@ func to_dict() -> Dictionary:
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "next_scout_id": next_scout_id, "delivered_observations": delivered,
-		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(),
+		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(),
 		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict()}
 
 
@@ -121,6 +123,9 @@ func restore(data: Dictionary) -> bool:
 	var restored_colony := Colony.new()
 	if not data.colony is Dictionary or not restored_colony.restore(data.colony, restored_world.bounds, restored_world.home_position):
 		return false
+	var restored_exploration := Exploration.new()
+	if data.has("exploration") and (not data.exploration is Dictionary or not restored_exploration.restore(data.exploration)):
+		return false
 	if not data.scouts is Array or data.scouts.size() > SCOUT_CONFIG.active_cap or not WorkerLedger.valid_count(data.next_scout_id) or data.next_scout_id < 1:
 		return false
 	var restored_scouts: Dictionary[String, ScoutAgent] = {}
@@ -136,6 +141,14 @@ func restore(data: Dictionary) -> bool:
 		for id: String in pile.workers.to_dict().commitments:
 			if id.begins_with("scout_") and (not restored_scouts.has(id) or restored_scouts[id].origin_pile != pile.id):
 				return false
+	var exploring_standing: int = 0
+	for agent: ScoutAgent in restored_scouts.values():
+		if agent.standing:
+			if not data.has("exploration"):
+				return false
+			exploring_standing += 1 if agent.phase not in ["returning", "blocked_returning"] else 0
+	if exploring_standing > restored_exploration.target:
+		return false
 	if not data.delivered_observations is Array:
 		return false
 	var restored_missions: Dictionary[String, ScoutMissionMemory] = {}
@@ -304,6 +317,7 @@ func restore(data: Dictionary) -> bool:
 	rival = restored_rival
 	swarm = restored_swarm
 	guest = restored_guest
+	exploration = restored_exploration
 	return true
 
 

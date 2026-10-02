@@ -14,6 +14,7 @@ var return_path: Array[Vector2] = []
 var mission_target: Vector2
 var investigating: String = ""
 var investigation_source_id: String = ""
+var standing: bool = false
 var observations: Dictionary[String, Observation] = {}
 
 
@@ -27,7 +28,7 @@ func to_dict() -> Dictionary:
 		"position": [position.x, position.y], "phase": phase, "elapsed": elapsed,
 		"path": _points(path), "cursor": cursor, "return_path": _points(return_path),
 		"mission_target": [mission_target.x, mission_target.y], "investigating": investigating,
-		"investigation_source_id": investigation_source_id, "observations": evidence}
+		"investigation_source_id": investigation_source_id, "standing": standing, "observations": evidence}
 
 
 static func _points(points: Array[Vector2]) -> Array:
@@ -87,6 +88,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if not data.get("investigation_source_id", "") is String or (not data.get("investigation_source_id", "").is_empty() and not world.nodes.has(data.investigation_source_id)):
 		return false
+	if not data.get("standing", false) is bool or data.get("standing", false) and data.origin_pile != "home":
+		return false
 	var restored_evidence: Dictionary[String, Observation] = {}
 	for value: Variant in data.observations:
 		var evidence := Evidence.new()
@@ -108,6 +111,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	mission_target = Vector2(data.mission_target[0], data.mission_target[1])
 	investigating = data.investigating
 	investigation_source_id = data.get("investigation_source_id", "")
+	standing = data.get("standing", false)
 	observations = restored_evidence
 	return true
 

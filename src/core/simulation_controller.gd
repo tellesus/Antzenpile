@@ -66,6 +66,14 @@ func dispatch_scout(origin_id: String, bearing: Variant = null) -> bool:
 	return scouting.dispatch(origin_id, bearing)
 
 
+func set_exploration(target: Variant) -> bool:
+	return scouting.set_effort(target)
+
+
+func set_exploration_bias(bearing: Variant) -> bool:
+	return scouting.set_bias(bearing)
+
+
 func investigate_known_source(origin_id: String, knowledge_id: String) -> bool:
 	return scouting.dispatch_investigation(origin_id, knowledge_id)
 
