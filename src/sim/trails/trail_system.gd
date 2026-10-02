@@ -205,13 +205,16 @@ func _encounter(cohort: TransitCohort, route: TrailRouteState) -> void:
 func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) -> void:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
-	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "ambush" if cause == "predator" else "foreign conflict")
+	var phenotype: String = pile.genetics.loss_profile(adapted == 1, pile.adaptation_repertoire, pile.workers_total, _run.rng)
+	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "ambush" if cause == "predator" else "foreign conflict", phenotype)
 	assert(removed)
 	route.allocated_workers -= 1
 	route.active_workers -= 1
 	cohort.worker_count -= 1
 	cohort.lost_workers += 1
 	cohort.adapted_lost_workers += adapted
+	if phenotype != "":
+		cohort.lost_profiles[phenotype] = cohort.lost_profiles.get(phenotype, 0) + 1
 	if cause == "rival":
 		cohort.rival_losses += 1
 		cohort.witnessed_fighting = cohort.worker_count > 0

@@ -247,6 +247,9 @@ func restore(data: Dictionary) -> bool:
 	for pile: PileState in restored_colony.piles.values():
 		if restored_trails.pending_for_pile(pile.id, true) > pile.adapted_workers_lost or restored_trails.pending_for_pile(pile.id) > WorkerLedger.MAX_COUNT - pile.workers_total:
 			return false
+		for trait_id: String in pile.genetics.established:
+			if restored_trails.pending_trait(pile.id, trait_id) > pile.genetics.count_trait(trait_id, true):
+				return false
 	var restored_guest := Guest.new()
 	if data.has("guest") and (not data.guest is Dictionary or not restored_guest.restore(data.guest, restored_colony.piles.home, restored_clock.tick_count)):
 		return false

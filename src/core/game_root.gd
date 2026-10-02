@@ -178,12 +178,18 @@ func inward_status(pile_id: String) -> Dictionary:
 			trail_workers += route.allocated_workers + simulation.run.trails.pending_losses(route.id)
 	var expected_total: int = pile.workers_total + simulation.run.trails.pending_for_pile(pile_id)
 	var expected_adapted: int = pile.adapted_workers_total + simulation.run.trails.pending_for_pile(pile_id, true)
+	var genetic_summary: Array[Dictionary] = []
+	for trait_id: String in pile.genetics.established:
+		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.trails.pending_trait(pile_id, trait_id)
+		genetic_summary.append({"id": trait_id, "expressed": expressed,
+			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
 	return {"pile_id": pile_id, "queens": pile.queen_count,
 		"workers_total": expected_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
 		"brood_losses": pile.brood_lost_total, "guest": guest_summary(pile_id),
 		"honeydew": honeydew_summary(pile_id),
 		"adaptation_repertoire": pile.adaptation_repertoire,
+		"genetic_repertoire": genetic_summary,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
 		"adapted_workers": expected_adapted,
 		"adaptation_fraction": float(expected_adapted) / expected_total if expected_total > 0 else 0.0,

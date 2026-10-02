@@ -33,6 +33,7 @@ func start(pile_id: String) -> bool:
 	pile.brood_started_total += 1
 	cohort.id = "brood_%d" % pile.brood_started_total
 	cohort.adaptation_id = pile.adaptation_repertoire
+	cohort.inherited_traits = pile.genetics.established.duplicate()
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
 	return true
@@ -100,9 +101,7 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 					assert(released)
 					var retired: bool = pile.workers.retire_commitment(commitment)
 					assert(retired)
-					pile.adaptation_repertoire = cohort.adaptation_id
-				if cohort.adaptation_id != "":
-					pile.adapted_workers_total += cohort.count
+				pile.register_emergence(cohort)
 				pile.brood_matured_total += cohort.count
 				pile.brood_cohorts.erase(cohort)
 			else:

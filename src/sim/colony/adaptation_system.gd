@@ -43,6 +43,9 @@ func start(pile_id: String, trait_id: String) -> bool:
 	cohort.id = "brood_%d" % pile.brood_started_total
 	cohort.adaptation_id = trait_id
 	cohort.adaptation_trial = true
+	cohort.inherited_traits = pile.genetics.established.duplicate()
+	cohort.inherited_traits.append(trait_id)
+	cohort.inherited_traits.sort()
 	pile.brood_cohorts.append(cohort)
 	last_error = ""
 	return true

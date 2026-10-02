@@ -55,3 +55,7 @@ The [source-recovery audit](tasks/041_source_recovery_audit.md) reproduced quick
 Further ecological relationships, satellites, dispersal, human attention and reality replay follow only when their dependencies and player-facing purpose are specified. Do not scaffold them all at once.
 
 Across every card, retain headless fixed-tick simulation, run-owned seeded state, aggregate workers except individual scouts, worker-ledger conservation, separate TrailRoute and TrailSegment, return-only knowledge, detached normal-view data, versioned saves, negative space and mobile-safe rendering.
+
+## Current genetic milestone
+
+[056 — repertoire foundation](tasks/056_genetic_repertoire_foundation.md) is complete. Next is [057 — pressure-revealed persistent chemistry](tasks/057_pressure_revealed_trail_chemistry.md): one experienced-rain candidate, biological trial, delayed adult expression, ongoing food tradeoff and combined verification. Full reproductive lineage mechanics remain future scope; balance/session duration remain tabled.

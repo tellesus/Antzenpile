@@ -19,6 +19,7 @@ var brood_lost_total: int = 0
 var adaptation_repertoire: String = ""
 var adapted_workers_total: int = 0
 var adapted_workers_lost: int = 0
+var genetics: GeneticRepertoire = GeneticRepertoire.new()
 var nursery_state: String = "primitive"
 var nursery_progress_seconds: float = 0.0
 var food_exchange_state: String = "primitive"
@@ -39,6 +40,7 @@ func to_dict() -> Dictionary:
 		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
 		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
 		"adapted_workers_lost": adapted_workers_lost,
+		"genetics": genetics.to_dict(),
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"food_exchange_state": food_exchange_state,
 		"food_exchange_progress_seconds": food_exchange_progress_seconds}
@@ -71,17 +73,51 @@ func adaptation_fraction() -> float:
 	return float(adapted_workers_total) / workers_total if workers_total > 0 else 0.0
 
 
-func lose_workers(pool: String, amount: Variant, adapted_amount: Variant, reason: String) -> bool:
+func lose_workers(pool: String, amount: Variant, adapted_amount: Variant, reason: String, exact_profile: Variant = null) -> bool:
 	# The commitment owner reconciles its own travelers/jobs in this same event.
 	if not Ledger.valid_count(amount) or not Ledger.valid_count(adapted_amount) or adapted_amount > amount:
 		return false
 	if adapted_amount > adapted_workers_total or amount - adapted_amount > workers_total - adapted_workers_total or adapted_amount > Ledger.MAX_COUNT - adapted_workers_lost:
 		return false
+	var plan: Dictionary[String, int] = {}
+	if exact_profile != null:
+		if not exact_profile is String:
+			return false
+		var available: int = workers_total - genetics.count_profiles() if exact_profile == "" else genetics.living.get(exact_profile, 0)
+		var has_foraging: bool = adaptation_repertoire != "" and adaptation_repertoire in GeneticRepertoire.traits_for(exact_profile)
+		if amount > available or adapted_amount != (amount if has_foraging else 0):
+			return false
+		plan[exact_profile] = int(amount)
+	else:
+		# Compatibility API can remove mixed baseline/foraging adults atomically.
+		var keys: Array[String] = [""]
+		keys.append_array(genetics.living.keys())
+		for category: bool in [false, true]:
+			var remaining: int = int(adapted_amount if category else amount - adapted_amount)
+			for key: String in keys:
+				if (adaptation_repertoire != "" and adaptation_repertoire in GeneticRepertoire.traits_for(key)) != category:
+					continue
+				var available: int = workers_total - genetics.count_profiles() if key == "" else genetics.living[key]
+				var removed: int = mini(remaining, available)
+				if removed > 0:
+					plan[key] = removed
+					remaining -= removed
+			if remaining > 0:
+				return false
 	if not workers.remove_living_workers(pool, amount, reason):
 		return false
+	for key: String in plan:
+		genetics.remove_profile(key, plan[key])
 	adapted_workers_total -= int(adapted_amount)
 	adapted_workers_lost += int(adapted_amount)
 	return true
+
+
+func register_emergence(cohort: BroodCohort) -> void:
+	genetics.emerge(cohort.inherited_traits, cohort.count, cohort.adaptation_id if cohort.adaptation_trial else "")
+	if cohort.adaptation_trial and cohort.adaptation_id in ["lean", "load"]:
+		adaptation_repertoire = cohort.adaptation_id
+	adapted_workers_total = genetics.count_trait(adaptation_repertoire)
 
 
 func nursery_max_care_capacity() -> int:
@@ -176,14 +212,23 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if (repertoire == "") != (lifetime_adapted == 0):
 		return false
+	var genetic_data: Variant = data.get("genetics", {"established": [] if repertoire == "" else [repertoire], "living": {} if adapted == 0 else {repertoire: adapted}, "lost": {} if adapted_lost == 0 else {repertoire: adapted_lost}})
+	var restored_genetics := GeneticRepertoire.new()
+	if not genetic_data is Dictionary or not restored_genetics.restore(genetic_data, restored.total, restored.lost_total, emerged):
+		return false
+	if restored_genetics.count_trait(repertoire) != adapted or restored_genetics.count_trait(repertoire, true) != adapted_lost or ("lean" in restored_genetics.established or "load" in restored_genetics.established) != (repertoire != ""):
+		return false
 	var trials: int = 0
 	for cohort: BroodCohort in restored_brood:
 		if cohort.adaptation_trial:
 			trials += 1
-			if repertoire != "" or adapted != 0:
+			if cohort.adaptation_id in restored_genetics.established or (cohort.adaptation_id in ["lean", "load"] and repertoire != ""):
 				return false
 		elif cohort.adaptation_id != "" and cohort.adaptation_id != repertoire:
 			return false
+		for trait_id: String in cohort.inherited_traits:
+			if trait_id not in restored_genetics.established and not (cohort.adaptation_trial and trait_id == cohort.adaptation_id):
+				return false
 	if trials > 1:
 		return false
 	var adaptation_commitment: String = "adaptation:" + data.id
@@ -219,6 +264,7 @@ func restore(data: Dictionary) -> bool:
 	adaptation_repertoire = repertoire
 	adapted_workers_total = int(adapted)
 	adapted_workers_lost = int(adapted_lost)
+	genetics = restored_genetics
 	nursery_state = restored_nursery_state
 	nursery_progress_seconds = float(restored_nursery_progress)
 	food_exchange_state = data.food_exchange_state

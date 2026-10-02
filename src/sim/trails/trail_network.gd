@@ -35,6 +35,16 @@ func pending_for_pile(pile_id: String, adapted: bool = false) -> int:
 	return total
 
 
+func pending_trait(pile_id: String, trait_id: String) -> int:
+	var total: int = 0
+	for cohort: TransitCohort in cohorts.values():
+		if routes[cohort.route_id].origin_pile == pile_id:
+			for key: String in cohort.lost_profiles:
+				if trait_id in GeneticRepertoire.traits_for(key):
+					total += cohort.lost_profiles[key]
+	return total
+
+
 func to_dict() -> Dictionary:
 	var route_records: Array[Dictionary] = []
 	var segment_records: Array[Dictionary] = []
@@ -101,6 +111,16 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if cohort.detour_report != null and (cohort.detour_report.origin_pile != route.origin_pile or cohort.detour_report.source_node_id == knowledge.nodes[route.destination_knowledge_id].source_node_id):
 			return false
 		var pile: PileState = colony.piles[route.origin_pile]
+		if not record.has("lost_profiles") and cohort.adapted_lost_workers > 0 and pile.adaptation_repertoire != "":
+			cohort.lost_profiles[pile.adaptation_repertoire] = cohort.adapted_lost_workers
+		var foraging_losses: int = 0
+		for key: String in cohort.lost_profiles:
+			if cohort.lost_profiles[key] > pile.genetics.lost.get(key, 0):
+				return false
+			if pile.adaptation_repertoire in GeneticRepertoire.traits_for(key):
+				foraging_losses += cohort.lost_profiles[key]
+		if foraging_losses != cohort.adapted_lost_workers:
+			return false
 		var fraction: float = 0.0
 		if pile.adaptation_repertoire == "lean":
 			fraction = (1.0 - cohort.energy_multiplier) / 0.3
@@ -149,6 +169,14 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		elif ledger.count(commitment) != -1:
 			return false
 	for pile: PileState in colony.piles.values():
+		var pending_profiles: Dictionary[String, int] = {}
+		for cohort: TransitCohort in restored_cohorts.values():
+			if restored_routes[cohort.route_id].origin_pile == pile.id:
+				for key: String in cohort.lost_profiles:
+					pending_profiles[key] = pending_profiles.get(key, 0) + cohort.lost_profiles[key]
+		for key: String in pending_profiles:
+			if pending_profiles[key] > pile.genetics.lost.get(key, 0):
+				return false
 		for id: String in pile.workers.to_dict().commitments:
 			var entry: Dictionary = pile.workers.to_dict().commitments[id]
 			if entry.kind == "trail" or id.begins_with("trail:"):

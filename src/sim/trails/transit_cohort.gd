@@ -18,6 +18,7 @@ var energy_multiplier: float = 1.0
 var carry_multiplier: float = 1.0
 var lost_workers: int = 0
 var adapted_lost_workers: int = 0
+var lost_profiles: Dictionary[String, int] = {}
 var foreign_contact: bool = false
 var foreign_sampled: bool = false
 var reports_source_outcome: bool = true
@@ -40,6 +41,7 @@ func to_dict() -> Dictionary:
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
 		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
+		"lost_profiles": lost_profiles.duplicate(),
 		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
 		"foreign_sampled": foreign_sampled, "reports_source_outcome": reports_source_outcome,
 		"swarm_engaged": swarm_engaged, "rival_losses": rival_losses,
@@ -96,6 +98,18 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if data.worker_count == 0 and (losses == 0 or data.payload != 0.0 or restored_detour != null or restored_report != null):
 		return false
+	var profile_losses: Variant = data.get("lost_profiles", {})
+	if not profile_losses is Dictionary:
+		return false
+	var restored_profiles: Dictionary[String, int] = {}
+	var profile_total: int = 0
+	for key: Variant in profile_losses:
+		if not key is String or key == "" or not WorkerLedger.valid_count(profile_losses[key]) or profile_losses[key] < 1:
+			return false
+		restored_profiles[key] = int(profile_losses[key])
+		profile_total += int(profile_losses[key])
+	if profile_total > losses:
+		return false
 	var attack_witness: Variant = data.get("witnessed_attack", false)
 	var fighting_witness: Variant = data.get("witnessed_fighting", false)
 	if typeof(attack_witness) != TYPE_BOOL or typeof(fighting_witness) != TYPE_BOOL:
@@ -127,6 +141,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	carry_multiplier = float(carry)
 	lost_workers = int(losses)
 	adapted_lost_workers = int(adapted_losses)
+	lost_profiles = restored_profiles
 	predator_encountered = encountered
 	witnessed_attack = attack_witness
 	witnessed_fighting = fighting_witness

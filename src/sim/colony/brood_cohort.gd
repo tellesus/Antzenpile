@@ -12,6 +12,7 @@ var nutrition: float = 1.0
 var care: float = 1.0
 var adaptation_id: String = ""
 var adaptation_trial: bool = false
+var inherited_traits: Array[String] = []
 
 
 static func next_id(matured_total: int, active_count: int = 0) -> String:
@@ -21,7 +22,8 @@ static func next_id(matured_total: int, active_count: int = 0) -> String:
 func to_dict() -> Dictionary:
 	return {"id": id, "stage": stage, "count": count, "lost_count": lost_count, "progress_seconds": progress_seconds,
 		"nutrition": nutrition, "care": care,
-		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial}
+		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial,
+		"inherited_traits": inherited_traits.duplicate()}
 
 
 func restore(data: Dictionary) -> bool:
@@ -39,6 +41,16 @@ func restore(data: Dictionary) -> bool:
 	var trial: Variant = data.get("adaptation_trial", false)
 	if not trait_id is String or not (trait_id == "" or AdaptationRules.valid_trait(trait_id)) or typeof(trial) != TYPE_BOOL or (trial and trait_id == ""):
 		return false
+	var traits: Variant = data.get("inherited_traits", [] if trait_id == "" else [trait_id])
+	if not traits is Array:
+		return false
+	var parsed_traits: Array[String] = []
+	for value: Variant in traits:
+		if not value is String or not AdaptationRules.valid_trait(value) or value in parsed_traits:
+			return false
+		parsed_traits.append(value)
+	if ("lean" in parsed_traits and "load" in parsed_traits) or (trait_id != "" and trait_id not in parsed_traits):
+		return false
 	id = data.id
 	stage = data.stage
 	count = int(data.count)
@@ -48,4 +60,5 @@ func restore(data: Dictionary) -> bool:
 	care = float(data.care)
 	adaptation_id = trait_id
 	adaptation_trial = trial
+	inherited_traits = parsed_traits
 	return true

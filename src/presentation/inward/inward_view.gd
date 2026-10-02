@@ -412,7 +412,7 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 215, "Trait emerges with this brood")
 			elif _status.adaptation_repertoire != "":
 				_detail_line(box, 163, "Chosen: %s" % ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
-				_detail_line(box, 189, "Adapted workers: %d / %d" % [_status.adapted_workers, _status.workers_total])
+				_detail_line(box, 189, "Expressed in %d / %d adults" % [_status.adapted_workers, _status.workers_total])
 				_detail_line(box, 215, "Future brood inherits this trait")
 			else:
 				_detail_line(box, 163, "One inherited trait for future brood")
@@ -435,6 +435,9 @@ func _draw_genetic_context(box: Rect2) -> void:
 	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
 		_detail_line(box, 185, "Stage: " + str(_status.adaptation_trial.stage).capitalize())
 		_detail_line(box, 211, "Expresses only with surviving adults")
+	elif _status.adaptation_repertoire == web_selection:
+		_detail_line(box, 185, "Expressed in %d / %d adults" % [_status.adapted_workers, _status.workers_total])
+		_detail_line(box, 211, "Future brood inherits; adults retain traits")
 	else:
 		var choice: String = _status.adaptation_repertoire if _status.adaptation_repertoire != "" else _status.adaptation_trial.get("adaptation_id", "")
 		_detail_line(box, 185, "Colony choice: " + ("Lean Foragers" if choice == "lean" else "Load Bearers"))
