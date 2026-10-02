@@ -675,9 +675,9 @@ func _draw_genetic_context(box: Rect2) -> void:
 			tradeoff = "Up to %.0f%% more trail food" % (_status.get("chemistry_extra_energy", 0.2) * 100)
 		"security":
 			benefits = "Up to %.0f%% less clearing time" % (_status.get("recognition_clearing_change", 0.4) * 100)
-			tradeoff = "Up to %d extra protection workers" % _status.get("recognition_labor_change", 2)
+			tradeoff = "Up to %d extra tending workers" % _status.get("recognition_labor_change", 2)
 		"tolerance":
-			benefits = "Up to %d fewer protection workers" % _status.get("recognition_labor_change", 2)
+			benefits = "Up to %d fewer tending workers" % _status.get("recognition_labor_change", 2)
 			tradeoff = "Up to %.0f%% more clearing time" % (_status.get("recognition_clearing_change", 0.4) * 100)
 	_detail_line(box, 125, benefits)
 	_detail_line(box, 151, tradeoff)
@@ -705,7 +705,7 @@ func _draw_genetic_context(box: Rect2) -> void:
 			_detail_line(box, 211, "Inherited family choice cannot switch")
 	if web_selection in ["security", "tolerance"]:
 		_detail_line(box, 302, "Earlier harm association" if web_selection == "security" else "Later harm association")
-		_detail_line(box, 326, "Reassign protection for new staffing")
+		_detail_line(box, 326, "Reassign tenders for new staffing")
 
 
 func _draw_relationship_context(box: Rect2) -> void:
@@ -723,7 +723,7 @@ func _draw_relationship_context(box: Rect2) -> void:
 		_detail_line(box, 185, "Protection supports the producers")
 		_detail_line(box, 211, "No gene trial or research payment")
 		draw_rect(_honeydew_rect(), Color("35483c"))
-		_label(_honeydew_rect().position + Vector2(130, 29), "WITHDRAW PROTECTION" if state == "tended" else "PROTECT PRODUCERS", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(_honeydew_rect().position + Vector2(130, 29), "WITHDRAW TENDERS" if state == "tended" else "TEND PRODUCERS", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _detail_line(box: Rect2, y: float, value: String) -> void:

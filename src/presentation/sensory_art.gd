@@ -11,6 +11,7 @@ static func color_for(category: String) -> Color:
 		"carbohydrate": return Color("dcb477")
 		"water": return Color("7fbfcf")
 		"protein": return Color("b8a1cf")
+		"threat": return Color("c58d79")
 	return Color("a0b1ae")
 
 

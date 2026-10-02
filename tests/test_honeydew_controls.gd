@@ -51,11 +51,11 @@ func run(test: Object) -> bool:
 	test.check(view._button_at(protect.get_center()) == "honeydew_start" and protect.size == Vector2(260, 44), "Loaded return offers a touch-sized Protect producers action")
 	var worker_before: int = game.run.colony.piles.home.workers_available
 	view._pointer_press(protect.get_center(), "mouse")
-	test.check(game.run.honeydew.relationship == "tended" and game.run.colony.piles.home.workers_available == worker_before - 6 and view._feedback == "Producers protected", "Mouse control reserves protection workers")
+	test.check(game.run.honeydew.relationship == "tended" and game.run.colony.piles.home.workers_available == worker_before - 6 and view._feedback == "Producers tended", "Mouse control reserves tending workers")
 	view._status = root.outward_status("home")
 	test.check(view._button_at(protect.get_center()) == "honeydew_stop" and view._status.honeydew.protection_workers == 6 and not view._status.honeydew.has("condition") and not view._status.honeydew.has("output"), "Tended context shows committed labor without hidden biology or forecast")
 	view._pointer_press(protect.get_center(), "touch")
-	test.check(game.run.honeydew.relationship == "exploited" and game.run.colony.piles.home.workers_available == worker_before and view._feedback == "Protection withdrawn", "Touch control releases the same six workers")
+	test.check(game.run.honeydew.relationship == "exploited" and game.run.colony.piles.home.workers_available == worker_before and view._feedback == "Tending withdrawn", "Touch control releases the same six workers")
 	var start: Dictionary = root.start_honeydew_tending("known:aphid_01")
 	test.check(start.accepted and root.stop_honeydew_tending("known:aphid_01").accepted, "Root semantic callbacks share controller validation")
 	var pile: PileState = game.run.colony.piles.home

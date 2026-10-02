@@ -45,6 +45,7 @@ func _ready() -> void:
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
 		outward.investigate_command = toggle_investigation_priority
+		outward.journey_command = respond_to_journey
 		outward.honeydew_start_command = start_honeydew_tending
 		outward.honeydew_stop_command = stop_honeydew_tending
 		outward.input_blocked = interaction_blocked
@@ -198,6 +199,17 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		if route != null and route.reported_losses > 0:
 			record.risk = "reported_loss"
 		result.append(record)
+	for id: String in simulation.run.journey_response.reports:
+		var report: Dictionary = simulation.run.journey_response.reports[id]
+		if report.finding not in ["ambush","mixed"]: continue
+		var route: TrailRouteState = simulation.run.trails.routes[id]
+		if route.origin_pile != pile_id: continue
+		var segment: TrailSegmentState = simulation.run.trails.segments[route.segment_id]
+		var offset: Vector2 = segment.start.lerp(segment.end,report.fraction) - origin
+		result.append({"id":"threat:" + id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat",
+			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":3.0,
+			"confidence":0.75,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time - report.observed_at,
+			"risk":"reported_attack","traffic":null,"foreign_contact":false,"conflict_report":""})
 	return result
 
 
@@ -215,6 +227,7 @@ func outward_status(pile_id: String) -> Dictionary:
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
 		"scout_missions": scout_mission_summaries(pile_id),
 		"honeydew": honeydew_summary(pile_id), "exploration": exploration_summary(),
+		"journey_response": simulation.journey_response.summary(),
 		"internal_attention": Pressure.attention(inward_status(pile_id))}
 
 
@@ -392,6 +405,7 @@ func _refresh_loaded_views() -> void:
 	if _outward_view != null:
 		_outward_view.facing = 0.0
 		_outward_view.selected_id = ""
+		_outward_view.journey_open = false
 		_outward_view.sources_open = false
 		_outward_view.source_page = 0
 		_outward_view._pointer_kind = ""
@@ -566,6 +580,12 @@ func set_trail_target(route_id: String, target: int) -> Dictionary:
 func recheck_trail(route_id: String) -> Dictionary:
 	var accepted: bool = simulation.recheck_trail(route_id)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
+
+
+func respond_to_journey(action: String, route_id: String) -> Dictionary:
+	var system: JourneyResponseSystem = simulation.journey_response
+	var accepted: bool = system.investigate(route_id) if action == "investigate" else system.recall() if action == "recall" and simulation.run.journey_response.route_id == route_id else false
+	return {"accepted":accepted,"reason":system.last_error if not accepted else ""}
 
 
 func dispatch_facing(bearing: float) -> bool:

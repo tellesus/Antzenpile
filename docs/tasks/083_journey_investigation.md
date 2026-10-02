@@ -1,0 +1,11 @@
+# 083 — Investigate returned journey losses
+
+Status: complete. Approved playtest response, original Part 4 §§59–63/144. Outcome: returned losses unlock Investigate Journey, a cautious three-worker survey of the remembered route. Actual proximity can find a localized ambusher and/or foreign traffic. Only home return establishes coarse threat evidence; otherwise report inconclusive. Stop gathering remains independent. One aggregate party, paid round-trip travel, actual recall and no added detailed agents.
+
+Keep bounded per-route delivered findings, observation/receipt times and coarse route-relative target; private samples never enter presentation. Normal away information is dispatched labor/elapsed time only. Strict optional saved state reconciles ownership, known routes, time/travel/report ranges and orphan jobs; legacy default empty. No new investigation mortality in this cautious first survey; combat risk belongs to 084. Tending wording explicitly describes producers rather than journey defense.
+
+Verify discovery/loss/investigation/home-delivery, independent foreign/ambush/inconclusive evidence, labor/energy/recall, no pre-return leak, exact saves/pause/speeds, invalid commands/saves, normal mouse/touch and standard/compact threat contexts. Full suite/import/Main. Handoff: 084 adds paid swarm intervention on the delivered ambusher report.
+
+Completion: focused 253 checks/0 failures; final full suite 5602/0; pinned Godot 4.7.2 import and Main smoke passed. Windows Compatibility probe captures ordinary loss, paid dispatch, away, returned and threat contexts at 1280×720/900×600; mouse/touch commands passed, eight screenshots inspected for panel/caption separation. No Android claim. Initial full run caught two obsolete tending-feedback expectations; updated wording assertions, repeated suite passed.
+
+Changed groups: typed ecology configuration/state/system and runtime/save composition; knowledge-only response callbacks/threat projection; OUTWARD survey context and distinct INWARD/OUTWARD tending labels; behavioral/save/input tests and reproducible graphical probe. Handoff: one cautious survey incurs food/labor, not combat mortality; 084 expands that party into a dangerous intervention.

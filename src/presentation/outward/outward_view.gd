@@ -33,6 +33,8 @@ var save_command: Callable
 var load_command: Callable
 var facing: float = 0.0
 var selected_id: String = ""
+var journey_open: bool = false
+var journey_command: Callable
 
 var _animation_time: float = 0.0
 var _signals: Array[Dictionary] = []
@@ -164,6 +166,7 @@ func _pointer_release(at: Vector2, kind: String) -> void:
 					picked = marker.id
 					break
 		selected_id = picked if not picked.is_empty() else ScoutTrace.pick(_mission_traces, at, selected_id)
+		journey_open = false
 	_pointer_kind = ""
 
 
@@ -176,6 +179,20 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 
 func _run_command(command: String) -> void:
+	if command == "journey_open": journey_open = true; return
+	if command == "journey_close":
+		journey_open = false
+		var selected: Dictionary = _selected_signal()
+		if selected.get("category") == "threat":
+			for signal_data: Dictionary in _signals:
+				if signal_data.category != "threat" and signal_data.source_knowledge_id == selected.source_knowledge_id: selected_id = signal_data.id; break
+		return
+	if command in ["journey_investigate","journey_recall"]:
+		var route: Dictionary = _selected_route(_selected_signal())
+		if not route.is_empty() and journey_command.is_valid():
+			var result: Dictionary = journey_command.call(command.trim_prefix("journey_"),route.id)
+			show_feedback("Party dispatched" if command == "journey_investigate" and result.get("accepted",false) else "Party recalled" if result.get("accepted",false) else result.get("reason","Response unavailable"))
+		return
 	if command.begins_with("source_filter_"):
 		source_category = command.trim_prefix("source_filter_")
 		source_page = 0
@@ -184,6 +201,7 @@ func _run_command(command: String) -> void:
 		source_page = (source_page + 1) % maxi(1, ceili(_source_entries().size() / 3.0))
 		return
 	if command.begins_with("source_entry_"):
+		journey_open = false
 		var entries: Array[Dictionary] = _source_entries()
 		var index: int = source_page * 3 + int(command.trim_prefix("source_entry_"))
 		if index < entries.size():
@@ -209,7 +227,7 @@ func _run_command(command: String) -> void:
 			if not action.is_valid():
 				return
 			var result: Dictionary = action.call(signal_data.source_knowledge_id)
-			_feedback = ("Producers protected" if command == "honeydew_start" else "Protection withdrawn") if result.get("accepted", false) else result.get("reason", "Protection unavailable")
+			_feedback = ("Producers tended" if command == "honeydew_start" else "Tending withdrawn") if result.get("accepted", false) else result.get("reason", "Tending unavailable")
 		"investigate":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty() or not investigate_command.is_valid():
@@ -314,6 +332,17 @@ func _button_at(at: Vector2) -> String:
 			if _exploration_rect(command).has_point(at):
 				return command
 	if not _selected_signal().is_empty():
+		var chosen_route: Dictionary = _selected_route(_selected_signal())
+		if _journey_attention():
+			var own_party: bool = _status.get("journey_response",{}).get("away",false) and _status.get("journey_response",{}).get("route_id","") == chosen_route.get("id")
+			if _journey_rect("journey_close").has_point(at): return "journey_close"
+			if _journey_rect("journey_investigate").has_point(at): return "journey_recall" if own_party else "journey_investigate"
+			if Rect2(get_viewport_rect().size.x - 316,144,292,448).has_point(at): return "journey_panel"
+		elif chosen_route.get("reported_losses",0) > 0 and _journey_rect("journey_open").has_point(at): return "journey_open"
+		if _journey_attention():
+			for command: String in ["scout","pause","speed_1","speed_4","speed_16","speed_64","inward","save","load","sources"]:
+				if _button_rect(command).has_point(at): return command
+			return ""
 		if _is_honeydew(_selected_signal()):
 			var relationship: String = _status.get("honeydew", {}).get("relationship", "unknown")
 			var honeydew_command: String = "honeydew_stop" if relationship == "tended" else "honeydew_start" if relationship == "exploited" else ""
@@ -417,7 +446,7 @@ func _prepare_signal_captions(size: Vector2) -> void:
 	if not _selected_mission().is_empty():
 		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 226))
 	elif not _selected_signal().is_empty():
-		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 344 + _evidence_offset()))
+		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 448 if _journey_attention() else 344 + _evidence_offset()))
 	if sources_open: _caption_blocks.append(Rect2(24, 148, 308, 396))
 	if exploration_open: _caption_blocks.append(Rect2(24, 148, 308, 266))
 	var ordered: Array[Dictionary] = _placed.duplicate()
@@ -500,6 +529,7 @@ func _draw_signal(entry: Dictionary) -> void:
 
 
 func _signal_caption(signal_data: Dictionary) -> String:
+	if signal_data.category == "threat": return "Ambush trace"
 	var empty: bool = _reported_empty(signal_data)
 	var title: String = _signal_title_for(signal_data) + " · EMPTY" if empty else _signal_title_for(signal_data)
 	if not empty and _status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {}).get("renewed_report", false): title += " · FOUND AGAIN"
@@ -528,6 +558,7 @@ func _draw_context(size: Vector2) -> void:
 	var selected: Dictionary = _selected_signal()
 	if selected.is_empty():
 		return
+	if _journey_attention(): _draw_journey_context(size); return
 	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 344 + _evidence_offset()))
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
@@ -554,6 +585,7 @@ func _draw_context(size: Vector2) -> void:
 		_label(box.position + Vector2(16, 137), hint_text, Color("8fa1a8"), 13)
 	if _is_honeydew(selected):
 		_draw_honeydew_context(selected, box)
+		_draw_journey_link()
 		return
 	var body: Rect2 = box
 	body.position.y += _evidence_offset()
@@ -585,6 +617,7 @@ func _draw_context(size: Vector2) -> void:
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
 	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), _investigation_title(selected), Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_draw_journey_link()
 
 
 func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
@@ -593,18 +626,18 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 	var relationship: String = _status.get("honeydew", {}).get("relationship", "unknown")
 	var required: int = int(_status.get("honeydew", {}).get("required_workers", 0))
 	var available: int = int(_status.get("available_workers", 0))
-	var relation_text: String = "Workers protecting producers" if relationship == "tended" else "Sweet source · protection possible" if relationship == "exploited" else "Sweet source · not yet harvested"
+	var relation_text: String = "Workers tending producers" if relationship == "tended" else "Sweet source · tending possible" if relationship == "exploited" else "Sweet source · not yet harvested"
 	_label(body.position + Vector2(16, 162), relation_text, Color("d6b98c"), 13)
 	var route: Dictionary = _selected_route(selected)
 	var route_text: String = "Trail: no workers committed" if route.is_empty() or route.status == "inactive" else "Trail recalling · %d away" % route.active_workers if route.status == "recalling" else "Report renewed · gathering paused" if route.status == "depleted" and route.get("recovery_ready", false) else "Trail: source reported empty" if route.status == "depleted" else "Trail: %d committed · %d moving" % [route.allocated_workers, route.active_workers]
 	_label(body.position + Vector2(16, 184), route_text, Color("a8b8bd"), 12)
-	var labor_text: String = "Protection: %d committed · %d available" % [int(_status.honeydew.protection_workers), available] if relationship == "tended" else "Protection needs %d · %d available" % [required, available]
+	var labor_text: String = "Tending: %d committed · %d available" % [int(_status.honeydew.protection_workers), available] if relationship == "tended" else "Tending needs %d · %d available" % [required, available]
 	_label(body.position + Vector2(16, 201), labor_text, Color("8fa1a8"), 12)
 	if relationship in ["exploited", "tended"]:
 		var protect_box: Rect2 = _honeydew_button_rect()
 		var can_start: bool = relationship == "tended" or available >= required
 		draw_rect(protect_box, Color("3d3328") if can_start else Color("202326"))
-		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "WITHDRAW PROTECTION" if relationship == "tended" else "PROTECT PRODUCERS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "WITHDRAW TENDERS" if relationship == "tended" else "TEND PRODUCERS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	if route.is_empty() or route.status in ["inactive", "recalling"]:
 		_draw_trail_button("trail_create", "INVEST 5 WORKERS" if route.is_empty() or route.status == "inactive" else "REINVEST 5 WORKERS")
 	elif route.status == "depleted":
@@ -681,6 +714,7 @@ func _selected_route(signal_data: Dictionary) -> Dictionary:
 
 
 func _reported_empty(signal_data: Dictionary) -> bool:
+	if signal_data.get("category") == "threat": return false
 	var hint: Dictionary = _status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {})
 	if hint.get("has_report", false):
 		return hint.get("last_return_empty", false)
@@ -718,6 +752,7 @@ func _evidence_offset() -> float:
 
 
 func _signal_title_for(signal_data: Dictionary) -> String:
+	if signal_data.category == "threat": return "Ambush trace"
 	return "Honeydew trace" if _is_honeydew(signal_data) else _signal_title(signal_data.category)
 
 
@@ -838,3 +873,43 @@ func _label(at: Vector2, value: String, color: Color, font_size: int, align: Hor
 	elif align == HORIZONTAL_ALIGNMENT_RIGHT:
 		placed.x -= width
 	draw_string(_font, placed, value, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+
+
+func _journey_attention() -> bool:
+	return journey_open or _selected_signal().get("category") == "threat"
+
+func _journey_rect(command: String) -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300,548 if command in ["journey_open","journey_close"] else 350,260,44)
+
+func _draw_journey_link() -> void:
+	if _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
+	var box: Rect2 = _journey_rect("journey_open")
+	draw_rect(box,Color("39302b"))
+	_label(box.get_center() + Vector2(0,5),"INVESTIGATE JOURNEY",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
+
+func _draw_journey_context(size: Vector2) -> void:
+	var box := Rect2(size.x - 316,144,292,448)
+	draw_rect(box,Color("17171b")); draw_rect(box,Color("665047"),false,1)
+	var route: Dictionary = _selected_route(_selected_signal())
+	var state: Dictionary = _status.get("journey_response",{})
+	var report: Dictionary = state.get("reports",{}).get(route.get("id"),{})
+	_detail_journey(box,31,"Journey response",20)
+	_detail_journey(box,65,"Returned losses: %d" % route.get("reported_losses",0))
+	_detail_journey(box,91,"Source tending is a separate job",12)
+	var finding: String = report.get("finding","")
+	var labels: Dictionary = {"":"No journey survey returned","ambush":"Localized ambusher reported","foreign":"Foreign traffic reported","mixed":"Ambusher and foreign traffic","inconclusive":"No clear threat found"}
+	_detail_journey(box,125,labels.get(finding,"Cause remains uncertain"))
+	if not report.is_empty(): _detail_journey(box,151,"Survey returned %.0fs ago" % (_status.time - report.received_at),12)
+	var own_party: bool = state.get("away",false) and state.get("route_id","") == route.get("id")
+	_detail_journey(box,183,"%d investigators away · %.0fs" % [state.workers,state.age] if own_party else "Survey needs 3 workers + travel food",12)
+	var action: Rect2 = _journey_rect("journey_investigate")
+	draw_rect(action,Color("39302b"))
+	_label(action.get_center() + Vector2(0,5),"RECALL PARTY" if own_party else "INVESTIGATE JOURNEY",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
+	_detail_journey(box,278,"Findings arrive with returning ants",12)
+	_detail_journey(box,302,"Gathering can be stopped separately",12)
+	var back: Rect2 = _journey_rect("journey_close")
+	draw_rect(back,Color("263038"))
+	_label(back.get_center() + Vector2(0,5),"BACK TO SOURCE",Color("d5ded8"),13,HORIZONTAL_ALIGNMENT_CENTER)
+
+func _detail_journey(box: Rect2, y: float, text: String, font_size: int = 13) -> void:
+	_label(box.position + Vector2(16,y),text,Color("c5b8b1"),font_size)

@@ -35,6 +35,7 @@ var swarm: SwarmState = Swarm.new()
 var guest: GuestState = Guest.new()
 var rival: RivalState = Rival.new()
 var predator: PredatorState = Predator.new()
+var journey_response: JourneyResponseState = JourneyResponseState.new()
 var delivered_observations: Dictionary[String, Observation] = {}
 
 var run_seed: int:
@@ -82,7 +83,7 @@ func to_dict() -> Dictionary:
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(),
-		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict()}
+		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
 
 
 func active_scout_count() -> int:
@@ -271,6 +272,9 @@ func restore(data: Dictionary) -> bool:
 	var restored_predator := Predator.new()
 	if data.has("predator") and (not data.predator is Dictionary or not restored_predator.restore(data.predator, restored_clock.tick_count)):
 		return false
+	var restored_response := JourneyResponseState.new()
+	var response_data: Variant = data.get("journey_response",restored_response.to_dict())
+	if not response_data is Dictionary or not restored_response.restore(response_data,restored_colony,restored_trails,restored_clock.simulation_time): return false
 	var casualties: int = 0
 	var predator_casualties: int = 0
 	var losses_by_pile: Dictionary[String, int] = {}
@@ -330,6 +334,7 @@ func restore(data: Dictionary) -> bool:
 	rain = restored_rain
 	honeydew = restored_honeydew
 	predator = restored_predator
+	journey_response = restored_response
 	rival = restored_rival
 	swarm = restored_swarm
 	guest = restored_guest

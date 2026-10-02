@@ -32,6 +32,7 @@ var swarm: SwarmSystem
 var guest: GuestSystem
 var rival: RivalSystem
 var predator: PredatorSystem
+var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
 
 
@@ -61,6 +62,7 @@ func _attach_run(next_run: RunState) -> void:
 	scouting = Scouts.new(run)
 	rival = Rival.new(run)
 	predator = Predator.new(run)
+	journey_response = JourneyResponseSystem.new(run)
 	trails = Trails.new(run, predator, rival)
 	swarm = Swarm.new(run, trails.apply_loss)
 	trails.swarm = swarm
@@ -181,6 +183,7 @@ func _tick(delta: float) -> void:
 	scouting.maintain_effort()
 	rival.tick(delta)
 	trails.tick(delta)
+	journey_response.tick()
 	swarm.tick()
 	rain.tick(delta)
 	ecology.tick(delta)

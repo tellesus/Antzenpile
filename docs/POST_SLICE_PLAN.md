@@ -1,6 +1,6 @@
 # Post-slice development plan
 
-## Current section — functional state art and integration (authorized 2026-10-02)
+## Current section — investigate journey losses and intervene (authorized 2026-10-02)
 
 Completed: [065 remembered sources](tasks/065_remembered_sources.md), [066 humidity care](tasks/066_nursery_humidity_care.md), [067 internal activity](tasks/067_internal_activity_attention.md), [068 chamber music](tasks/068_functional_chamber_music.md), [069 sound preferences](tasks/069_audio_preferences.md), [070 fresh colonies](tasks/070_new_colony_controls.md), [071 Garden Edge](tasks/071_garden_edge_scenario.md), [072 returned discovery](tasks/072_returned_discovery_notice.md) and [073 optional guide](tasks/073_optional_colony_guide.md). Ordinary source/humidity/garden measurements support paid growth and scenario variation without a broad rate change. Each card records actual tests and platform limits.
 
@@ -18,6 +18,9 @@ Completed next sequence:
 [079 conservative standing brood intent](tasks/079_standing_brood_intent.md) is complete: optional Queen Manual/Grow intent repeats ordinary cohorts against local care/space and remaining food demand, preserving explicit laying and real resource competition. [Ordinary evidence](STANDING_BROOD_EVALUATION.md) shows growth plus deliberate reserve waiting in both settings, with no automatic exterior commands or rate changes.
 
 [080 contaminated-food windfall](tasks/080_contaminated_food.md) is complete: optional Roadside exercises hidden physical intake, delayed local adult failures and deliberate withdrawal/gradual recovery. [Three paired trials](CONTAMINATED_FOOD_EVALUATION.md), saves and standard/compact input/graphics passed. [081 returned supply evidence](tasks/081_returned_supply_evidence.md) is complete: actual first/latest net home receipt dates remain separate from remote sensing, with honest missing legacy history. [082 sensory caption spacing](tasks/082_sensory_caption_spacing.md) is complete: measured resource/scout overlaps now use bounded placement around fixed clouds and open panels, with standard/compact graphics and input verified. Resume original-design milestones from combined evidence; scope the next player outcome against the actual remaining scout survivability/experience or internal-function contracts before adding it. Queen/brood/committed-job poisoning, new remedies and additional contaminants remain later scope.
+
+
+Player feedback reprioritizes the next outcome: [083 journey investigation](tasks/083_journey_investigation.md) is complete. [084 ambusher defensive swarm](tasks/084_ambusher_defensive_swarm.md) follows immediately: paid mobilization on returned evidence, physical travel/combat/reinforcement/recall, delivered outcome and ordinary honeydew recovery evidence. These restore the original Part 4 predator-response loop; tending and rival conflicts remain distinct.
 
 Continue across cards without routine acknowledgement, with logical local commits and published feature milestones. Preserve return-before-information, aggregate ledgers, headless fixed ticks and mobile-safe sensory rendering. Storage/throughput 034 stays deferred; disease, wider poison effects, scout experience/mortality, broader seasons, satellites, full reproductive lineages and replay remain milestones requiring a concrete player outcome/dependencies. The 20–30-minute session target remains tabled. Choose the next original-design need from current evidence rather than scaffolding the remaining game at once.
 
