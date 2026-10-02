@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 077 reveals one Nursery expansion after demonstrated growth/full occupancy. INWARD shows Expansion Available or Expanding, a named Expand to 32 Brood Space action with actual price/labor/time, and a distinct progress arc. Climate/laying remain separate; available action extends its pane to end above time controls. Existing 16-space functionality stays online during the project. Four cohort stages have concise group counts and a six-glyph limit; completed Nursery gains a restrained extra inner contour. No arbitrary catalog, automatic payment or new music stem.
+
 Card 074 eases selected INWARD function membranes over 0.28 real seconds and gently dims other organ art, preserving labels/controls and fixed hit areas. Attention remains responsive on pause; biological pulses freeze and stay independent of game speed. Nursery/Midden use only detached food/care/climate/refuse rates: stable healthy pulses, irregular broken strained contours and bounded dimmer brood/looser refuse contents. Existing written causes and remedies remain primary; color is not the only cue. No inferred disease or new health mechanic.
 
 Card 075 gives resource/alarm captions priority over secondary scout captions. A scout caption can move vertically to a nearby clear position or hide when the field is crowded; its trace/marker/hit area and selected mission context remain intact. Source labels and controls do not move.

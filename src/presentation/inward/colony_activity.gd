@@ -37,6 +37,7 @@ static func jobs(status: Dictionary) -> Array[Dictionary]:
 		result.append({"role": "climate", "from": "food_exchange", "to": "nursery", "color": Color("7fbfcf")})
 	for organ: String in ["food_exchange", "nursery", "midden"]:
 		var developing: bool = midden.get("state", "") == "developing" if organ == "midden" else status.get(organ + "_state", "") == "developing"
+		if organ == "nursery": developing = developing or status.get("nursery_expansion", {}).get("state", "") == "developing"
 		if developing and (organ != "midden" or midden.get("revealed", false)):
 			result.append({"role": "excavation", "from": "entrance", "to": organ, "color": Color("a69f7c")})
 	if status.get("guest", {}).get("rejection_active", false):
@@ -66,9 +67,11 @@ static func representatives(status: Dictionary, centers: Dictionary, time: float
 static func brood_stages(status: Dictionary) -> Array[String]:
 	var result: Array[String] = []
 	var cohorts: Array = status.get("brood", [])
-	for index: int in mini(2, cohorts.size()):
+	var groups: int = mini(4, cohorts.size())
+	for index: int in groups:
 		var cohort: Dictionary = cohorts[index]
-		for glyph: int in mini(MAX_BROOD / mini(2, cohorts.size()), int(cohort.get("count", 0))):
+		var quota: int = MAX_BROOD / groups + (1 if index < MAX_BROOD % groups else 0)
+		for glyph: int in mini(quota, int(cohort.get("count", 0))):
 			result.append(cohort.get("stage", "egg"))
 	return result
 
@@ -85,6 +88,9 @@ static func pressure(status: Dictionary, organ: String) -> String:
 
 
 static func project_progress(status: Dictionary, organ: String) -> float:
+	var expansion: Dictionary = status.get("nursery_expansion", {})
+	if organ == "nursery" and expansion.get("state", "") == "developing":
+		return clampf(expansion.get("progress_seconds", 0.0) / maxf(expansion.get("duration", 1.0), 0.001), 0.0, 1.0)
 	if organ == "midden":
 		var midden: Dictionary = status.get("midden", {})
 		return clampf(midden.get("progress", 0.0), 0.0, 1.0) if midden.get("state", "") == "developing" else -1.0

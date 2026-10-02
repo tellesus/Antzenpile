@@ -1,6 +1,6 @@
 class_name NurseryDevelopmentSystem
 extends RefCounted
-## One prepaid Primitive -> Developed Nursery transition, with ledger-owned labor.
+## Prepaid development and one need-revealed expansion, with ledger-owned labor.
 
 signal chamber_online(pile_id: String)
 
@@ -46,6 +46,7 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for pile_id: String in ids:
 		var pile: PileState = _run.colony.piles[pile_id]
+		_tick_expansion(pile, delta)
 		if pile.nursery_state != "developing":
 			continue
 		pile.nursery_progress_seconds = minf(CONFIG.build_seconds, pile.nursery_progress_seconds + delta)
@@ -58,6 +59,45 @@ func tick(delta: float) -> void:
 		assert(retired)
 		pile.nursery_state = "developed"
 		chamber_online.emit(pile_id)
+
+
+func start_expansion(pile_id: String) -> bool:
+	if not _run.colony.piles.has(pile_id): return _reject("Unknown pile")
+	var pile: PileState = _run.colony.piles[pile_id]
+	if pile.nursery_state != "developed" or pile.nursery_expansion_state != "available": return _reject("Nursery expansion is not available")
+	if pile.workers_available < CONFIG.expansion_workers: return _reject("Eight available workers required")
+	var costs: Dictionary = CONFIG.expansion_costs()
+	for resource_id: String in costs:
+		if pile.resources[resource_id] < costs[resource_id]: return _reject("More " + resource_id + " required")
+	var commitment: String = "nursery_expansion:" + pile_id
+	if not pile.workers.create_commitment(commitment, "internal", pile_id): return _reject("Expansion labor unavailable")
+	if not pile.workers.allocate(commitment, CONFIG.expansion_workers):
+		pile.workers.retire_commitment(commitment)
+		return _reject("Could not reserve expansion workers")
+	if not pile.consume_resources(costs):
+		pile.workers.release(commitment, CONFIG.expansion_workers)
+		pile.workers.retire_commitment(commitment)
+		return _reject("Could not pay expansion cost")
+	pile.nursery_expansion_state = "developing"
+	pile.nursery_expansion_progress = 0.0
+	last_error = ""
+	return true
+
+
+func _tick_expansion(pile: PileState, delta: float) -> void:
+	if pile.nursery_state != "developed": return
+	if pile.nursery_expansion_state == "latent" and pile.brood_matured_total >= CONFIG.expansion_matured_required and pile.nursery_occupied_space() >= pile.nursery_brood_capacity():
+		pile.nursery_expansion_state = "available"
+	if pile.nursery_expansion_state != "developing": return
+	pile.nursery_expansion_progress = minf(CONFIG.expansion_seconds, pile.nursery_expansion_progress + delta)
+	if pile.nursery_expansion_progress < CONFIG.expansion_seconds: return
+	var commitment: String = "nursery_expansion:" + pile.id
+	var released: bool = pile.workers.release(commitment, CONFIG.expansion_workers)
+	assert(released)
+	var retired: bool = pile.workers.retire_commitment(commitment)
+	assert(retired)
+	pile.nursery_expansion_state = "developed"
+	chamber_online.emit(pile.id)
 
 
 func _reject(reason: String) -> bool:

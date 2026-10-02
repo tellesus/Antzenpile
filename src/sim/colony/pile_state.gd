@@ -29,6 +29,8 @@ var recognition_experience: bool = false
 var recognition_candidate: bool = false
 var nursery_state: String = "primitive"
 var nursery_progress_seconds: float = 0.0
+var nursery_expansion_state: String = "latent"
+var nursery_expansion_progress: float = 0.0
 var food_exchange_state: String = "primitive"
 var food_exchange_progress_seconds: float = 0.0
 var workers_total: int:
@@ -51,11 +53,13 @@ func to_dict() -> Dictionary:
 		"rain_trace_observed": rain_trace_observed, "chemistry_candidate": chemistry_candidate,
 		"recognition_experience": recognition_experience, "recognition_candidate": recognition_candidate,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
+		"nursery_expansion": {"state": nursery_expansion_state, "progress_seconds": nursery_expansion_progress},
 		"food_exchange_state": food_exchange_state,
 		"food_exchange_progress_seconds": food_exchange_progress_seconds, "midden": midden.to_dict(), "humidity": humidity.to_dict()}
 
 
 func nursery_brood_capacity() -> int:
+	if nursery_expansion_state == "developed": return NURSERY_CONFIG.expansion_capacity
 	return BROOD_CONFIG.developed_nursery_brood_capacity if nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_brood_capacity
 
 
@@ -134,6 +138,7 @@ func register_emergence(cohort: BroodCohort) -> void:
 
 
 func nursery_max_care_capacity() -> int:
+	if nursery_expansion_state == "developed": return NURSERY_CONFIG.expansion_capacity
 	return BROOD_CONFIG.developed_nursery_care_capacity if nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_care_capacity
 
 
@@ -182,7 +187,14 @@ func restore(data: Dictionary) -> bool:
 	var restored_nursery_progress: Variant = data.get("nursery_progress_seconds", 0.0)
 	if not restored_nursery_state in ["primitive", "developing", "developed"] or not typeof(restored_nursery_progress) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(restored_nursery_progress)) or restored_nursery_progress < 0.0:
 		return false
-	var max_cohorts: int = 2 if restored_nursery_state == "developed" else 1
+	var expansion: Variant = data.get("nursery_expansion", {"state": "latent", "progress_seconds": 0.0})
+	if not expansion is Dictionary or not expansion.has_all(["state", "progress_seconds"]) or not expansion.state in ["latent", "available", "developing", "developed"]:
+		return false
+	if not typeof(expansion.progress_seconds) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(expansion.progress_seconds)) or expansion.progress_seconds < 0.0:
+		return false
+	if expansion.state != "latent" and (restored_nursery_state != "developed" or not Ledger.valid_count(data.brood_matured_total) or data.brood_matured_total < NURSERY_CONFIG.expansion_matured_required):
+		return false
+	var max_cohorts: int = NURSERY_CONFIG.expansion_capacity / BROOD_CONFIG.starting_count if expansion.state == "developed" else 2 if restored_nursery_state == "developed" else 1
 	if not data.brood_cohorts is Array or data.brood_cohorts.size() > max_cohorts or not Ledger.valid_count(data.brood_matured_total):
 		return false
 	var restored_brood: Array[BroodCohort] = []
@@ -211,6 +223,7 @@ func restore(data: Dictionary) -> bool:
 	if emerged + int(brood_lost) + occupied != total_started * BROOD_CONFIG.starting_count or active_losses > brood_lost:
 		return false
 	var brood_limit: int = BROOD_CONFIG.developed_nursery_brood_capacity if restored_nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_brood_capacity
+	if expansion.state == "developed": brood_limit = NURSERY_CONFIG.expansion_capacity
 	if occupied > brood_limit:
 		return false
 	if restored_nursery_state != "developed" and not restored_brood.is_empty() and restored_brood[0].id != "brood_%d" % total_started:
@@ -290,6 +303,16 @@ func restore(data: Dictionary) -> bool:
 			return false
 	elif not nursery_record.is_empty() or restored_nursery_progress != (NURSERY_CONFIG.build_seconds if restored_nursery_state == "developed" else 0.0):
 		return false
+	var expansion_commitment: String = "nursery_expansion:" + data.id
+	var commitments: Dictionary = restored.to_dict().commitments
+	for key: String in commitments:
+		if key.begins_with("nursery_expansion:") and key != expansion_commitment: return false
+	var expansion_record: Dictionary = commitments.get(expansion_commitment, {})
+	if expansion.state == "developing":
+		if expansion.progress_seconds >= NURSERY_CONFIG.expansion_seconds or expansion_record.get("kind") != "internal" or expansion_record.get("owner_id") != data.id or expansion_record.get("count") != NURSERY_CONFIG.expansion_workers:
+			return false
+	elif not expansion_record.is_empty() or expansion.progress_seconds != (NURSERY_CONFIG.expansion_seconds if expansion.state == "developed" else 0.0):
+		return false
 	var commitment: String = "food_exchange:" + data.id
 	var record: Dictionary = restored.to_dict().commitments.get(commitment, {})
 	if data.food_exchange_state == "developing":
@@ -325,6 +348,8 @@ func restore(data: Dictionary) -> bool:
 	recognition_experience = recognition_seen
 	recognition_candidate = recognition_available
 	nursery_state = restored_nursery_state
+	nursery_expansion_state = expansion.state
+	nursery_expansion_progress = float(expansion.progress_seconds)
 	nursery_progress_seconds = float(restored_nursery_progress)
 	food_exchange_state = data.food_exchange_state
 	food_exchange_progress_seconds = float(data.food_exchange_progress_seconds)

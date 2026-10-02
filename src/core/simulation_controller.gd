@@ -131,6 +131,10 @@ func start_nursery_development(pile_id: String) -> bool:
 	return nursery.start(pile_id)
 
 
+func start_nursery_expansion(pile_id: String) -> bool:
+	return nursery.start_expansion(pile_id)
+
+
 func set_sanitation_workers(pile_id: String, target: Variant) -> bool:
 	return sanitation.set_workers(pile_id, target)
 

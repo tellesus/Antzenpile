@@ -12,6 +12,7 @@ var pause_command: Callable
 var speed_command: Callable
 var develop_command: Callable
 var nursery_develop_command: Callable
+var nursery_expand_command: Callable
 var midden_develop_command: Callable
 var sanitation_command: Callable
 var humidity_command: Callable
@@ -65,6 +66,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "available" and _nursery_expand_rect().has_point(at):
+		_run_command("expand_nursery")
+		return true
 	if selected_id == "nursery" and _status.get("nursery_state", "primitive") == "developed":
 		for target: int in [0, 1, 2, 4]:
 			if _humidity_rect(target).has_point(at):
@@ -131,6 +135,10 @@ func activate_at(at: Vector2) -> bool:
 
 func _run_command(command: String) -> void:
 	match command:
+		"expand_nursery":
+			if nursery_expand_command.is_valid():
+				var result: Dictionary = nursery_expand_command.call()
+				show_feedback("Nursery expansion started" if result.get("accepted", false) else result.get("reason", "Expansion unavailable"))
 		"climate_0", "climate_1", "climate_2", "climate_4":
 			if humidity_command.is_valid():
 				var result: Dictionary = humidity_command.call(int(command.trim_prefix("climate_")))
@@ -253,6 +261,10 @@ func _nursery_develop_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 494.0, 260.0, 44.0)
 
 
+func _nursery_expand_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 550.0, 260.0, 44.0)
+
+
 func _adaptation_rect(_trait_id: String) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
 
@@ -364,6 +376,8 @@ func _draw_node(id: String, at: Vector2) -> void:
 			for index: int in 3:
 				draw_arc(at + Vector2(index * 5 - 5, index * 3 - 3), 9, 0.4, 4.1, 16, Color(color, 0.45), 1.0, true)
 		"nursery":
+			if _status.get("nursery_expansion", {}).get("state", "") == "developed":
+				draw_polyline(Art.membrane(at, 21, -phase, 0.82).slice(15, 29), Color(color, 0.32), 1.0, true)
 			var stages: Array[String] = Activity.brood_stages(_status)
 			for index: int in stages.size():
 				var seed_at: Vector2 = at + Vector2(index % 3 * 9 - 9, index / 3 * 11 - 5)
@@ -406,7 +420,10 @@ func _draw_node(id: String, at: Vector2) -> void:
 		draw_polyline(Art.membrane(at, 38, -phase).slice(2, 12), Color("cc967a", 0.65), 1.2, true)
 		_label(at + Vector2(0, 70), pressure, Color("ccac91"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 	elif progress >= 0.0:
-		_label(at + Vector2(0, 70), "DEVELOPING", Color("b0ab8b"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+		var project_title: String = "EXPANDING" if id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "developing" else "DEVELOPING"
+		_label(at + Vector2(0, 70), project_title, Color("b0ab8b"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+	elif id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "available":
+		_label(at + Vector2(0, 70), "EXPANSION AVAILABLE", Color("a5b49a"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_hud(size: Vector2) -> void:
@@ -423,7 +440,9 @@ func _draw_hud(size: Vector2) -> void:
 func _draw_context(size: Vector2) -> void:
 	if selected_id.is_empty() or _status.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 400 if selected_id == "nursery" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
+	var expansion: Dictionary = _status.get("nursery_expansion", {})
+	var expansion_action: bool = expansion.get("state", "") == "available"
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	var web: bool = selected_id == "adaptation"
 	draw_rect(box, Color("17141f") if web else Color("111921"))
 	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
@@ -473,7 +492,13 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 91, "Care capacity: %d / %d" % [_status.nursery_care_capacity, _status.nursery_max_care_capacity])
 			if not brood.is_empty():
 				var stages: String = "%s · %.0fs" % [brood[0].stage.capitalize(), brood[0].progress_seconds] if brood.size() == 1 else "2 cohorts: %s / %s" % [brood[0].stage, brood[1].stage]
-				_detail_line(box, 117, stages)
+				if brood.size() > 2:
+					var groups: Array[String] = []
+					for stage: String in ["egg", "larva", "pupa"]:
+						var amount: int = brood.filter(func(cohort): return cohort.stage == stage).size()
+						if amount > 0: groups.append("%s×%d" % [stage, amount])
+					stages = "%d cohorts: " % brood.size() + " / ".join(groups)
+				_label(box.position + Vector2(16, 117), stages, Color("a8b8bd"), 13)
 				var food_enough: bool = true
 				var care_enough: bool = true
 				for cohort: Dictionary in brood:
@@ -502,8 +527,18 @@ func _draw_context(size: Vector2) -> void:
 					var button: Rect2 = _humidity_rect(target)
 					draw_rect(button, Color("355059") if target == humidity.carers else Color("263038"))
 					_label(button.get_center() + Vector2(0, 6), str(target), Color("dce5d9"), 16, HORIZONTAL_ALIGNMENT_CENTER)
-				_detail_line(box, 310, "Humidifying uses stored water")
-				_detail_line(box, 332, "%.1f water used · airing uses labor" % humidity.water_used)
+				if expansion.get("state", "") == "available":
+					_detail_line(box, 310, "Expansion: %.0f carb · %.0f protein" % [expansion.costs.carbohydrate, expansion.costs.protein])
+					_detail_line(box, 332, "%.0f water · %d workers · %.0fs" % [expansion.costs.water, expansion.workers, expansion.duration])
+					var button: Rect2 = _nursery_expand_rect()
+					draw_rect(button, Color("35483c"))
+					_label(button.get_center() + Vector2(0, 6), "EXPAND TO %d BROOD SPACE" % expansion.capacity, Color("dce5d9"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+				elif expansion.get("state", "") == "developing":
+					_detail_line(box, 310, "Expanding: %.0f / %.0fs" % [expansion.progress_seconds, expansion.duration])
+					_detail_line(box, 332, "%d workers · existing space online" % expansion.workers)
+				else:
+					_detail_line(box, 310, "Humidifying uses stored water")
+					_detail_line(box, 332, "%.1f water used · airing uses labor" % humidity.water_used)
 			if _can_lay_brood():
 				_draw_brood_button()
 		"food_exchange":

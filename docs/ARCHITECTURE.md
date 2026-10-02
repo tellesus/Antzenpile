@@ -1,5 +1,7 @@
 # Architecture
 
+Card 077 extends NurseryDevelopmentSystem with one latched need and prepaid expansion, separate from initial development. Pile owns typed state/progress; the ledger owns eight excavators. Existing developed capacity/climate remain active until completion increases brood/care capacity. Root detaches the project state/price/progress; capped presentation represents four cohort groups with six glyphs and one excavation role. No new individual agents, RNG or engine dependency.
+
 Card 076 shares pure ColonyPressure causes between local organ art and OUTWARD internal_attention. GameRoot derives that small detached dictionary from approved inward_status, and revalidates it for explicit context navigation. The normal view receives no pile/world references; attention adds no saved field or simulation mutation.
 
 Card 074 keeps functional visual health as a pure minimum of approved Nursery food/care/climate/sanitation rates (Midden uses sanitation). It owns no gameplay health. View-local attention gains ease over real time independently of paused biological decoration; load/new colony clears them. Fixed centers/hit areas and immediate semantic selection remain authoritative for interaction.

@@ -61,6 +61,7 @@ func _ready() -> void:
 		inward.speed_command = simulation.set_time_scale
 		inward.develop_command = start_food_exchange
 		inward.nursery_develop_command = start_nursery_development
+		inward.nursery_expand_command = start_nursery_expansion
 		inward.midden_develop_command = start_midden
 		inward.sanitation_command = set_sanitation_workers
 		inward.humidity_command = set_humidity_workers
@@ -336,6 +337,9 @@ func inward_status(pile_id: String) -> Dictionary:
 		"nursery_care_capacity": pile.nursery_care_capacity(),
 		"nursery_max_care_capacity": pile.nursery_max_care_capacity(),
 		"nursery_progress": pile.nursery_progress_seconds,
+		"nursery_expansion": {"state": pile.nursery_expansion_state, "progress_seconds": pile.nursery_expansion_progress,
+			"duration": NURSERY_CONFIG.expansion_seconds, "capacity": NURSERY_CONFIG.expansion_capacity,
+			"workers": NURSERY_CONFIG.expansion_workers, "costs": NURSERY_CONFIG.expansion_costs()},
 		"nursery_build_duration": NURSERY_CONFIG.build_seconds,
 		"nursery_costs": NURSERY_CONFIG.costs(),
 		"nursery_workers_required": NURSERY_CONFIG.workers_required,
@@ -469,6 +473,11 @@ func start_adaptation(trait_id: String) -> Dictionary:
 
 func start_nursery_development() -> Dictionary:
 	var accepted: bool = simulation.start_nursery_development("home")
+	return {"accepted": accepted, "reason": simulation.nursery.last_error}
+
+
+func start_nursery_expansion() -> Dictionary:
+	var accepted: bool = simulation.start_nursery_expansion("home")
 	return {"accepted": accepted, "reason": simulation.nursery.last_error}
 
 
