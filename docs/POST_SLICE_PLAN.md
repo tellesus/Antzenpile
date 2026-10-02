@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Interface review — proposed next passes (2026-10-02)
+
+The player requested an interface wording/usability review and an improvement plan. [Review and proposed sequence](INTERFACE_REVIEW_PLAN.md) records a confirmed mouse/touch panel gesture leak, ambiguous job terminology, confusing historical/returned outcomes, and compact-layout/navigation improvements. No fixes are implemented by this review. If implementation is authorized, expand three bounded cards for input/action clarity, decision/report guidance, and readability/navigation before resuming the next larger gameplay milestone. Preserve the existing mechanics and return-before-information rule.
+
 ## Current section — investigate journey losses and intervene (authorized 2026-10-02)
 
 Completed: [065 remembered sources](tasks/065_remembered_sources.md), [066 humidity care](tasks/066_nursery_humidity_care.md), [067 internal activity](tasks/067_internal_activity_attention.md), [068 chamber music](tasks/068_functional_chamber_music.md), [069 sound preferences](tasks/069_audio_preferences.md), [070 fresh colonies](tasks/070_new_colony_controls.md), [071 Garden Edge](tasks/071_garden_edge_scenario.md), [072 returned discovery](tasks/072_returned_discovery_notice.md) and [073 optional guide](tasks/073_optional_colony_guide.md). Ordinary source/humidity/garden measurements support paid growth and scenario variation without a broad rate change. Each card records actual tests and platform limits.
