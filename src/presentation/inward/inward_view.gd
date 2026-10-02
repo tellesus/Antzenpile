@@ -4,6 +4,7 @@ extends Node2D
 
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Web = preload("res://src/presentation/inward/adaptation_web.gd")
+const Activity = preload("res://src/presentation/inward/colony_activity.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
 var mode_command: Callable
@@ -294,53 +295,70 @@ func _draw() -> void:
 		_draw_flow(centers[pair[0]], centers[pair[1]], pair[0] == "nursery" or pair[0] == "entrance")
 	for id: String in ["queen", "nursery"]:
 		draw_line(centers[id], centers["adaptation"], Color(0.43, 0.40, 0.55, 0.20), 1.0, true)
+	if _status.get("midden", {}).get("revealed", false):
+		_draw_flow(centers.entrance, centers.midden, false)
+	if not _status.get("guest", {}).is_empty():
+		draw_line(centers.guest, centers.nursery, Color(0.65, 0.53, 0.64, 0.18), 1.0, true)
+	_draw_activity(centers)
 	for id: String in NODES:
 		_draw_node(id, centers[id])
 	if _status.get("midden", {}).get("revealed", false):
-		_draw_flow(centers.entrance, centers.midden, false)
 		_draw_node("midden", centers.midden)
 	if not _status.get("guest", {}).is_empty():
-		draw_line(centers.guest, centers.nursery, Color(0.65, 0.53, 0.64, 0.18), 1.0, true)
 		_draw_node("guest", centers.guest)
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
 
 
-func _draw_flow(start: Vector2, finish: Vector2, representative: bool) -> void:
+func _draw_flow(start: Vector2, finish: Vector2, _representative: bool) -> void:
 	var control: Vector2 = (start + finish) * 0.5 + Vector2(12, -18)
 	var points := PackedVector2Array()
 	for step: int in 25:
 		var t: float = float(step) / 24.0
 		points.append(start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t)
 	draw_polyline(points, Color(0.45, 0.59, 0.53, 0.18), 1.0, true)
-	var activity: int = int(_status.get("nursery_occupied_space", 0)) + int(_status.get("trail_workers", 0))
-	if representative and activity > 0:
-		for index: int in 2:
-			var t: float = fposmod(_animation_time * 0.05 + index * 0.5, 1.0)
-			var at: Vector2 = start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t
-			Art.ant(self, at, finish - start, Color(0.76, 0.80, 0.69, 0.36), _animation_time, 0.72)
+
+
+func _draw_activity(centers: Dictionary) -> void:
+	for ant: Dictionary in Activity.representatives(_status, centers, _animation_time):
+		var under_label: bool = false
+		for center: Vector2 in centers.values():
+			under_label = under_label or Rect2(center + Vector2(-90, 40), Vector2(180, 44)).has_point(ant.position)
+		if under_label:
+			continue
+		Art.ant(self, ant.position, ant.direction, Color(ant.color, 0.62), _animation_time, 0.8)
+		if ant.role in ["climate", "cleanup"]:
+			draw_circle(ant.position + ant.direction.normalized() * 6, 1.6, Color(ant.color, 0.65))
 
 
 func _draw_node(id: String, at: Vector2) -> void:
 	var color: Color = Color("d5c4a1") if id == "queen" else Color("aebdb7") if id == "nursery" else Color("c7af86") if id == "food_exchange" else Color("bba6c8") if id == "adaptation" else Color("bd927a") if id == "midden" else Color("8daeb3")
 	var phase: float = _animation_time * 0.18 + NODES.find(id)
 	var outline: PackedVector2Array = Art.membrane(at, 34.0, phase, 0.86)
-	draw_colored_polygon(outline, Color(color, 0.045))
-	draw_polyline(outline.slice(1, 27), Color(color, 0.4), 1.1, true)
+	draw_colored_polygon(outline, Color(color, 0.08 if id == selected_id else 0.045))
+	draw_polyline(outline.slice(1, 27), Color(color, 0.7 if id == selected_id else 0.4), 1.1, true)
 	match id:
 		"midden":
-			for index: int in 3:
-				var fragment: Vector2 = at + Vector2(index * 8 - 8, (index % 2) * 7 - 3)
+			var burden: float = _status.get("midden", {}).get("burden", 0.0)
+			for index: int in mini(6, int(ceil(burden))):
+				var fragment: Vector2 = at + Vector2(index % 3 * 9 - 9, index / 3 * 8 - 3)
 				draw_line(fragment, fragment + Vector2(4, -3), Color("bd765c"), 1.5, true)
 		"guest":
 			for index: int in 3:
 				draw_arc(at + Vector2(index * 5 - 5, index * 3 - 3), 9, 0.4, 4.1, 16, Color(color, 0.45), 1.0, true)
 		"nursery":
-			var occupied: int = int(_status.get("nursery_occupied_space", 0))
-			for index: int in mini(6, occupied):
+			var stages: Array[String] = Activity.brood_stages(_status)
+			for index: int in stages.size():
 				var seed_at: Vector2 = at + Vector2(index % 3 * 9 - 9, index / 3 * 11 - 5)
-				draw_circle(seed_at, 2.9, Color(color, 0.52))
+				if stages[index] == "larva":
+					draw_arc(seed_at, 3.2, 0.2, 4.8, 12, Color(color, 0.75), 2.0, true)
+				elif stages[index] == "pupa":
+					draw_polyline(Art.membrane(seed_at, 4.4, 0, 0.48), Color(color, 0.7), 1.0, true)
+				else:
+					draw_circle(seed_at, 2.1, Color(color, 0.7))
+			if _status.get("humidity", {}).get("carers", 0) > 0:
+				draw_polyline(Art.membrane(at, 26, -phase, 0.62).slice(3, 14), Color("7fbfcf", 0.4), 1.0, true)
 		"adaptation":
 			for index: int in 3:
 				var seed_at: Vector2 = at + Vector2.from_angle(index * TAU / 3.0 + 0.3) * 13
@@ -348,6 +366,9 @@ func _draw_node(id: String, at: Vector2) -> void:
 				draw_circle(seed_at, 3.2, Color(color, 0.64))
 		"food_exchange":
 			draw_polyline(Art.membrane(at, 16, -phase, 0.56).slice(3, 22), Color(color, 0.5), 1.2, true)
+			if _status.get("food_exchange_state", "") == "developed":
+				draw_polyline(Art.membrane(at, 24, phase * 0.5, 0.6).slice(12, 28), Color(color, 0.35), 1.0, true)
+				draw_circle(at + Vector2(sin(phase) * 7, cos(phase) * 4), 2.1, Color(color, 0.65))
 		"entrance":
 			draw_arc(at + Vector2(0, 5), 12, PI, TAU, 20, Color(color, 0.6), 1.5, true)
 		"queen":
@@ -360,6 +381,15 @@ func _draw_node(id: String, at: Vector2) -> void:
 		draw_polyline(focus.slice(1, 8), Color("dce5d9"), 1.0, true)
 		draw_polyline(focus.slice(17, 24), Color("dce5d9"), 1.0, true)
 	_label(at + Vector2(0, 52), _title(id), color, 15, HORIZONTAL_ALIGNMENT_CENTER)
+	var pressure: String = Activity.pressure(_status, id)
+	var progress: float = Activity.project_progress(_status, id)
+	if progress >= 0.0:
+		draw_arc(at, 39, -PI * 0.5, -PI * 0.5 + TAU * maxf(progress, 0.005), 32, Color("c3b991"), 1.3, true)
+	if not pressure.is_empty():
+		draw_polyline(Art.membrane(at, 38, -phase).slice(2, 12), Color("cc967a", 0.65), 1.2, true)
+		_label(at + Vector2(0, 70), pressure, Color("ccac91"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+	elif progress >= 0.0:
+		_label(at + Vector2(0, 70), "DEVELOPING", Color("b0ab8b"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_hud(size: Vector2) -> void:

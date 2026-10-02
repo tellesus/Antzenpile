@@ -4,6 +4,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+INWARD now shows sparse job activity, distinct aggregate brood stages, developing-organ arcs and local climate/refuse/food/care pressure. Selecting a function sharpens its contours while preserving the abstract network and darkness. Representatives suggest committed work rather than physical cargo or individual workers.
+
 Developing Nursery now opens **humidity care**: assign climate workers to humidify or air the larger brood environment. Water and labor support slow environmental regulation; dry/damp conditions can slow larvae without adding deaths. Climate staffing and Lay Brood are separate controls. See the [ordinary colony trials](docs/HUMIDITY_EVALUATION.md).
 
 **Remembered Sources** lets you browse returned food/protein/water memories, including old or empty reports, then focus their bearing and existing gathering controls. Browsing is free attention; it never dispatches workers. The [source-choice measurement](docs/SOURCE_CHOICE_EVALUATION.md) found reliable carbohydrate access through existing known alternatives without changing rates, with real exposure/labor tradeoffs.
