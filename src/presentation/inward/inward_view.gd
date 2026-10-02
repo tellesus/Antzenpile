@@ -2,6 +2,7 @@ class_name InwardView
 extends Node2D
 ## Abstract functional network; consumes detached pile summaries only.
 
+const Copy = preload("res://src/presentation/interface_text.gd")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Web = preload("res://src/presentation/inward/adaptation_web.gd")
 const Activity = preload("res://src/presentation/inward/colony_activity.gd")
@@ -172,7 +173,7 @@ func _run_command(command: String) -> void:
 			if honeydew_command.is_valid():
 				var tending: bool = _status.get("honeydew", {}).get("relationship", "unknown") != "tended"
 				var result: Dictionary = honeydew_command.call(tending)
-				show_feedback(("Protection started" if tending else "Protection withdrawn") if result.get("accepted", false) else result.get("reason", "Relationship unavailable"))
+				show_feedback(("Tending started" if tending else "Tending withdrawn") if result.get("accepted", false) else Copy.reason(result.get("reason", "Relationship unavailable")))
 		"guest_rejection":
 			if guest_rejection_command.is_valid():
 				var enabled: bool = not _status.get("guest", {}).get("rejection_active", false)
@@ -506,19 +507,19 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 246, "Isolated refuse stays unusable")
 		"queen":
 			_detail_line(box, 65, "Queens: %d" % _status.queens)
-			_detail_line(box, 91, "Living workers: %d" % _status.workers_total)
+			_detail_line(box, 91, "Colony worker count: %d" % _status.workers_total)
 			_detail_line(box, 117, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 157, "Nursery: %d / %d brood space" % [_status.nursery_occupied_space, _status.nursery_brood_capacity])
 			var production: Dictionary = _status.get("brood_production", {"intent":"manual", "waiting":"manual"})
-			_label(box.position + Vector2(16, 195), "Brood intent", Color("a9b9bc"), 13)
+			_label(box.position + Vector2(16, 195), "Brood laying", Color("a9b9bc"), 13)
 			for intent: String in ["manual", "grow"]:
 				var button: Rect2 = _brood_intent_rect(intent)
 				draw_rect(button, Color("354d55") if production.intent == intent else Color("263038"))
-				_label(button.get_center() + Vector2(0, 5), intent.to_upper(), Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+				_label(button.get_center() + Vector2(0, 5), ("MANUAL" if intent == "manual" else "AUTO BROOD"), Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 			var waiting_labels: Dictionary = {"manual":"Manual cohorts", "ready":"Ready on next simulation tick", "space":"Waiting for Nursery space", "care":"Waiting for care workers", "queen":"No queen can lay", "population":"Population limit reached", "carbohydrate":"Waiting for carbohydrate reserve", "protein":"Waiting for protein reserve", "water":"Waiting for water reserve"}
 			_label(box.position + Vector2(16, 273), waiting_labels.get(production.waiting, ""), Color("a9b9bc"), 13)
-			_label(box.position + Vector2(16, 294), "Grow repeats when food/care/space fit.", Color("8fa1a8"), 12)
-			_label(box.position + Vector2(16, 313), "Manual laying skips the food check.", Color("8fa1a8"), 12)
+			_label(box.position + Vector2(16, 294), "Auto repeats with food, care and space.", Color("8fa1a8"), 12)
+			_label(box.position + Vector2(16, 313), "Manual brood still needs food as it grows.", Color("8fa1a8"), 12)
 			if _can_lay_brood():
 				_draw_brood_button()
 		"nursery":
@@ -601,7 +602,7 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 189, "Water: %.1f" % _status.resources.water)
 			if food_attention:
 				if recent_food_losses:
-					_label(box.position + Vector2(16, 300), "Workers fail after food sharing", Color("c7ad98"), 13)
+					_label(box.position + Vector2(16, 300), "Workers lost after food sharing", Color("c7ad98"), 13)
 					_label(box.position + Vector2(16, 324), "%d lost at home · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("a9b9bc"), 13)
 					_label(box.position + Vector2(16, 348), "Cause remains uncertain", Color("8fa1a8"), 13)
 					_label(box.position + Vector2(16, 388), "Review returned food supplies", Color("8fa1a8"), 11)
@@ -611,7 +612,7 @@ func _draw_context(size: Vector2) -> void:
 				for resource_id: String in Pressure.food_sources_needed(_status):
 					var button: Rect2 = _food_source_rect(resource_id)
 					draw_rect(button, Color("263038"))
-					_label(button.get_center() + Vector2(0, 5), "FOOD" if resource_id == "carbohydrate" else resource_id.to_upper(), Color("dce5d9"), 12, HORIZONTAL_ALIGNMENT_CENTER)
+					_label(button.get_center() + Vector2(0, 5), "CARBS" if resource_id == "carbohydrate" else resource_id.to_upper(), Color("dce5d9"), 12, HORIZONTAL_ALIGNMENT_CENTER)
 			elif food_losses.get("losses",0) > 0:
 				_label(box.position + Vector2(16, 213), "Home losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 12)
 		"entrance":
@@ -633,7 +634,7 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 137, "Rejection workers released")
 			if observation in ["loss", "foreign"]:
 				draw_rect(_guest_rect(), Color("39323e"))
-				_label(_guest_rect().position + Vector2(130, 29), "STOP REJECTION" if guest.get("rejection_active", false) else "INCREASE REJECTION", Color("d9c9d7"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+				_label(_guest_rect().position + Vector2(130, 29), "STOP REJECTION" if guest.get("rejection_active", false) else "ASSIGN 4 TO REJECTION", Color("d9c9d7"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		"adaptation":
 			_detail_line(box, 65, "Security / tolerance · overview" if web_family == "recognition" else "Colony repertoire · overview")
 			_detail_line(box, 91, "Select a trait to inspect its tradeoff")
@@ -665,11 +666,11 @@ func _draw_genetic_context(box: Rect2) -> void:
 	var tradeoff: String = ""
 	match web_selection:
 		"lean":
-			benefits = "30% less travel energy"
-			tradeoff = "15% less carrying"
+			benefits = "Up to 30% less travel energy"
+			tradeoff = "Up to 15% less carrying"
 		"load":
-			benefits = "30% more carrying"
-			tradeoff = "20% more travel energy"
+			benefits = "Up to 30% more carrying"
+			tradeoff = "Up to 20% more travel energy"
 		"persistent":
 			benefits = "Up to %.0fx scent persistence" % _status.get("chemistry_persistence", 2.0)
 			tradeoff = "Up to %.0f%% more trail food" % (_status.get("chemistry_extra_energy", 0.2) * 100)
@@ -688,7 +689,7 @@ func _draw_genetic_context(box: Rect2) -> void:
 		var rect: Rect2 = _adaptation_rect(web_selection)
 		draw_rect(rect, Color("28212f"))
 		draw_rect(rect, Color("a28aaf"), false, 1.5)
-		_label(rect.position + Vector2(130, 29), "START %s BROOD TRIAL" % ("CHEMISTRY" if web_selection == "persistent" else web_selection.to_upper()), Color("e3dbe7"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(rect.position + Vector2(130, 29), "START SELECTED TRAIT TRIAL", Color("e3dbe7"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
 		_detail_line(box, 185, "Stage: " + str(_status.adaptation_trial.stage).capitalize())
 		_detail_line(box, 211, "Expresses only with surviving adults")
@@ -716,12 +717,12 @@ func _draw_relationship_context(box: Rect2) -> void:
 	if state == "unknown":
 		_detail_line(box, 125, "Producer source observed")
 		_detail_line(box, 151, "Harvest it through an OUTWARD trail")
-		_detail_line(box, 185, "Protection follows a loaded return")
+		_detail_line(box, 185, "Tending follows a loaded return")
 	else:
-		_detail_line(box, 125, "Workers protect producers" if state == "tended" else "Honeydew successfully harvested")
+		_detail_line(box, 125, "Workers tend producers" if state == "tended" else "Honeydew successfully harvested")
 		_detail_line(box, 151, "%d workers committed" % relationship.protection_workers if state == "tended" else "Needs %d available workers" % relationship.required_workers)
-		_detail_line(box, 185, "Protection supports the producers")
-		_detail_line(box, 211, "No gene trial or research payment")
+		_detail_line(box, 185, "Tending supports production")
+		_detail_line(box, 211, "Journey defense is a separate job")
 		draw_rect(_honeydew_rect(), Color("35483c"))
 		_label(_honeydew_rect().position + Vector2(130, 29), "WITHDRAW TENDERS" if state == "tended" else "TEND PRODUCERS", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 

@@ -131,7 +131,7 @@ func run(test: Object) -> bool:
 		if signal_data.source_knowledge_id == "known:carb_exposed":
 			selected = signal_data
 	view.selected_id = selected.id
-	test.check(view._investigation_title(selected).begins_with("REMOVE"), "Selected prioritized trace names its persistent state")
+	test.check(view._investigation_title(selected).begins_with("STOP PRIORITY"), "Selected prioritized trace names its persistent state")
 	view._pointer_press(view._investigate_button_rect().get_center(), "touch")
 	view._status = root.outward_status("home")
 	test.check(view._investigation_title(selected).begins_with("PRIORITIZE"), "Touch removes priority rather than sending another one-shot scout")

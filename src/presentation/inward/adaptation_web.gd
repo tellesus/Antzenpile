@@ -39,18 +39,18 @@ static func trait_state(status: Dictionary, id: String) -> String:
 	if id in ["persistent", "security", "tolerance"]:
 		var option: Dictionary = status.get("adaptation_options", {}).get(id, {})
 		if option.get("inherited", false):
-			return "Inherited · %d expressed" % option.get("expressed", 0)
+			return "Inherited · %d adult carriers" % option.get("expressed", 0)
 		if id in ["security", "tolerance"]:
 			var other: String = "tolerance" if id == "security" else "security"
 			if status.get("adaptation_options", {}).get(other, {}).get("inherited", false) or status.get("adaptation_trial", {}).get("adaptation_id", "") == other:
-				return "Alternative"
-		return "Candidate · variation observed" if status.get("adaptation_trial", {}).is_empty() else "Waiting for focused trial"
+				return "Other branch chosen"
+		return "Candidate · variation observed" if status.get("adaptation_trial", {}).is_empty() else "Another trial is growing"
 	if status.get("adaptation_repertoire", "") == id:
-		return "Inherited · %d expressed" % status.get("adapted_workers", 0)
+		return "Inherited · %d adult carriers" % status.get("adapted_workers", 0)
 	if status.get("adaptation_trial", {}).get("adaptation_id", "") in ["persistent", "security", "tolerance"]:
-		return "Waiting for focused trial"
+		return "Another trial is growing"
 	if status.get("adaptation_repertoire", "") != "" or not status.get("adaptation_trial", {}).is_empty():
-		return "Alternative"
+		return "Other branch chosen"
 	return "Brood trial available"
 
 static func title(id: String) -> String:
@@ -63,7 +63,7 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 		var ecological: bool = id == "honeydew"
 		var color: Color = Color("99b59c") if ecological else Color("bba6c8")
 		var state: String = trait_state(status, id) if id not in ["foraging", "honeydew"] else ""
-		if state == "Alternative":
+		if state == "Other branch chosen":
 			color = Color("776e80")
 		if id != "foraging":
 			if ecological or id == "persistent":
@@ -98,5 +98,5 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 			view.draw_arc(at, 39, PI, PI + 0.65, 12, Color("dce5d9"), 1.0, true)
 		var label: String = "Recognition repertoire" if id == "foraging" and family == "recognition" else title(id)
 		view._label(at + Vector2(0, 45), label, color, 15, HORIZONTAL_ALIGNMENT_CENTER)
-		var subtitle: String = "Genes and ecological experience" if id == "foraging" else trait_state(status, id) if not ecological else "Ecological · protection active" if status.honeydew.relationship == "tended" else "Ecological · harvested" if status.honeydew.relationship == "exploited" else "Ecological · source observed"
+		var subtitle: String = "Genes and ecological experience" if id == "foraging" else trait_state(status, id) if not ecological else "Ecological · tending active" if status.honeydew.relationship == "tended" else "Ecological · harvested" if status.honeydew.relationship == "exploited" else "Ecological · source observed"
 		view._label(at + Vector2(0, 64), subtitle, Color(color, 0.75), 12, HORIZONTAL_ALIGNMENT_CENTER)

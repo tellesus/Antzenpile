@@ -101,7 +101,7 @@ func run(test: Object) -> bool:
 	for signal_data: Dictionary in view._signals:
 		if signal_data.source_knowledge_id == "known:carb_exposed":
 			view.selected_id = signal_data.id
-	test.check(view._investigation_title(view._selected_signal()) == "WATCH FOR RECOVERY" and view._recheck_title(view._selected_route(view._selected_signal())) == "TRY GATHERING", "Checking and uncertain gathering have distinct contextual names")
+	test.check(view._investigation_title(view._selected_signal()) == "WATCH AND RESUME GATHERING" and view._recheck_title(view._selected_route(view._selected_signal())) == "TRY GATHERING", "Checking and uncertain gathering have distinct contextual names")
 	view._pointer_press(view._investigate_button_rect().get_center(), "touch")
 	view._status = root.outward_status("home")
 	test.check(view._investigation_title(view._selected_signal()) == "STOP RECOVERY WATCH", "Touch arms a persistent watch with a clear stop action")

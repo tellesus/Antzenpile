@@ -63,7 +63,7 @@ func run(test: Object) -> bool:
 	test.check(pile.workers.create_commitment("test_busy", "other", "test") and pile.workers.allocate("test_busy", spare - 5), "Fixture reserves other labor to exercise shortage")
 	view._status = root.outward_status("home")
 	view._pointer_press(protect.get_center(), "mouse")
-	test.check(view._feedback == "Not enough workers to protect the producers" and game.run.honeydew.relationship == "exploited" and pile.workers.count("honeydew:home") == -1, "Insufficient labor gives a concise rejection without partial commitment")
+	test.check(view._feedback == "Not enough available workers to tend producers" and game.run.honeydew.relationship == "exploited" and pile.workers.count("honeydew:home") == -1, "Insufficient labor gives a concise rejection without partial commitment")
 	test.check(pile.workers.release("test_busy", spare - 5) and pile.workers.retire_commitment("test_busy"), "Fixture releases unrelated commitment")
 	for size: Vector2 in [Vector2(1280, 720), Vector2(900, 600)]:
 		var x: float = size.x - 300.0

@@ -8,6 +8,7 @@ const Art = preload("res://src/presentation/sensory_art.gd")
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd")
 const LossEvidence = preload("res://src/presentation/returned_loss_evidence.gd")
+const Copy = preload("res://src/presentation/interface_text.gd")
 const Memories = preload("res://src/presentation/outward/source_memory.gd")
 var sources_open: bool = false
 var source_category: String = "carbohydrate"
@@ -134,15 +135,39 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _pointer_press(at: Vector2, kind: String) -> void:
+	_pointer_kind = ""
 	var command: String = _button_at(at)
 	if not command.is_empty():
 		_run_command(command)
+		return
+	if _panel_at(at):
 		return
 	if _field_rect().has_point(at):
 		_pointer_kind = kind
 		_pointer_start = at
 		_pointer_last = at
 		_dragged = false
+
+
+func _panel_at(at: Vector2) -> bool:
+	if sources_open and _sources_panel_rect().has_point(at): return true
+	if exploration_open and _exploration_panel_rect().has_point(at): return true
+	if not _selected_signal().is_empty() or not _selected_mission().is_empty():
+		return _context_panel_rect().has_point(at)
+	return false
+
+
+func _sources_panel_rect() -> Rect2:
+	return Rect2(24, 148, 308, 396)
+
+
+func _exploration_panel_rect() -> Rect2:
+	return Rect2(24, 148, 308, 266)
+
+
+func _context_panel_rect() -> Rect2:
+	var height: float = 448 if _journey_attention() else 226 if not _selected_mission().is_empty() else 344 + _evidence_offset()
+	return Rect2(get_viewport_rect().size.x - 316, 144, 292, height)
 
 
 func _pointer_drag(at: Vector2) -> void:
@@ -228,15 +253,15 @@ func _run_command(command: String) -> void:
 			if not action.is_valid():
 				return
 			var result: Dictionary = action.call(signal_data.source_knowledge_id)
-			_feedback = ("Producers tended" if command == "honeydew_start" else "Tending withdrawn") if result.get("accepted", false) else result.get("reason", "Tending unavailable")
+			_feedback = ("Producers tended" if command == "honeydew_start" else "Tending withdrawn") if result.get("accepted", false) else Copy.reason(result.get("reason", "Tending unavailable"))
 		"investigate":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty() or not investigate_command.is_valid():
 				return
 			var result: Dictionary = investigate_command.call(signal_data.source_knowledge_id)
-			_feedback = "Scout investigating remembered source" if result.get("accepted", false) else result.get("reason", "Investigation unavailable")
+			_feedback = "Scout sent to recheck source" if result.get("accepted", false) else result.get("reason", "Investigation unavailable")
 			if result.get("accepted", false) and result.get("standing_priority", false):
-				_feedback = "Investigation priority removed" if not result.enabled else "Priority queued · set Exploration effort" if result.exploration_off else "Source prioritized for recurring investigation"
+				_feedback = "Source recheck priority removed" if not result.enabled else "Priority queued · set Exploration effort" if result.exploration_off else "Source prioritized for scout rechecks"
 				if result.get("recovery_watch", false):
 					_feedback = "Recovery watch stopped" if not result.enabled else "Watch queued · set Exploration effort" if result.exploration_off else "Watch set · fresh return can resume gathering"
 		"trail_create", "trail_less", "trail_more", "trail_cancel", "trail_recheck":
@@ -317,7 +342,7 @@ func _button_rect(command: String) -> Rect2:
 func _button_at(at: Vector2) -> String:
 	if not _status.get("internal_attention", {}).is_empty() and _button_rect("internal_pressure").has_point(at):
 		return "internal_pressure"
-	if sources_open and Rect2(24, 148, 308, 396).has_point(at):
+	if sources_open and _sources_panel_rect().has_point(at):
 		for category: String in ["carbohydrate", "protein", "water"]:
 			if _source_filter_rect(category).has_point(at):
 				return "source_filter_" + category
@@ -564,7 +589,7 @@ func _draw_context(size: Vector2) -> void:
 	if selected.is_empty():
 		return
 	if _journey_attention(): _draw_journey_context(size); return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 344 + _evidence_offset()))
+	var box: Rect2 = _context_panel_rect()
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), _signal_title_for(selected), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
@@ -599,11 +624,11 @@ func _draw_context(size: Vector2) -> void:
 		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" and float(route.get("route_familiarity", 0.0)) < 0.1 else "No workers · scent " + _scent_label(route)
 		_label(body.position + Vector2(16, 165), idle_text, Color("a8b8bd"), 13)
 		_label(body.position + Vector2(16, 187), "Home stores: %.1f" % _status.get("resources", {}).get(selected.category, 0.0), Color("8fa1a8"), 13)
-		_draw_trail_button("trail_create", "INVEST 5 WORKERS")
+		_draw_trail_button("trail_create", "ASSIGN 5 GATHERERS")
 	elif route.status == "recalling":
 		_label(body.position + Vector2(16, 165), "Recalling: %d workers away" % route.active_workers, Color("a8b8bd"), 13)
 		_label(body.position + Vector2(16, 187), "Scent %s · Delivered %.1f" % [_scent_label(route), route.delivered_total], Color("8fa1a8"), 13)
-		_draw_trail_button("trail_create", "REINVEST 5 WORKERS")
+		_draw_trail_button("trail_create", "ASSIGN 5 GATHERERS")
 	else:
 		var route_note: String = "Report renewed · gathering paused" if route.status == "depleted" and route.get("recovery_ready", false) else "Waiting for confirming scout report" if route.status == "depleted" and route.get("resume_on_report", false) else "Source reported empty · scent " + _scent_label(route) if route.status == "depleted" else "Waiting for carbohydrate" if route.get("energy_limited", false) else "Trail scent: " + _scent_label(route)
 		_label(body.position + Vector2(16, 165), route_note, Color("a8b8bd"), 14)
@@ -617,7 +642,7 @@ func _draw_context(size: Vector2) -> void:
 		else:
 			_draw_trail_button("trail_less", "− 1")
 			_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
-		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
+		_draw_trail_button("trail_cancel", "RECALL")
 	var scout_available: bool = _status.has("exploration") or _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
@@ -644,15 +669,15 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 		draw_rect(protect_box, Color("3d3328") if can_start else Color("202326"))
 		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "WITHDRAW TENDERS" if relationship == "tended" else "TEND PRODUCERS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	if route.is_empty() or route.status in ["inactive", "recalling"]:
-		_draw_trail_button("trail_create", "INVEST 5 WORKERS" if route.is_empty() or route.status == "inactive" else "REINVEST 5 WORKERS")
+		_draw_trail_button("trail_create", "ASSIGN 5 GATHERERS" if route.is_empty() or route.status == "inactive" else "ASSIGN 5 GATHERERS")
 	elif route.status == "depleted":
 		if route.active_workers == 0:
 			_draw_trail_button("trail_recheck", _recheck_title(route))
-		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
+		_draw_trail_button("trail_cancel", "RECALL")
 	else:
 		_draw_trail_button("trail_less", "− 1")
 		_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
-		_draw_trail_button("trail_cancel", "STOP TRAFFIC" if route.get("reported_losses", 0) > 0 or route.get("foreign_reports", 0) > 0 else "CANCEL")
+		_draw_trail_button("trail_cancel", "RECALL")
 	var scout_available: bool = _status.has("exploration") or available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
 	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
@@ -661,13 +686,13 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 
 func _investigation_title(selected: Dictionary) -> String:
 	if not _status.has("exploration"):
-		return "INVESTIGATE SOURCE"
+		return "SEND SCOUT TO RECHECK"
 	var route: Dictionary = _selected_route(selected)
 	if route.get("resume_on_report", false):
 		return "STOP RECOVERY WATCH"
 	if route.get("status", "") == "depleted":
-		return "WATCH FOR RECOVERY"
-	return "REMOVE INVESTIGATION PRIORITY" if selected.source_knowledge_id in _status.exploration.get("priorities", []) else "PRIORITIZE INVESTIGATION"
+		return "WATCH AND RESUME GATHERING"
+	return "STOP PRIORITY RECHECKS" if selected.source_knowledge_id in _status.exploration.get("priorities", []) else "PRIORITIZE SOURCE RECHECKS"
 
 
 func _recheck_title(route: Dictionary) -> String:
@@ -687,7 +712,7 @@ func _selected_mission() -> Dictionary:
 
 
 func _draw_mission_context(mission: Dictionary, size: Vector2) -> void:
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 226))
+	var box: Rect2 = _context_panel_rect()
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
 	_label(box.position + Vector2(16, 31), "Scout " + str(mission.id).trim_prefix("scout_"), Color("d9d3be"), 20)
@@ -809,12 +834,12 @@ func _source_page_rect() -> Rect2:
 
 
 func _draw_sources() -> void:
-	draw_rect(Rect2(24, 148, 308, 396), Color("111921"))
+	draw_rect(_sources_panel_rect(), Color("111921"))
 	_label(Vector2(40, 177), "Remembered sources", Color("d3dcd4"), 20)
 	for category: String in ["carbohydrate", "protein", "water"]:
 		var button: Rect2 = _source_filter_rect(category)
 		draw_rect(button, Color("31505a") if category == source_category else Color("18252b"))
-		_label(button.get_center() + Vector2(0, 6), "FOOD" if category == "carbohydrate" else category.to_upper(), Art.color_for(category), 13, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(button.get_center() + Vector2(0, 6), "CARBS" if category == "carbohydrate" else category.to_upper(), Art.color_for(category), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	var entries: Array[Dictionary] = _source_entries()
 	source_page = mini(source_page, maxi(0, ceili(entries.size() / 3.0) - 1))
 	for index: int in 3:
@@ -842,10 +867,10 @@ func _exploration_rect(command: String) -> Rect2:
 
 
 func _draw_exploration() -> void:
-	draw_rect(Rect2(24, 148, 308, 266), Color("111921"))
+	draw_rect(_exploration_panel_rect(), Color("111921"))
 	var policy: Dictionary = _status.get("exploration", {"target": 0, "away": 0, "bias": null})
 	_label(Vector2(40, 177), "Exploration labor", Color("d3dcd4"), 20)
-	_label(Vector2(40, 203), "%d target · %d away · replaces on return" % [policy.target, policy.away], Color("a8b9b6"), 13)
+	_label(Vector2(40, 203), "Target %d scouts · %d away" % [policy.target, policy.away], Color("a8b9b6"), 13)
 	for target: int in [0, 2, 5, 8]:
 		var box: Rect2 = _exploration_rect("explore_%d" % target)
 		draw_rect(box, Color("31505a") if target == policy.target else Color("18252b"))
@@ -853,14 +878,14 @@ func _draw_exploration() -> void:
 	for command: String in ["exploration_bias", "exploration_general"]:
 		var box: Rect2 = _exploration_rect(command)
 		draw_rect(box, Color("283b3f"))
-		var title: String = "FAVOR THIS DIRECTION" if command == "exploration_bias" else "GENERAL EXPLORATION" if policy.bias == null else "CLEAR BIAS · %03d°" % roundi(rad_to_deg(policy.bias))
+		var title: String = "FAVOR THIS DIRECTION" if command == "exploration_bias" else "NO DIRECTIONAL BIAS" if policy.bias == null else "CLEAR BIAS · %03d°" % roundi(rad_to_deg(policy.bias))
 		_label(box.position + Vector2(137,29), title, Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
-	_label(Vector2(40, 387), "%d investigation priorities · shares effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 12)
+	_label(Vector2(40, 387), "%d source recheck priorities · shares effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 12)
 	_label(Vector2(40, 406), "Established trails extend search reach", Color("a8b9b6"), 12)
 
 func _signal_title(category: String) -> String:
 	match category:
-		"carbohydrate": return "Food trace"
+		"carbohydrate": return "Carbs trace"
 		"protein": return "Protein trace"
 		"water": return "Water trace"
 	return "Unknown trace"
@@ -890,10 +915,10 @@ func _draw_journey_link() -> void:
 	if _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
 	var box: Rect2 = _journey_rect("journey_open")
 	draw_rect(box,Color("39302b"))
-	_label(box.get_center() + Vector2(0,5),"INVESTIGATE JOURNEY",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
+	_label(box.get_center() + Vector2(0,5),"SURVEY JOURNEY FOR DANGER",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
 
 func _draw_journey_context(size: Vector2) -> void:
-	var box := Rect2(size.x - 316,144,292,448)
+	var box: Rect2 = _context_panel_rect()
 	draw_rect(box,Color("17171b")); draw_rect(box,Color("665047"),false,1)
 	var route: Dictionary = _selected_route(_selected_signal())
 	var state: Dictionary = _status.get("journey_response",{})
@@ -914,7 +939,7 @@ func _draw_journey_context(size: Vector2) -> void:
 		_detail_journey(box,239,"%d returned / %d sent · %.0fs ago" % [outcome.sent - outcome.lost,outcome.sent,_status.time - outcome.received_at],12)
 	var action: Rect2 = _journey_rect("journey_investigate")
 	draw_rect(action,Color("39302b"))
-	_label(action.get_center() + Vector2(0,5),"RECALL PARTY" if own_party else "INVESTIGATE JOURNEY",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
+	_label(action.get_center() + Vector2(0,5),"RECALL SURVEY / DEFENDERS" if own_party else "SURVEY JOURNEY FOR DANGER",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
 	if own_party and state.get("reinforcement_available",false) or not own_party and _can_mobilize(route):
 		var mob: Rect2 = _journey_rect("journey_defend")
 		draw_rect(mob,Color("49332f"))
