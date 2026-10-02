@@ -1,0 +1,104 @@
+{
+	"duration_seconds": 2400,
+	"engine": "4.7.2-stable (official)",
+	"platform": "Windows",
+	"policy": "Ordinary stores/scouts; fixed initial source versus returned-known alternatives. Alternative policy stops reported empty nonrecurring food and foreign routes, funds known food sources with four home carers reserved, tends harvested honeydew, and deliberately sustains its reported risky traffic up to ten gatherers. Both fund chambers/brood/sanitation from real stores. No hidden source decisions or rate changes.",
+	"rows": [
+		{
+			"adult_losses": 0,
+			"alternatives": false,
+			"brood_emerged": 32,
+			"lowest_carbohydrate": 0.00165,
+			"protection": 0,
+			"routes": 3,
+			"save_exact": true,
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 0.00165,
+				"protein": 67.92778,
+				"water": 121.51297
+			},
+			"workers": 72
+		},
+		{
+			"adult_losses": 10,
+			"alternatives": true,
+			"brood_emerged": 71,
+			"lowest_carbohydrate": 2.36272,
+			"protection": 6,
+			"routes": 6,
+			"save_exact": true,
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 195.05693,
+				"protein": 44.55096,
+				"water": 127.26254
+			},
+			"workers": 101
+		},
+		{
+			"adult_losses": 0,
+			"alternatives": false,
+			"brood_emerged": 32,
+			"lowest_carbohydrate": 0.00188,
+			"protection": 0,
+			"routes": 3,
+			"save_exact": true,
+			"seed": 591,
+			"stores": {
+				"carbohydrate": 0.00188,
+				"protein": 67.53797,
+				"water": 122.56328
+			},
+			"workers": 72
+		},
+		{
+			"adult_losses": 11,
+			"alternatives": true,
+			"brood_emerged": 71,
+			"lowest_carbohydrate": 2.05674,
+			"protection": 6,
+			"routes": 6,
+			"save_exact": true,
+			"seed": 591,
+			"stores": {
+				"carbohydrate": 209.42987,
+				"protein": 44.33136,
+				"water": 131.89714
+			},
+			"workers": 100
+		},
+		{
+			"adult_losses": 0,
+			"alternatives": false,
+			"brood_emerged": 72,
+			"lowest_carbohydrate": 0.0,
+			"protection": 0,
+			"routes": 3,
+			"save_exact": true,
+			"seed": 202603,
+			"stores": {
+				"carbohydrate": 0.00738,
+				"protein": 44.64537,
+				"water": 134.41788
+			},
+			"workers": 112
+		},
+		{
+			"adult_losses": 11,
+			"alternatives": true,
+			"brood_emerged": 70,
+			"lowest_carbohydrate": 6.90945,
+			"protection": 6,
+			"routes": 6,
+			"save_exact": true,
+			"seed": 202603,
+			"stores": {
+				"carbohydrate": 188.9507,
+				"protein": 46.52726,
+				"water": 111.55574
+			},
+			"workers": 99
+		}
+	]
+}

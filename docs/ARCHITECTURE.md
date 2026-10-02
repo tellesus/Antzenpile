@@ -1,5 +1,7 @@
 # Architecture
 
+Card 065 adds SourceMemory, a pure projection of detached returned signals/outcomes and route staffing/danger summaries. OUTWARD browsing only selects a remembered bearing; no gameplay command or world lookup. Private standing scout provenance is captured at sensing to preserve eight-decimal observation continuation; observations still enter KnowledgeBase only on return.
+
 Card 064: PileState owns SanitationState. SanitationSystem generates conserved refuse on fixed ticks, owns internal cleaner/excavator ledger jobs and prepaid Midden development, and runs before BroodSystem. BroodSystem scales larval progress and proportional food demand by burden, independently of care/nutrition. GameRoot supplies detached burden, staffing, project and rate summaries; InwardView issues commands. No disease, new deaths, remote corpse retrieval or audio asset.
 
 Card 063: KnowledgeBase checks returned confirming observations after a route's last empty receipt. TrailSystem alone resumes opt-in depleted gathering once travelers are home, without reallocating or consulting source truth. UI combines source investigation with a saved recovery watch; off exploration leaves it queued. Cancel/returned danger retain authority. Normal summaries carry recovery readiness and watch intent, never hidden quantities.

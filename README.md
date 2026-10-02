@@ -4,6 +4,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+**Remembered Sources** lets you browse returned food/protein/water memories, including old or empty reports, then focus their bearing and existing gathering controls. Browsing is free attention; it never dispatches workers. The [source-choice measurement](docs/SOURCE_CHOICE_EVALUATION.md) found reliable carbohydrate access through existing known alternatives without changing rates, with real exposure/labor tradeoffs.
+
 Depleted trails offer **Watch for Recovery**: standing investigators must bring fresh confirming evidence home before existing gatherers can resume. Hidden renewal and faint cues cannot restart traffic; reported danger requires a manual decision. **Try Gathering** and **Resume Gathering** distinguish uncertain trips from returned confirmation.
 
 Growing colony activity reveals the **Midden** in INWARD. Assign 0/1/2/5 cleanup workers to basic isolation, then **Develop Midden** to double efficiency using stores, excavation labor and time. Excess refuse slows larvae; Nursery shows this separately from food/care. No new sanitation deaths or disease simulation. The [three-seed measurement](docs/SANITATION_EVALUATION.md) records affordability, growth and remaining carbohydrate constraints.

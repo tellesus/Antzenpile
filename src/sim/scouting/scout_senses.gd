@@ -19,6 +19,7 @@ static func sample(agent: ScoutAgent, world: WorldState, config: ScoutConfig, rn
 		var evidence: Observation = agent.observations.get(id)
 		if evidence == null:
 			evidence = Evidence.new()
+			evidence.collective_search = agent.standing
 			evidence.id = agent.id + ":" + id
 			evidence.scout_id = agent.id
 			evidence.origin_pile = agent.origin_pile

@@ -142,6 +142,12 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		var evidence := Evidence.new()
 		if not value is Dictionary or not evidence.restore(value, world, colony, time):
 			return false
+		if data.get("standing", false) and not evidence.collective_search:
+			# Pre-065 private standing samples were rounded by sensing but did
+			# not acquire collective provenance until delivery. Keep their precision.
+			var rounded_radius: float = roundf(evidence.uncertainty_radius * 1e8) / 1e8
+			if absf(rounded_radius - evidence.uncertainty_radius) <= 1e-15:
+				evidence.uncertainty_radius = rounded_radius
 		if evidence.scout_id != data.id or evidence.origin_pile != data.origin_pile or restored_evidence.has(evidence.source_node_id):
 			return false
 		restored_evidence[evidence.source_node_id] = evidence

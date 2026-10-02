@@ -289,6 +289,8 @@ func quick_load() -> Dictionary:
 		if _outward_view != null:
 			_outward_view.facing = 0.0
 			_outward_view.selected_id = ""
+			_outward_view.sources_open = false
+			_outward_view.source_page = 0
 			_outward_view.reset_mission_visuals()
 		if _inward_view != null:
 			_inward_view.selected_id = ""

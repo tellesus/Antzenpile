@@ -8,6 +8,10 @@ const Art = preload("res://src/presentation/sensory_art.gd")
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd")
 const LossEvidence = preload("res://src/presentation/returned_loss_evidence.gd")
+const Memories = preload("res://src/presentation/outward/source_memory.gd")
+var sources_open: bool = false
+var source_category: String = "carbohydrate"
+var source_page: int = 0
 var signal_provider: Callable
 var status_provider: Callable
 var dispatch_command: Callable
@@ -169,7 +173,27 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 
 func _run_command(command: String) -> void:
+	if command.begins_with("source_filter_"):
+		source_category = command.trim_prefix("source_filter_")
+		source_page = 0
+		return
+	if command == "source_page":
+		source_page = (source_page + 1) % maxi(1, ceili(_source_entries().size() / 3.0))
+		return
+	if command.begins_with("source_entry_"):
+		var entries: Array[Dictionary] = _source_entries()
+		var index: int = source_page * 3 + int(command.trim_prefix("source_entry_"))
+		if index < entries.size():
+			selected_id = entries[index].id
+			if entries[index].bearing != null:
+				facing = entries[index].bearing
+			sources_open = false
+			_placed = Panorama.project(_signals, facing, get_viewport_rect().size)
+		return
 	match command:
+		"sources":
+			sources_open = not sources_open
+			exploration_open = false
 		"honeydew_start", "honeydew_stop":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty() or not _is_honeydew(signal_data):
@@ -210,6 +234,7 @@ func _run_command(command: String) -> void:
 				result = trail_set_command.call(route.id, target)
 			_feedback = ("Gatherers resumed from returned evidence" if route.get("recovery_ready", false) else "Gatherers sent · availability still uncertain") if command == "trail_recheck" and result.get("accepted", false) else "Trail updated" if result.get("accepted", false) else result.get("reason", "Trail unavailable")
 		"scout":
+			sources_open = false
 			if exploration_command.is_valid():
 				exploration_open = not exploration_open
 				return
@@ -249,6 +274,7 @@ func _field_rect() -> Rect2:
 func _button_rect(command: String) -> Rect2:
 	var y: float = get_viewport_rect().size.y - 104.0
 	match command:
+		"sources": return Rect2(24, 100, 220, 44)
 		"scout": return Rect2(24, y, 148, 64)
 		"pause": return Rect2(188, y, 104, 64)
 		"speed_1": return Rect2(308, y, 62, 64)
@@ -262,6 +288,17 @@ func _button_rect(command: String) -> Rect2:
 
 
 func _button_at(at: Vector2) -> String:
+	if sources_open and Rect2(24, 148, 308, 336).has_point(at):
+		for category: String in ["carbohydrate", "protein", "water"]:
+			if _source_filter_rect(category).has_point(at):
+				return "source_filter_" + category
+		var entries: Array[Dictionary] = _source_entries()
+		for index: int in 3:
+			if source_page * 3 + index < entries.size() and _source_row_rect(index).has_point(at):
+				return "source_entry_" + str(index)
+		if _source_page_rect().has_point(at):
+			return "source_page"
+		return "source_panel"
 	if exploration_open:
 		for command: String in ["explore_0", "explore_2", "explore_5", "explore_8", "exploration_bias", "exploration_general"]:
 			if _exploration_rect(command).has_point(at):
@@ -287,7 +324,7 @@ func _button_at(at: Vector2) -> String:
 		for command: String in contextual:
 			if _trail_button_rect(command).has_point(at):
 				return command
-	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load"]:
+	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load", "sources"]:
 		if _button_rect(command).has_point(at):
 			return command
 	return ""
@@ -306,6 +343,8 @@ func _draw() -> void:
 	if exploration_open:
 		_draw_exploration()
 	_draw_context(size)
+	if sources_open:
+		_draw_sources()
 	_draw_controls(size)
 
 
@@ -632,7 +671,7 @@ func _draw_trail_button(command: String, title: String) -> void:
 
 
 func _draw_controls(size: Vector2) -> void:
-	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load"]:
+	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load", "sources"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale
 		var unavailable: bool = command == "scout" and not exploration_command.is_valid() and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)
@@ -642,10 +681,10 @@ func _draw_controls(size: Vector2) -> void:
 		if unavailable:
 			color = Color("202326")
 		draw_rect(box, color)
-		var title: String = "SEND SCOUT" if command == "scout" else "INWARD" if command == "inward" else "SAVE" if command == "save" else "LOAD" if command == "load" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
+		var title: String = "REMEMBERED SOURCES" if command == "sources" else "SEND SCOUT" if command == "scout" else "INWARD" if command == "inward" else "SAVE" if command == "save" else "LOAD" if command == "load" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
 		if command == "scout" and exploration_command.is_valid():
 			title = "EXPLORATION"
-		_label(box.position + Vector2(box.size.x * 0.5, 40), title, Color("d3dcd4") if not unavailable else Color("78817e"), 14 if command in ["save", "load"] else 16, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(box.position + Vector2(box.size.x * 0.5, 29 if command == "sources" else 40), title, Color("d3dcd4") if not unavailable else Color("78817e"), 14 if command in ["save", "load", "sources"] else 16, HORIZONTAL_ALIGNMENT_CENTER)
 	if not _feedback.is_empty() and Time.get_ticks_msec() < _feedback_until:
 		_label(Vector2(24, size.y - 17), _feedback, Color("b6c8b2"), 13)
 	else:
@@ -654,6 +693,47 @@ func _draw_controls(size: Vector2) -> void:
 
 func _signal_color(category: String) -> Color:
 	return Art.color_for(category)
+
+
+func _source_entries() -> Array[Dictionary]:
+	return Memories.entries(_signals, _status, source_category)
+
+
+func _source_filter_rect(category: String) -> Rect2:
+	return Rect2(40 + ["carbohydrate", "protein", "water"].find(category) * 92, 190, 86, 44)
+
+
+func _source_row_rect(index: int) -> Rect2:
+	return Rect2(40, 244 + index * 60, 274, 54)
+
+
+func _source_page_rect() -> Rect2:
+	return Rect2(40, 430, 274, 44)
+
+
+func _draw_sources() -> void:
+	draw_rect(Rect2(24, 148, 308, 336), Color("111921"))
+	_label(Vector2(40, 177), "Remembered sources", Color("d3dcd4"), 20)
+	for category: String in ["carbohydrate", "protein", "water"]:
+		var button: Rect2 = _source_filter_rect(category)
+		draw_rect(button, Color("31505a") if category == source_category else Color("18252b"))
+		_label(button.get_center() + Vector2(0, 6), "FOOD" if category == "carbohydrate" else category.to_upper(), Art.color_for(category), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	var entries: Array[Dictionary] = _source_entries()
+	source_page = mini(source_page, maxi(0, ceili(entries.size() / 3.0) - 1))
+	for index: int in 3:
+		var offset: int = source_page * 3 + index
+		if offset >= entries.size():
+			break
+		var entry: Dictionary = entries[offset]
+		var box: Rect2 = _source_row_rect(index)
+		draw_rect(box, Color("30382f") if entry.id == selected_id else Color("182329"))
+		var title: String = "Honeydew" if entry.honeydew else "Memory %d" % (offset + 1)
+		_label(box.position + Vector2(10, 20), "%s · sensed %.0fs ago" % [title, entry.age], Color("d4c6a8"), 13)
+		_label(box.position + Vector2(10, 42), "%s · %d gathering%s" % [entry.state, entry.workers, " · ALARM" if entry.danger else ""], Color("c48c7c") if entry.danger else Color("96aab0"), 12)
+	if entries.is_empty():
+		_label(Vector2(40, 275), "No returned memory of this resource", Color("96aab0"), 13)
+	draw_rect(_source_page_rect(), Color("18252b"))
+	_label(_source_page_rect().get_center() + Vector2(0, 6), "MORE · %d / %d" % [source_page + 1, maxi(1, ceili(entries.size() / 3.0))], Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _exploration_rect(command: String) -> Rect2:

@@ -85,7 +85,13 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		closest_distance = physical_distance
 	var config: ScoutConfig = preload("res://data/scouting/default_scouts.tres")
 	var physical_radius: float = config.localization_floor + closest_distance * config.distance_uncertainty
-	if absf(physical_radius - uncertainty_radius) <= 1e-15:
+	if data.get("collective_search", false):
+		# Collective samples are authored to eight decimals by ScoutSenses.
+		# Do not reconstruct an unrounded legacy radius from their distance.
+		var rounded_radius: float = roundf(uncertainty_radius * 1e8) / 1e8
+		if absf(rounded_radius - uncertainty_radius) <= 1e-15:
+			uncertainty_radius = rounded_radius
+	elif absf(physical_radius - uncertainty_radius) <= 1e-15:
 		uncertainty_radius = physical_radius
 	proximity_confirmed = data.proximity_confirmed
 	collective_search = data.get("collective_search", false)
