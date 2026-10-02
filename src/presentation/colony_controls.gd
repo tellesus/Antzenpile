@@ -55,7 +55,7 @@ func activate_at(at: Vector2) -> bool:
 		guide_page = 0
 		return true
 	if scenario_rect().has_point(at):
-		selected_scenario = "garden_edge" if selected_scenario == "backyard_slice" else "backyard_slice"
+		selected_scenario = ScenarioCatalog.IDS[(ScenarioCatalog.IDS.find(selected_scenario) + 1) % ScenarioCatalog.IDS.size()]
 		return true
 	if choice_rect("cancel").has_point(at):
 		opened = false

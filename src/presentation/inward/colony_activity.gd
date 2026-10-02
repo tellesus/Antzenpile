@@ -9,6 +9,7 @@ const Pressure = preload("res://src/presentation/colony_pressure.gd")
 
 static func health(status: Dictionary, organ: String) -> float:
 	# These are already-known functional rates, not a new health simulation.
+	if organ == "food_exchange": return 0.5 if status.get("food_sharing",{}).get("recent",false) else 1.0
 	if organ == "midden":
 		return clampf(status.get("midden", {}).get("larval_rate", 1.0), 0.0, 1.0)
 	if organ != "nursery":
@@ -77,6 +78,7 @@ static func brood_stages(status: Dictionary) -> Array[String]:
 
 
 static func pressure(status: Dictionary, organ: String) -> String:
+	if organ == "food_exchange": return "HOME LOSSES" if status.get("food_sharing",{}).get("recent",false) else ""
 	var midden: Dictionary = status.get("midden", {})
 	if organ == "midden":
 		return "REFUSE PRESSURE" if midden.get("larval_rate", 1.0) < 1.0 else ""

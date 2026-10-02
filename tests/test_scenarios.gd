@@ -45,6 +45,8 @@ func run(test: Object) -> bool:
 	controls.activate_at(controls.button_rect().get_center())
 	test.check(controls.selected_scenario == "garden_edge", "Opening restart menu starts from the active setting")
 	controls.activate_at(controls.scenario_rect().get_center())
+	test.check(controls.selected_scenario == "roadside" and root.simulation.run.to_dict() == before, "Roadside can be selected without changing the active colony")
+	controls.activate_at(controls.scenario_rect().get_center())
 	test.check(controls.selected_scenario == "backyard_slice" and root.simulation.run.to_dict() == before, "Selecting a setting does not replace the colony before an explicit start")
 	controls.activate_at(controls.choice_rect("repeat").get_center())
 	test.check(root.current_scenario() == "backyard_slice" and root.current_seed() == 71, "Repeat action applies the selected world with the current seed")

@@ -32,6 +32,7 @@ var swarm: SwarmSystem
 var guest: GuestSystem
 var rival: RivalSystem
 var predator: PredatorSystem
+var food_toxicity: FoodToxicitySystem
 
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
@@ -64,6 +65,7 @@ func _attach_run(next_run: RunState) -> void:
 	swarm = Swarm.new(run, trails.apply_loss)
 	trails.swarm = swarm
 	brood = Brood.new(run)
+	food_toxicity = FoodToxicitySystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
@@ -188,3 +190,4 @@ func _tick(delta: float) -> void:
 	humidity.tick()
 	guest.tick()
 	brood.tick(delta)
+	food_toxicity.tick(delta)

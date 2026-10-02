@@ -78,6 +78,7 @@ func policy(root: Node, row: Dictionary) -> void:
 		_event(root, row, "reject observed guest", root.set_guest_rejection(true))
 	var used: Array[String] = []
 	for route: Dictionary in outside.trails:
+		if route.destination_knowledge_id in row.get("withheld",[]): continue
 		var kind: String = ""
 		for signal_data: Dictionary in signals:
 			if signal_data.source_knowledge_id == route.destination_knowledge_id: kind = signal_data.category
@@ -95,6 +96,7 @@ func policy(root: Node, row: Dictionary) -> void:
 	for signal_data: Dictionary in signals:
 		if signal_data.category != "carbohydrate" and signal_data.category in used: continue
 		var id: String = signal_data.source_knowledge_id
+		if id in row.get("withheld",[]): continue
 		var hint: Dictionary = outside.temporal_hints.get(id, {})
 		if hint.get("last_return_empty", false): continue
 		var existing: Dictionary = {}

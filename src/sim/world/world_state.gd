@@ -43,6 +43,8 @@ func restore(data: Dictionary, definition_ids: Array[String]) -> bool:
 		var position := Vector2(value.position[0], value.position[1])
 		if not area.has_point(position) or typeof(value.active) != TYPE_BOOL or not value.properties is Dictionary:
 			return _reject("Node outside bounds or invalid active/properties")
+		var contamination: Variant = value.properties.get("contaminant_fraction",0.0)
+		if not _number(contamination) or contamination < 0 or contamination > 1 or (contamination > 0 and value.definition_id != "carbohydrate"): return _reject("Invalid food contamination")
 		var node := WorldNode.new()
 		node.id = value.id
 		node.definition_id = value.definition_id

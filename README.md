@@ -4,6 +4,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+**Colony → Roadside** adds the original design's first contaminated-food windfall. Ordinary-looking returned food can cause delayed home worker failures after sharing. **Check Food Exchange** shows uncertain local evidence and opens food memories; **Cancel** a suspect ordinary supply (or **Stop Traffic** on a dangerous trail) recalls real travelers. Inbound cargo still arrives; dilution and decay permit gradual recovery. This first model affects available home adults only. [Three paired trials](docs/CONTAMINATED_FOOD_EVALUATION.md) verified response, conserved workers and exact saves without exposing chemical knowledge. Backyard and Garden Edge remain uncontaminated controls.
+
 **Queen → Grow** repeats ordinary brood when current food reserves, care and Nursery space support it. **Manual** stops new automatic laying while existing brood continues; **Lay 8 Brood Now** remains an explicit choice. Growth checks remaining larval food, with real travel/project/climate competition still possible. Old saves default to Manual. [Ordinary trials](docs/STANDING_BROOD_EVALUATION.md) exercised repeated production in both settings without repeated laying commands.
 
 Nursery feeding feedback now identifies the resource missing from the last feeding attempt. **Food Exchange → Browse returned sources** opens remembered food/protein/water sources for that need, without dispatching workers. Lack of care leaves food unassessed and displays **Brood waits for care**. Ordinary expanded-colony examples showed carbohydrate shortage in Backyard and protein shortage in Garden Edge; amounts and rates remain unchanged.
@@ -20,7 +22,7 @@ The [expanded-colony review](docs/EXPANDED_COLONY_EVALUATION.md) exercised both 
 
 Newly home-delivered traces now give a brief visual notice and delicate chime. Repeated reports and loaded knowledge stay quiet; discovery never turns or selects the view for you. The chime follows Information Cues volume.
 
-The Colony panel now selects **Backyard** or **Garden Edge** before starting. Garden Edge changes the hidden initial resource arrangement while reusing established ecology/rates. Repeat preserves the selected layout and seed; saves preserve scenario identity. [Three ordinary trials](docs/GARDEN_EVALUATION.md) demonstrate continued growth and meaningful differences in water discovery.
+The Colony panel now selects **Backyard**, **Garden Edge** or **Roadside** before starting. Garden Edge changes the hidden initial resource arrangement while reusing established ecology/rates. Repeat preserves the selected layout and seed; saves preserve scenario identity. [Three ordinary trials](docs/GARDEN_EVALUATION.md) demonstrate continued growth and meaningful differences in water discovery.
 
 **Colony** in either view starts a fresh colony with the current or a new seed without relaunching. Its explicit restart panel preserves your saved slot and sound settings. Seed selection controls stochastic behavior; the setting selector chooses an authored layout.
 

@@ -12,6 +12,7 @@ var direction: String = "outbound"
 var worker_count: int = 0
 var resource_id: String = ""
 var payload: float = 0.0
+var contaminant_mass: float = 0.0
 var remaining_ticks: int = 1
 var unpaid_energy_cost: float = 0.0
 var energy_multiplier: float = 1.0
@@ -38,7 +39,7 @@ var detour_report: Observation
 func to_dict() -> Dictionary:
 	return {"id": id, "route_id": route_id, "direction": direction,
 		"worker_count": worker_count, "resource_id": resource_id,
-		"payload": payload, "remaining_ticks": remaining_ticks,
+		"payload": payload, "remaining_ticks": remaining_ticks, "contaminant_mass": contaminant_mass,
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
 		"chemistry_fraction": chemistry_fraction,
@@ -64,6 +65,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if not typeof(data.payload) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.payload)) or data.payload < 0.0:
 		return false
+	var contamination: Variant = data.get("contaminant_mass",0.0)
+	if not typeof(contamination) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(contamination)) or contamination < 0 or contamination > data.payload or (contamination > 0 and (data.resource_id != "carbohydrate" or data.direction != "inbound")): return false
 	if data.has("unpaid_energy_cost") and (not typeof(data.unpaid_energy_cost) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.unpaid_energy_cost)) or data.unpaid_energy_cost < 0.0):
 		return false
 	var energy: Variant = data.get("energy_multiplier", 1.0)
@@ -140,6 +143,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	worker_count = int(data.worker_count)
 	resource_id = data.resource_id
 	payload = float(data.payload)
+	contaminant_mass = float(contamination)
 	remaining_ticks = int(data.remaining_ticks)
 	unpaid_energy_cost = float(data.get("unpaid_energy_cost", 0.0))
 	energy_multiplier = float(energy)

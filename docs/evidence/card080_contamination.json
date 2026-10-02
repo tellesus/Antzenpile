@@ -1,0 +1,518 @@
+{
+	"engine": "4.7.2-stable (official)",
+	"policy": "Ordinary Roadside growth and returned-evidence supply policy. After the first known home food-sharing failure, suspect the most recently first-established active ordinary carbohydrate supply with no returned foreign contact, excluding the identified living producer; stop it and withhold it from further gathering. This is a fallible player heuristic, not chemical source identification. Compare continued supply from the same snapshot, 1500 more simulated seconds. No injected stores/knowledge or suppressed threats; truth only measures material.",
+	"rows": [
+		{
+			"continued": {
+				"brood_emerged": 16,
+				"dose": 103495,
+				"last_loss_age": 113.25,
+				"losses": 3,
+				"mass": 15.10984486,
+				"recent": true,
+				"stores": {
+					"carbohydrate": 525.60424,
+					"protein": 120.52369,
+					"water": 123.03031
+				},
+				"time": 1827.25,
+				"workers": 43
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 20.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 25.0
+				},
+				{
+					"action": "gather known:carb_spill",
+					"time": 35.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 40.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 45.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 70.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 90.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 180.0
+				},
+				{
+					"action": "stop suspect supply",
+					"time": 327.25
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 390.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 395.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 465.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 465.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 545.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 545.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 545.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 545.0
+				},
+				{
+					"action": "expand Nursery",
+					"time": 545.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 580.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 620.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 625.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 720.0
+				},
+				{
+					"action": "trial load",
+					"time": 725.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 725.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 725.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 765.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 1085.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1235.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1240.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 1445.0
+				}
+			],
+			"expand_enabled": true,
+			"intake_at": 56.75,
+			"loss_at": 327.25,
+			"save_exact": true,
+			"seed": 482817,
+			"standing_growth": true,
+			"stopped": {
+				"brood_emerged": 119,
+				"dose": 0,
+				"last_loss_age": 1500.0,
+				"losses": 1,
+				"mass": 0.00450059,
+				"recent": false,
+				"stores": {
+					"carbohydrate": 69.92583,
+					"protein": 22.50744,
+					"water": 32.92281
+				},
+				"time": 1827.25,
+				"workers": 147
+			},
+			"suspect": "known:carb_spill",
+			"withheld": [
+				"known:carb_spill"
+			]
+		},
+		{
+			"continued": {
+				"brood_emerged": 110,
+				"dose": 1125359,
+				"last_loss_age": 904.75,
+				"losses": 2,
+				"mass": 16.53944734,
+				"recent": false,
+				"stores": {
+					"carbohydrate": 620.05358,
+					"protein": 14.63919,
+					"water": 70.86456
+				},
+				"time": 2647.5,
+				"workers": 137
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 20.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 35.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 40.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 45.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 45.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 85.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 105.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 175.0
+				},
+				{
+					"action": "gather known:carb_spill",
+					"time": 360.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 360.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 455.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 455.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 500.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 550.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 560.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 560.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 560.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 575.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 630.0
+				},
+				{
+					"action": "expand Nursery",
+					"time": 635.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 640.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 710.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 710.0
+				},
+				{
+					"action": "trial load",
+					"time": 815.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 815.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 840.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 840.0
+				},
+				{
+					"action": "stop suspect supply",
+					"time": 1147.5
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1310.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1315.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1960.0
+				}
+			],
+			"expand_enabled": true,
+			"intake_at": 380.75,
+			"loss_at": 1147.5,
+			"save_exact": true,
+			"seed": 591,
+			"standing_growth": true,
+			"stopped": {
+				"brood_emerged": 174,
+				"dose": 0,
+				"last_loss_age": 1500.0,
+				"losses": 1,
+				"mass": 0.01970685,
+				"recent": false,
+				"stores": {
+					"carbohydrate": 182.37141,
+					"protein": 40.78708,
+					"water": 40.87492
+				},
+				"time": 2647.5,
+				"workers": 202
+			},
+			"suspect": "known:carb_spill",
+			"withheld": [
+				"known:carb_spill"
+			]
+		},
+		{
+			"continued": {
+				"brood_emerged": 87,
+				"dose": 488757,
+				"last_loss_age": 367.75,
+				"losses": 3,
+				"mass": 15.25214358,
+				"recent": false,
+				"stores": {
+					"carbohydrate": 481.77619,
+					"protein": 25.44484,
+					"water": 67.36616
+				},
+				"time": 1788.0,
+				"workers": 117
+			},
+			"events": [
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 25.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 30.0
+				},
+				{
+					"action": "gather known:carb_spill",
+					"time": 35.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 35.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 50.0
+				},
+				{
+					"action": "stop suspect supply",
+					"time": 288.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 350.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 380.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 400.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 430.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 430.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 435.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 520.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 545.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 545.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 565.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 645.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 690.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 730.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 855.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 855.0
+				},
+				{
+					"action": "expand Nursery",
+					"time": 855.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 870.0
+				},
+				{
+					"action": "trial lean",
+					"time": 1035.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 1060.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 1070.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 1105.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 1395.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1425.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1430.0
+				},
+				{
+					"action": "trial security",
+					"time": 1755.0
+				}
+			],
+			"expand_enabled": true,
+			"intake_at": 53.75,
+			"loss_at": 288.0,
+			"save_exact": true,
+			"seed": 202603,
+			"standing_growth": true,
+			"stopped": {
+				"brood_emerged": 87,
+				"dose": 0,
+				"last_loss_age": 1500.0,
+				"losses": 1,
+				"mass": 0.00738595,
+				"recent": false,
+				"stores": {
+					"carbohydrate": 96.51122,
+					"protein": 1.59604,
+					"water": 67.95746
+				},
+				"time": 1788.0,
+				"workers": 118
+			},
+			"suspect": "known:carb_spill",
+			"withheld": [
+				"known:carb_spill"
+			]
+		}
+	]
+}

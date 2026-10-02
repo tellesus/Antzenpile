@@ -33,8 +33,15 @@ static func food_names(status: Dictionary) -> String:
 	for resource_id: String in food_shortages(status): labels.append("Carb" if resource_id == "carbohydrate" else resource_id.capitalize())
 	return " + ".join(labels)
 
+static func food_sources_needed(status: Dictionary) -> Array[String]:
+	var result: Array[String] = food_shortages(status)
+	if status.get("food_sharing",{}).get("recent",false) and "carbohydrate" not in result: result.push_front("carbohydrate")
+	return result
+
 static func attention(status: Dictionary) -> Dictionary:
 	var causes: Array[String] = nursery_causes(status)
+	if status.get("food_sharing",{}).get("recent",false):
+		return {"organ":"food_exchange","causes":["HOME LOSSES · CAUSE UNCERTAIN"],"title":"CHECK FOOD EXCHANGE"}
 	if causes.is_empty(): return {}
 	var organ: String = "midden" if causes == ["REFUSE"] and status.get("midden", {}).get("revealed", false) else "nursery"
 	return {"organ": organ, "causes": causes, "title": "CHECK " + organ.to_upper()}

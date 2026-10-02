@@ -24,9 +24,13 @@ func load_scenario(path: String = "res://data/scenarios/backyard_slice.tres") ->
 		if definition == null or definition.definition == null:
 			last_error = "Node has no resource definition"
 			return null
+		if not is_finite(definition.contaminant_fraction) or definition.contaminant_fraction < 0 or definition.contaminant_fraction > 1:
+			last_error = "Invalid authored contaminant fraction"
+			return null
 		records.append({"id": definition.id, "definition_id": definition.definition.id,
 			"position": [definition.position.x, definition.position.y], "quantity": definition.initial_quantity,
 			"active": definition.initial_active, "properties": {}})
+		if definition.contaminant_fraction > 0: records.back().properties.contaminant_fraction = definition.contaminant_fraction
 	var regions: Array[Dictionary] = []
 	for definition: TerrainDefinition in scenario.terrain:
 		if definition == null:

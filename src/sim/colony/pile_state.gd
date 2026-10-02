@@ -3,6 +3,7 @@ extends RefCounted
 
 var midden := SanitationState.new()
 var humidity := HumidityState.new()
+var food_toxicity := FoodToxicityState.new()
 
 const Ledger = preload("res://src/sim/colony/worker_ledger.gd")
 const Brood = preload("res://src/sim/colony/brood_cohort.gd")
@@ -56,7 +57,7 @@ func to_dict() -> Dictionary:
 		"recognition_experience": recognition_experience, "recognition_candidate": recognition_candidate,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"nursery_expansion": {"state": nursery_expansion_state, "progress_seconds": nursery_expansion_progress},
-		"food_exchange_state": food_exchange_state,
+		"food_exchange_state": food_exchange_state, "food_toxicity": food_toxicity.to_dict(),
 		"food_exchange_progress_seconds": food_exchange_progress_seconds, "midden": midden.to_dict(), "humidity": humidity.to_dict()}
 
 
@@ -144,12 +145,14 @@ func nursery_max_care_capacity() -> int:
 	return BROOD_CONFIG.developed_nursery_care_capacity if nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_care_capacity
 
 
-func deposit_resource(resource_id: String, amount: float) -> bool:
+func deposit_resource(resource_id: String, amount: float, contaminant_mass: float = 0.0) -> bool:
 	if not resources.has(resource_id) or not is_finite(amount) or amount < 0.0 or not is_finite(resources[resource_id] + amount):
 		return false
+	if not is_finite(contaminant_mass) or contaminant_mass < 0 or contaminant_mass > amount or (contaminant_mass > 0 and resource_id != "carbohydrate"): return false
 	# Fixed-tick rain uses fractional deposits; match the five-decimal debit precision
 	# so JSON save/reload preserves exact resource continuation.
 	resources[resource_id] = roundf((resources[resource_id] + amount) * 100000.0) / 100000.0
+	if contaminant_mass > 0: food_toxicity.mass = minf(resources.carbohydrate,roundf((food_toxicity.mass + contaminant_mass) * 100000000.0) / 100000000.0)
 	return true
 
 
@@ -161,7 +164,10 @@ func consume_resources(costs: Dictionary) -> bool:
 	for resource_id: String in costs:
 		# Authored brood and developed-exchange costs use five decimal places; quantize debits to avoid
 		# accumulated binary drift across full-precision JSON continuations.
+		if resource_id == "carbohydrate" and resources.carbohydrate > 0:
+			food_toxicity.mass = maxf(0.0,roundf(food_toxicity.mass * (1.0 - float(costs[resource_id]) / resources.carbohydrate) * 100000000.0) / 100000000.0)
 		resources[resource_id] = maxf(0.0, roundf((resources[resource_id] - float(costs[resource_id])) * 100000.0) / 100000.0)
+		if resource_id == "carbohydrate": food_toxicity.mass = minf(food_toxicity.mass,resources.carbohydrate)
 	return true
 
 
@@ -188,6 +194,9 @@ func restore(data: Dictionary) -> bool:
 			return false
 		restored_resources[resource_id] = float(data.resources[resource_id])
 	var restored_nursery_state: Variant = data.get("nursery_state", "primitive")
+	var restored_toxicity := FoodToxicityState.new()
+	var toxicity_data: Variant = data.get("food_toxicity",restored_toxicity.to_dict())
+	if not toxicity_data is Dictionary or not restored_toxicity.restore(toxicity_data,restored_resources.carbohydrate,restored.lost_total): return false
 	var restored_nursery_progress: Variant = data.get("nursery_progress_seconds", 0.0)
 	if not restored_nursery_state in ["primitive", "developing", "developed"] or not typeof(restored_nursery_progress) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(restored_nursery_progress)) or restored_nursery_progress < 0.0:
 		return false
@@ -334,6 +343,7 @@ func restore(data: Dictionary) -> bool:
 		return false
 	midden = restored_midden
 	humidity = restored_humidity
+	food_toxicity = restored_toxicity
 	id = data.id
 	position = Vector2(data.position[0], data.position[1])
 	queen_count = int(data.queen_count)

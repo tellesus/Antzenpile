@@ -348,6 +348,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"nursery_workers_required": NURSERY_CONFIG.workers_required,
 		"nursery_developed_capacity": BROOD_CONFIG.developed_nursery_brood_capacity,
 		"resources": pile.resources.duplicate(), "food_exchange_state": pile.food_exchange_state,
+		"food_sharing": simulation.food_toxicity.summary(pile_id),
 		"food_exchange_progress": pile.food_exchange_progress_seconds,
 		"food_exchange_duration": FOOD_CONFIG.build_seconds,
 		"food_exchange_costs": FOOD_CONFIG.costs(),
@@ -490,7 +491,7 @@ func start_nursery_expansion() -> Dictionary:
 
 
 func browse_food_sources(resource_id: String) -> Dictionary:
-	if resource_id not in Pressure.food_shortages(inward_status("home")) or _outward_view == null:
+	if resource_id not in Pressure.food_sources_needed(inward_status("home")) or _outward_view == null:
 		return {"accepted": false, "reason": "Feeding needs changed"}
 	_outward_view.exploration_open = false
 	_outward_view.sources_open = true

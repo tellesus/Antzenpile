@@ -77,7 +77,7 @@ func activate_at(at: Vector2) -> bool:
 					show_feedback(("Growth intent set" if intent == "grow" else "Manual laying selected") if result.get("accepted", false) else result.get("reason", "Intent unavailable"))
 				return true
 	if selected_id == "food_exchange":
-		for resource_id: String in Pressure.food_shortages(_status):
+		for resource_id: String in Pressure.food_sources_needed(_status):
 			if _food_source_rect(resource_id).has_point(at):
 				if food_sources_command.is_valid():
 					var result: Dictionary = food_sources_command.call(resource_id)
@@ -287,7 +287,7 @@ func _nursery_expand_rect() -> Rect2:
 
 
 func _food_source_rect(resource_id: String) -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0 + ["carbohydrate", "protein", "water"].find(resource_id) * 88, 470, 84, 44)
+	return Rect2(get_viewport_rect().size.x - 300.0 + ["carbohydrate", "protein", "water"].find(resource_id) * 88, 550 if _status.get("food_sharing",{}).get("recent",false) else 470, 84, 44)
 
 
 func _adaptation_rect(_trait_id: String) -> Rect2:
@@ -382,7 +382,7 @@ func _draw_node(id: String, at: Vector2) -> void:
 	var strain: float = 1.0 - health
 	var pulse: float = Activity.pulse(health, _animation_time)
 	var phase: float = _animation_time * 0.18 + NODES.find(id)
-	var radius: float = 34.0 + pulse * (0.8 + strain * 0.8) if id in ["nursery", "midden"] else 34.0
+	var radius: float = 34.0 + pulse * (0.8 + strain * 0.8) if id in ["nursery", "midden", "food_exchange"] else 34.0
 	var outline: PackedVector2Array = Art.membrane(at, radius, phase, 0.86)
 	draw_colored_polygon(outline, Color(color, lerpf(0.045, 0.08, focus) * attention))
 	var edge: Color = Color(color.lerp(Color("cb927c"), strain * 0.55), lerpf(0.4, 0.7, focus) * attention)
@@ -467,8 +467,10 @@ func _draw_context(size: Vector2) -> void:
 		return
 	var expansion: Dictionary = _status.get("nursery_expansion", {})
 	var expansion_action: bool = expansion.get("state", "") == "available"
-	var food_attention: bool = selected_id == "food_exchange" and not Pressure.food_shortages(_status).is_empty()
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 388 if food_attention or selected_id == "queen" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
+	var food_attention: bool = selected_id == "food_exchange" and not Pressure.food_sources_needed(_status).is_empty()
+	var food_losses: Dictionary = _status.get("food_sharing",{})
+	var recent_food_losses: bool = food_losses.get("recent",false)
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses else 388 if food_attention or selected_id == "queen" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	var web: bool = selected_id == "adaptation"
 	draw_rect(box, Color("17141f") if web else Color("111921"))
 	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
@@ -598,12 +600,20 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 163, "Protein: %.1f" % _status.resources.protein)
 				_detail_line(box, 189, "Water: %.1f" % _status.resources.water)
 			if food_attention:
-				_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 13)
-				_label(box.position + Vector2(16, 316), "Browse returned sources", Color("8fa1a8"), 11)
-				for resource_id: String in Pressure.food_shortages(_status):
+				if recent_food_losses:
+					_label(box.position + Vector2(16, 300), "Workers fail after food sharing", Color("c7ad98"), 13)
+					_label(box.position + Vector2(16, 324), "%d lost at home · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("a9b9bc"), 13)
+					_label(box.position + Vector2(16, 348), "Cause remains uncertain", Color("8fa1a8"), 13)
+					_label(box.position + Vector2(16, 388), "Review returned food supplies", Color("8fa1a8"), 11)
+				else:
+					_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 13)
+					_label(box.position + Vector2(16, 316), "Browse returned sources", Color("8fa1a8"), 11)
+				for resource_id: String in Pressure.food_sources_needed(_status):
 					var button: Rect2 = _food_source_rect(resource_id)
 					draw_rect(button, Color("263038"))
 					_label(button.get_center() + Vector2(0, 5), "FOOD" if resource_id == "carbohydrate" else resource_id.to_upper(), Color("dce5d9"), 12, HORIZONTAL_ALIGNMENT_CENTER)
+			elif food_losses.get("losses",0) > 0:
+				_label(box.position + Vector2(16, 213), "Home losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 12)
 		"entrance":
 			_detail_line(box, 65, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)

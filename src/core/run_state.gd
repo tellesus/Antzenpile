@@ -292,6 +292,7 @@ func restore(data: Dictionary) -> bool:
 	for pile: PileState in restored_colony.piles.values():
 		if restored_trails.pending_for_pile(pile.id, true) > pile.adapted_workers_lost or restored_trails.pending_for_pile(pile.id) > WorkerLedger.MAX_COUNT - pile.workers_total:
 			return false
+		if pile.food_toxicity.last_loss_tick > restored_clock.tick_count or pile.food_toxicity.losses > pile.workers.lost_total - losses_by_pile.get(pile.id,0): return false
 		if pile.rain_trace_observed and restored_rain.phase == "waiting":
 			return false
 		for trait_id: String in pile.genetics.established:

@@ -229,7 +229,9 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 		cohort.witnessed_fighting = cohort.worker_count > 0
 	else:
 		cohort.witnessed_attack = cohort.worker_count > 0
+	var payload_before: float = cohort.payload
 	cohort.payload = minf(cohort.payload, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
+	cohort.contaminant_mass *= cohort.payload / payload_before if payload_before > 0 else 0.0
 	if cohort.payload == 0.0:
 		cohort.resource_id = ""
 	if cohort.worker_count == 0:
@@ -354,6 +356,7 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 		node.active = false
 	cohort.payload = amount
 	cohort.resource_id = node.definition_id
+	cohort.contaminant_mass = amount * node.properties.get("contaminant_fraction",0.0)
 
 
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
@@ -387,7 +390,8 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		assert(recorded)
 	if cohort.payload > 0.0:
 		var net_payload: float = maxf(0.0, cohort.payload - cohort.unpaid_energy_cost)
-		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload)
+		var net_contaminant: float = cohort.contaminant_mass * net_payload / cohort.payload
+		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload, net_contaminant)
 		assert(deposited)
 		route.delivered_total = roundf((route.delivered_total + net_payload) * 100000.0) / 100000.0
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
