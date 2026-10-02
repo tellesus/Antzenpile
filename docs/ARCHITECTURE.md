@@ -1,5 +1,7 @@
 # Architecture
 
+Card 070 attaches a fresh RunState to the existing SimulationController, disconnecting its old clock before recreating every run-scoped system. GameRoot keeps bound controller commands valid, resets transient views/debug selection and audio intent, preserves player preferences/save service, and enters OUTWARD. ColonyControls is an explicit graphical restart modal, mutually exclusive with Sound. Seed generation happens only on a player fresh-run choice, outside run RNG.
+
 Card 069 owns AudioPreferences outside RunState and save slots, persisted to user://audio_preferences.cfg. GameRoot shares it with graphical AudioController and AudioSettings. Independent music/cue gains do not stop loops or affect semantic intent. The modal overlay consumes input before normal views and blocks direct view commands/keyboard actions. Headless composition skips preference disk access and graphical controls.
 
 Card 068 extends MusicState from detached internal function/condition summaries and INWARD selection. Four persistent equal-length loops remain synchronized; developed Nursery/Midden add melody/pulse, known Nursery condition gently thins its layer, and attention modestly reduces other organ layers. Three-second fades use real time; phase-zero reload recreates audio without saved gameplay fields. Returned-loss cues remain separate and headless runs stay silent.

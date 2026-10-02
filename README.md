@@ -4,6 +4,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+**Colony** in either view starts a fresh colony with the current or a new seed without relaunching. Its explicit restart panel preserves your saved slot and sound settings. Both choices currently use the same authored backyard.
+
 Developed Nursery and Midden now add synchronized melody/rhythm to the colony soundtrack. Known Nursery strain gently thins its voice; selected musical organs come forward. **Sound** in either view independently adjusts Music and Information Cues; settings persist locally outside colony saves. The arrangement remains original prototype audio awaiting listening/composition review.
 
 INWARD now shows sparse job activity, distinct aggregate brood stages, developing-organ arcs and local climate/refuse/food/care pressure. Selecting a function sharpens its contours while preserving the abstract network and darkness. Representatives suggest committed work rather than physical cargo or individual workers.

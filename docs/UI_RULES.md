@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 070 adds Colony beside Sound/Save/Load. An explicit modal warns about replacing unsaved progress while retaining the saved slot/settings, then offers Repeat This Seed, Start With a Fresh Seed, and Cancel (360x44 logical targets). Escape/cancel does not change the colony. Both choices use the same authored backyard; seed changes stochastic behavior. No auto-restart or death/game-over model.
+
 Card 069 adds Sound beside Save/Load in both views. A modal panel offers independent Music/Information Cue off/25/50/75/100% presets (60x44 logical targets), Close and Escape; background input is absorbed without pausing the game. Local levels survive colony loading and mode switches. No unused Ambient control; muted cues retain the existing visual returned-loss evidence.
 
 Card 068 adds soft Nursery melody and a sparse developed-Midden rhythm to the synchronized arrangement. Known brood/climate/refuse strain thins Nursery contribution; selecting a musical organ modestly foregrounds it without restarting loops. Hidden ecology never changes musical intent. These are long-term function cues with visual equivalents; immediate returned-loss audio stays separate. Audio continues at real tempo through pause/speed.

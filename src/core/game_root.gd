@@ -21,6 +21,7 @@ var save_service: SaveService = Save.new()
 var mode: String = "outward"
 var audio_preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
 var _audio_settings: AudioSettings
+var _colony_controls: ColonyControls
 
 
 func _ready() -> void:
@@ -78,9 +79,15 @@ func _ready() -> void:
 		_audio_settings = preload("res://src/presentation/audio_settings.gd").new()
 		_audio_settings.preferences = audio_preferences
 		_audio_settings.changed = audio_preferences.save_file
-		_audio_settings.blocked = debug_is_open
+		_audio_settings.blocked = sound_controls_blocked
 		_audio_settings.z_index = 100
 		add_child(_audio_settings)
+		_colony_controls = preload("res://src/presentation/colony_controls.gd").new()
+		_colony_controls.seed_provider = current_seed
+		_colony_controls.start_command = start_new_colony
+		_colony_controls.blocked = colony_controls_blocked
+		_colony_controls.z_index = 101
+		add_child(_colony_controls)
 	# Lazy load keeps truth-view code out of the headless runtime and release input path.
 	if OS.is_debug_build() and DisplayServer.get_name() != "headless":
 		_debug_view = load("res://src/debug/debug_world_view.gd").new()
@@ -95,7 +102,7 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _audio_settings != null and _audio_settings.opened: return
+	if interaction_blocked(): return
 	if not debug_is_open() and event.is_action_pressed("save_run"):
 		_show_save_feedback(quick_save(), "Run saved")
 		get_viewport().set_input_as_handled()
@@ -125,7 +132,29 @@ func set_mode(next_mode: String) -> bool:
 
 
 func interaction_blocked() -> bool:
+	return debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened
+
+
+func sound_controls_blocked() -> bool:
+	return debug_is_open() or _colony_controls != null and _colony_controls.opened
+
+
+func colony_controls_blocked() -> bool:
 	return debug_is_open() or _audio_settings != null and _audio_settings.opened
+
+
+func current_seed() -> int:
+	return simulation.run.run_seed
+
+
+func start_new_colony(seed_value: Variant) -> Dictionary:
+	if not simulation.start_new_run(seed_value):
+		return {"accepted": false, "reason": "Invalid colony seed"}
+	if _audio_settings != null: _audio_settings.opened = false
+	if _colony_controls != null: _colony_controls.opened = false
+	set_mode("outward")
+	_refresh_loaded_views()
+	return {"accepted": true, "reason": ""}
 
 
 func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
@@ -306,21 +335,31 @@ func quick_save() -> Dictionary:
 func quick_load() -> Dictionary:
 	var accepted: bool = save_service.load_into(simulation)
 	if accepted:
-		if _outward_view != null:
-			_outward_view.facing = 0.0
-			_outward_view.selected_id = ""
-			_outward_view.sources_open = false
-			_outward_view.source_page = 0
-			_outward_view.reset_mission_visuals()
-		if _inward_view != null:
-			_inward_view.selected_id = ""
-			_inward_view.web_selection = "foraging"
-			_inward_view.web_family = "foraging"
-		if _debug_view != null:
-			_debug_view.snapshot_provider = simulation.run.to_dict
-		if _audio_controller != null:
-			_audio_controller.restart_after_load()
+		_refresh_loaded_views()
 	return {"accepted": accepted, "reason": save_service.last_error}
+
+
+func _refresh_loaded_views() -> void:
+	if _outward_view != null:
+		_outward_view.facing = 0.0
+		_outward_view.selected_id = ""
+		_outward_view.sources_open = false
+		_outward_view.source_page = 0
+		_outward_view._pointer_kind = ""
+		_outward_view._feedback = ""
+		_outward_view.reset_mission_visuals()
+		_outward_view._process(0)
+	if _inward_view != null:
+		_inward_view.selected_id = ""
+		_inward_view.web_selection = "foraging"
+		_inward_view.web_family = "foraging"
+		_inward_view._feedback = ""
+		_inward_view._process(0)
+	if _debug_view != null:
+		_debug_view.snapshot_provider = simulation.run.to_dict
+		_debug_view.model.selected_id = "home"
+	if _audio_controller != null:
+		_audio_controller.restart_after_load()
 
 
 func _show_save_feedback(result: Dictionary, success: String) -> void:

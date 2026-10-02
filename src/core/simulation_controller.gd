@@ -46,6 +46,13 @@ func restore_snapshot(snapshot: Dictionary) -> bool:
 	return true
 
 
+func start_new_run(seed_value: Variant) -> bool:
+	if not seed_value is int:
+		return false
+	_attach_run(Run.new(seed_value))
+	return true
+
+
 func _attach_run(next_run: RunState) -> void:
 	if run != null and run.clock.tick.is_connected(_tick):
 		run.clock.tick.disconnect(_tick)
