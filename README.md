@@ -4,6 +4,10 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+Nursery/Midden now use stable healthy pulses and broken, irregular strained contours from the colony's known food/care/climate/refuse conditions. Selected INWARD functions settle gently into focus; paused controls remain responsive. Scout captions avoid overlapping resource/alarm labels.
+
+The [expanded-colony review](docs/EXPANDED_COLONY_EVALUATION.md) exercised both settings, paid internal growth, all three current adaptation axes and returned-source alternatives together. Six ordinary runs preserved exact command/save continuation without changing rates. Human playtesting remains needed.
+
 **Colony → How to Play** offers an optional four-page guide to observation, worker commitments, internal growth, and time/sound/saves. It explains only current controls and colony knowledge; reading never starts a new colony.
 
 Newly home-delivered traces now give a brief visual notice and delicate chime. Repeated reports and loaded knowledge stay quiet; discovery never turns or selects the view for you. The chime follows Information Cues volume.
@@ -48,7 +52,7 @@ Current development follows the [rolling post-slice roadmap](docs/POST_SLICE_PLA
 | [UI_RULES](docs/UI_RULES.md) | OUTWARD, INWARD, information and rendering rules |
 | [CODING_RULES](docs/CODING_RULES.md) | Implementation and validation workflow |
 | [DECISIONS](docs/DECISIONS.md) | Locked choices, defaults, unresolved details |
-| [Task cards](docs/tasks/) | 001–033, 035, 037–040, 042–064 implemented; 034 deferred; 036 reviewed; 041 source-recovery audit complete |
+| [Task cards](docs/tasks/) | 001–033, 035, 037–040, 042–074 implemented; 034 deferred; 036/041/075 reviewed |
 | [Slice evaluation](docs/SLICE_EVALUATION.md) | Measured arc, Windows workload and design questions |
 | [Post-slice evaluation](docs/POST_SLICE_EVALUATION.md) | Combined run, Windows visual/workload review, and remaining playtest questions |
 | [Post-slice plan](docs/POST_SLICE_PLAN.md) | Current rolling roadmap and completed post-slice history |

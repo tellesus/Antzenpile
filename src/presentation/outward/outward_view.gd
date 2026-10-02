@@ -386,6 +386,13 @@ func _draw_trails(size: Vector2) -> void:
 
 
 func _draw_scout_traces(size: Vector2) -> void:
+	var captions: Array[Rect2] = []
+	for placed: Dictionary in _placed:
+		var text_size: Vector2 = _font.get_string_size(_signal_caption(placed.signal), HORIZONTAL_ALIGNMENT_LEFT, -1, 13)
+		var baseline: Vector2 = placed.center + Vector2(0, placed.radius + 22)
+		captions.append(Rect2(baseline - Vector2(text_size.x * 0.5, text_size.y), text_size + Vector2(0, 4)))
+	for marker: Dictionary in Scent.alarm_markers(_status.get("trails", []), _placed, size):
+		captions.append(Rect2(marker.center + Vector2(-48, -26), Vector2(96, 16)))
 	for entry: Dictionary in _mission_traces:
 		var selected: bool = false
 		for mission: Dictionary in entry.missions:
@@ -399,7 +406,11 @@ func _draw_scout_traces(size: Vector2) -> void:
 		var label: String = "SCOUT" if entry.missions[0].returned_at < 0.0 else "RETURNED"
 		if entry.missions.size() > 1:
 			label += " ×%d" % entry.missions.size()
-		_label(entry.center + Vector2(0, -13), label, Color(color, 0.78), 10, HORIZONTAL_ALIGNMENT_CENTER)
+		var text_size: Vector2 = _font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10)
+		var baseline: Variant = ScoutTrace.caption_at(entry.center, text_size, captions, Rect2(24, 148, size.x - 364, size.y - 266))
+		if baseline != null:
+			_label(baseline, label, Color(color, 0.78), 10, HORIZONTAL_ALIGNMENT_CENTER)
+			captions.append(Rect2(baseline - Vector2(text_size.x * 0.5, text_size.y), text_size + Vector2(0, 4)))
 	var chosen: Dictionary = _selected_mission()
 	if chosen.is_empty() or chosen.returned_at < 0.0:
 		return
@@ -442,12 +453,15 @@ func _draw_signal(entry: Dictionary) -> void:
 		var attention: PackedVector2Array = Art.membrane(at, radius + 8.0, 1.5)
 		draw_polyline(attention.slice(1, 7), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
 		draw_polyline(attention.slice(17, 23), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
-	var title: String = _signal_title_for(signal_data) + " · EMPTY" if reported_empty else _signal_title_for(signal_data)
-	if not reported_empty and _status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {}).get("renewed_report", false):
-		title += " · FOUND AGAIN"
-	if signal_data.get("foreign_contact", false):
-		title += " · FOREIGN"
-	_label(at + Vector2(0, radius + 22), title, color, 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(at + Vector2(0, radius + 22), _signal_caption(signal_data), color, 13, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+func _signal_caption(signal_data: Dictionary) -> String:
+	var empty: bool = _reported_empty(signal_data)
+	var title: String = _signal_title_for(signal_data) + " · EMPTY" if empty else _signal_title_for(signal_data)
+	if not empty and _status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {}).get("renewed_report", false): title += " · FOUND AGAIN"
+	if signal_data.get("foreign_contact", false): title += " · FOREIGN"
+	return title
 
 
 func _draw_hud(size: Vector2) -> void:

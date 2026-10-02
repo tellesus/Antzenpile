@@ -1,0 +1,1570 @@
+{
+	"duration_seconds": 3600,
+	"engine": "4.7.2-stable (official)",
+	"platform": "Windows",
+	"policy": "Detached-summary ordinary paid growth, known alternatives/recovery, inherited trials and remedies after known pressure; no truth-based decisions or injected resources/knowledge. Seed 202603 chooses Lean/security; others Load/tolerance when available. Pause/speed and human usability are separate checks.",
+	"rows": [
+		{
+			"captures": {
+				"adaptation": 535.0,
+				"climate": 575.0,
+				"final": 3600.0,
+				"guest": 1260.0,
+				"loss": 350.0,
+				"pressure": 575.0,
+				"refuse": 1290.0
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 20.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 25.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 40.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 45.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 55.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 85.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 140.0
+				},
+				{
+					"action": "trial load",
+					"time": 175.0
+				},
+				{
+					"action": "lay brood",
+					"time": 360.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 360.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 365.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 465.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 465.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 505.0
+				},
+				{
+					"action": "lay brood",
+					"time": 535.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 535.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 545.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 545.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 575.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 600.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 600.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 675.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 715.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 725.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 760.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 800.0
+				},
+				{
+					"action": "lay brood",
+					"time": 895.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 1085.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1255.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1290.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1295.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1450.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1615.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1810.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1960.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1975.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2170.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2335.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2530.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 2660.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2695.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2890.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3055.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3250.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 3365.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3415.0
+				}
+			],
+			"final": {
+				"brood_losses": 4,
+				"emerged": 140,
+				"humidity": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 15.035
+				},
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 2,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"nursery": "developed",
+				"repertoire": [
+					{
+						"expressed": 123,
+						"fraction": 0.727810650887574,
+						"id": "load"
+					},
+					{
+						"expressed": 100,
+						"fraction": 0.591715976331361,
+						"id": "persistent"
+					},
+					{
+						"expressed": 84,
+						"fraction": 0.4970414201183432,
+						"id": "tolerance"
+					}
+				],
+				"returned_losses": 11,
+				"sources": 7,
+				"stores": {
+					"carbohydrate": 82.52514,
+					"protein": 101.79492,
+					"water": 102.80836
+				},
+				"time": 3600.0,
+				"workers": 169
+			},
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"strained_seconds": 10.0
+		},
+		{
+			"captures": {
+				"adaptation": 535.0,
+				"climate": 575.0,
+				"final": 3600.0,
+				"guest": 1260.0,
+				"loss": 340.0,
+				"pressure": 575.0,
+				"refuse": 1290.0
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 20.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 35.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 40.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 45.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 45.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 85.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 105.0
+				},
+				{
+					"action": "trial load",
+					"time": 175.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 175.0
+				},
+				{
+					"action": "lay brood",
+					"time": 360.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 360.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 455.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 455.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 500.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 535.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 535.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 550.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 560.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 560.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 575.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 600.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 620.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 635.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 685.0
+				},
+				{
+					"action": "lay brood",
+					"time": 725.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 770.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 810.0
+				},
+				{
+					"action": "lay brood",
+					"time": 895.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1085.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 1255.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1290.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1295.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1450.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1615.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1810.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1960.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1975.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2170.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2335.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2530.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 2660.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2695.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2890.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3055.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3250.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 3365.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3415.0
+				}
+			],
+			"final": {
+				"brood_losses": 4,
+				"emerged": 140,
+				"humidity": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 15.035
+				},
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 2,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"nursery": "developed",
+				"repertoire": [
+					{
+						"expressed": 123,
+						"fraction": 0.727810650887574,
+						"id": "load"
+					},
+					{
+						"expressed": 108,
+						"fraction": 0.6390532544378699,
+						"id": "persistent"
+					},
+					{
+						"expressed": 77,
+						"fraction": 0.4556213017751479,
+						"id": "tolerance"
+					}
+				],
+				"returned_losses": 11,
+				"sources": 7,
+				"stores": {
+					"carbohydrate": 87.53453,
+					"protein": 83.75798,
+					"water": 107.80836
+				},
+				"time": 3600.0,
+				"workers": 169
+			},
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591,
+			"strained_seconds": 10.0
+		},
+		{
+			"captures": {
+				"adaptation": 560.0,
+				"climate": 600.0,
+				"final": 3600.0,
+				"guest": 1260.0,
+				"loss": 330.0,
+				"pressure": 600.0,
+				"refuse": 1300.0
+			},
+			"events": [
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 25.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 30.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 35.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 50.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 60.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 110.0
+				},
+				{
+					"action": "trial lean",
+					"time": 200.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 245.0
+				},
+				{
+					"action": "lay brood",
+					"time": 360.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 360.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 365.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 430.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 430.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 530.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 530.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 530.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 560.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 560.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 565.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 565.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 565.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 600.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 630.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 705.0
+				},
+				{
+					"action": "lay brood",
+					"time": 725.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 725.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 765.0
+				},
+				{
+					"action": "lay brood",
+					"time": 920.0
+				},
+				{
+					"action": "trial security",
+					"time": 1085.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1280.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1300.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1305.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1450.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1640.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1810.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1960.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2000.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2170.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2360.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2530.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 2655.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2720.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2890.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3080.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3250.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 3350.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3440.0
+				}
+			],
+			"final": {
+				"brood_losses": 4,
+				"emerged": 140,
+				"humidity": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 14.91
+				},
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 2,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"nursery": "developed",
+				"repertoire": [
+					{
+						"expressed": 124,
+						"fraction": 0.7337278106508875,
+						"id": "lean"
+					},
+					{
+						"expressed": 108,
+						"fraction": 0.6390532544378699,
+						"id": "persistent"
+					},
+					{
+						"expressed": 85,
+						"fraction": 0.5029585798816568,
+						"id": "security"
+					}
+				],
+				"returned_losses": 11,
+				"sources": 7,
+				"stores": {
+					"carbohydrate": 68.67324,
+					"protein": 118.56646,
+					"water": 107.70849
+				},
+				"time": 3600.0,
+				"workers": 169
+			},
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 202603,
+			"strained_seconds": 10.0
+		},
+		{
+			"captures": {
+				"adaptation": 590.0,
+				"climate": 630.0,
+				"final": 3600.0,
+				"guest": 1260.0,
+				"loss": 315.0,
+				"pressure": 630.0,
+				"refuse": 1295.0
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 30.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 35.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 45.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 55.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 105.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 140.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 150.0
+				},
+				{
+					"action": "trial load",
+					"time": 230.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 230.0
+				},
+				{
+					"action": "lay brood",
+					"time": 360.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 485.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 485.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 490.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 545.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 550.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 590.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 630.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 665.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 665.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 685.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 705.0
+				},
+				{
+					"action": "lay brood",
+					"time": 725.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 725.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 770.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 950.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1085.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 1165.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 1165.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 1240.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1295.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1300.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1310.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1450.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1670.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1810.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1960.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2030.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2170.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2390.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2530.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 2665.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2750.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2890.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3110.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3250.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 3370.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3470.0
+				}
+			],
+			"final": {
+				"brood_losses": 4,
+				"emerged": 140,
+				"humidity": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 14.76
+				},
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 2,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"nursery": "developed",
+				"repertoire": [
+					{
+						"expressed": 124,
+						"fraction": 0.7294117647058823,
+						"id": "load"
+					},
+					{
+						"expressed": 92,
+						"fraction": 0.5411764705882353,
+						"id": "persistent"
+					},
+					{
+						"expressed": 108,
+						"fraction": 0.6352941176470588,
+						"id": "tolerance"
+					}
+				],
+				"returned_losses": 10,
+				"sources": 7,
+				"stores": {
+					"carbohydrate": 83.3803,
+					"protein": 71.70881,
+					"water": 113.09119
+				},
+				"time": 3600.0,
+				"workers": 170
+			},
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"strained_seconds": 10.0
+		},
+		{
+			"captures": {
+				"adaptation": 910.0,
+				"climate": 950.0,
+				"final": 3600.0,
+				"guest": 1260.0,
+				"loss": 340.0,
+				"pressure": 220.0,
+				"refuse": 1415.0
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 25.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 50.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 125.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 170.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 175.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 265.0
+				},
+				{
+					"action": "lay brood",
+					"time": 440.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 440.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 440.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 460.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 500.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 500.0
+				},
+				{
+					"action": "trial load",
+					"time": 550.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 670.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 715.0
+				},
+				{
+					"action": "lay brood",
+					"time": 800.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 800.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 800.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 810.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 825.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 845.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 845.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 845.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 860.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 910.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 950.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 1105.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 1105.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1160.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 1270.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 1295.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1415.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1420.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1525.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1630.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1885.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1960.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1990.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2245.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2350.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2605.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 2660.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2710.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2965.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3070.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3325.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 3365.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3430.0
+				}
+			],
+			"final": {
+				"brood_losses": 4,
+				"emerged": 132,
+				"humidity": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 13.415
+				},
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 2,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"nursery": "developed",
+				"repertoire": [
+					{
+						"expressed": 108,
+						"fraction": 0.6708074534161491,
+						"id": "load"
+					},
+					{
+						"expressed": 92,
+						"fraction": 0.5714285714285714,
+						"id": "persistent"
+					},
+					{
+						"expressed": 77,
+						"fraction": 0.4782608695652174,
+						"id": "tolerance"
+					}
+				],
+				"returned_losses": 11,
+				"sources": 7,
+				"stores": {
+					"carbohydrate": 105.77207,
+					"protein": 75.38192,
+					"water": 73.99258
+				},
+				"time": 3600.0,
+				"workers": 161
+			},
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591,
+			"strained_seconds": 85.0
+		},
+		{
+			"captures": {
+				"adaptation": 585.0,
+				"climate": 625.0,
+				"final": 3600.0,
+				"guest": 1260.0,
+				"loss": 340.0,
+				"pressure": 625.0,
+				"refuse": 1305.0
+			},
+			"events": [
+				{
+					"action": "gather known:water_01",
+					"time": 30.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 35.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 40.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 60.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 75.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 135.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 215.0
+				},
+				{
+					"action": "trial lean",
+					"time": 225.0
+				},
+				{
+					"action": "lay brood",
+					"time": 360.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 360.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 365.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 500.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 500.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 500.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 585.0
+				},
+				{
+					"action": "assign climate 1",
+					"time": 625.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 630.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 685.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 685.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 700.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 710.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 710.0
+				},
+				{
+					"action": "lay brood",
+					"time": 725.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 745.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 745.0
+				},
+				{
+					"action": "lay brood",
+					"time": 945.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 1010.0
+				},
+				{
+					"action": "trial security",
+					"time": 1085.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1305.0
+				},
+				{
+					"action": "assign cleanup 2",
+					"time": 1305.0
+				},
+				{
+					"action": "develop Midden",
+					"time": 1310.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1450.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1665.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1810.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1960.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2025.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2170.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2385.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2530.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 2655.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2745.0
+				},
+				{
+					"action": "lay brood",
+					"time": 2890.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3105.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3250.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 3350.0
+				},
+				{
+					"action": "lay brood",
+					"time": 3465.0
+				}
+			],
+			"final": {
+				"brood_losses": 4,
+				"emerged": 140,
+				"humidity": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 14.785
+				},
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 2,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"nursery": "developed",
+				"repertoire": [
+					{
+						"expressed": 123,
+						"fraction": 0.727810650887574,
+						"id": "lean"
+					},
+					{
+						"expressed": 108,
+						"fraction": 0.6390532544378699,
+						"id": "persistent"
+					},
+					{
+						"expressed": 85,
+						"fraction": 0.5029585798816568,
+						"id": "security"
+					}
+				],
+				"returned_losses": 11,
+				"sources": 7,
+				"stores": {
+					"carbohydrate": 76.77884,
+					"protein": 86.01759,
+					"water": 115.56491
+				},
+				"time": 3600.0,
+				"workers": 169
+			},
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 202603,
+			"strained_seconds": 10.0
+		}
+	]
+}
