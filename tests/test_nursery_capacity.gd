@@ -43,7 +43,7 @@ func run(test: Object) -> bool:
 	test.get_root().add_child(view)
 	view.selected_id = "nursery"
 	view._status = {"queens": 1, "brood": [], "brood_batch_count": 8, "nursery_brood_capacity": 8, "nursery_occupied_space": 8}
-	test.check(not view.activate_at(view._brood_rect().get_center()), "INWARD hides Lay Brood when detached free space is insufficient")
+	test.check(view.activate_at(view._brood_rect().get_center()) and not view._feedback.is_empty(), "INWARD explains Lay Brood when detached free space is insufficient")
 	view.free()
 
 	test.check(pile.workers.release("test:care", 38) and pile.workers.retire_commitment("test:care"), "Care fixture releases all workers")

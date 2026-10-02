@@ -100,7 +100,7 @@ func _test_inward_action(test: Object) -> void:
 	var no_queen: Dictionary = ui._status.duplicate(true)
 	no_queen.queens = 0
 	ui._status = no_queen
-	test.check(not ui.activate_at(ui._brood_rect().get_center()) and pile.brood_cohorts.is_empty(), "INWARD hides the brood action without a queen")
+	test.check(ui.activate_at(ui._brood_rect().get_center()) and ui._feedback == "No queen available" and pile.brood_cohorts.is_empty(), "INWARD explains unavailable brood without issuing a command")
 	ui._status = root.inward_status("home")
 	var touch := InputEventScreenTouch.new()
 	touch.pressed = true

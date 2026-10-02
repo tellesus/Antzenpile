@@ -348,6 +348,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"adaptation_nurses": AdaptationRules.NURSES,
 		"brood_batch_count": BROOD_CONFIG.starting_count,
 		"brood_production": simulation.brood.production_status(pile_id),
+		"brood_reserve": simulation.brood.remaining_food_reserve(pile).duplicate(),
 		"nursery_state": pile.nursery_state, "nursery_brood_capacity": pile.nursery_brood_capacity(),
 		"nursery_occupied_space": pile.nursery_occupied_space(),
 		"nursery_care_capacity": pile.nursery_care_capacity(),

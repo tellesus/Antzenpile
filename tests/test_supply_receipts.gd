@@ -28,7 +28,7 @@ func run(test: Object) -> bool:
 	var detached: Dictionary = root.trail_summaries("home")[0].receipt
 	detached.last_amount = 999
 	test.check(route.receipt.last_amount != 999 and not str(remembered).contains("contaminant"), "Normal receipt projection is detached and contains no hidden chemistry")
-	test.check(Memory.receipt_label(remembered[0],game.run.simulation_time).contains("first") and Memory.receipt_label({"delivered_total":0},10) == "No food delivered home yet", "Receipt text distinguishes actual intake from sensing and no intake")
+	test.check(Memory.first_receipt_label(remembered[0],game.run.simulation_time).begins_with("First delivery") and Memory.receipt_label({"delivered_total":0},10) == "No delivery home yet", "Receipt text distinguishes actual intake from sensing and no intake")
 	root.free()
 	# Malformed/future data rejects atomically at the full restore boundary.
 	for invalid: Variant in [null, [], {"first_at":1}, {"first_at":0,"last_at":90,"last_amount":1,"earlier_unrecorded":false}, {"first_at":90,"last_at":89,"last_amount":1,"earlier_unrecorded":false}, {"first_at":90,"last_at":999999,"last_amount":1,"earlier_unrecorded":false}, {"first_at":90,"last_at":90,"last_amount":999,"earlier_unrecorded":false}, {"first_at":90,"last_at":90,"last_amount":1,"earlier_unrecorded":1}, {"first_at":90,"last_at":90,"last_amount":1,"earlier_unrecorded":false,"contaminant":true}]:
@@ -38,9 +38,9 @@ func run(test: Object) -> bool:
 	var legacy: Dictionary = saved.duplicate(true); legacy.trails.routes[0].erase("receipt")
 	var old := Controller.new(); test.check(old.restore_snapshot(legacy), "Legacy delivered route restores with unknown receipt dates")
 	var old_route: TrailRouteState = old.run.trails.routes.route_1
-	test.check(old_route.receipt.is_empty() and Memory.receipt_label({"delivered_total":5},100) == "Home dates unrecorded", "Existing food does not acquire an invented legacy arrival date")
+	test.check(old_route.receipt.is_empty() and Memory.receipt_label({"delivered_total":5},100) == "Delivery dates unrecorded", "Existing food does not acquire an invented legacy arrival date")
 	while old_route.receipt.is_empty(): old.advance(0.25)
-	test.check(old_route.receipt.earlier_unrecorded and Memory.receipt_label({"receipt":old_route.receipt},old.run.simulation_time).contains("tracked"), "New post-legacy intake explicitly marks its incomplete earlier history")
+	test.check(old_route.receipt.earlier_unrecorded and Memory.first_receipt_label({"receipt":old_route.receipt},old.run.simulation_time).begins_with("Records began"), "New post-legacy intake explicitly marks its incomplete earlier history")
 	# A recalled loaded return records the energy-paid amount, not gross cargo.
 	game = Toxic.new().returning_spill(true)
 	route = game.run.trails.find_route("home","known:carb_spill")

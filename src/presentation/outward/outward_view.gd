@@ -158,7 +158,7 @@ func _panel_at(at: Vector2) -> bool:
 
 
 func _sources_panel_rect() -> Rect2:
-	return Rect2(24, 148, 308, 396)
+	return Rect2(24, 148, 332, 442)
 
 
 func _exploration_panel_rect() -> Rect2:
@@ -477,8 +477,8 @@ func _prepare_signal_captions(size: Vector2) -> void:
 		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 226))
 	elif not _selected_signal().is_empty():
 		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 448 if _journey_attention() else 344 + _evidence_offset()))
-	if sources_open: _caption_blocks.append(Rect2(24, 148, 308, 396))
-	if exploration_open: _caption_blocks.append(Rect2(24, 148, 308, 266))
+	if sources_open: _caption_blocks.append(_sources_panel_rect())
+	if exploration_open: _caption_blocks.append(_exploration_panel_rect())
 	var ordered: Array[Dictionary] = _placed.duplicate()
 	ordered.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		if (a.id == selected_id) != (b.id == selected_id): return a.id == selected_id
@@ -592,7 +592,7 @@ func _draw_context(size: Vector2) -> void:
 	var box: Rect2 = _context_panel_rect()
 	draw_rect(box, Color("111921"))
 	draw_rect(box, Color("41535a"), false, 1.0)
-	_label(box.position + Vector2(16, 31), _signal_title_for(selected), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
+	_label(box.position + Vector2(16, 31), Memories.display_name({"knowledge_id": selected.source_knowledge_id, "category": selected.category, "honeydew": _is_honeydew(selected)}), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
 	_label(box.position + Vector2(16, 58), "A %s trace" % selected.confidence_label, Color("d4d8d1"), 15)
 	var distance_word: String = "nearby" if selected.estimated_distance < 6.0 else "within reach" if selected.estimated_distance < 14.0 else "distant"
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 14)
@@ -609,8 +609,14 @@ func _draw_context(size: Vector2) -> void:
 
 	var evidence: Array[String] = LossEvidence.lines(loss_route, float(_status.get("time", 0.0)))
 	if not evidence.is_empty():
-		for index: int in evidence.size():
-			_label(box.position + Vector2(16, 137 + index * 19), evidence[index], Color("c48c7c") if index == 0 else Color("8fa1a8"), 13)
+		var outcome: Dictionary = _status.get("journey_response", {}).get("outcomes", {}).get(loss_route.get("id"), {})
+		if not outcome.is_empty():
+			_label(box.position + Vector2(16, 137), "Last defense: " + Memories.defense_label(outcome), Color("afbc9b"), 13)
+			_label(box.position + Vector2(16, 156), "Returned " + Copy.duration(_status.time - outcome.received_at) + " ago", Color("8fa1a8"), 13)
+			_label(box.position + Vector2(16, 175), "Past harvest losses: %d · see journey history" % losses, Color("8fa1a8"), 12)
+		else:
+			for index: int in evidence.size():
+				_label(box.position + Vector2(16, 137 + index * 19), evidence[index], Color("c48c7c") if index == 0 else Color("8fa1a8"), 13)
 	else:
 		_label(box.position + Vector2(16, 137), hint_text, Color("8fa1a8"), 13)
 	if _is_honeydew(selected):
@@ -822,15 +828,15 @@ func _source_entries() -> Array[Dictionary]:
 
 
 func _source_filter_rect(category: String) -> Rect2:
-	return Rect2(40 + ["carbohydrate", "protein", "water"].find(category) * 92, 190, 86, 44)
+	return Rect2(40 + ["carbohydrate", "protein", "water"].find(category) * 100, 190, 94, 44)
 
 
 func _source_row_rect(index: int) -> Rect2:
-	return Rect2(40, 244 + index * 76, 274, 70)
+	return Rect2(40, 244 + index * 94, 300, 88)
 
 
 func _source_page_rect() -> Rect2:
-	return Rect2(40, 490, 274, 44)
+	return Rect2(40, 536, 300, 44)
 
 
 func _draw_sources() -> void:
@@ -849,14 +855,15 @@ func _draw_sources() -> void:
 		var entry: Dictionary = entries[offset]
 		var box: Rect2 = _source_row_rect(index)
 		draw_rect(box, Color("30382f") if entry.id == selected_id else Color("182329"))
-		var title: String = "Honeydew" if entry.honeydew else "Memory %d" % (offset + 1)
-		_label(box.position + Vector2(10, 20), "%s · sensed %.0fs ago" % [title, entry.age], Color("d4c6a8"), 13)
+		var title: String = Memories.display_name(entry)
+		_label(box.position + Vector2(10, 20), "%s · %s ago" % [title, Copy.duration(entry.age)], Color("d4c6a8"), 13)
 		_label(box.position + Vector2(10, 42), "%s · %d gathering%s" % [entry.state, entry.workers, " · ALARM" if entry.danger else ""], Color("c48c7c") if entry.danger else Color("96aab0"), 12)
-		_label(box.position + Vector2(10, 61), Memories.receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 11)
+		_label(box.position + Vector2(10, 61), Memories.receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 13)
+		_label(box.position + Vector2(10, 80), Memories.first_receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 12)
 	if entries.is_empty():
 		_label(Vector2(40, 275), "No returned memory of this resource", Color("96aab0"), 13)
 	draw_rect(_source_page_rect(), Color("18252b"))
-	_label(_source_page_rect().get_center() + Vector2(0, 6), "MORE · %d / %d" % [source_page + 1, maxi(1, ceili(entries.size() / 3.0))], Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(_source_page_rect().get_center() + Vector2(0, 6), "NEXT PAGE · %d / %d" % [source_page + 1, maxi(1, ceili(entries.size() / 3.0))], Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _exploration_rect(command: String) -> Rect2:
@@ -915,40 +922,50 @@ func _draw_journey_link() -> void:
 	if _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
 	var box: Rect2 = _journey_rect("journey_open")
 	draw_rect(box,Color("39302b"))
-	_label(box.get_center() + Vector2(0,5),"SURVEY JOURNEY FOR DANGER",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
+	_label(box.get_center() + Vector2(0,5),"JOURNEY REPORTS AND RESPONSE",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
 
-func _draw_journey_context(size: Vector2) -> void:
+func _draw_journey_context(_size: Vector2) -> void:
 	var box: Rect2 = _context_panel_rect()
-	draw_rect(box,Color("17171b")); draw_rect(box,Color("665047"),false,1)
+	draw_rect(box, Color("17171b")); draw_rect(box, Color("665047"), false, 1)
 	var route: Dictionary = _selected_route(_selected_signal())
-	var state: Dictionary = _status.get("journey_response",{})
-	var report: Dictionary = state.get("reports",{}).get(route.get("id"),{})
-	_detail_journey(box,31,"Journey response",20)
-	_detail_journey(box,65,"Returned losses: %d" % route.get("reported_losses",0))
-	_detail_journey(box,91,"Source tending is a separate job",12)
-	var finding: String = report.get("finding","")
-	var labels: Dictionary = {"":"No journey survey returned","ambush":"Localized ambusher reported","foreign":"Foreign traffic reported","mixed":"Ambusher and foreign traffic","inconclusive":"No clear threat found"}
-	_detail_journey(box,125,labels.get(finding,"Cause remains uncertain"))
-	if not report.is_empty(): _detail_journey(box,151,"Survey returned %.0fs ago" % (_status.time - report.received_at),12)
-	var own_party: bool = state.get("away",false) and state.get("route_id","") == route.get("id")
-	_detail_journey(box,183,"%d %s away · %.0fs" % [state.workers,"defenders" if state.get("mode") == "defend" else "investigators",state.age] if own_party else "Survey needs 3 workers + travel food",12)
-	var outcome: Dictionary = state.get("outcomes",{}).get(route.get("id"),{})
+	var state: Dictionary = _status.get("journey_response", {})
+	var report: Dictionary = state.get("reports", {}).get(route.get("id"), {})
+	var outcome: Dictionary = state.get("outcomes", {}).get(route.get("id"), {})
+	var own_party: bool = state.get("away", false) and state.get("route_id", "") == route.get("id")
+	_detail_journey(box, 31, "Journey response", 20)
+	_detail_journey(box, 62, "LAST DEFENSIVE RETURN", 12)
+	_detail_journey(box, 85, Memories.defense_label(outcome), 14)
 	if not outcome.is_empty():
-		var result_text: Dictionary = {"secured":"Ambusher driven off","withdrew":"Defenders withdrew","not_found":"No ambusher found on journey"}
-		_detail_journey(box,215,result_text.get(outcome.outcome,"Outcome uncertain"))
-		_detail_journey(box,239,"%d returned / %d sent · %.0fs ago" % [outcome.sent - outcome.lost,outcome.sent,_status.time - outcome.received_at],12)
+		_detail_journey(box, 107, "%d returned / %d sent · %s ago" % [outcome.sent - outcome.lost, outcome.sent, Copy.duration(_status.time - outcome.received_at)])
+	_detail_journey(box, 125, "SURVEY HISTORY", 12)
+	var finding: String = report.get("finding", "")
+	var labels: Dictionary = {"": "No danger survey returned", "ambush": "Localized ambusher reported", "foreign": "Foreign traffic reported", "mixed": "Ambusher and foreign traffic", "inconclusive": "No clear threat found"}
+	_detail_journey(box, 145, labels.get(finding, "Cause remains uncertain"))
+	if not report.is_empty(): _detail_journey(box, 165, "Reported " + Copy.duration(_status.time - report.received_at) + " ago")
+	_detail_journey(box, 191, "HARVEST HISTORY", 12)
+	var witnesses: Array[String] = LossEvidence.lines(route, _status.get("time", 0.0))
+	_detail_journey(box, 211, witnesses[0] if not witnesses.is_empty() else "No harvest losses reported", 12)
+	_detail_journey(box, 233, "%d losses · report %s ago" % [route.get("reported_losses", 0), Copy.duration(_status.time - route.get("last_loss_time", 0))])
+	_detail_journey(box, 257, "%d %s sent · away %s" % [state.workers, "defenders" if state.get("mode") == "defend" else "survey workers", Copy.duration(state.age)] if own_party else "Home carbs: %.1f · %d workers available" % [_status.get("resources", {}).get("carbohydrate", 0), _status.get("available_workers", 0)], 12)
+	_detail_journey(box, 279, "Reports arrive on return; tending is separate", 12)
 	var action: Rect2 = _journey_rect("journey_investigate")
-	draw_rect(action,Color("39302b"))
-	_label(action.get_center() + Vector2(0,5),"RECALL SURVEY / DEFENDERS" if own_party else "SURVEY JOURNEY FOR DANGER",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
-	if own_party and state.get("reinforcement_available",false) or not own_party and _can_mobilize(route):
-		var mob: Rect2 = _journey_rect("journey_defend")
-		draw_rect(mob,Color("49332f"))
-		_label(mob.get_center() + Vector2(0,5),"REINFORCE 4 + TRAVEL FOOD" if own_party else "MOBILIZE 12 + TRAVEL FOOD",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
-	_detail_journey(box,254,"Findings arrive with returning ants",12)
-	_detail_journey(box,278,"Foreign contest: reinforce gathering" if finding in ["foreign","mixed"] else "Gathering can be stopped separately",12)
+	_draw_journey_action(action, ("RECALL DEFENDERS" if state.get("mode") == "defend" else "RECALL SURVEY PARTY") if own_party else "SURVEY JOURNEY FOR DANGER", "Workers return through travel" if own_party else _party_requirement(3))
+	if own_party and state.get("reinforcement_available", false) or not own_party and _can_mobilize(route):
+		_draw_journey_action(_journey_rect("journey_defend"), "REQUEST 4 DEFENDERS" if own_party else "SEND 12 DEFENDERS", _party_requirement(4 if own_party else 12))
 	var back: Rect2 = _journey_rect("journey_close")
-	draw_rect(back,Color("263038"))
-	_label(back.get_center() + Vector2(0,5),"BACK TO SOURCE",Color("d5ded8"),13,HORIZONTAL_ALIGNMENT_CENTER)
+	draw_rect(back, Color("263038"))
+	_label(back.get_center() + Vector2(0, 5), "BACK TO SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+func _party_requirement(workers: int) -> String:
+	var shortage: String = Copy.local_shortage(_status, {}, workers)
+	return shortage if not shortage.is_empty() else "%d workers + travel carbs on dispatch" % workers
+
+
+func _draw_journey_action(box: Rect2, title: String, detail: String) -> void:
+	draw_rect(box, Color("39302b"))
+	_label(box.position + Vector2(130, 17), title, Color("e0c5b7"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(box.position + Vector2(130, 36), detail, Color("c5b8b1"), 12, HORIZONTAL_ALIGNMENT_CENTER)
 
 func _detail_journey(box: Rect2, y: float, text: String, font_size: int = 13) -> void:
 	_label(box.position + Vector2(16,y),text,Color("c5b8b1"),font_size)
