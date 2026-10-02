@@ -2,6 +2,7 @@ extends Node
 
 const Controller = preload("res://src/core/simulation_controller.gd")
 const Perception = preload("res://src/presentation/perception_model.gd")
+const Pressure = preload("res://src/presentation/colony_pressure.gd")
 const Outward = preload("res://src/presentation/outward/outward_view.gd")
 const Inward = preload("res://src/presentation/inward/inward_view.gd")
 const Audio = preload("res://src/audio/audio_controller.gd")
@@ -48,6 +49,7 @@ func _ready() -> void:
 		outward.honeydew_stop_command = stop_honeydew_tending
 		outward.input_blocked = interaction_blocked
 		outward.mode_command = set_mode.bind("inward")
+		outward.pressure_command = inspect_internal_pressure
 		outward.save_command = quick_save
 		outward.load_command = quick_load
 		add_child(outward)
@@ -209,7 +211,21 @@ func outward_status(pile_id: String) -> Dictionary:
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
 		"scout_missions": scout_mission_summaries(pile_id),
-		"honeydew": honeydew_summary(pile_id), "exploration": exploration_summary()}
+		"honeydew": honeydew_summary(pile_id), "exploration": exploration_summary(),
+		"internal_attention": Pressure.attention(inward_status(pile_id))}
+
+
+func inspect_internal_pressure() -> Dictionary:
+	var attention: Dictionary = Pressure.attention(inward_status("home"))
+	if attention.is_empty(): return {"accepted": false, "reason": "Internal conditions are steady"}
+	if _inward_view != null:
+		_inward_view.selected_id = attention.organ
+		_inward_view._process(0)
+	if _outward_view != null:
+		_outward_view.sources_open = false
+		_outward_view.exploration_open = false
+	set_mode("inward")
+	return {"accepted": true, "reason": ""}
 
 
 func exploration_summary() -> Dictionary:

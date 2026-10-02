@@ -4,6 +4,8 @@ Card 074 eases selected INWARD function membranes over 0.28 real seconds and gen
 
 Card 075 gives resource/alarm captions priority over secondary scout captions. A scout caption can move vertically to a nearby clear position or hide when the field is crowded; its trace/marker/hit area and selected mission context remain intact. Source labels and controls do not move.
 
+Card 076 conditionally shows Check Nursery/Midden in OUTWARD's 300×44 header target beside Remembered Sources, with known food/care/dry/damp/refuse causes. Refuse-only directs voluntary attention to cleanup; mixed causes open Nursery. It disappears when conditions recover, remains clickable paused, and changes neither facing nor resource selection. Navigation revalidates current evidence and closes outgoing browser/exploration panels. No automatic switch, strategy advice, hidden cause or new cue sound.
+
 Card 073 adds optional How to Play within Colony: four concise observation/journey/internal-function/save pages, Previous/Next/Back to Colony and Escape. Guide buttons absorb coordinates of the restart controls beneath them; reading never changes simulation or opens automatically. Its modal remains mutually exclusive with Sound, with fixed 44-pixel logical targets and no map/resource preview.
 
 Card 072 briefly says New food/water/protein trace(s) returned in the active view footer, with a delicate chime controlled by Information Cues. New-only sensory IDs batch into one event; private scout sensing/repeated reports/loaded old knowledge produce none. Notice never changes facing/selection; the new cloud and Remembered Sources entry supply persistent visual evidence. A later player action may replace transient feedback.

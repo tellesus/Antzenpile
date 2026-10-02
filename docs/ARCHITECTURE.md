@@ -1,5 +1,7 @@
 # Architecture
 
+Card 076 shares pure ColonyPressure causes between local organ art and OUTWARD internal_attention. GameRoot derives that small detached dictionary from approved inward_status, and revalidates it for explicit context navigation. The normal view receives no pile/world references; attention adds no saved field or simulation mutation.
+
 Card 074 keeps functional visual health as a pure minimum of approved Nursery food/care/climate/sanitation rates (Midden uses sanitation). It owns no gameplay health. View-local attention gains ease over real time independently of paused biological decoration; load/new colony clears them. Fixed centers/hit areas and immediate semantic selection remain authoritative for interaction.
 
 Card 072 baselines detached sensory identities in ephemeral ReturnedDiscovery. Graphical GameRoot polls after simulation advancement; only new home-delivered IDs increment a presentation counter and set temporary view feedback. AudioController polls that counter for one short batched cue, separate from music/loss cues. Load/reset baselines known IDs and resets presentation counters before restarting audio. No RunState or RNG fields.

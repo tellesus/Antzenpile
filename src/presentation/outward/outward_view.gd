@@ -28,6 +28,7 @@ var honeydew_start_command: Callable
 var honeydew_stop_command: Callable
 var input_blocked: Callable
 var mode_command: Callable
+var pressure_command: Callable
 var save_command: Callable
 var load_command: Callable
 var facing: float = 0.0
@@ -191,6 +192,10 @@ func _run_command(command: String) -> void:
 			_placed = Panorama.project(_signals, facing, get_viewport_rect().size)
 		return
 	match command:
+		"internal_pressure":
+			if not _status.get("internal_attention", {}).is_empty() and pressure_command.is_valid():
+				var result: Dictionary = pressure_command.call()
+				if not result.get("accepted", false): _feedback = result.get("reason", "Internal attention unavailable")
 		"sources":
 			sources_open = not sources_open
 			exploration_open = false
@@ -274,6 +279,7 @@ func _field_rect() -> Rect2:
 func _button_rect(command: String) -> Rect2:
 	var y: float = get_viewport_rect().size.y - 104.0
 	match command:
+		"internal_pressure": return Rect2(264, 100, 300, 44)
 		"sources": return Rect2(24, 100, 220, 44)
 		"scout": return Rect2(24, y, 148, 64)
 		"pause": return Rect2(188, y, 104, 64)
@@ -288,6 +294,8 @@ func _button_rect(command: String) -> Rect2:
 
 
 func _button_at(at: Vector2) -> String:
+	if not _status.get("internal_attention", {}).is_empty() and _button_rect("internal_pressure").has_point(at):
+		return "internal_pressure"
 	if sources_open and Rect2(24, 148, 308, 336).has_point(at):
 		for category: String in ["carbohydrate", "protein", "water"]:
 			if _source_filter_rect(category).has_point(at):
@@ -340,12 +348,23 @@ func _draw() -> void:
 	for entry: Dictionary in _placed:
 		_draw_signal(entry)
 	_draw_hud(size)
+	_draw_pressure_attention()
 	if exploration_open:
 		_draw_exploration()
 	_draw_context(size)
 	if sources_open:
 		_draw_sources()
 	_draw_controls(size)
+
+
+func _draw_pressure_attention() -> void:
+	var attention: Dictionary = _status.get("internal_attention", {})
+	if attention.is_empty(): return
+	var box: Rect2 = _button_rect("internal_pressure")
+	draw_rect(box, Color("211c1b"))
+	draw_line(box.position, box.position + Vector2(0, box.size.y), Color("b58c79"), 1.0, true)
+	_label(box.position + Vector2(16, 18), attention.title, Color("d3c3b8"), 12)
+	_label(box.position + Vector2(16, 35), " / ".join(attention.causes), Color("bca08e"), 11)
 
 
 func _draw_rain(size: Vector2) -> void:

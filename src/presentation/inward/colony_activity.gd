@@ -4,6 +4,7 @@ extends RefCounted
 
 const MAX_ANTS: int = 12
 const MAX_BROOD: int = 6
+const Pressure = preload("res://src/presentation/colony_pressure.gd")
 
 
 static func health(status: Dictionary, organ: String) -> float:
@@ -80,20 +81,7 @@ static func pressure(status: Dictionary, organ: String) -> String:
 		return "REJECTION" if status.get("guest", {}).get("rejection_active", false) else ""
 	if organ != "nursery":
 		return ""
-	var causes: Array[String] = []
-	var humidity: Dictionary = status.get("humidity", {})
-	if humidity.get("larval_rate", 1.0) < 1.0:
-		causes.append("DRY" if humidity.get("moisture", 65.0) < 45.0 else "DAMP")
-	if midden.get("larval_rate", 1.0) < 1.0:
-		causes.append("REFUSE")
-	var food: bool = false
-	var care: bool = false
-	for cohort: Dictionary in status.get("brood", []):
-		food = food or cohort.get("nutrition", 1.0) < 1.0
-		care = care or cohort.get("care", 1.0) < 1.0
-	if food: causes.append("FOOD")
-	if care: causes.append("CARE")
-	return " / ".join(causes)
+	return " / ".join(Pressure.nursery_causes(status))
 
 
 static func project_progress(status: Dictionary, organ: String) -> float:

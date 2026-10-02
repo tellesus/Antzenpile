@@ -4,6 +4,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+When the colony knows Nursery food/care/climate or refuse strain, OUTWARD offers **Check Nursery/Midden** beside Remembered Sources. It opens the existing relevant internal controls when tapped and disappears on recovery; healthy colonies stay quiet.
+
 Nursery/Midden now use stable healthy pulses and broken, irregular strained contours from the colony's known food/care/climate/refuse conditions. Selected INWARD functions settle gently into focus; paused controls remain responsive. Scout captions avoid overlapping resource/alarm labels.
 
 The [expanded-colony review](docs/EXPANDED_COLONY_EVALUATION.md) exercised both settings, paid internal growth, all three current adaptation axes and returned-source alternatives together. Six ordinary runs preserved exact command/save continuation without changing rates. Human playtesting remains needed.
