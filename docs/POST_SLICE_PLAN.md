@@ -2,7 +2,7 @@
 
 ## Current section — source recovery and sanitation (approved 2026-10-02)
 
-Complete [063 source recovery controls](tasks/063_source_recovery_controls.md), then define and implement 064 Midden/sanitation labor from original Part 3 §§50–51. Use returned availability to reduce blind rechecks, then add a meaningful internal job for growing colonies. Keep storage/throughput card 034 deferred; do not add disease, poison, scout mortality or a session target. Commit sections separately and publish together.
+Complete: [063 source recovery controls](tasks/063_source_recovery_controls.md) and [064 Midden/sanitation labor](tasks/064_midden_sanitation.md), from original Part 3 §§50–51. Returned availability supports opt-in recovery watches; growing colonies can staff basic refuse isolation and invest in a more efficient Midden. See the [sanitation measurement](SANITATION_EVALUATION.md). Storage/throughput 034 stays deferred; disease, poison, scout mortality and session targets remain outside this section. Next bounded planning step: review source replacement/carbohydrate reliability against producer ecology before expanding internal pressure. Do not infer a hard storage cap or automatically implement a disease model.
 
 Revised 2026-10-01 against the [original Antzenpile brainstorm](https://chatgpt.com/share/6abd62e2-f184-83ea-bc56-3220b40ea45f) and new player feedback. Cards 029–033, 035, 037–040 and 042–059 are complete; card 034 is deferred after its conditional review. Card 036's automated review and later player feedback are recorded in the [post-slice evaluation](POST_SLICE_EVALUATION.md).
 

@@ -1,0 +1,134 @@
+{
+	"duration_seconds": 2400,
+	"engine": "4.7.2-stable (official)",
+	"platform": "Windows",
+	"policy": "Five standing scouts, one route per returned basic resource, returned-positive rechecks; real stores pay Food Exchange, Nursery, brood and Midden. Compare no cleanup with two basic cleaners, then one developed cleaner. No injected food, workers, knowledge or danger suppression.",
+	"rows": [
+		{
+			"brood_emerged": 47,
+			"build_started_at": -1.0,
+			"burden": 45.18314,
+			"cleaners": 0,
+			"cleanup": false,
+			"developed_at": -1.0,
+			"isolated": 0.0,
+			"peak_burden": 45.18314,
+			"revealed_at": 366.25,
+			"save_exact": true,
+			"seed": 482817,
+			"state": "primitive",
+			"stores": {
+				"carbohydrate": 0.00122,
+				"protein": 72.78026,
+				"water": 115.59793
+			},
+			"strained_seconds": 1197.75,
+			"workers": 87
+		},
+		{
+			"brood_emerged": 32,
+			"build_started_at": 370.0,
+			"burden": 0.0,
+			"cleaners": 1,
+			"cleanup": true,
+			"developed_at": 460.0,
+			"isolated": 40.6332,
+			"peak_burden": 4.0528,
+			"revealed_at": 366.25,
+			"save_exact": true,
+			"seed": 482817,
+			"state": "developed",
+			"stores": {
+				"carbohydrate": 0.00165,
+				"protein": 67.92778,
+				"water": 121.51297
+			},
+			"strained_seconds": 0.0,
+			"workers": 72
+		},
+		{
+			"brood_emerged": 47,
+			"build_started_at": -1.0,
+			"burden": 45.21697,
+			"cleaners": 0,
+			"cleanup": false,
+			"developed_at": -1.0,
+			"isolated": 0.0,
+			"peak_burden": 45.21697,
+			"revealed_at": 366.0,
+			"save_exact": true,
+			"seed": 591,
+			"state": "primitive",
+			"stores": {
+				"carbohydrate": 0.00058,
+				"protein": 72.38532,
+				"water": 116.63931
+			},
+			"strained_seconds": 1198.75,
+			"workers": 87
+		},
+		{
+			"brood_emerged": 32,
+			"build_started_at": 370.0,
+			"burden": 0.0,
+			"cleaners": 1,
+			"cleanup": true,
+			"developed_at": 460.0,
+			"isolated": 40.6564,
+			"peak_burden": 4.056,
+			"revealed_at": 366.0,
+			"save_exact": true,
+			"seed": 591,
+			"state": "developed",
+			"stores": {
+				"carbohydrate": 0.00188,
+				"protein": 67.53797,
+				"water": 122.56328
+			},
+			"strained_seconds": 0.0,
+			"workers": 72
+		},
+		{
+			"brood_emerged": 69,
+			"build_started_at": -1.0,
+			"burden": 47.93067,
+			"cleaners": 0,
+			"cleanup": false,
+			"developed_at": -1.0,
+			"isolated": 0.0,
+			"peak_burden": 47.93067,
+			"revealed_at": 366.5,
+			"save_exact": true,
+			"seed": 202603,
+			"state": "primitive",
+			"stores": {
+				"carbohydrate": 31.09559,
+				"protein": 58.92045,
+				"water": 144.18785
+			},
+			"strained_seconds": 1196.75,
+			"workers": 109
+		},
+		{
+			"brood_emerged": 72,
+			"build_started_at": 370.0,
+			"burden": 0.0,
+			"cleaners": 1,
+			"cleanup": true,
+			"developed_at": 460.0,
+			"isolated": 48.88701,
+			"peak_burden": 4.0496,
+			"revealed_at": 366.5,
+			"save_exact": true,
+			"seed": 202603,
+			"state": "developed",
+			"stores": {
+				"carbohydrate": 0.00738,
+				"protein": 44.64537,
+				"water": 134.41788
+			},
+			"strained_seconds": 0.0,
+			"workers": 112
+		}
+	]
+}

@@ -1,5 +1,7 @@
 # Architecture
 
+Card 064: PileState owns SanitationState. SanitationSystem generates conserved refuse on fixed ticks, owns internal cleaner/excavator ledger jobs and prepaid Midden development, and runs before BroodSystem. BroodSystem scales larval progress and proportional food demand by burden, independently of care/nutrition. GameRoot supplies detached burden, staffing, project and rate summaries; InwardView issues commands. No disease, new deaths, remote corpse retrieval or audio asset.
+
 Card 063: KnowledgeBase checks returned confirming observations after a route's last empty receipt. TrailSystem alone resumes opt-in depleted gathering once travelers are home, without reallocating or consulting source truth. UI combines source investigation with a saved recovery watch; off exploration leaves it queued. Cancel/returned danger retain authority. Normal summaries carry recovery readiness and watch intent, never hidden quantities.
 
 Card 062 selects explorer trunks from colony-known route estimates and returned traffic/danger evidence. A scout physically walks its captured home-to-endpoint grid path, searches beyond it, then retraces branch/trunk breadcrumbs. TrailRoute/TrailSegment and aggregate travelers remain separate from the scout's own ledger commitment. The trunk path stays private; normal presentation retains departure facts and home-delivered coarse courses. Stopping trail traffic does not erase an away scout's remembered path.

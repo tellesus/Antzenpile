@@ -28,6 +28,10 @@ func experienced_game(seed_value: int = 3020) -> SimulationController:
 	game.set_trail_workers("route_1", 0)
 	game.set_trail_workers("route_2", 0)
 	game.advance(400.0)
+	# Genetic fixtures keep colony hygiene staffed so their fixed trial timings
+	# exercise inheritance/guest pressure rather than the separate sanitation slowdown.
+	var cleaning: bool = game.set_sanitation_workers("home", 2)
+	assert(cleaning)
 	return game
 
 

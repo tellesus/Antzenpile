@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 064 adds a conditional copper-colored Midden organ in INWARD when local refuse need appears. Its context shows on-hand burden, sanitation's larval rate, separate 0/1/2/5 staffing targets (62×44 logical pixels), and a named Develop Midden action with real costs/time/labor and doubled-efficiency benefit. Staffing, development and Adaptation trials remain distinct. Nursery reports sanitation slowdown separately from food/care. Basic isolation is available before development; no disease, hidden corpse count or forecast is shown. Standard/compact views retain negative space and capped decoration without bloom.
+
 Card 063 distinguishes Try Gathering (uncertain trip), Resume Gathering (confirming returned evidence) and Watch for Recovery (standing investigation plus opt-in resumption of existing gathering). Stop Recovery Watch removes that intent; Cancel still recalls gatherers. Off exploration shows a queued message. Found Again is a returned-source marker; a renewed source can still have gathering paused. Returned danger requires manual gathering. Existing contextual rows are reused at standard/compact sizes.
 
 Card 062 adds one short Exploration-panel hint that established trails extend reach. Automatic trunk travel still shows only home-known departure scent/age while away; the existing bounded coarse course appears after physical return. No new map, live branch path or hidden-resource marker is added.

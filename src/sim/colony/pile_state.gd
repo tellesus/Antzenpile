@@ -1,6 +1,8 @@
 class_name PileState
 extends RefCounted
 
+var midden := SanitationState.new()
+
 const Ledger = preload("res://src/sim/colony/worker_ledger.gd")
 const Brood = preload("res://src/sim/colony/brood_cohort.gd")
 const BROOD_CONFIG = preload("res://data/resources/default_brood.tres")
@@ -49,7 +51,7 @@ func to_dict() -> Dictionary:
 		"recognition_experience": recognition_experience, "recognition_candidate": recognition_candidate,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"food_exchange_state": food_exchange_state,
-		"food_exchange_progress_seconds": food_exchange_progress_seconds}
+		"food_exchange_progress_seconds": food_exchange_progress_seconds, "midden": midden.to_dict()}
 
 
 func nursery_brood_capacity() -> int:
@@ -294,6 +296,11 @@ func restore(data: Dictionary) -> bool:
 			return false
 	elif not record.is_empty() or data.food_exchange_progress_seconds != (FOOD_CONFIG.build_seconds if data.food_exchange_state == "developed" else 0.0):
 		return false
+	var restored_midden := SanitationState.new()
+	var midden_data: Variant = data.get("midden", restored_midden.to_dict())
+	if not midden_data is Dictionary or not restored_midden.restore(midden_data, restored, data.id):
+		return false
+	midden = restored_midden
 	id = data.id
 	position = Vector2(data.position[0], data.position[1])
 	queen_count = int(data.queen_count)

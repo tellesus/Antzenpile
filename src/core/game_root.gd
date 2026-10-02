@@ -9,6 +9,7 @@ const Save = preload("res://src/core/save_service.gd")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 const BROOD_CONFIG = preload("res://data/resources/default_brood.tres")
 const NURSERY_CONFIG = preload("res://data/resources/default_nursery_development.tres")
+const SANITATION_CONFIG = preload("res://data/resources/default_sanitation.tres")
 const HONEYDEW_CONFIG = preload("res://data/ecology/backyard_honeydew.tres")
 var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
@@ -52,6 +53,8 @@ func _ready() -> void:
 		inward.speed_command = simulation.set_time_scale
 		inward.develop_command = start_food_exchange
 		inward.nursery_develop_command = start_nursery_development
+		inward.midden_develop_command = start_midden
+		inward.sanitation_command = set_sanitation_workers
 		inward.brood_command = start_brood
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
@@ -222,6 +225,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
 	return {"pile_id": pile_id, "queens": pile.queen_count,
+		"midden": midden_summary(pile_id),
 		"workers_total": expected_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
 		"brood_losses": pile.brood_lost_total, "guest": guest_summary(pile_id),
@@ -306,6 +310,28 @@ func _show_save_feedback(result: Dictionary, success: String) -> void:
 func start_food_exchange() -> Dictionary:
 	var accepted: bool = simulation.start_food_exchange("home")
 	return {"accepted": accepted, "reason": simulation.food_exchange.last_error}
+
+
+func midden_summary(pile_id: String) -> Dictionary:
+	if not simulation.run.colony.piles.has(pile_id):
+		return {}
+	var state: SanitationState = simulation.run.colony.piles[pile_id].midden
+	return {"revealed": state.revealed, "state": state.state,
+		"burden": float(state.burden_units) / SANITATION_CONFIG.units_per_quantity,
+		"cleaners": state.cleaners, "larval_rate": state.larval_rate(),
+		"progress": float(state.progress_ticks) / SANITATION_CONFIG.build_ticks,
+		"costs": SANITATION_CONFIG.costs(), "build_workers": SANITATION_CONFIG.build_workers,
+		"build_seconds": SANITATION_CONFIG.build_ticks * SimulationClock.TICK_INTERVAL}
+
+
+func start_midden() -> Dictionary:
+	var accepted: bool = simulation.start_midden("home")
+	return {"accepted": accepted, "reason": simulation.sanitation.last_error}
+
+
+func set_sanitation_workers(target: int) -> Dictionary:
+	var accepted: bool = simulation.set_sanitation_workers("home", target)
+	return {"accepted": accepted, "reason": simulation.sanitation.last_error}
 
 
 func guest_summary(pile_id: String) -> Dictionary:

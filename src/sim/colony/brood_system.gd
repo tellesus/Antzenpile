@@ -79,16 +79,17 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 	if cohort.care < 1.0:
 		cohort.nutrition = 0.0 if cohort.stage == "larva" else 1.0
 		return
+	var effective_delta: float = delta * (pile.midden.larval_rate() if cohort.stage == "larva" else 1.0)
 	if cohort.stage == "larva":
 		var food_multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0
-		var costs: Dictionary = {"carbohydrate": cohort.count * CONFIG.carbohydrate_per_larva_second * delta * food_multiplier,
-			"protein": cohort.count * CONFIG.protein_per_larva_second * delta * food_multiplier,
-			"water": cohort.count * CONFIG.water_per_larva_second * delta * food_multiplier}
+		var costs: Dictionary = {"carbohydrate": cohort.count * CONFIG.carbohydrate_per_larva_second * effective_delta * food_multiplier,
+			"protein": cohort.count * CONFIG.protein_per_larva_second * effective_delta * food_multiplier,
+			"water": cohort.count * CONFIG.water_per_larva_second * effective_delta * food_multiplier}
 		if not pile.consume_resources(costs):
 			cohort.nutrition = 0.0
 			return
 	cohort.nutrition = 1.0
-	cohort.progress_seconds += delta
+	cohort.progress_seconds += effective_delta
 	if cohort.progress_seconds < CONFIG.stage_seconds(cohort.stage):
 		return
 	cohort.progress_seconds = 0.0

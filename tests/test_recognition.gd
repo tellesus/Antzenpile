@@ -13,6 +13,10 @@ func snapshot(game: SimulationController) -> Dictionary:
 
 func advance_cared(game: SimulationController, seconds: float) -> void:
 	for tick: int in roundi(seconds / 0.25):
+		var pile: PileState = game.run.colony.piles.home
+		if pile.midden.revealed and pile.midden.cleaners == 0:
+			var cleaning: bool = game.set_sanitation_workers("home", 2)
+			assert(cleaning)
 		if game.run.guest.observation in ["loss", "foreign"] and game.run.colony.piles.home.workers.count("rejection:home") == -1:
 			game.start_guest_rejection()
 		game.advance(0.25)

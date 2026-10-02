@@ -11,6 +11,8 @@ var pause_command: Callable
 var speed_command: Callable
 var develop_command: Callable
 var nursery_develop_command: Callable
+var midden_develop_command: Callable
+var sanitation_command: Callable
 var brood_command: Callable
 var adaptation_command: Callable
 var guest_rejection_command: Callable
@@ -56,6 +58,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "midden" and _status.get("midden", {}).get("revealed", false):
+		for target: int in [0, 1, 2, 5]:
+			if _cleaner_rect(target).has_point(at):
+				_run_command("cleanup_" + str(target))
+				return true
+		if _status.midden.state == "primitive" and _midden_develop_rect().has_point(at):
+			_run_command("develop_midden")
+			return true
 	if selected_id == "adaptation" and _web_back_rect().has_point(at):
 		selected_id = ""
 		web_selection = "foraging"
@@ -97,7 +107,7 @@ func activate_at(at: Vector2) -> bool:
 			queue_redraw()
 			return true
 		return false
-	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty())
+	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty(), _status.get("midden", {}).get("revealed", false))
 	if not picked.is_empty():
 		selected_id = picked
 		if picked == "adaptation":
@@ -109,6 +119,14 @@ func activate_at(at: Vector2) -> bool:
 
 func _run_command(command: String) -> void:
 	match command:
+		"cleanup_0", "cleanup_1", "cleanup_2", "cleanup_5":
+			if sanitation_command.is_valid():
+				var result: Dictionary = sanitation_command.call(int(command.trim_prefix("cleanup_")))
+				show_feedback("Cleanup workers reassigned" if result.get("accepted", false) else result.get("reason", "Cleanup unavailable"))
+		"develop_midden":
+			if midden_develop_command.is_valid():
+				var result: Dictionary = midden_develop_command.call()
+				show_feedback("Midden development started" if result.get("accepted", false) else result.get("reason", "Development unavailable"))
 		"honeydew":
 			if honeydew_command.is_valid():
 				var tending: bool = _status.get("honeydew", {}).get("relationship", "unknown") != "tended"
@@ -165,10 +183,13 @@ static func positions(size: Vector2) -> Dictionary:
 		"food_exchange": origin + Vector2(field_width * 0.72, field_height * 0.72),
 		"entrance": origin + Vector2(field_width * 0.28, field_height * 0.78),
 		"adaptation": origin + Vector2(field_width * 0.5, field_height * 0.52),
-		"guest": origin + Vector2(field_width * 0.50, field_height * 0.89)}
+		"guest": origin + Vector2(field_width * 0.50, field_height * 0.89),
+		"midden": origin + Vector2(field_width * 0.08, field_height * 0.52)}
 
 
-static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false) -> String:
+static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, midden_visible: bool = false) -> String:
+	if midden_visible and at.distance_to(positions(size).midden) <= 44.0:
+		return "midden"
 	if guest_visible and at.distance_to(positions(size).guest) <= 44.0:
 		return "guest"
 	for id: String in NODES:
@@ -193,6 +214,14 @@ func _button_rect(command: String) -> Rect2:
 
 func _develop_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
+
+
+func _cleaner_rect(target: int) -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0 + [0, 1, 2, 5].find(target) * 66.0, 300, 62, 44)
+
+
+func _midden_develop_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 430, 260, 44)
 
 
 func _brood_rect() -> Rect2:
@@ -252,6 +281,9 @@ func _draw() -> void:
 		draw_line(centers[id], centers["adaptation"], Color(0.43, 0.40, 0.55, 0.20), 1.0, true)
 	for id: String in NODES:
 		_draw_node(id, centers[id])
+	if _status.get("midden", {}).get("revealed", false):
+		_draw_flow(centers.entrance, centers.midden, false)
+		_draw_node("midden", centers.midden)
 	if not _status.get("guest", {}).is_empty():
 		draw_line(centers.guest, centers.nursery, Color(0.65, 0.53, 0.64, 0.18), 1.0, true)
 		_draw_node("guest", centers.guest)
@@ -276,12 +308,16 @@ func _draw_flow(start: Vector2, finish: Vector2, representative: bool) -> void:
 
 
 func _draw_node(id: String, at: Vector2) -> void:
-	var color: Color = Color("d5c4a1") if id == "queen" else Color("aebdb7") if id == "nursery" else Color("c7af86") if id == "food_exchange" else Color("bba6c8") if id == "adaptation" else Color("8daeb3")
+	var color: Color = Color("d5c4a1") if id == "queen" else Color("aebdb7") if id == "nursery" else Color("c7af86") if id == "food_exchange" else Color("bba6c8") if id == "adaptation" else Color("bd927a") if id == "midden" else Color("8daeb3")
 	var phase: float = _animation_time * 0.18 + NODES.find(id)
 	var outline: PackedVector2Array = Art.membrane(at, 34.0, phase, 0.86)
 	draw_colored_polygon(outline, Color(color, 0.045))
 	draw_polyline(outline.slice(1, 27), Color(color, 0.4), 1.1, true)
 	match id:
+		"midden":
+			for index: int in 3:
+				var fragment: Vector2 = at + Vector2(index * 8 - 8, (index % 2) * 7 - 3)
+				draw_line(fragment, fragment + Vector2(4, -3), Color("bd765c"), 1.5, true)
 		"guest":
 			for index: int in 3:
 				draw_arc(at + Vector2(index * 5 - 5, index * 3 - 3), 9, 0.4, 4.1, 16, Color(color, 0.45), 1.0, true)
@@ -325,7 +361,7 @@ func _draw_hud(size: Vector2) -> void:
 func _draw_context(size: Vector2) -> void:
 	if selected_id.is_empty() or _status.is_empty():
 		return
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 400 if selected_id == "nursery" else 344 if selected_id == "adaptation" else 284))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, 400 if selected_id == "nursery" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	var web: bool = selected_id == "adaptation"
 	draw_rect(box, Color("17141f") if web else Color("111921"))
 	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
@@ -337,6 +373,28 @@ func _draw_context(size: Vector2) -> void:
 		_draw_genetic_context(box)
 		return
 	match selected_id:
+		"midden":
+			var midden: Dictionary = _status.get("midden", {})
+			_detail_line(box, 65, "Refuse burden: %.1f" % midden.get("burden", 0.0))
+			_detail_line(box, 89, "Developed isolation" if midden.get("state") == "developed" else "Basic refuse isolation")
+			_detail_line(box, 113, "Larval growth: %.0f%%" % (midden.get("larval_rate", 1.0) * 100.0))
+			_detail_line(box, 137, "Cleanup workers: %d" % midden.get("cleaners", 0))
+			for target: int in [0, 1, 2, 5]:
+				var button: Rect2 = _cleaner_rect(target)
+				draw_rect(button, Color("4b5141") if target == midden.get("cleaners", 0) else Color("263038"))
+				_label(button.get_center() + Vector2(0, 6), str(target), Color("dce5d9"), 16, HORIZONTAL_ALIGNMENT_CENTER)
+			if midden.get("state") == "primitive":
+				_detail_line(box, 218, "Develop for twice the cleanup")
+				_detail_line(box, 244, "Needs %.0f carb · %.0f protein" % [midden.costs.carbohydrate, midden.costs.protein])
+				_detail_line(box, 266, "%.0f water · %d workers · %.0fs" % [midden.costs.water, midden.build_workers, midden.build_seconds])
+				draw_rect(_midden_develop_rect(), Color("35483c"))
+				_label(_midden_develop_rect().get_center() + Vector2(0, 6), "DEVELOP MIDDEN", Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+			elif midden.get("state") == "developing":
+				_detail_line(box, 224, "Developing: %.0f%%" % (midden.progress * 100.0))
+				_detail_line(box, 246, "%d excavation workers committed" % midden.build_workers)
+			else:
+				_detail_line(box, 224, "Cleanup efficiency doubled")
+				_detail_line(box, 246, "Isolated refuse stays unusable")
 		"queen":
 			_detail_line(box, 65, "Queens: %d" % _status.queens)
 			_detail_line(box, 91, "Living workers: %d" % _status.workers_total)
@@ -361,6 +419,8 @@ func _draw_context(size: Vector2) -> void:
 					care_enough = care_enough and cohort.care >= 1.0
 				_detail_line(box, 143, "Food %s · care %s" % ["enough" if food_enough else "short", "enough" if care_enough else "short"])
 			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)])
+			if _status.get("midden", {}).get("larval_rate", 1.0) < 1.0:
+				_detail_line(box, 162, "Sanitation slows larvae · visit Midden")
 			if _status.nursery_state == "primitive":
 				_detail_line(box, 209, "Develop for %d brood space" % _status.nursery_developed_capacity)
 				_detail_line(box, 235, "Needs %.0f carb · %.0f protein" % [_status.nursery_costs.carbohydrate, _status.nursery_costs.protein])
@@ -537,6 +597,7 @@ static func _title(id: String) -> String:
 		"entrance": return "Entrance"
 		"adaptation": return "Adaptation"
 		"guest": return "Guest"
+		"midden": return "Midden"
 	return ""
 
 

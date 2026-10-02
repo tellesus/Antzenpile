@@ -54,6 +54,9 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 		return false
 	for pile: PileState in restored.values():
 		for commitment_id: String in pile.workers.to_dict().commitments:
+			for prefix: String in ["sanitation:", "midden:"]:
+				if commitment_id.begins_with(prefix) and commitment_id != prefix + pile.id:
+					return false
 			if commitment_id.begins_with("food_exchange:") and commitment_id != "food_exchange:" + pile.id:
 				return false
 			if commitment_id.begins_with("nursery:") and commitment_id != "nursery:" + pile.id:

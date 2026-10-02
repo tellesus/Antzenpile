@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SanitationConfig" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/sanitation_config.gd" id="1"]
+[resource]
+script = ExtResource("1")
+units_per_quantity = 100000
+worker_quarters_per_tick = 25
+brood_quarters_per_tick = 8
+reveal_units = 400000
+strain_units = 1800000
+heavy_units = 3600000
+strained_larval_rate = 0.75
+heavy_larval_rate = 0.5
+removal_units_per_worker_tick = 500
+developed_multiplier = 2
+cleaner_cap = 8
+build_workers = 4
+build_ticks = 360
+carbohydrate_cost = 24.0
+protein_cost = 12.0
+water_cost = 6.0

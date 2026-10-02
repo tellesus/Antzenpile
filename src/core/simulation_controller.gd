@@ -8,6 +8,7 @@ const Trails = preload("res://src/sim/trails/trail_system.gd")
 const Brood = preload("res://src/sim/colony/brood_system.gd")
 const FoodExchange = preload("res://src/sim/colony/food_exchange_system.gd")
 const Nursery = preload("res://src/sim/colony/nursery_development_system.gd")
+const Sanitation = preload("res://src/sim/colony/sanitation_system.gd")
 const Adaptation = preload("res://src/sim/colony/adaptation_system.gd")
 const Rain = preload("res://src/sim/weather/rain_system.gd")
 const Swarm = preload("res://src/sim/ecology/swarm_system.gd")
@@ -21,6 +22,7 @@ var trails: RefCounted
 var brood: RefCounted
 var food_exchange: RefCounted
 var nursery: NurseryDevelopmentSystem
+var sanitation: RefCounted
 var adaptation: RefCounted
 var rain: RainSystem
 var ecology: EcologySystem
@@ -56,6 +58,7 @@ func _attach_run(next_run: RunState) -> void:
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
+	sanitation = Sanitation.new(run)
 	adaptation = Adaptation.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
@@ -118,6 +121,14 @@ func start_nursery_development(pile_id: String) -> bool:
 	return nursery.start(pile_id)
 
 
+func set_sanitation_workers(pile_id: String, target: Variant) -> bool:
+	return sanitation.set_workers(pile_id, target)
+
+
+func start_midden(pile_id: String) -> bool:
+	return sanitation.start(pile_id)
+
+
 func start_adaptation(pile_id: String, trait_id: String) -> bool:
 	return adaptation.start(pile_id, trait_id)
 
@@ -151,5 +162,6 @@ func _tick(delta: float) -> void:
 	ecology.tick(delta)
 	food_exchange.tick(delta)
 	nursery.tick(delta)
+	sanitation.tick()
 	guest.tick()
 	brood.tick(delta)
