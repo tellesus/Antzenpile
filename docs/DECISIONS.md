@@ -1,5 +1,7 @@
 # Decision register
 
+A46 (071, authored prototype variation): Garden Edge retains the 40x40 backyard/home, terrain halves, all quantities/event/rates and producer/rival geometry; initial food moves to (31,18)/(8,16), protein (9,29), water (14,13), episodic crumbs (23,26). These positions are provisional content. Both registered layouts use the established backyard ecology family; no procedural map, season, satellite, new mortality or balance sweep.
+
 A45 (068, implementation discretion): retain eight-second/22,050-Hz arrangement; add authored Nursery melody/Midden wooden pulse, four persistent loops at -4 dB, three-real-second fades. Developed-only rewards; Nursery gain 0.55 + 0.45 x minimum known care/nutrition/climate/sanitation sufficiency. Selecting a musical function preserves its intent while other organ stems receive 85%; no selection unlocks a layer. Prototype composition proof, no gameplay authority or hidden guest cue. Independent player volume follows in 069.
 
 Source: **Ant Game Brainstorm**, GDD v0.2 Parts 1–8, with Part 7A overriding earlier visual ambiguity. This file separates locked design from implementation defaults; changing a lock requires an explicit design decision.

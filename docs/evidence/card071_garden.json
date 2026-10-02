@@ -1,0 +1,59 @@
+{
+	"duration_seconds": 2400,
+	"engine": "4.7.2-stable (official)",
+	"platform": "Windows",
+	"policy": "Unfunded returned-source alternatives from 065, real Nursery/brood/sanitation/climate costs, no injected knowledge/resources or suppressed threat deaths. Authored positions vary; rates unchanged.",
+	"rows": [
+		{
+			"adult_losses": 10,
+			"brood_emerged": 77,
+			"climate_carers": 1,
+			"first_food": 28.5,
+			"first_water": 30.5,
+			"known_sources": 7,
+			"nursery": "developed",
+			"save_exact": true,
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 244.9536,
+				"protein": 42.74556,
+				"water": 124.29794
+			},
+			"workers": 107
+		},
+		{
+			"adult_losses": 11,
+			"brood_emerged": 57,
+			"climate_carers": 1,
+			"first_food": 24.5,
+			"first_water": 403.0,
+			"known_sources": 7,
+			"nursery": "developed",
+			"save_exact": true,
+			"seed": 591,
+			"stores": {
+				"carbohydrate": 221.2456,
+				"protein": 49.96302,
+				"water": 94.21594
+			},
+			"workers": 86
+		},
+		{
+			"adult_losses": 11,
+			"brood_emerged": 69,
+			"climate_carers": 1,
+			"first_food": 32.5,
+			"first_water": 28.5,
+			"known_sources": 7,
+			"nursery": "developed",
+			"save_exact": true,
+			"seed": 202603,
+			"stores": {
+				"carbohydrate": 181.11826,
+				"protein": 48.10698,
+				"water": 135.60352
+			},
+			"workers": 98
+		}
+	]
+}

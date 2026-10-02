@@ -1,5 +1,7 @@
 # Data model
 
+Card 071 uses the existing scenario_id snapshot field for backyard_slice/garden_edge; no schema change. WorldLoader creates independent mutable nodes/terrain from registered immutable authored Resources. Garden Edge moves initial carbohydrate/water/protein and episodic crumbs while keeping starting quantities, home, producer/rival positions and existing ecology definitions. New-run unknown IDs reject before attachment; loaded world truth remains in the snapshot.
+
 Card 066 adds optional pile humidity {moisture: integer 0–1,000,000, carers: 0–4, water_used_units: exact nonnegative count}. Primitive/developing Nurseries remain at authored stable moisture with no job/use. Developed Nurseries drift/regulate through integer steps; actual humidification debits five-decimal stored water and records 100,000 units per water. Airing costs only committed labor. Restore reconciles humidity:pile kind/owner/count, rejects orphan/cross-pile work and invalid ranges atomically. Missing group defaults stable/zero, so old saves gain no retroactive climate burden. Reducing staff releases immediately; pause/speeds and JSON continuation preserve exact counters.
 
 Card 065 has no new saved gameplay fields. Observation.collective_search now identifies private standing samples at creation as well as delivery; rounded sensory uncertainty retains eight-decimal representation when restored. Legacy private standing records retain provenance and normalize only ≤1e-15 representation noise. Browser filters/page/open state is disposable view attention, reset on load.

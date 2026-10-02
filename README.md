@@ -4,7 +4,9 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
-**Colony** in either view starts a fresh colony with the current or a new seed without relaunching. Its explicit restart panel preserves your saved slot and sound settings. Both choices currently use the same authored backyard.
+The Colony panel now selects **Backyard** or **Garden Edge** before starting. Garden Edge changes the hidden initial resource arrangement while reusing established ecology/rates. Repeat preserves the selected layout and seed; saves preserve scenario identity. [Three ordinary trials](docs/GARDEN_EVALUATION.md) demonstrate continued growth and meaningful differences in water discovery.
+
+**Colony** in either view starts a fresh colony with the current or a new seed without relaunching. Its explicit restart panel preserves your saved slot and sound settings. Seed selection controls stochastic behavior; the setting selector chooses an authored layout.
 
 Developed Nursery and Midden now add synchronized melody/rhythm to the colony soundtrack. Known Nursery strain gently thins its voice; selected musical organs come forward. **Sound** in either view independently adjusts Music and Information Cues; settings persist locally outside colony saves. The arrangement remains original prototype audio awaiting listening/composition review.
 

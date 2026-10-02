@@ -5,6 +5,7 @@ const Clock = preload("res://src/core/simulation_clock.gd")
 const SNAPSHOT_VERSION: int = 5
 const World = preload("res://src/sim/world/world_state.gd")
 const Loader = preload("res://src/sim/world/world_loader.gd")
+const Scenarios = preload("res://src/sim/world/scenario_catalog.gd")
 const Colony = preload("res://src/sim/colony/colony_state.gd")
 const Scout = preload("res://src/sim/scouting/scout_agent.gd")
 const Knowledge = preload("res://src/sim/knowledge/knowledge_base.gd")
@@ -55,7 +56,8 @@ func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> voi
 	_scenario_id = scenario
 	rng.seed = _seed
 	genetic_rng.seed = _seed ^ 0x415450
-	world = Loader.new().load_scenario()
+	world = Loader.new().load_scenario(Scenarios.path_for(scenario))
+	assert(world != null, "Run construction requires a registered authored scenario")
 	colony.initialize_home(world.home_position)
 
 

@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 071 adds a 360x44 setting selector to Colony restart context. Opening defaults to the current setting; Change cycles Backyard/Garden Edge without changing the run. Repeat/fresh applies the selected authored layout and seed only on explicit start; cancel retains the colony. No source, threat or weather preview. A saved alternate setting loads and can be repeated without returning silently to Backyard.
+
 Card 070 adds Colony beside Sound/Save/Load. An explicit modal warns about replacing unsaved progress while retaining the saved slot/settings, then offers Repeat This Seed, Start With a Fresh Seed, and Cancel (360x44 logical targets). Escape/cancel does not change the colony. Both choices use the same authored backyard; seed changes stochastic behavior. No auto-restart or death/game-over model.
 
 Card 069 adds Sound beside Save/Load in both views. A modal panel offers independent Music/Information Cue off/25/50/75/100% presets (60x44 logical targets), Close and Escape; background input is absorbed without pausing the game. Local levels survive colony loading and mode switches. No unused Ambient control; muted cues retain the existing visual returned-loss evidence.

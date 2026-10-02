@@ -61,7 +61,7 @@ func stop_tending(pile_id: String) -> bool:
 
 func tick(_delta: float) -> void:
 	var now: int = _run.clock.tick_count
-	if _run.scenario_id != "backyard_slice":
+	if not ScenarioCatalog.uses_backyard_ecology(_run.scenario_id):
 		return
 	_tick_nectar(now)
 	_tick_picnic(now)

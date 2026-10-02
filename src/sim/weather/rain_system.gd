@@ -48,7 +48,7 @@ func tick(delta: float) -> void:
 
 
 func _refill_exterior_water(raining_seconds: float) -> void:
-	if _run.scenario_id != "backyard_slice" or not _run.world.nodes.has(CONFIG.exterior_water_source_id):
+	if not ScenarioCatalog.uses_backyard_ecology(_run.scenario_id) or not _run.world.nodes.has(CONFIG.exterior_water_source_id):
 		return
 	var source: WorldNodeState = _run.world.nodes[CONFIG.exterior_water_source_id]
 	assert(source.definition_id == "water")

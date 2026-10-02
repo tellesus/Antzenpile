@@ -3,9 +3,11 @@ extends Node2D
 ## Explicit restart choices, separate from colony actions and save slots.
 
 var seed_provider: Callable
+var scenario_provider: Callable
 var start_command: Callable
 var blocked: Callable
 var opened: bool = false
+var selected_scenario: String = "backyard_slice"
 var _font: Font = ThemeDB.fallback_font
 
 func _process(_delta: float) -> void: queue_redraw()
@@ -19,12 +21,20 @@ func panel_rect() -> Rect2:
 func choice_rect(choice: String) -> Rect2:
 	return Rect2(panel_rect().position + Vector2(24,148 if choice == "repeat" else 206 if choice == "fresh" else 264),Vector2(360,44))
 
+
+func scenario_rect() -> Rect2:
+	return Rect2(panel_rect().position + Vector2(24,94), Vector2(360,44))
+
 func activate_at(at: Vector2) -> bool:
 	if blocked.is_valid() and blocked.call(): return false
 	if button_rect().has_point(at):
 		opened = not opened
+		if opened and scenario_provider.is_valid(): selected_scenario = scenario_provider.call()
 		return true
 	if not opened: return false
+	if scenario_rect().has_point(at):
+		selected_scenario = "garden_edge" if selected_scenario == "backyard_slice" else "backyard_slice"
+		return true
 	if choice_rect("cancel").has_point(at):
 		opened = false
 		return true
@@ -34,7 +44,7 @@ func activate_at(at: Vector2) -> bool:
 			if choice == "fresh":
 				seed_value = int(Time.get_ticks_usec() % 2147483646) + 1
 				if seed_value == seed_provider.call(): seed_value = seed_value % 2147483646 + 1
-			var result: Dictionary = start_command.call(seed_value)
+			var result: Dictionary = start_command.call(seed_value, selected_scenario)
 			if result.get("accepted",false): opened = false
 	return true
 
@@ -59,8 +69,9 @@ func _draw() -> void:
 	draw_rect(panel,Color("41535a"),false)
 	_label(panel.position+Vector2(24,32),"Start a new colony",22,Color("d9d3be"))
 	_label(panel.position+Vector2(24,64),"Unsaved progress will be replaced.",15,Color("ccac91"))
-	_label(panel.position+Vector2(24,90),"Your saved colony and sound settings stay.",15,Color("a9b9bc"))
-	_label(panel.position+Vector2(24,120),"Same backyard · current seed %s" % str(seed_provider.call()),13,Color("82939c"))
+	_label(panel.position+Vector2(24,86),"Saved colony and sound settings stay.",14,Color("a9b9bc"))
+	draw_rect(scenario_rect(),Color("263038"))
+	_label(scenario_rect().position+Vector2(16,28),"SETTING: %s  ·  CHANGE" % ScenarioCatalog.label_for(selected_scenario),14,Color("a9b9bc"))
 	for choice: String in ["repeat","fresh","cancel"]:
 		draw_rect(choice_rect(choice),Color("35483c") if choice != "cancel" else Color("263038"))
 		_label(choice_rect(choice).position+Vector2(32,28),"REPEAT THIS SEED" if choice == "repeat" else "START WITH A FRESH SEED" if choice == "fresh" else "CANCEL",14,Color("dce5d9"))

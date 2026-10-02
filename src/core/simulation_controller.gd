@@ -34,8 +34,8 @@ var rival: RivalSystem
 var predator: PredatorSystem
 
 
-func _init(seed_value: int = 482817) -> void:
-	_attach_run(Run.new(seed_value))
+func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
+	_attach_run(Run.new(seed_value, scenario))
 
 
 func restore_snapshot(snapshot: Dictionary) -> bool:
@@ -46,10 +46,10 @@ func restore_snapshot(snapshot: Dictionary) -> bool:
 	return true
 
 
-func start_new_run(seed_value: Variant) -> bool:
-	if not seed_value is int:
+func start_new_run(seed_value: Variant, scenario: Variant = "backyard_slice") -> bool:
+	if not seed_value is int or not scenario is String or not scenario in ScenarioCatalog.IDS:
 		return false
-	_attach_run(Run.new(seed_value))
+	_attach_run(Run.new(seed_value, scenario))
 	return true
 
 

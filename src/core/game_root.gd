@@ -84,6 +84,7 @@ func _ready() -> void:
 		add_child(_audio_settings)
 		_colony_controls = preload("res://src/presentation/colony_controls.gd").new()
 		_colony_controls.seed_provider = current_seed
+		_colony_controls.scenario_provider = current_scenario
 		_colony_controls.start_command = start_new_colony
 		_colony_controls.blocked = colony_controls_blocked
 		_colony_controls.z_index = 101
@@ -147,9 +148,14 @@ func current_seed() -> int:
 	return simulation.run.run_seed
 
 
-func start_new_colony(seed_value: Variant) -> Dictionary:
-	if not simulation.start_new_run(seed_value):
-		return {"accepted": false, "reason": "Invalid colony seed"}
+func current_scenario() -> String:
+	return simulation.run.scenario_id
+
+
+func start_new_colony(seed_value: Variant, scenario: Variant = "") -> Dictionary:
+	var next_scenario: Variant = current_scenario() if scenario is String and scenario.is_empty() else scenario
+	if not simulation.start_new_run(seed_value, next_scenario):
+		return {"accepted": false, "reason": "Invalid colony seed or scenario"}
 	if _audio_settings != null: _audio_settings.opened = false
 	if _colony_controls != null: _colony_controls.opened = false
 	set_mode("outward")
