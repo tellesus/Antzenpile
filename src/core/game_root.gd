@@ -279,7 +279,8 @@ func returned_losses(pile_id: String) -> int:
 func music_state(pile_id: String) -> MusicState:
 	if not simulation.run.colony.piles.has(pile_id):
 		return MusicState.new()
-	return MusicState.from_food_exchange(simulation.run.colony.piles[pile_id].food_exchange_state)
+	var focus: String = _inward_view.selected_id if mode == "inward" and _inward_view != null else ""
+	return MusicState.from_summary(inward_status(pile_id), focus)
 
 
 func quick_save() -> Dictionary:

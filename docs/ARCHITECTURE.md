@@ -1,5 +1,7 @@
 # Architecture
 
+Card 068 extends MusicState from detached internal function/condition summaries and INWARD selection. Four persistent equal-length loops remain synchronized; developed Nursery/Midden add melody/pulse, known Nursery condition gently thins its layer, and attention modestly reduces other organ layers. Three-second fades use real time; phase-zero reload recreates audio without saved gameplay fields. Returned-loss cues remain separate and headless runs stay silent.
+
 Card 066: each PileState owns HumidityState; HumiditySystem owns humidity:pile internal labor and paid regulation. Only developed Nurseries drift on the local rain/fixed clock. It follows Nursery completion and sanitation, before brood advancement. BroodSystem takes the worse sanitation/humidity rate for larvae and proportional food costs. GameRoot detaches internal condition/use/staff summaries; INWARD keeps climate staffing separate from laying brood. No external source query becomes knowledge, and primitive climate remains stable.
 
 Card 065 adds SourceMemory, a pure projection of detached returned signals/outcomes and route staffing/danger summaries. OUTWARD browsing only selects a remembered bearing; no gameplay command or world lookup. Private standing scout provenance is captured at sensing to preserve eight-decimal observation continuation; observations still enter KnowledgeBase only on return.
