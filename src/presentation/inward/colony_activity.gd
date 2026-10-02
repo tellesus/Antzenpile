@@ -6,6 +6,23 @@ const MAX_ANTS: int = 12
 const MAX_BROOD: int = 6
 
 
+static func health(status: Dictionary, organ: String) -> float:
+	# These are already-known functional rates, not a new health simulation.
+	if organ == "midden":
+		return clampf(status.get("midden", {}).get("larval_rate", 1.0), 0.0, 1.0)
+	if organ != "nursery":
+		return 1.0
+	var result: float = minf(status.get("humidity", {}).get("larval_rate", 1.0), status.get("midden", {}).get("larval_rate", 1.0))
+	for cohort: Dictionary in status.get("brood", []):
+		result = minf(result, minf(cohort.get("nutrition", 1.0), cohort.get("care", 1.0)))
+	return clampf(result, 0.0, 1.0)
+
+
+static func pulse(health_rate: float, time: float) -> float:
+	var strain: float = 1.0 - clampf(health_rate, 0.0, 1.0)
+	return sin(time * 1.4) * (1.0 - strain) + sin(time * 2.3 + sin(time * 0.7)) * strain
+
+
 static func jobs(status: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	if status.get("nursery_occupied_space", 0) > 0 and status.get("nursery_care_capacity", 0) > 0:

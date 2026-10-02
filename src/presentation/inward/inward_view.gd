@@ -26,6 +26,8 @@ var selected_id: String = ""
 var web_selection: String = "foraging"
 var web_family: String = "foraging"
 var _animation_time: float = 0.0
+const FOCUS_SECONDS: float = 0.28
+var _focus_gains: Dictionary = {}
 var _status: Dictionary = {}
 var _font: Font = ThemeDB.fallback_font
 var _feedback: String = ""
@@ -42,6 +44,9 @@ func _process(delta: float) -> void:
 		_status = status_provider.call()
 	if not _status.get("paused", false):
 		_animation_time = fposmod(_animation_time + minf(delta, 0.1), 3600.0)
+	# UI attention remains responsive on pause; gameplay decoration stays frozen.
+	for id: String in NODES + ["guest", "midden"]:
+		_focus_gains[id] = move_toward(float(_focus_gains.get(id, 0.0)), 1.0 if id == selected_id else 0.0, maxf(delta, 0.0) / FOCUS_SECONDS)
 	queue_redraw()
 
 
@@ -334,15 +339,26 @@ func _draw_activity(centers: Dictionary) -> void:
 
 func _draw_node(id: String, at: Vector2) -> void:
 	var color: Color = Color("d5c4a1") if id == "queen" else Color("aebdb7") if id == "nursery" else Color("c7af86") if id == "food_exchange" else Color("bba6c8") if id == "adaptation" else Color("bd927a") if id == "midden" else Color("8daeb3")
+	var focus: float = smoothstep(0.0, 1.0, float(_focus_gains.get(id, 0.0)))
+	var attention: float = lerpf(0.85, 1.0, focus) if not selected_id.is_empty() else 1.0
+	var health: float = Activity.health(_status, id)
+	var strain: float = 1.0 - health
+	var pulse: float = Activity.pulse(health, _animation_time)
 	var phase: float = _animation_time * 0.18 + NODES.find(id)
-	var outline: PackedVector2Array = Art.membrane(at, 34.0, phase, 0.86)
-	draw_colored_polygon(outline, Color(color, 0.08 if id == selected_id else 0.045))
-	draw_polyline(outline.slice(1, 27), Color(color, 0.7 if id == selected_id else 0.4), 1.1, true)
+	var radius: float = 34.0 + pulse * (0.8 + strain * 0.8) if id in ["nursery", "midden"] else 34.0
+	var outline: PackedVector2Array = Art.membrane(at, radius, phase, 0.86)
+	draw_colored_polygon(outline, Color(color, lerpf(0.045, 0.08, focus) * attention))
+	var edge: Color = Color(color.lerp(Color("cb927c"), strain * 0.55), lerpf(0.4, 0.7, focus) * attention)
+	if strain > 0.0:
+		for part: int in 3:
+			draw_polyline(outline.slice(1 + part * 9, 8 + part * 9), edge, 1.1, true)
+	else:
+		draw_polyline(outline.slice(1, 27), edge, 1.1, true)
 	match id:
 		"midden":
 			var burden: float = _status.get("midden", {}).get("burden", 0.0)
 			for index: int in mini(6, int(ceil(burden))):
-				var fragment: Vector2 = at + Vector2(index % 3 * 9 - 9, index / 3 * 8 - 3)
+				var fragment: Vector2 = at + Vector2(index % 3 * 9 - 9, index / 3 * 8 - 3) + Vector2.from_angle(index * 2.1) * strain * (3.0 + pulse)
 				draw_line(fragment, fragment + Vector2(4, -3), Color("bd765c"), 1.5, true)
 		"guest":
 			for index: int in 3:
@@ -351,12 +367,13 @@ func _draw_node(id: String, at: Vector2) -> void:
 			var stages: Array[String] = Activity.brood_stages(_status)
 			for index: int in stages.size():
 				var seed_at: Vector2 = at + Vector2(index % 3 * 9 - 9, index / 3 * 11 - 5)
+				var brood_color: Color = Color(color, (0.55 + health * 0.2 + pulse * 0.025) * attention)
 				if stages[index] == "larva":
-					draw_arc(seed_at, 3.2, 0.2, 4.8, 12, Color(color, 0.75), 2.0, true)
+					draw_arc(seed_at, 3.2, 0.2, 4.8, 12, brood_color, 2.0, true)
 				elif stages[index] == "pupa":
-					draw_polyline(Art.membrane(seed_at, 4.4, 0, 0.48), Color(color, 0.7), 1.0, true)
+					draw_polyline(Art.membrane(seed_at, 4.4, 0, 0.48), brood_color, 1.0, true)
 				else:
-					draw_circle(seed_at, 2.1, Color(color, 0.7))
+					draw_circle(seed_at, 2.1, brood_color)
 			if _status.get("humidity", {}).get("carers", 0) > 0:
 				draw_polyline(Art.membrane(at, 26, -phase, 0.62).slice(3, 14), Color("7fbfcf", 0.4), 1.0, true)
 		"adaptation":
@@ -376,10 +393,10 @@ func _draw_node(id: String, at: Vector2) -> void:
 			draw_circle(at + Vector2(0, 9), 3.0, Color(color, 0.36))
 	if id == "nursery" and _status.get("guest", {}).get("observation", "") == "foreign":
 		draw_arc(at, 39.0, 0.3, 1.9, 20, Color("b79eaf"), 1.0, true)
-	if id == selected_id:
-		var focus: PackedVector2Array = Art.membrane(at, 43.0, 1.5)
-		draw_polyline(focus.slice(1, 8), Color("dce5d9"), 1.0, true)
-		draw_polyline(focus.slice(17, 24), Color("dce5d9"), 1.0, true)
+	if focus > 0.0:
+		var focus_outline: PackedVector2Array = Art.membrane(at, 43.0, 1.5)
+		draw_polyline(focus_outline.slice(1, 8), Color("dce5d9", focus), 1.0, true)
+		draw_polyline(focus_outline.slice(17, 24), Color("dce5d9", focus), 1.0, true)
 	_label(at + Vector2(0, 52), _title(id), color, 15, HORIZONTAL_ALIGNMENT_CENTER)
 	var pressure: String = Activity.pressure(_status, id)
 	var progress: float = Activity.project_progress(_status, id)

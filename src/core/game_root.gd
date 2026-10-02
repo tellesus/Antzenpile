@@ -376,6 +376,7 @@ func _refresh_loaded_views() -> void:
 		_outward_view._process(0)
 	if _inward_view != null:
 		_inward_view.selected_id = ""
+		_inward_view._focus_gains.clear()
 		_inward_view.web_selection = "foraging"
 		_inward_view.web_family = "foraging"
 		_inward_view._feedback = ""

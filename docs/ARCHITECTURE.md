@@ -1,5 +1,7 @@
 # Architecture
 
+Card 074 keeps functional visual health as a pure minimum of approved Nursery food/care/climate/sanitation rates (Midden uses sanitation). It owns no gameplay health. View-local attention gains ease over real time independently of paused biological decoration; load/new colony clears them. Fixed centers/hit areas and immediate semantic selection remain authoritative for interaction.
+
 Card 072 baselines detached sensory identities in ephemeral ReturnedDiscovery. Graphical GameRoot polls after simulation advancement; only new home-delivered IDs increment a presentation counter and set temporary view feedback. AudioController polls that counter for one short batched cue, separate from music/loss cues. Load/reset baselines known IDs and resets presentation counters before restarting audio. No RunState or RNG fields.
 
 Card 071 registers two authored layouts in ScenarioCatalog. RunState loads the requested resource path; fresh-run commands validate IDs before attachment and retain current scenario on unspecified repeat. The two layouts explicitly share backyard ecology and rain-water rules; snapshot identity/world remain authoritative and legacy restore acceptance stays unchanged. Colony selection shows only setting names, never source geometry.

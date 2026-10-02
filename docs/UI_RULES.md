@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 074 eases selected INWARD function membranes over 0.28 real seconds and gently dims other organ art, preserving labels/controls and fixed hit areas. Attention remains responsive on pause; biological pulses freeze and stay independent of game speed. Nursery/Midden use only detached food/care/climate/refuse rates: stable healthy pulses, irregular broken strained contours and bounded dimmer brood/looser refuse contents. Existing written causes and remedies remain primary; color is not the only cue. No inferred disease or new health mechanic.
+
 Card 073 adds optional How to Play within Colony: four concise observation/journey/internal-function/save pages, Previous/Next/Back to Colony and Escape. Guide buttons absorb coordinates of the restart controls beneath them; reading never changes simulation or opens automatically. Its modal remains mutually exclusive with Sound, with fixed 44-pixel logical targets and no map/resource preview.
 
 Card 072 briefly says New food/water/protein trace(s) returned in the active view footer, with a delicate chime controlled by Information Cues. New-only sensory IDs batch into one event; private scout sensing/repeated reports/loaded old knowledge produce none. Notice never changes facing/selection; the new cloud and Remembered Sources entry supply persistent visual evidence. A later player action may replace transient feedback.
