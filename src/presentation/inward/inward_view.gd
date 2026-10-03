@@ -331,7 +331,7 @@ func _can_lay_brood() -> bool:
 
 func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
-	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
+	draw_rect(Rect2(Vector2.ZERO, size), Color.BLACK)
 	if selected_id == "adaptation":
 		Web.draw_graph(self, size, _status, web_selection, _animation_time, web_family)
 		UIStyle.surface(self, _web_back_rect(), Color("18252b"))

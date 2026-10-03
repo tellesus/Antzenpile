@@ -1,5 +1,7 @@
 # Decision register
 
+089 palette follow-up (2026-10-02): the player selected pure black for empty INWARD/OUTWARD space, replacing inherited blue-black. Local art illumination and distinct dark control surfaces remain. This also applies to viewport clear color; no new effect or gameplay contract.
+
 Graphics clarification accepted 2026-10-02 (089): the player's new bioluminescent references authorize a substantial textured art upgrade. INWARD may visibly grow functional organs through existing construction and capacity expansion. Baked lighting, reusable generated empty shells and original shaded anatomy are authoring techniques; contents remain approved state projections. Local Home substrate is permitted in OUTWARD; distant space remains an information field. No new major system, engine upgrade, paid plugin or physical tunnel geography is authorized.
 
 A49 (080, delegated routine defaults; original Part 3 §§29–31/127): optional Roadside adds a 1,200-unit ordinary carbohydrate spill at (13,13), contaminant fraction 25%. Liquid-pool half-life 180s, one-unit mixing floor, 1e-8 mass floor precision, exposure threshold equivalent to 12 concentration-seconds and competing recovery 0.02/s; one available home adult lost per threshold. Local feeding failures remain recent for 300s with persistent history. First model excludes queen, brood and committed jobs; no chemical source knowledge, instant intake death, new cure/trait or disease. Authored values are provisional; old environments and general rates stay intact.

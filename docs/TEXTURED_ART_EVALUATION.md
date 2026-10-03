@@ -42,3 +42,11 @@ Requests were 1280x720, 900x600 and 1920x1080. Compact capture is 900x506; the l
 ## Remaining boundaries
 
 Distinct chamber material variants and report-derived object impressions can expand this modular direction. Full release visual quality, minimum supported hardware, long-session memory, busy live-colony stress, thermal behavior and Android performance remain open. Pixel 7 Pro is the player's first real-device target, not a measured minimum specification; SDK/export/device setup is pending. No paid tool/plugin was added. [Asset provenance and generation prompts](../assets/graphics/colony/README.md) are checked in.
+
+## Black-field follow-up
+
+The player chose pure black instead of inherited blue-black. Both normal views and viewport clear now use RGB 0/0/0, with existing local illumination and framed controls retained. Fresh standard/compact captures and pixel inspection passed; the full suite remains 6003 checks / zero failures, with clean script/resource import, Main smoke and unchanged probe snapshot/RNG. The preceding timing comparison belongs to the textured-art pass; no new performance claim is made for this color-only follow-up.
+
+![INWARD on black](evidence/card089_black_inward.png)
+
+![OUTWARD on black](evidence/card089_black_outward.png)

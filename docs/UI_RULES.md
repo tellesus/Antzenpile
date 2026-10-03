@@ -56,7 +56,7 @@ The first release-style proof uses three reusable cloud-mask layers and up to tw
 
 ## Shared rules
 
-- Near-black background; large meaningful negative space. When nothing relevant is known or happening, render almost nothing. No filler stars, mist, particles, roots, noise, or ornamental HUD.
+- Pure black empty field and viewport clear; warm/cool illumination stays local to meaningful structures and sensory traces. Large meaningful negative space. When nothing relevant is known or happening, render almost nothing. No filler stars, mist, particles, roots, noise, or ornamental HUD.
 - Bioluminescent, organic chemical visualization. Clean sans-serif typography, translucent small context cards, qualitative information first. Avoid a futuristic tactical interface.
 - Thin bright trail cores, faint chemical envelopes, representative moving traffic, restrained glow. Strong trails are coherent; fading trails become gapped and irregular. Familiarity can remain as a much fainter ghost after chemical loss.
 - Warm amber/gold primarily means carbohydrate/metabolic energy; cyan/blue, violet, red-orange, pale neutral, and restrained positive-state green remain distinct families. Exact hues are tunable. Color must not be the only distinction: water can ripple, alarm pulse abruptly, and death fragment/fade.

@@ -419,7 +419,7 @@ func _button_at(at: Vector2) -> String:
 func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	_prepare_signal_captions(size)
-	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
+	draw_rect(Rect2(Vector2.ZERO, size), Color.BLACK)
 	_draw_rain(size)
 	Art.home_entrance(self,Vector2(size.x*0.5,size.y*0.78))
 	_draw_trails(size)
