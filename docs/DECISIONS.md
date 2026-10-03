@@ -1,5 +1,7 @@
 # Decision register
 
+094, user feedback 2026-10-03: adaptation choice is one saved, replaceable next-brood intent, not a list or immediate purchase. Laying locks that cohort's trait and clears the intent for a follow-up selection. Existing revealed/exclusive repertoire and single-active-trial limits remain. A queued choice is an explicit automatic paid-trial request even with ordinary laying Manual, and takes priority over ordinary Grow/Manual Lay; paused ticks do not lay. Supersedes immediate UI purchase behavior in 039/044 and the no-adaptation-priority portion of A48. Existing costs and expression on emergence remain.
+
 092 music pass accepted 2026-10-02: supersede the prototype duration/rate in A16/A45 with an original 16-bar/80-BPM, 48-second/44.1-kHz mono arrangement. Soft recorded bass drum/tuned timpani and complementary harp/marimba/light percussion use seven pinned CC0 VCSL samples in offline authoring only. Four synchronized players, developed/known-condition/focus gates, -4 dB runtime gain, real-time fades and separate cues remain. Larger PCM footprint is explicit; subjective/mobile validation remains pending.
 
 089 palette follow-up (2026-10-02): the player selected pure black for empty INWARD/OUTWARD space, replacing inherited blue-black. Local art illumination and distinct dark control surfaces remain. This also applies to viewport clear color; no new effect or gameplay contract.

@@ -71,7 +71,7 @@ func _ready() -> void:
 		inward.brood_intent_command = set_brood_intent
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
-		inward.adaptation_command = start_adaptation
+		inward.adaptation_command = queue_adaptation
 		inward.input_blocked = interaction_blocked
 		inward.save_command = quick_save
 		inward.load_command = quick_load
@@ -324,7 +324,7 @@ func inward_status(pile_id: String) -> Dictionary:
 			continue
 		if trait_id in ["security", "tolerance"] and not pile.recognition_candidate:
 			continue
-		adaptation_options[trait_id] = {"available": AdaptationRules.can_select(pile, trait_id),
+		adaptation_options[trait_id] = {"available": AdaptationRules.can_queue(pile, trait_id),
 			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.genetics.established,
 			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)}
 	for trait_id: String in pile.genetics.established:
@@ -349,6 +349,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"recognition_clearing_change": AdaptationRules.RECOGNITION.clearing_change,
 		"recognition_labor_change": AdaptationRules.RECOGNITION.protection_worker_change,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
+		"adaptation_queue": simulation.adaptation.queued_status(pile_id),
 		"adapted_workers": expected_adapted,
 		"adaptation_fraction": float(expected_adapted) / expected_total if expected_total > 0 else 0.0,
 		"adaptation_costs": AdaptationRules.COSTS.duplicate(),
@@ -499,6 +500,11 @@ func set_brood_intent(intent: String) -> Dictionary:
 
 func start_adaptation(trait_id: String) -> Dictionary:
 	var accepted: bool = simulation.start_adaptation("home", trait_id)
+	return {"accepted": accepted, "reason": simulation.adaptation.last_error}
+
+
+func queue_adaptation(trait_id: String) -> Dictionary:
+	var accepted: bool = simulation.queue_adaptation("home", trait_id)
 	return {"accepted": accepted, "reason": simulation.adaptation.last_error}
 
 

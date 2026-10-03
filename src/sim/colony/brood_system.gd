@@ -3,12 +3,15 @@ extends RefCounted
 
 const CONFIG = preload("res://data/resources/default_brood.tres")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
+const Adaptation = preload("res://src/sim/colony/adaptation_system.gd")
 var _run: RunState
+var _adaptation: RefCounted
 var last_error: String = ""
 
 
-func _init(run_state: RunState) -> void:
+func _init(run_state: RunState, adaptation_system: RefCounted = null) -> void:
 	_run = run_state
+	_adaptation = adaptation_system if adaptation_system != null else Adaptation.new(_run)
 
 
 func start(pile_id: String) -> bool:
@@ -16,6 +19,10 @@ func start(pile_id: String) -> bool:
 		last_error = "Unknown pile"
 		return false
 	var pile: PileState = _run.colony.piles[pile_id]
+	if not pile.queued_adaptation.is_empty():
+		var accepted: bool = _adaptation.start_queued(pile_id)
+		last_error = _adaptation.last_error
+		return accepted
 	if pile.queen_count < 1:
 		last_error = "No queen in pile"
 		return false
@@ -55,7 +62,8 @@ func production_status(pile_id: String) -> Dictionary:
 	var pile: PileState = _run.colony.piles[pile_id]
 	var waiting: String = "ready"
 	var pending: int = pile.nursery_occupied_space() + CONFIG.starting_count
-	if pile.brood_intent == "manual": waiting = "manual"
+	if not pile.queued_adaptation.is_empty(): waiting = "adaptation"
+	elif pile.brood_intent == "manual": waiting = "manual"
 	elif pile.queen_count < 1: waiting = "queen"
 	elif pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pending > pile.nursery_brood_capacity(): waiting = "space"
 	elif pending > pile.nursery_care_capacity(): waiting = "care"
@@ -112,7 +120,11 @@ func tick(delta: float) -> void:
 		var care_fraction: float = minf(1.0, float(pile.nursery_care_capacity()) / occupied) if occupied > 0 else 1.0
 		for cohort: BroodCohort in pile.brood_cohorts.duplicate():
 			_advance(pile, cohort, delta, care_fraction)
-		if pile.brood_intent == "grow" and production_status(id).waiting == "ready":
+		# A player's selected trial owns the next laying opportunity, even in Manual.
+		# Do not let ordinary Auto Brood consume that slot while the trial is waiting.
+		if not pile.queued_adaptation.is_empty():
+			_adaptation.start_queued(id)
+		elif pile.brood_intent == "grow" and production_status(id).waiting == "ready":
 			start(id)
 
 

@@ -66,14 +66,14 @@ func _attach_run(next_run: RunState) -> void:
 	trails = Trails.new(run, predator, rival)
 	swarm = Swarm.new(run, trails.apply_loss)
 	trails.swarm = swarm
-	brood = Brood.new(run)
+	adaptation = Adaptation.new(run)
+	brood = Brood.new(run, adaptation)
 	food_toxicity = FoodToxicitySystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
 	sanitation = Sanitation.new(run)
 	humidity = Humidity.new(run)
-	adaptation = Adaptation.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
 	run.clock.tick.connect(_tick)
@@ -157,6 +157,10 @@ func set_humidity_workers(pile_id: String, target: Variant) -> bool:
 
 func start_adaptation(pile_id: String, trait_id: String) -> bool:
 	return adaptation.start(pile_id, trait_id)
+
+
+func queue_adaptation(pile_id: String, trait_id: Variant) -> bool:
+	return adaptation.queue_choice(pile_id, trait_id)
 
 
 func start_honeydew_tending(pile_id: String) -> bool:

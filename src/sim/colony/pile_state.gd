@@ -21,6 +21,7 @@ var brood_matured_total: int = 0
 var brood_started_total: int = 1
 var brood_lost_total: int = 0
 var brood_intent: String = "manual"
+var queued_adaptation: String = ""
 var adaptation_repertoire: String = ""
 var adapted_workers_total: int = 0
 var adapted_workers_lost: int = 0
@@ -50,6 +51,7 @@ func to_dict() -> Dictionary:
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
 		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
 		"brood_intent": brood_intent,
+		"queued_adaptation": queued_adaptation,
 		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
 		"adapted_workers_lost": adapted_workers_lost,
 		"genetics": genetics.to_dict(),
@@ -278,9 +280,11 @@ func restore(data: Dictionary) -> bool:
 			if (restored_genetics.living.get(key, 0) + restored_genetics.lost.get(key, 0)) % BROOD_CONFIG.starting_count != 0:
 				return false
 	var trials: int = 0
+	var locked_trait: String = ""
 	for cohort: BroodCohort in restored_brood:
 		if cohort.adaptation_trial:
 			trials += 1
+			locked_trait = cohort.adaptation_id
 			if cohort.adaptation_id in restored_genetics.established or (cohort.adaptation_id in ["lean", "load"] and repertoire != ""):
 				return false
 			if cohort.adaptation_id == "persistent" and not candidate:
@@ -301,6 +305,9 @@ func restore(data: Dictionary) -> bool:
 		if cohort.recognition_comparison and not recognition_seen:
 			return false
 	if trials > 1:
+		return false
+	var restored_queue: Variant = data.get("queued_adaptation", "")
+	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), restored_genetics.established, candidate, recognition_available, locked_trait)):
 		return false
 	var adaptation_commitment: String = "adaptation:" + data.id
 	var adaptation_record: Dictionary = restored.to_dict().commitments.get(adaptation_commitment, {})
@@ -354,6 +361,7 @@ func restore(data: Dictionary) -> bool:
 	brood_started_total = int(started)
 	brood_lost_total = int(brood_lost)
 	brood_intent = restored_intent
+	queued_adaptation = restored_queue
 	adaptation_repertoire = repertoire
 	adapted_workers_total = int(adapted)
 	adapted_workers_lost = int(adapted_lost)

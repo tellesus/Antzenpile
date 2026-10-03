@@ -4,9 +4,11 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+Adaptation choices can now be queued while Nursery is full. Inspect a trait and use **Queue for Next Brood**; another choice replaces it, or cancel before laying. The funded trial takes the next brood slot, locks its trait when eggs are laid, and leaves the queue available for a compatible follow-up. Queued/waiting and laid/locked states are distinct; choices survive save/load. [094 verification](docs/tasks/094_queued_adaptation_choice.md).
+
 The graphics branch now integrates the player's returned Queen/Nursery/Entrance kit with a matching expansion annex and fine functional fibers. Native amber/cyan materials stay distinct; known Nursery construction blends its lining and grows the organ. [091 evidence](docs/tasks/091_returned_art_integration.md) records actual standard/compact graphics and desktop cost.
 
-The music is now an original 48-second arrangement with warm low harmony, soft bass drum/tuned timpani, harp, marimba and light frame/wood/shaker rhythm. Developed chambers add complementary layers through the existing condition/focus controls; speed and pause leave playback tempo unchanged. Four synchronized WAVs use pinned free CC0 samples during offline authoring, with no new runtime plugin. [Music evidence and listening limits](docs/MUSIC_EVALUATION.md); subjective repeat listening and Pixel 7 Pro validation remain pending.
+The music is now an original 48-second arrangement with warm low harmony, soft bass drum/tuned timpani, harp, marimba and muted frame drum/sparse softened shaker. Developed chambers add complementary layers through the existing condition/focus controls; speed and pause leave playback tempo unchanged. Four synchronized WAVs use pinned free CC0 samples during offline authoring, with no new runtime plugin. [Music evidence and listening limits](docs/MUSIC_EVALUATION.md); wider repeat listening and Pixel 7 Pro validation remain pending.
 
 The graphics branch now has textured growing INWARD organs, an additional Nursery lobe after expansion, shaded queen/brood/worker sprites, filament-rich resource clouds and trails, a sculpted Home entrance, and shared dark framed controls. Gameplay remains unchanged. See [the art and performance evidence](docs/TEXTURED_ART_EVALUATION.md); actual Pixel 7 Pro validation is pending.
 

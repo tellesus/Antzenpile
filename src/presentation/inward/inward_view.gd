@@ -123,8 +123,11 @@ func activate_at(at: Vector2) -> bool:
 		return true
 	if selected_id == "adaptation" and web_selection in ["lean", "load", "persistent", "security", "tolerance"] and _can_choose_adaptation():
 		if _adaptation_rect(web_selection).has_point(at):
-			_run_command("adaptation_" + web_selection)
+			_run_command("cancel_adaptation" if _queued_trait() == web_selection else "adaptation_" + web_selection)
 			return true
+	if selected_id == "adaptation" and web_selection == "foraging" and not _queued_trait().is_empty() and _adaptation_rect("").has_point(at):
+		_run_command("cancel_adaptation")
+		return true
 	if selected_id in ["queen", "nursery"] and _brood_rect().has_point(at):
 		if _can_lay_brood(): _run_command("lay_brood")
 		else: show_feedback(_brood_block_reason())
@@ -205,10 +208,10 @@ func _run_command(command: String) -> void:
 				var result: Dictionary = brood_command.call()
 				_feedback = "New brood started" if result.get("accepted", false) else result.get("reason", "Brood unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
-		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance":
+		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance", "cancel_adaptation":
 			if adaptation_command.is_valid():
-				var result: Dictionary = adaptation_command.call(command.trim_prefix("adaptation_"))
-				_feedback = "Adaptation brood started" if result.get("accepted", false) else result.get("reason", "Adaptation unavailable")
+				var result: Dictionary = adaptation_command.call("" if command == "cancel_adaptation" else command.trim_prefix("adaptation_"))
+				_feedback = ("Queued adaptation cleared" if command == "cancel_adaptation" else "Next brood choice saved · changeable until laid") if result.get("accepted", false) else result.get("reason", "Adaptation unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
 		"save", "load":
 			var action: Callable = save_command if command == "save" else load_command
@@ -326,7 +329,12 @@ func _can_choose_adaptation() -> bool:
 	return _status.get("adaptation_options", {}).get(web_selection, {}).get("available", _status.get("adaptation_repertoire", "") == "" and _status.get("adaptation_trial", {}).is_empty() and web_selection in ["lean", "load"])
 
 
+func _queued_trait() -> String:
+	return _status.get("adaptation_queue", {}).get("trait_id", "")
+
+
 func _can_lay_brood() -> bool:
+	if not _queued_trait().is_empty(): return _status.get("adaptation_queue", {}).get("waiting", "") == "ready"
 	return _status.get("queens", 0) > 0 and _status.get("brood", []).size() < _status.get("nursery_brood_capacity", 0) / maxi(1, _status.get("brood_batch_count", 8)) and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
 
 
@@ -455,7 +463,8 @@ func _draw_node(id: String, at: Vector2) -> void:
 
 func _draw_hud(size: Vector2) -> void:
 	_label(Vector2(24, 38), "INWARD  /  ADAPTATION WEB" if selected_id == "adaptation" else "INWARD  /  HOME", Color("dad7c8"), 22)
-	_label(Vector2(24, 63), "Genes grow through brood; relationships through interaction." if selected_id == "adaptation" else "Tap a function to inspect it.", Color("82939c"), 13)
+	var web_hint: String = "Next brood: %s · change until eggs are laid" % Web.short_title(_queued_trait()) if not _queued_trait().is_empty() else "Inspect a trait, then queue it for the next brood."
+	_label(Vector2(24, 63), web_hint if selected_id == "adaptation" else "Tap a function to inspect it.", Color("82939c"), 13)
 	if not _status.is_empty():
 		var stores: Dictionary = _status.get("resources", {})
 		_label(Vector2(24, 96), "STORES   Carbs %.1f   ·   Protein %.1f   ·   Water %.1f" % [stores.get("carbohydrate", 0.0), stores.get("protein", 0.0), stores.get("water", 0.0)], Color("a9b9bc"), 13)
@@ -523,8 +532,10 @@ func _draw_context(size: Vector2) -> void:
 				var needed: float = _status.get("brood_reserve", {}).get(production.waiting, 0.0)
 				wait_text = "Auto needs %.1f %s; have %.1f" % [needed, Copy.resource(production.waiting), _status.resources.get(production.waiting, 0.0)]
 			_label(box.position + Vector2(16, 273), wait_text, Color("a9b9bc"), 15)
-			_label(box.position + Vector2(16, 294), "Auto checks food, care and space.", Color("8fa1a8"), 15)
-			_label(box.position + Vector2(16, 313), "Manual brood still needs feeding.", Color("8fa1a8"), 15)
+			if production.waiting == "adaptation":
+				_label(box.position + Vector2(16, 273), "Next: " + Web.short_title(_queued_trait()), Color("d9c5a5"), 15)
+			_label(box.position + Vector2(16, 294), Web.queue_wait(_status) if production.waiting == "adaptation" else "Auto checks food, care and space.", Color("8fa1a8"), 15)
+			_label(box.position + Vector2(16, 313), "Queued trial has priority." if production.waiting == "adaptation" else "Manual brood still needs feeding.", Color("8fa1a8"), 15)
 			_draw_brood_button()
 		"nursery":
 			var brood: Array = _status.brood
@@ -639,11 +650,11 @@ func _draw_context(size: Vector2) -> void:
 		"adaptation":
 			_detail_line(box, 65, "Security / tolerance · overview" if web_family == "recognition" else "Colony repertoire · overview")
 			_detail_line(box, 91, "Select a trait to inspect its tradeoff")
-			_detail_line(box, 117, "Start its brood trial in this panel")
+			_detail_line(box, 117, "Queue its next brood in this panel")
 			if not _status.adaptation_trial.is_empty():
-				_detail_line(box, 163, "%s trial" % str(_status.adaptation_trial.adaptation_id).capitalize())
-				_detail_line(box, 189, "Brood stage: %s" % _status.adaptation_trial.stage.capitalize())
-				_detail_line(box, 215, "Trait emerges with this brood")
+				_detail_line(box, 163, "Laid: " + Web.short_title(_status.adaptation_trial.adaptation_id))
+				_detail_line(box, 189, "Locked · %s brood" % _status.adaptation_trial.stage.capitalize())
+				_detail_line(box, 215, "Surviving adults express the trait")
 			elif not _status.get("genetic_repertoire", []).is_empty():
 				_detail_line(box, 163, "%d inherited traits" % _status.get("genetic_repertoire", []).size())
 				_detail_line(box, 189, "Inspect each leaf for adult expression")
@@ -652,7 +663,11 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 163, "One focused brood trial at a time")
 				_detail_line(box, 189, "Genes require food, nurses and brood")
 				_detail_line(box, 215, "Relationships grow through interaction")
-			if _status.get("wet_trail_experience", false) and not _status.get("adaptation_options", {}).has("persistent"):
+			if not _queued_trait().is_empty():
+				_draw_action(_adaptation_rect(""), "CANCEL QUEUED CHOICE", "", Color("28212f"))
+				_detail_line(box, 302, "Next: " + Web.short_title(_queued_trait()))
+				_detail_line(box, 326, Web.queue_wait(_status))
+			elif _status.get("wet_trail_experience", false) and not _status.get("adaptation_options", {}).has("persistent"):
 				_detail_line(box, 249, "Wet journeys weakened scent")
 				_detail_line(box, 275, "New brood may reveal variation")
 			elif _status.get("recognition_experience", false) and not _status.get("adaptation_options", {}).has("security"):
@@ -688,24 +703,26 @@ func _draw_genetic_context(box: Rect2) -> void:
 		_detail_line(box, 185, "%.0f carbs · %.0f protein · %.0f water" % [costs.carbohydrate, costs.protein, costs.water])
 		_detail_line(box, 211, "%d nurses · %d brood slots" % [_status.adaptation_nurses, _status.brood_batch_count])
 		var rect: Rect2 = _adaptation_rect(web_selection)
-		_draw_action(rect, "START SELECTED TRAIT TRIAL", _trial_shortage(costs), Color("28212f"))
+		var queued: bool = _queued_trait() == web_selection
+		_draw_action(rect, "CANCEL QUEUED CHOICE" if queued else "REPLACE QUEUED CHOICE" if not _queued_trait().is_empty() else "QUEUE FOR NEXT BROOD", "", Color("28212f"))
 		UIStyle.surface(self, rect, Color("a28aaf"), true)
+		_detail_line(box, 302, Web.queue_wait(_status) if queued else "Paid only when eggs are laid")
+		_detail_line(box, 326, "Change choice until eggs are laid" if queued else "Replaces choice; no waiting list")
 	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
-		_detail_line(box, 185, "Stage: " + str(_status.adaptation_trial.stage).capitalize())
+		_detail_line(box, 185, "Locked · " + str(_status.adaptation_trial.stage).capitalize())
 		_detail_line(box, 211, "Expresses only with surviving adults")
+		if not _queued_trait().is_empty():
+			_detail_line(box, 247, "Next: " + Web.short_title(_queued_trait()))
+			_detail_line(box, 273, "This brood's trait stays locked")
 	elif _status.get("adaptation_options", {}).get(web_selection, {}).get("inherited", _status.adaptation_repertoire == web_selection):
 		var expressed: int = _status.get("adaptation_options", {}).get(web_selection, {}).get("expressed", _status.adapted_workers)
 		_detail_line(box, 185, "%d / %d adults carry this trait" % [expressed, _status.workers_total])
 		_detail_line(box, 211, "Future brood inherits this trait")
 		_detail_line(box, 247, "Effects scale with adult carriers")
 	else:
-		if not _status.adaptation_trial.is_empty():
-			_detail_line(box, 185, "Focused trial already growing")
-			_detail_line(box, 211, "New selection waits for emergence")
-		else:
-			_detail_line(box, 185, "Other recognition choice inherited" if web_selection in ["security", "tolerance"] else "Colony choice: " + ("Lean Foragers" if _status.adaptation_repertoire == "lean" else "Load Bearers"))
-			_detail_line(box, 211, "Other branch already inherited")
-	if web_selection in ["security", "tolerance"]:
+		_detail_line(box, 185, "Exclusive branch already chosen" if Web.trait_state(_status, web_selection) == "Other branch chosen" else "Trait not available")
+		_detail_line(box, 211, "Laid and inherited traits stay fixed")
+	if web_selection in ["security", "tolerance"] and not _can_choose_adaptation():
 		_detail_line(box, 302, "Associates Nursery harm sooner" if web_selection == "security" else "Associates Nursery harm later")
 		_detail_line(box, 326, "Reassign tenders for new staffing")
 
@@ -731,12 +748,9 @@ func _detail_line(box: Rect2, y: float, value: String) -> void:
 	_label(box.position + Vector2(16, y), value, Color("a9b9bc"), 15)
 
 
-func _trial_shortage(costs: Dictionary) -> String:
-	var shortage: String = Copy.local_shortage(_status, costs, _status.adaptation_nurses)
-	return shortage if not shortage.is_empty() else _brood_block_reason()
-
-
 func _brood_block_reason() -> String:
+	if not _queued_trait().is_empty():
+		return Web.queue_wait(_status) if _status.get("adaptation_queue", {}).get("waiting", "") != "ready" else ""
 	if _status.get("queens", 0) < 1: return "No queen available"
 	if _status.get("nursery_state", "") != "developed" and not _status.get("brood", []).is_empty(): return "Nursery already has a brood group"
 	if not _can_lay_brood(): return "Nursery needs %d free brood slots" % _status.get("brood_batch_count", 8)
@@ -751,7 +765,7 @@ func _draw_action(box: Rect2, title: String, shortage: String = "", color: Color
 
 
 func _draw_brood_button() -> void:
-	_draw_action(_brood_rect(), "LAY %d BROOD NOW" % _status.brood_batch_count, _brood_block_reason())
+	_draw_action(_brood_rect(), "LAY QUEUED TRIAL NOW" if not _queued_trait().is_empty() else "LAY %d BROOD NOW" % _status.brood_batch_count, _brood_block_reason())
 
 
 func _draw_nursery_develop_button() -> void:

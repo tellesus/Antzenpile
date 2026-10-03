@@ -1,5 +1,7 @@
 # Architecture
 
+094 separates editable adaptation intent from paid laying. PileState owns one queued trait; AdaptationSystem validates replacement/cancellation and atomic trial funding. BroodSystem shares that run-scoped system and tries the pending trial after current cohorts advance, before ordinary Grow, including in Manual. Manual Lay also honors the queue. Selection spends/commits nothing; actual laying clears intent and captures the cohort's immutable trait bundle. Controller/GameRoot expose semantic queue commands and detached queue/waiting summaries. Existing exclusive branches, revealed candidates, one focused trial, nurse ledger and emergence expression stay intact.
+
 092 replaces only the four authored audio payloads with equal-frame 48s/44.1-kHz WAVs. AudioController's persistent synchronized players/intent/preferences/cues remain unchanged. Original offline score and pinned CC0 sample fetcher live under Godot-ignored tools/music; source recordings are locally cached by checksum, never runtime dependencies. Historical prototype generators cannot overwrite current outputs.
 
 091 selects modular returned textures inside ChamberArt without changing state ownership. Nursery blends primitive/developed materials from approved progress and draws a separate known expansion annex. SensoryArt's optional ribbon texture lets INWARD use a neutral imported fiber bundle; OUTWARD retains its prior texture. All assets/lighting remain baked and draw caps/input ownership unchanged.

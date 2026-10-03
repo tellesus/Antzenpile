@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Current feedback — queued adaptation brood (authorized 2026-10-03)
+
+[094 queued adaptation choice](tasks/094_queued_adaptation_choice.md) is complete: one editable next-brood intent replaces the narrow immediate-purchase window. Laying locks the funded cohort; compatible follow-up selection remains pending. Saved continuation, actual mouse/touch states and 6060 full-suite checks passed. Resume the graphics milestones below when broader development continues; session-duration balancing remains tabled.
+
 ## Current section — measured graphics development (authorized 2026-10-02)
 
 The player approved organic sensory trails, colored clouds resolving into smoky impressions from returned knowledge, luminous exterior ants, shaded interior ants, and earthen functional interiors. [088 release-style graphics proof](tasks/088_release_graphics_proof.md) is complete: cached organic routes, cloud/water masks, shared shaded/luminous worker atlases and a bounded Nursery vignette passed desktop graphics/input checks and 5979 full-suite checks. [Comparable measurements](GRAPHICS_EVALUATION.md) show lower draw counts/frame intervals on the named desktop, with about 3.20 MiB more monitored texture memory. Preserve Part 7A's darkness, rotating panorama and abstract INWARD relationships. Blender/Krita are free authoring tools, not runtime dependencies; keep generated assets reproducible.
