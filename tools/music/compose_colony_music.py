@@ -18,6 +18,12 @@ BAR = BEAT * 4
 DURATION = BAR * 16
 FRAMES = round(DURATION * RATE)
 STEMS = ["base_loop", "growth_loop", "nursery_loop", "midden_loop"]
+# Preserve 092's calibrated mix gain when revising a single instrument/layer.
+# Re-normalizing against the new full mix would change otherwise untouched WAVs.
+MIX_GAIN = 2.349314498747226
+# Phrase accents rather than a continuous high-frequency metronome.
+SHAKER_ACCENTS = {0: 3.35, 2: 1.65, 4: 2.75, 6: 3.1,
+                  8: 1.35, 10: 2.15, 12: 3.45, 14: 2.55}
 # A-minor/C-major family: four spacious phrases, with a gentle return to home.
 CHORDS = [
     (45, (57, 60, 64, 67)), (41, (57, 60, 64, 65)),
@@ -99,6 +105,14 @@ def room(track):
     return result
 
 
+def soften_shaker(source):
+    # Symmetric windowed-sinc filter, baked offline; leave low drums untouched.
+    taps = np.arange(129) - 64
+    kernel = 2 * 3000 / RATE * np.sinc(2 * 3000 / RATE * taps) * np.hanning(129)
+    kernel /= kernel.sum()
+    return np.convolve(source, kernel, mode="same")
+
+
 def write_wav(path, track):
     path.parent.mkdir(parents=True, exist_ok=True)
     with wave.open(str(path), "wb") as target:
@@ -114,7 +128,8 @@ def compose():
         if sha256((ROOT / "samples" / row["file"]).read_bytes()).hexdigest() != row["sha256"]:
             raise ValueError("Source checksum mismatch: " + row["file"])
     samples = {name: read_sample(name + ".wav") for name in
-               ["bass_drum", "harp_c4", "marimba_c4", "timpani", "frame_drum", "woodblock", "shaker"]}
+               ["bass_drum", "harp_c4", "marimba_c4", "timpani", "frame_drum", "shaker"]}
+    samples["shaker"] = soften_shaker(samples["shaker"])
     tracks = [np.zeros(FRAMES) for _ in STEMS]
     base, food, nursery, midden = tracks
     for bar, (root, chord) in enumerate(CHORDS):
@@ -144,15 +159,11 @@ def compose():
                     at + BEAT * (0.75 + index * 1.6), 0.085 if index == 0 else 0.060)
         for beat, gain in [(1.05, 0.040), (3.1, 0.027)]:
             add(midden, pitched(samples["frame_drum"], 60, 60, 0.9), at + BEAT * beat, gain * intensity)
-        if bar % 4 != 3:
-            add(midden, pitched(samples["woodblock"], 60, 58 + bar % 3, 0.7), at + BEAT * 2.5, 0.020)
-        for beat in [0.5, 1.5, 2.5, 3.5]:
-            add(midden, pitched(samples["shaker"], 60, 60, 0.20), at + BEAT * beat, 0.016 * intensity)
+        if bar in SHAKER_ACCENTS:
+            add(midden, pitched(samples["shaker"], 60, 60, 0.20),
+                at + BEAT * SHAKER_ACCENTS[bar], 0.009 * intensity)
     tracks = [room(track) for track in tracks]
-    # One common gain preserves every combination's intended balance/headroom.
-    combined = sum(tracks)
-    gain = 0.32 / max(np.max(np.abs(combined)), 1e-9)
-    return [track * gain for track in tracks]
+    return [track * MIX_GAIN for track in tracks]
 
 
 def main():
@@ -160,7 +171,10 @@ def main():
     for name, track in zip(STEMS, tracks):
         write_wav(REPO / "assets/audio" / (name + ".wav"), track)
     evidence = {"bpm": BPM, "bars": 16, "duration_seconds": DURATION,
-                "sample_rate": RATE, "frames": FRAMES, "channels": 1, "combinations": []}
+                "sample_rate": RATE, "frames": FRAMES, "channels": 1,
+                "mix_gain": MIX_GAIN, "woodblock_hits": 0,
+                "shaker_hits": len(SHAKER_ACCENTS), "shaker_lowpass_hz": 3000,
+                "combinations": []}
     previews = REPO / "builds/music_review"
     for mask in range(8):
         mix = tracks[0].copy()
@@ -178,7 +192,7 @@ def main():
         assert np.isfinite(track).all() and np.max(np.abs(track)) < 0.6, name
         assert abs(track[0] - track[-1]) < 0.003, name
     assert all(row["peak"] < 0.6 and row["boundary_delta"] < 0.003 for row in evidence["combinations"])
-    (REPO / "docs/evidence/card092_music.json").write_text(json.dumps(evidence, indent=2) + "\n")
+    (REPO / "docs/evidence/card093_music.json").write_text(json.dumps(evidence, indent=2) + "\n")
     print(json.dumps(evidence, indent=2))
 
 

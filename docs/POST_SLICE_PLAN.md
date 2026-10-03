@@ -12,6 +12,8 @@ The player approved organic sensory trails, colored clouds resolving into smoky 
 
 092 is complete: original 48-second layered arrangement, recorded CC0 instruments and verified synchronization/preferences. Both art/music sections are ready for the player's combined playtest. Follow that visual/listening evidence before another material/composition pass; wider report-derived impressions and mobile quality/device validation remain next graphics milestones.
 
+[093 percussion feedback](tasks/093_soften_repeating_percussion.md) addresses the player's repeating high sound with removed wooden clicks and softer, sparse shaker accents. Keep this a bounded listening correction; other layers and gameplay remain unchanged.
+
 ## Interface clarity — complete (2026-10-02)
 
 The authorized [interface review](INTERFACE_REVIEW_PLAN.md) is implemented in [085 panel input/action wording](tasks/085_interface_actions_and_input.md), [086 local guidance/returned history](tasks/086_interface_guidance_and_history.md), and [087 readability/navigation](tasks/087_interface_readability_and_navigation.md). Panels absorb gestures; selected jobs/cost blockers and dated outcomes are distinct; Help opens directly; compact contexts have clearer typography/spacing. Existing mechanics and return-before-information remain unchanged. Cards record actual checks and desktop limits. Resume the next bounded original-design scout survivability/experience milestone when further development is requested; Android and human usability checks remain open.

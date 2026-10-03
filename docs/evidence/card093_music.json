@@ -1,0 +1,90 @@
+{
+  "bpm": 80,
+  "bars": 16,
+  "duration_seconds": 48.0,
+  "sample_rate": 44100,
+  "frames": 2116800,
+  "channels": 1,
+  "mix_gain": 2.349314498747226,
+  "woodblock_hits": 0,
+  "shaker_hits": 8,
+  "shaker_lowpass_hz": 3000,
+  "combinations": [
+    {
+      "layers": [
+        "base"
+      ],
+      "peak": 0.18158345077818638,
+      "rms": 0.04342411965039374,
+      "boundary_delta": 0.00011185833903061201
+    },
+    {
+      "layers": [
+        "base",
+        "food"
+      ],
+      "peak": 0.1837072058463782,
+      "rms": 0.044324349694456935,
+      "boundary_delta": 6.935366166016532e-05
+    },
+    {
+      "layers": [
+        "base",
+        "nursery"
+      ],
+      "peak": 0.19956070600472164,
+      "rms": 0.04566362018600373,
+      "boundary_delta": 0.00011185833903061201
+    },
+    {
+      "layers": [
+        "base",
+        "food",
+        "nursery"
+      ],
+      "peak": 0.20193933033691722,
+      "rms": 0.046530938513860455,
+      "boundary_delta": 6.935366166016532e-05
+    },
+    {
+      "layers": [
+        "base",
+        "midden"
+      ],
+      "peak": 0.18158345077818638,
+      "rms": 0.043550454513906524,
+      "boundary_delta": 0.00011243179415960577
+    },
+    {
+      "layers": [
+        "base",
+        "food",
+        "midden"
+      ],
+      "peak": 0.1837072058463782,
+      "rms": 0.044449758645012966,
+      "boundary_delta": 6.992711678915561e-05
+    },
+    {
+      "layers": [
+        "base",
+        "nursery",
+        "midden"
+      ],
+      "peak": 0.19956067437145272,
+      "rms": 0.04578441011358618,
+      "boundary_delta": 0.00011243179415960577
+    },
+    {
+      "layers": [
+        "base",
+        "food",
+        "nursery",
+        "midden"
+      ],
+      "peak": 0.20193928852106752,
+      "rms": 0.04665103843158671,
+      "boundary_delta": 6.992711678915561e-05
+    }
+  ]
+}

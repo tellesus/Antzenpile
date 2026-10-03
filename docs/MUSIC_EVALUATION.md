@@ -1,5 +1,13 @@
 # Warm layered music — 092
 
+## Player feedback revision — 093
+
+The player reports a frequently repeating high percussion sound that does not blend. The wooden click and beat-by-beat shaker are the likely contributors based on the arrangement and source spectra; identification by the player remains unconfirmed. 093 removes all 12 wooden clicks, reduces shaker hits from 64 to eight varied accents, lowers their gain and filters their bright edge offline. Low drum parts remain intact, and Base/Food/Nursery WAVs are byte-identical to 092. No runtime player/effect/gate changes.
+
+[Actual PCM comparison](evidence/card093_percussion_comparison.json): Midden energy above 2.5 kHz falls **15.80 dB** across the loop. [Current eight mixes](evidence/card093_music.json) retain peak <0.203 at runtime gain and boundary step <0.000113; stem frame count/rate/format and memory payload remain unchanged. Import, 90-frame Main smoke, actual four-layer focus/strain/paused-64x-wrap/reload playback (zero measured phase spread), and the final **6003 checks / zero failures** passed again on Windows. Only existing environmental permission warnings remain. These measurements establish a softer, less frequent high percussion part; the player must judge whether it resolves the listening complaint.
+
+## Original 092 evaluation
+
 The original eight-second sine-tone proof is replaced with an original 48-second/16-bar/80-BPM arrangement. Base provides low warm harmony/bass and soft recorded bass drum, with occasional tuned timpani at phrase ends. Food Exchange adds harp movement, Nursery soft marimba answers/rests, and Midden muted frame drum/wood/shaker detail. Authoring uses seven pinned CC0 VCSL recordings; Godot needs only the four finished WAVs. [Source and provenance](../tools/music/README.md).
 
 ## Verified
