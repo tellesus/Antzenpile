@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Current priority — desktop colony material pass (2026-10-03)
+
+The player uploaded the v2 graphics handoff and tabled mobile work. [095 layered colony material](tasks/095_layered_colony_material.md) is complete: original sculpt/packed finish sources, staggered embedded organs, structural tissue, front occlusion, known expansion and desktop input/performance evidence. 6060 full-suite checks passed. Static composition must succeed before adding motion. Follow with a bounded OUTWARD Home/substrate and smoky-cloud pass, then paired desktop measurements. Keep controls touch-friendly; mobile packaging, device tests, quality tiers and optimization are deferred. Earlier mobile-next statements below are historical, superseded by this priority. Preserve information boundaries, dynamic contents and the abstract functional network.
+
 ## Current feedback — queued adaptation brood (authorized 2026-10-03)
 
 [094 queued adaptation choice](tasks/094_queued_adaptation_choice.md) is complete: one editable next-brood intent replaces the narrow immediate-purchase window. Laying locks the funded cohort; compatible follow-up selection remains pending. Saved continuation, actual mouse/touch states and 6060 full-suite checks passed. Resume the graphics milestones below when broader development continues; session-duration balancing remains tabled.

@@ -9,7 +9,8 @@ const Web = preload("res://src/presentation/inward/adaptation_web.gd")
 const Contents = preload("res://src/presentation/inward/chamber_contents.gd")
 const Chambers = preload("res://src/presentation/inward/chamber_art.gd")
 const Activity = preload("res://src/presentation/inward/colony_activity.gd")
-const FIBER = preload("res://assets/graphics/colony/returned/functional_fiber_strip.png")
+const TISSUE = preload("res://assets/graphics/colony/material/bridge.png")
+const SUBSTRATE = preload("res://assets/graphics/colony/material/substrate.png")
 const Pressure = preload("res://src/presentation/colony_pressure.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
@@ -227,25 +228,25 @@ func _run_command(command: String) -> void:
 static func positions(size: Vector2) -> Dictionary:
 	var field_width: float = minf(size.x * 0.65, size.x - 340.0)
 	var field_height: float = maxf(0.0, size.y - 210.0)
-	var origin := Vector2(24.0, 90.0)
-	return {"queen": origin + Vector2(field_width * 0.28, field_height * 0.25),
-		"nursery": origin + Vector2(field_width * 0.72, field_height * 0.32),
-		"food_exchange": origin + Vector2(field_width * 0.72, field_height * 0.72),
-		"entrance": origin + Vector2(field_width * 0.28, field_height * 0.78),
-		"adaptation": origin + Vector2(field_width * 0.5, field_height * 0.52),
-		"guest": origin + Vector2(field_width * 0.50, field_height * 0.82),
-		"midden": origin + Vector2(field_width * 0.08, field_height * 0.52)}
+	var origin := Vector2(24.0, 94.0)
+	return {"queen": origin + Vector2(field_width * 0.48, field_height * 0.24),
+		"nursery": origin + Vector2(field_width * 0.21, field_height * 0.45),
+		"food_exchange": origin + Vector2(field_width * 0.78, field_height * 0.58),
+		"entrance": origin + Vector2(field_width * 0.42, field_height * 0.79),
+		"adaptation": origin + Vector2(field_width * 0.77, field_height * 0.27),
+		"guest": origin + Vector2(field_width * 0.75, field_height * 0.83),
+		"midden": origin + Vector2(field_width * 0.11, field_height * 0.76)}
 
 
 static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, midden_visible: bool = false, nursery_lobe_visible: bool = false) -> String:
-	if nursery_lobe_visible and _organ_hit(at, positions(size).nursery + Vector2(64,-43), Vector2(57,43)):
+	if nursery_lobe_visible and _organ_hit(at, positions(size).nursery + Chambers.lobe_offset(), Vector2(64,48)):
 		return "nursery"
 	if midden_visible and _organ_hit(at, positions(size).midden, Vector2(66,54)):
 		return "midden"
 	if guest_visible and _organ_hit(at, positions(size).guest, Vector2(66,54)):
 		return "guest"
 	for id: String in NODES:
-		if _organ_hit(at, positions(size)[id], Vector2(70,58) if id == "adaptation" else Vector2(98,73)):
+		if _organ_hit(at, positions(size)[id], Chambers.hit_radii(id)):
 			return id
 	return ""
 
@@ -353,6 +354,9 @@ func _draw() -> void:
 		_draw_controls(size)
 		return
 	var centers: Dictionary = positions(size)
+	# One dark continuous material field, with no baked organs or inhabitants.
+	var field := Rect2(Vector2(12,110),Vector2(minf(size.x*0.68,size.x-324.0),size.y-212.0))
+	draw_texture_rect(SUBSTRATE,field,false,Color(1,1,1,0.80))
 	for pair: Array in [["queen", "nursery"], ["nursery", "food_exchange"], ["food_exchange", "entrance"], ["entrance", "queen"]]:
 		_draw_flow(centers[pair[0]], centers[pair[1]], pair[0] == "nursery" or pair[0] == "entrance")
 	for id: String in ["queen", "nursery"]:
@@ -362,13 +366,19 @@ func _draw() -> void:
 	if not _status.get("guest", {}).is_empty():
 		_draw_flow(centers.guest, centers.nursery, false, Color("b79bcc"))
 
-	for id: String in NODES:
-		_draw_node(id, centers[id])
-	if _status.get("midden", {}).get("revealed", false):
-		_draw_node("midden", centers.midden)
-	if not _status.get("guest", {}).is_empty():
-		_draw_node("guest", centers.guest)
+	var visible_ids: Array[String] = NODES.duplicate()
+	if _status.get("midden", {}).get("revealed", false): visible_ids.append("midden")
+	if not _status.get("guest", {}).is_empty(): visible_ids.append("guest")
+	for id: String in visible_ids:
+		Chambers.rear(self,_status,id,centers[id],float(_focus_gains.get(id,0.0)))
+	for id: String in visible_ids:
+		_draw_node(id,centers[id])
 	_draw_activity(centers)
+	# Live contents and ants share depth: lips occlude them before text/UI.
+	for id: String in visible_ids:
+		Chambers.front(self,_status,id,centers[id],float(_focus_gains.get(id,0.0)))
+	for id: String in visible_ids:
+		_draw_node_labels(id,centers[id])
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
@@ -380,14 +390,19 @@ func _draw_flow(start: Vector2, finish: Vector2, representative: bool, tint: Col
 	for step: int in 25:
 		var t: float = float(step) / 24.0
 		points.append(start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t)
-	# Fine baked bundles stay subordinate to organs, labels and representative ants.
-	Art.filament(self, points, Color(Color("a5d8df") if representative else tint.lightened(0.3), 0.78), 28.0, FIBER)
-	for strand: int in 2:
-		var fibers := PackedVector2Array()
-		for index: int in points.size():
+	# Substantial baked earthen/resin tissue, with flared joins under the organs.
+	var edges := PackedVector2Array()
+	var uv := PackedVector2Array()
+	for side: int in [1,-1]:
+		for offset: int in points.size():
+			var index: int = offset if side == 1 else points.size()-1-offset
 			var t: float = float(index)/(points.size()-1)
-			fibers.append(points[index] + Vector2(sin(t*21+strand*2),cos(t*17+strand))*sin(PI*t)*7.0)
-		draw_polyline(fibers, Color(tint,0.18),0.65,true)
+			var tangent: Vector2 = points[mini(index+1,points.size()-1)]-points[maxi(0,index-1)]
+			var width: float = 68.0+34.0*pow(absf(t*2.0-1.0),2.0)
+			edges.append(points[index]+tangent.normalized().orthogonal()*width*0.5*side)
+			uv.append(Vector2(t,0.0 if side == 1 else 1.0))
+	var tissue_tint: Color = Color(0.86,0.88,0.95) if representative else Color.WHITE.lerp(tint,0.22)
+	draw_polygon(edges,PackedColorArray([tissue_tint]),uv,TISSUE)
 
 
 func _draw_activity(centers: Dictionary) -> void:
@@ -395,7 +410,7 @@ func _draw_activity(centers: Dictionary) -> void:
 		var under_label: bool = false
 		for id: String in centers:
 			var center: Vector2 = centers[id]
-			under_label = under_label or Rect2(center + Vector2(-90, Chambers.label_offset(id)-17), Vector2(180, 42)).grow(20.0).has_point(ant.position)
+			under_label = under_label or Rect2(Chambers.label_position(id,center)+Vector2(-90,-17), Vector2(180, 42)).grow(20.0).has_point(ant.position)
 		if under_label:
 			continue
 		Art.ant(self, ant.position, ant.direction, Color(ant.color, 0.62), _animation_time, 1.25, true)
@@ -424,7 +439,7 @@ func _draw_node(id: String, at: Vector2) -> void:
 		"nursery":
 			var stages: Array[String] = Activity.brood_stages(_status)
 			for index: int in stages.size():
-				var seed_at: Vector2 = at + Vector2(index % 3 * 22 - 22, index / 3 * 24 - 5)
+				var seed_at: Vector2 = at + Vector2(index % 3 * 25 - 25, index / 3 * 26 + 16)
 				Contents.brood(self, seed_at, stages[index], health*attention)
 		"adaptation":
 			for index: int in 3:
@@ -438,27 +453,32 @@ func _draw_node(id: String, at: Vector2) -> void:
 				var amount: float = float(stores.get(key,0.0))
 				for index: int in 3:
 					if amount >= [0.001,4.0,12.0][index]:
-						Contents.brood(self, at+Vector2(resource*22-22,index*15-8), "egg",attention,Art.color_for(key))
+						Contents.brood(self, at+Vector2(resource*25-25,index*17+5), "egg",attention,Art.color_for(key))
 		"entrance":
 			draw_arc(at+Vector2(0,8),20,PI,TAU,24,Color("b0d9df",0.55),1.0,true)
 		"queen":
-			if _status.get("queens",0) > 0: Contents.queen(self, at+Vector2(0,6),_animation_time)
+			if _status.get("queens",0) > 0: Contents.queen(self, at+Vector2(0,22),_animation_time)
 	if id == "nursery" and _status.get("guest", {}).get("observation", "") == "foreign":
 		draw_arc(at, 39.0, 0.3, 1.9, 20, Color("b79eaf"), 1.0, true)
-	var label_y: float = Chambers.label_offset(id)
-	_label(at + Vector2(0, label_y), _title(id), color, 16, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+func _draw_node_labels(id: String, at: Vector2) -> void:
+	var color: Color = Color("d5c4a1") if id == "queen" else Color("aebdb7") if id == "nursery" else Color("c7af86") if id == "food_exchange" else Color("bba6c8") if id == "adaptation" else Color("bd927a") if id == "midden" else Color("8daeb3")
+	var phase: float = _animation_time*0.18+NODES.find(id)
+	var label_at: Vector2 = Chambers.label_position(id,at)
+	_label(label_at, _title(id), color, 16, HORIZONTAL_ALIGNMENT_CENTER)
 	var pressure: String = Activity.pressure(_status, id)
 	var progress: float = Activity.project_progress(_status, id)
 	if progress >= 0.0:
 		draw_arc(at, 65, -PI * 0.5, -PI * 0.5 + TAU * maxf(progress, 0.005), 32, Color("c3b991"), 1.3, true)
 	if not pressure.is_empty():
 		draw_polyline(Art.membrane(at, 38, -phase).slice(2, 12), Color("cc967a", 0.65), 1.2, true)
-		_label(at + Vector2(0, label_y+19), pressure, Color("ccac91"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(label_at+Vector2(0,19), pressure, Color("ccac91"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 	elif progress >= 0.0:
 		var project_title: String = "EXPANDING" if id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "developing" else "DEVELOPING"
-		_label(at + Vector2(0, label_y+19), project_title, Color("b0ab8b"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(label_at+Vector2(0,19), project_title, Color("b0ab8b"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 	elif id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "available":
-		_label(at + Vector2(0, label_y+19), "EXPANSION AVAILABLE", Color("a5b49a"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(label_at+Vector2(0,19), "EXPANSION AVAILABLE", Color("a5b49a"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_hud(size: Vector2) -> void:
@@ -802,4 +822,5 @@ func _label(at: Vector2, value: String, color: Color, font_size: int, align: Hor
 		placed.x -= width * 0.5
 	elif align == HORIZONTAL_ALIGNMENT_RIGHT:
 		placed.x -= width
+	draw_string_outline(_font,placed,value,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,3,Color(0,0,0,0.82))
 	draw_string(_font, placed, value, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)

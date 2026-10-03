@@ -27,7 +27,7 @@ func run(test: Object) -> bool:
 	test.check(Activity.brood_stages({}).is_empty() and Activity.jobs({}).is_empty(),"Empty organs invent no brood or working ants")
 	for size: Vector2 in [Vector2(1280,720),Vector2(900,600)]:
 		var centers: Dictionary = View.positions(size)
-		test.check(View.node_at(centers.nursery+Vector2(110,-43),size,false,false,true) == "nursery" and View.node_at(centers.nursery+Vector2(110,-43),size) == "","Only visible Nursery extensions add a selectable lobe")
+		test.check(View.node_at(centers.nursery+Chambers.lobe_offset()+Vector2(45,24),size,false,false,true) == "nursery" and View.node_at(centers.nursery+Chambers.lobe_offset()+Vector2(45,24),size) == "","Only visible Nursery extensions add a selectable lobe")
 		for id: String in View.NODES:
 			test.check(View.node_at(centers[id]+Vector2(48,0),size) == id,"Visible chamber edges remain selectable: "+id)
 		test.check(View.node_at(centers.midden,size) == "" and View.node_at(centers.guest,size) == "","Unrevealed conditional functions retain no input target")

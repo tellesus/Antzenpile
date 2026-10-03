@@ -8,7 +8,7 @@ const PUPA = preload("res://assets/graphics/colony/brood_pupa.png")
 
 static func queen(canvas: Node2D, at: Vector2, time: float) -> void:
 	canvas.draw_set_transform(at + Vector2(sin(time*0.4),cos(time*0.3))*1.2, -PI*0.28)
-	canvas.draw_texture_rect(QUEEN,Rect2(-Vector2.ONE*41,Vector2.ONE*82),false,Color(1.08,1.03,0.92))
+	canvas.draw_texture_rect(QUEEN,Rect2(-Vector2.ONE*48,Vector2.ONE*96),false,Color(1.08,1.03,0.92))
 	canvas.draw_set_transform(Vector2.ZERO)
 
 static func brood(canvas: Node2D, at: Vector2, stage: String, health: float, tint: Color = Color.WHITE) -> void:
