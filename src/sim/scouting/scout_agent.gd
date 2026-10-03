@@ -96,6 +96,9 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	for points: Array[Vector2] in [restored_path, restored_return]:
 		for index: int in range(1, points.size()):
+			var entrance: Vector2 = colony.piles[data.origin_pile].position
+			var entrance_edge: bool = (points[index-1] == entrance and points[index] == entrance.round()) or (points[index] == entrance and points[index-1] == entrance.round())
+			if entrance_edge and entrance != entrance.round(): continue
 			var step: Vector2 = (points[index] - points[index - 1]).abs()
 			if not is_equal_approx(step.x + step.y, 1.0) or not is_zero_approx(step.x * step.y):
 				return false

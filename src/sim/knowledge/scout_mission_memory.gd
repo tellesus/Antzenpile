@@ -6,6 +6,7 @@ const MAX_COURSE: int = 8
 const RECENT_RETURNS: int = 16
 var id: String
 var origin_pile: String
+var target_knowledge_id: String = ""
 var bearing: float
 var departed_at: float
 var scent: float = 1.0
@@ -20,9 +21,11 @@ func completed_at() -> float:
 
 
 func to_dict() -> Dictionary:
-	return {"id": id, "origin_pile": origin_pile, "bearing": bearing,
+	var result: Dictionary = {"id": id, "origin_pile": origin_pile, "bearing": bearing,
 		"departed_at": departed_at, "scent": scent, "returned_at": returned_at,
 		"course": course.duplicate(true), "expected_at": expected_at, "missing_at": missing_at}
+	if not target_knowledge_id.is_empty(): result["target_knowledge_id"] = target_knowledge_id
+	return result
 
 
 func restore(data: Dictionary, colony: ColonyState, scouts: Dictionary, next_id: int, time: float) -> bool:
@@ -30,6 +33,8 @@ func restore(data: Dictionary, colony: ColonyState, scouts: Dictionary, next_id:
 		return false
 	if not data.id is String or not data.id.begins_with("scout_") or not data.origin_pile is String or not colony.piles.has(data.origin_pile):
 		return false
+	var target: Variant = data.get("target_knowledge_id", "")
+	if not target is String or not target.is_empty() and not target.begins_with("known:"): return false
 	var suffix: String = data.id.trim_prefix("scout_")
 	if not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= next_id:
 		return false
@@ -67,6 +72,7 @@ func restore(data: Dictionary, colony: ColonyState, scouts: Dictionary, next_id:
 			return false
 	id = data.id
 	origin_pile = data.origin_pile
+	target_knowledge_id = target
 	bearing = float(data.bearing)
 	departed_at = float(data.departed_at)
 	scent = float(data.scent)

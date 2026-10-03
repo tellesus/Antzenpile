@@ -246,6 +246,10 @@ func restore(data: Dictionary) -> bool:
 	var restored_knowledge := Knowledge.new()
 	if not restored_knowledge.restore(data.knowledge, archived, restored_clock.simulation_time):
 		return false
+	for memory: ScoutMissionMemory in restored_missions.values():
+		if memory.target_knowledge_id.is_empty(): continue # Legacy/general departures have no named target.
+		if not restored_knowledge.nodes.has(memory.target_knowledge_id): return false
+		if restored_scouts.has(memory.id) and "known:" + restored_scouts[memory.id].investigation_source_id != memory.target_knowledge_id: return false
 	for priority: String in restored_exploration.priorities:
 		if not restored_knowledge.nodes.has(priority):
 			return false

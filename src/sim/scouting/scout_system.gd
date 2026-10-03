@@ -39,7 +39,7 @@ func dispatch(origin_id: String, bearing: Variant = null, standing: bool = false
 		var angle: float = _run.rng.randf_range(-PI, PI) if bearing == null else float(bearing) + _run.rng.randf_range(-config.cone_radians, config.cone_radians)
 		var distance: float = _run.rng.randf_range(config.minimum_distance, config.maximum_distance)
 		var target: Vector2 = (origin.position + Vector2.from_angle(angle) * distance).round()
-		route = finder.path(origin.position, target)
+		route = finder.path_from_origin(origin.position, target, _run.world)
 		if route.size() > 1:
 			if not cautions.is_empty() and Caution.path_risk(route, cautions, _run.trails, origin.position) > 0.0 and attempt < config.target_attempts - 1:
 				continue
@@ -232,7 +232,7 @@ func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 		return _reject("No available worker")
 	var known: KnownNode = _run.knowledge.nodes[knowledge_id]
 	var target: Vector2 = known.estimated_position.round()
-	var route: Array[Vector2] = Pathfinder.new(_run.world).path(pile.position, target)
+	var route: Array[Vector2] = Pathfinder.new(_run.world).path_from_origin(pile.position, target, _run.world)
 	if route.size() < 2:
 		return _reject("No reachable known estimate")
 	return _dispatch_route(pile, route, false, (target - pile.position).angle(), known.source_node_id)
@@ -312,7 +312,7 @@ func tick(delta: float) -> void:
 				var valid: bool = delivered.restore(observation.to_dict(), _run.world, _run.colony, _run.simulation_time)
 				assert(valid)
 				_run.delivered_observations[delivered.id] = delivered
-			if not agent.investigation_source_id.is_empty() and not agent.observations.has(agent.investigation_source_id):
+			if not agent.investigation_source_id.is_empty() and not agent.observations.has(agent.investigation_source_id) and agent.mission_target in agent.return_path:
 				assert(_run.knowledge.record_outcome(agent.investigation_source_id, false, _run.simulation_time, "scout"))
 			var released: bool = home.workers.release(id, 1)
 			assert(released)
@@ -328,6 +328,7 @@ func _remember_departure(agent: ScoutAgent, bearing: float) -> void:
 	var memory := Memory.new()
 	memory.id = agent.id
 	memory.origin_pile = agent.origin_pile
+	if not agent.investigation_source_id.is_empty(): memory.target_knowledge_id = "known:" + agent.investigation_source_id
 	memory.bearing = _memory_bearing(bearing)
 	memory.departed_at = _run.simulation_time
 	memory.expected_at = agent.expected_tick * SimulationClock.TICK_INTERVAL

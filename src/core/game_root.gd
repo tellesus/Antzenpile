@@ -425,7 +425,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"food_exchange_costs": FOOD_CONFIG.costs(),
 		"food_exchange_workers_required": FOOD_CONFIG.workers_required,
 		"food_exchange_food_multiplier": FOOD_CONFIG.developed_larval_food_multiplier,
-		"active_scouts": simulation.run.scouts.size() if pile_id=="home" else 0, "trail_workers": trail_workers,
+		"active_scouts": simulation.run.scouts.values().filter(func(agent: ScoutAgent) -> bool: return agent.origin_pile == pile_id).size(), "trail_workers": trail_workers,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale}
 
@@ -656,7 +656,16 @@ func daughter_gathering_summary() -> Dictionary:
 	var sources: Dictionary = {}
 	for category: String in PileState.RESOURCE_IDS:
 		sources[category] = SourceMemory.entries(signals,status,category)
+		for entry: Dictionary in sources[category]: entry["scout"] = daughter_source_scout(entry.knowledge_id)
 	return {"sources":sources, "workers":simulation.trails.CONFIG.initial_workers, "time":simulation.run.simulation_time}
+
+
+func daughter_source_scout(knowledge_id: String) -> Dictionary:
+	for memory: Dictionary in scout_mission_summaries("satellite_1"):
+		if memory.get("target_knowledge_id", "") == knowledge_id:
+			return {"id":memory.id, "awaiting":memory.awaiting, "away_seconds":memory.away_seconds,
+				"overdue":memory.overdue, "returned_at":memory.returned_at, "missing_at":memory.missing_at}
+	return {}
 
 
 func daughter_gathering_command(knowledge_id: String, action: String) -> Dictionary:
@@ -667,6 +676,15 @@ func daughter_gathering_command(knowledge_id: String, action: String) -> Diction
 	var route: TrailRouteState = simulation.run.trails.find_route("satellite_1",knowledge_id)
 	var accepted: bool = false
 	match action:
+		"scout":
+			if daughter_source_scout(knowledge_id).get("awaiting", false): return {"accepted":false,"reason":"A local scout is already awaiting return"}
+			accepted = simulation.investigate_known_source("satellite_1",knowledge_id)
+			return {"accepted":accepted,"reason":simulation.scouting.last_error}
+		"recall_scout":
+			var memory: Dictionary = daughter_source_scout(knowledge_id)
+			if not memory.get("awaiting",false): return {"accepted":false,"reason":"No local scout is awaiting return"}
+			accepted = simulation.recall_scout(memory.id)
+			return {"accepted":accepted,"reason":simulation.scouting.last_error}
 		"gather": accepted = simulation.create_trail("satellite_1",knowledge_id)
 		"add": accepted = route != null and route.purpose == "food" and simulation.set_trail_workers(route.id,route.desired_workers+simulation.trails.CONFIG.initial_workers)
 		"recheck": accepted = route != null and simulation.recheck_trail(route.id)

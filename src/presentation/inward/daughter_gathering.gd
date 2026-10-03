@@ -14,7 +14,7 @@ func reset() -> void:
  opened=false;category="carbohydrate";page=0;selected=""
 
 func panel(size: Vector2) -> Rect2:
- return Rect2(size.x-316,144,292,400)
+ return Rect2(size.x-316,144,292,456)
 
 func rect(size: Vector2, action: String, index: int=0) -> Rect2:
  var x: float=size.x-300
@@ -24,7 +24,8 @@ func rect(size: Vector2, action: String, index: int=0) -> Rect2:
   "page": return Rect2(x,374,260,44)
   "order": return Rect2(x,430,156,44)
   "stop": return Rect2(x+164,430,96,44)
-  "back": return Rect2(x,482,260,44)
+  "scout": return Rect2(x,482,260,44)
+  "back": return Rect2(x,538,260,44)
  return Rect2()
 
 func entries(status: Dictionary) -> Array:
@@ -50,10 +51,11 @@ func activate(view: Node2D, at: Vector2, status: Dictionary, command: Callable) 
  if entry.is_empty(): return true
  var action: String=""
  if rect(size,"stop").has_point(at) and not entry.route_id.is_empty() and entry.workers>0: action="stop"
+ elif rect(size,"scout").has_point(at): action="recall_scout" if entry.get("scout",{}).get("awaiting",false) else "scout"
  elif rect(size,"order").has_point(at): action=order(entry)
  if not action.is_empty() and command.is_valid():
   var result: Dictionary=command.call(entry.knowledge_id,action)
-  var titles: Dictionary={"gather":"Daughter gatherers assigned","add":"Daughter gatherers added","stop":"Daughter gatherers recalled","recheck":"Local trail recheck started"}
+  var titles: Dictionary={"gather":"Daughter gatherers assigned","add":"Daughter gatherers added","stop":"Daughter gatherers recalled","recheck":"Local trail recheck started","scout":"Local scout dispatched · await return","recall_scout":"Scout return requested"}
   view.show_feedback(titles[action] if result.get("accepted",false) else result.get("reason","Gathering unavailable"))
  return true
 
@@ -92,5 +94,13 @@ func draw(view: Node2D, status: Dictionary) -> void:
   if chosen.workers>0:
    at=rect(size,"stop");Style.surface(view,at,Color("39302b"))
    view._label(at.get_center()+Vector2(0,5),"RECALL",Color("e0c5b7"),12,HORIZONTAL_ALIGNMENT_CENTER)
+  var scout: Dictionary=chosen.get("scout",{});var awaiting: bool=scout.get("awaiting",false)
+  at=rect(size,"scout");Style.surface(view,at,Color("26383a"))
+  view._label(at.get_center()+Vector2(0,-3),"RECALL LOCAL SCOUT" if awaiting else "SEND 1 LOCAL SCOUT",Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)
+  var detail: String="1 daughter worker · shared scout cap"
+  if awaiting: detail=("Overdue" if scout.overdue else "Awaiting") + " · away " + Copy.duration(scout.away_seconds)
+  elif scout.get("missing_at",-1)>=0: detail="Did not return · cause unknown"
+  elif scout.get("returned_at",-1)>=0: detail="Scout returned " + Copy.duration(status.get("time",0)-scout.returned_at) + " ago"
+  view._label(at.get_center()+Vector2(0,15),detail,Color("a7b5b1"),11,HORIZONTAL_ALIGNMENT_CENTER)
  at=rect(size,"back");Style.surface(view,at,Color("263038"))
  view._label(at.get_center()+Vector2(0,5),"BACK TO FOOD EXCHANGE",Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)
