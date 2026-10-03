@@ -21,6 +21,14 @@ var known_sources: Array[String] = []
 var trunk_route_id: String = ""
 var trunk_path: Array[Vector2] = []
 var observations: Dictionary[String, Observation] = {}
+var predator_encountered: bool = false
+var lost: bool = false
+var lost_profile: String = ""
+var expected_tick: int = 0
+
+
+func pending_trait(trait_id: String) -> int:
+	return 1 if lost and trait_id in GeneticRepertoire.traits_for(lost_profile) else 0
 
 
 func to_dict() -> Dictionary:
@@ -35,7 +43,9 @@ func to_dict() -> Dictionary:
 		"mission_target": [mission_target.x, mission_target.y], "investigating": investigating,
 		"investigation_source_id": investigation_source_id, "standing": standing, "observations": evidence,
 		"need_weights": need_weights.duplicate(), "search_memory": search_memory.duplicate(), "known_sources": known_sources.duplicate(),
-		"trunk_route_id": trunk_route_id, "trunk_path": _points(trunk_path)}
+		"trunk_route_id": trunk_route_id, "trunk_path": _points(trunk_path),
+		"survival": {"encountered": predator_encountered, "lost": lost,
+			"profile": lost_profile, "expected_tick": expected_tick}}
 
 
 static func _points(points: Array[Vector2]) -> Array:
@@ -64,7 +74,22 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 				return false
 			pair[1].append(Vector2(point[0], point[1]))
 	var commitments: Dictionary = colony.piles[data.origin_pile].workers.to_dict().commitments
-	if not commitments.has(data.id) or commitments[data.id] != {"kind": "scout", "owner_id": data.id, "count": 1}:
+	var survival: Variant = data.get("survival", {"encountered": false, "lost": false, "profile": "", "expected_tick": 0})
+	if not survival is Dictionary or survival.size() != 4 or not survival.has_all(["encountered", "lost", "profile", "expected_tick"]):
+		return false
+	if not survival.encountered is bool or not survival.lost is bool or not survival.profile is String or not WorkerLedger.valid_count(survival.expected_tick):
+		return false
+	if not data.observations is Array:
+		return false
+	if survival.lost:
+		if not survival.encountered or survival.expected_tick <= floori(time / SimulationClock.TICK_INTERVAL) or not data.observations.is_empty():
+			return false
+		var pile: PileState = colony.piles[data.origin_pile]
+		if survival.profile != "" and pile.genetics.lost.get(survival.profile, 0) < 1:
+			return false
+	elif survival.profile != "":
+		return false
+	if not commitments.has(data.id) or commitments[data.id] != {"kind": "scout", "owner_id": data.id, "count": 0 if survival.lost else 1}:
 		return false
 	if restored_return[0] != colony.piles[data.origin_pile].position:
 		return false
@@ -171,6 +196,10 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	trunk_route_id = trunk_id
 	trunk_path = restored_trunk
 	observations = restored_evidence
+	predator_encountered = survival.encountered
+	lost = survival.lost
+	lost_profile = survival.profile
+	expected_tick = int(survival.expected_tick)
 	return true
 
 

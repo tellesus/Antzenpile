@@ -26,6 +26,7 @@ var world: WorldState
 var colony: ColonyState = Colony.new()
 var scouts: Dictionary[String, ScoutAgent] = {}
 var scout_missions: Dictionary[String, ScoutMissionMemory] = {}
+var scout_losses: Dictionary[String, int] = {}
 var next_scout_id: int = 1
 var knowledge: KnowledgeBase = Knowledge.new()
 var trails: TrailNetwork = Trails.new()
@@ -81,7 +82,7 @@ func to_dict() -> Dictionary:
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
-		"scouts": scout_records, "scout_missions": missions, "next_scout_id": next_scout_id, "delivered_observations": delivered,
+		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(),
 		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
 
@@ -103,10 +104,28 @@ func recognition_share(pile_id: String) -> float:
 	return snappedf(float(security - tolerance) / expected, 0.00001) if expected > 0 else 0.0
 
 func pending_for_pile(pile_id: String, adapted: bool = false) -> int:
-	return trails.pending_for_pile(pile_id,adapted) + (journey_response.defense.adapted_lost if adapted else journey_response.defense.lost) if pile_id == "home" else trails.pending_for_pile(pile_id,adapted)
+	var total: int = trails.pending_for_pile(pile_id, adapted)
+	if pile_id == "home":
+		total += journey_response.defense.adapted_lost if adapted else journey_response.defense.lost
+	for agent: ScoutAgent in scouts.values():
+		if agent.origin_pile == pile_id and agent.lost:
+			total += agent.pending_trait(colony.piles[pile_id].adaptation_repertoire) if adapted else 1
+	return total
 
 func pending_trait(pile_id: String, trait_id: String) -> int:
-	return trails.pending_trait(pile_id,trait_id) + (journey_response.defense.pending_trait(trait_id) if pile_id == "home" else 0)
+	var total: int = trails.pending_trait(pile_id,trait_id) + (journey_response.defense.pending_trait(trait_id) if pile_id == "home" else 0)
+	for agent: ScoutAgent in scouts.values():
+		if agent.origin_pile == pile_id:
+			total += agent.pending_trait(trait_id)
+	return total
+
+
+func missing_scouts(pile_id: String) -> int:
+	var total: int = scout_losses.get(pile_id, 0)
+	for agent: ScoutAgent in scouts.values():
+		if agent.origin_pile == pile_id and agent.lost:
+			total -= 1
+	return total
 
 
 func restore(data: Dictionary) -> bool:
@@ -146,6 +165,22 @@ func restore(data: Dictionary) -> bool:
 		if not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_scout_id:
 			return false
 		restored_scouts[agent.id] = agent
+	var scout_loss_data: Variant = data.get("scout_losses", {})
+	if not scout_loss_data is Dictionary:
+		return false
+	var restored_scout_losses: Dictionary[String, int] = {}
+	var all_scout_losses: int = 0
+	for key: Variant in scout_loss_data:
+		if not key is String or not restored_colony.piles.has(key) or not WorkerLedger.valid_count(scout_loss_data[key]) or scout_loss_data[key] < 1 or scout_loss_data[key] > restored_colony.piles[key].workers.lost_total:
+			return false
+		restored_scout_losses[key] = int(scout_loss_data[key])
+		all_scout_losses += int(scout_loss_data[key])
+	for pile: PileState in restored_colony.piles.values():
+		var pending: int = 0
+		for agent: ScoutAgent in restored_scouts.values():
+			pending += 1 if agent.origin_pile == pile.id and agent.lost else 0
+		if pending > restored_scout_losses.get(pile.id, 0):
+			return false
 	for pile: PileState in restored_colony.piles.values():
 		for id: String in pile.workers.to_dict().commitments:
 			if id.begins_with("scout_") and (not restored_scouts.has(id) or restored_scouts[id].origin_pile != pile.id):
@@ -155,7 +190,7 @@ func restore(data: Dictionary) -> bool:
 		if agent.standing:
 			if not data.has("exploration"):
 				return false
-			exploring_standing += 1 if agent.phase not in ["returning", "blocked_returning"] else 0
+			exploring_standing += 1 if not agent.lost and agent.phase not in ["returning", "blocked_returning"] else 0
 	if exploring_standing > restored_exploration.target:
 		return false
 	if not data.delivered_observations is Array:
@@ -169,10 +204,19 @@ func restore(data: Dictionary) -> bool:
 			var memory := MissionMemory.new()
 			if not value is Dictionary or not memory.restore(value, restored_colony, restored_scouts, int(data.next_scout_id), restored_clock.simulation_time) or restored_missions.has(memory.id):
 				return false
-			returned_count += 1 if memory.returned_at >= 0.0 else 0
+			returned_count += 1 if memory.completed_at() >= 0.0 else 0
 			restored_missions[memory.id] = memory
 		if returned_count > MissionMemory.RECENT_RETURNS:
 			return false
+		for pile: PileState in restored_colony.piles.values():
+			var known_missing: int = 0
+			var pending_missing: int = 0
+			for memory: ScoutMissionMemory in restored_missions.values():
+				known_missing += 1 if memory.origin_pile == pile.id and memory.missing_at >= 0.0 else 0
+			for agent: ScoutAgent in restored_scouts.values():
+				pending_missing += 1 if agent.origin_pile == pile.id and agent.lost else 0
+			if known_missing + pending_missing > restored_scout_losses.get(pile.id, 0):
+				return false
 	var restored_delivered: Dictionary[String, Observation] = {}
 	for value: Variant in data.delivered_observations:
 		var evidence := Evidence.new()
@@ -297,8 +341,13 @@ func restore(data: Dictionary) -> bool:
 		for cohort: TransitCohort in restored_trails.cohorts.values():
 			if cohort.route_id == route.id:
 				predator_casualties += cohort.lost_workers - cohort.rival_losses
-	if predator_casualties != restored_predator.kills_total:
+	if predator_casualties + all_scout_losses != restored_predator.kills_total:
 		return false
+	for pile_id: String in restored_scout_losses:
+		var recorded: int = losses_by_pile.get(pile_id, 0) + restored_scout_losses[pile_id]
+		if recorded > restored_colony.piles[pile_id].workers.lost_total:
+			return false
+		losses_by_pile[pile_id] = recorded
 	var defense: JourneyDefenseState = restored_response.defense
 	if defense.reported_losses + defense.lost != restored_predator.defense_losses: return false
 	if restored_predator.defense_losses > restored_colony.piles.home.workers.lost_total - losses_by_pile.get("home",0): return false
@@ -313,15 +362,25 @@ func restore(data: Dictionary) -> bool:
 	for pile: PileState in restored_colony.piles.values():
 		var pending: int = restored_trails.pending_for_pile(pile.id) + (defense.lost if pile.id == "home" else 0)
 		var pending_adapted: int = restored_trails.pending_for_pile(pile.id,true) + (defense.adapted_lost if pile.id == "home" else 0)
+		var profiles: Dictionary[String,int] = defense.lost_profiles.duplicate() if pile.id == "home" else {}
+		for agent: ScoutAgent in restored_scouts.values():
+			if agent.origin_pile == pile.id and agent.lost:
+				pending += 1
+				pending_adapted += agent.pending_trait(pile.adaptation_repertoire)
+				if agent.lost_profile != "":
+					profiles[agent.lost_profile] = profiles.get(agent.lost_profile, 0) + 1
 		if pending_adapted > pile.adapted_workers_lost or pending > WorkerLedger.MAX_COUNT - pile.workers_total:
 			return false
 		if pile.food_toxicity.last_loss_tick > restored_clock.tick_count or pile.food_toxicity.losses > pile.workers.lost_total - losses_by_pile.get(pile.id,0): return false
 		if pile.rain_trace_observed and restored_rain.phase == "waiting":
 			return false
 		for trait_id: String in pile.genetics.established:
-			if restored_trails.pending_trait(pile.id, trait_id) + (defense.pending_trait(trait_id) if pile.id == "home" else 0) > pile.genetics.count_trait(trait_id, true):
+			var pending_count: int = restored_trails.pending_trait(pile.id, trait_id) + (defense.pending_trait(trait_id) if pile.id == "home" else 0)
+			for agent: ScoutAgent in restored_scouts.values():
+				if agent.origin_pile == pile.id:
+					pending_count += agent.pending_trait(trait_id)
+			if pending_count > pile.genetics.count_trait(trait_id, true):
 				return false
-		var profiles: Dictionary[String,int] = defense.lost_profiles.duplicate() if pile.id == "home" else {}
 		for cohort: TransitCohort in restored_trails.cohorts.values():
 			if restored_trails.routes[cohort.route_id].origin_pile == pile.id:
 				for key: String in cohort.lost_profiles: profiles[key] = profiles.get(key,0) + cohort.lost_profiles[key]
@@ -352,6 +411,7 @@ func restore(data: Dictionary) -> bool:
 	colony = restored_colony
 	scouts = restored_scouts
 	scout_missions = restored_missions
+	scout_losses = restored_scout_losses
 	next_scout_id = int(data.next_scout_id)
 	delivered_observations = restored_delivered
 	knowledge = restored_knowledge

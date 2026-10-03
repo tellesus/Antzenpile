@@ -1,5 +1,7 @@
 # Antzenpile
 
+Scouts now face the existing ambusher. Lost private discoveries never reach home; only delayed missing-return memories appear, with cause unknown. Select an awaiting scout departure to request a real return. Overdue survivors can still come home; exploration effort and direction remain available responses. See [scout survivability evidence](docs/SCOUT_SURVIVAL_EVALUATION.md).
+
 A colony-scale strategy game about interpreting and shaping a living ant trail network. The player is the colony: the physical world is hidden, and play proceeds through incomplete collective knowledge and an abstract audiovisual sensorium.
 
 ## Current state

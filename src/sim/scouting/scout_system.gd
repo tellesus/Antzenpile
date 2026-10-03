@@ -8,10 +8,12 @@ const Memory = preload("res://src/sim/knowledge/scout_mission_memory.gd")
 var config: ScoutConfig = preload("res://data/scouting/default_scouts.tres")
 var last_error: String = ""
 var _run: RunState
+var _predator: PredatorSystem
 
 
 func _init(run_state: RunState) -> void:
 	_run = run_state
+	_predator = PredatorSystem.new(run_state)
 
 
 func dispatch(origin_id: String, bearing: Variant = null, standing: bool = false) -> bool:
@@ -63,6 +65,15 @@ func _dispatch_route(origin: PileState, route: Array[Vector2], standing: bool, b
 	agent.return_path.append(origin.position)
 	agent.investigation_source_id = source_id
 	agent.trunk_route_id = trunk_id
+	var round_trip: float = 0.0
+	for index: int in range(1, route.size()):
+		round_trip += 2.0 * maxf(Pathfinder.travel_cost(_run.world, route[index - 1]), Pathfinder.travel_cost(_run.world, route[index])) / config.speed
+	var expectation: float = config.manual_expectation_seconds
+	if standing:
+		expectation = round_trip + 2.0 * (config.standing_search_seconds + config.cue_extension_seconds) + config.return_grace_seconds
+	elif not source_id.is_empty():
+		expectation = round_trip + config.return_grace_seconds
+	agent.expected_tick = _run.clock.tick_count + ceili(expectation / SimulationClock.TICK_INTERVAL)
 	if not trunk_id.is_empty():
 		agent.trunk_path = route.duplicate()
 	_run.scouts[id] = agent
@@ -99,7 +110,7 @@ func set_effort(target: Variant) -> bool:
 	_run.exploration.target = target
 	var active: Array[ScoutAgent] = []
 	for agent: ScoutAgent in _run.scouts.values():
-		if agent.standing and agent.phase not in ["returning", "blocked_returning"]:
+		if agent.standing and not agent.lost and agent.phase not in ["returning", "blocked_returning"]:
 			active.append(agent)
 	active.sort_custom(func(a: ScoutAgent, b: ScoutAgent) -> bool: return a.id.trim_prefix("scout_").to_int() > b.id.trim_prefix("scout_").to_int())
 	while active.size() > target:
@@ -121,6 +132,17 @@ func standing_count() -> int:
 	for agent: ScoutAgent in _run.scouts.values():
 		count += 1 if agent.standing else 0
 	return count
+
+
+func recall(id: String) -> bool:
+	if not _run.scouts.has(id):
+		return _reject("Scout mission no longer awaiting return")
+	var agent: ScoutAgent = _run.scouts[id]
+	# An absence cannot acknowledge a command differently from a living scout.
+	if not agent.lost:
+		_start_return(agent)
+	last_error = ""
+	return true
 
 
 func maintain_effort() -> void:
@@ -220,12 +242,20 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var agent: ScoutAgent = _run.scouts[id]
+		if agent.lost:
+			if _run.clock.tick_count >= agent.expected_tick:
+				_settle_missing(agent)
+			continue
+		if _ambush(agent, agent.position):
+			continue
 		if agent.phase == "departing":
 			agent.phase = "following_trail" if not agent.trunk_route_id.is_empty() else "exploring"
 			continue
 		if agent.phase in ["following_trail", "blocked_following_trail"]:
 			Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
 			_move(agent, delta, true)
+			if agent.lost:
+				continue
 			Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
 			if agent.phase == "blocked_exploring":
 				agent.phase = "blocked_following_trail"
@@ -252,6 +282,8 @@ func tick(delta: float) -> void:
 		if not exploring and agent.phase != "returning":
 			agent.phase = "returning"
 		_move(agent, delta, exploring)
+		if agent.lost:
+			continue
 		Senses.sample(agent, _run.world, config, _run.rng, _run.simulation_time)
 		if exploring:
 			agent.elapsed += delta
@@ -290,6 +322,7 @@ func _remember_departure(agent: ScoutAgent, bearing: float) -> void:
 	memory.origin_pile = agent.origin_pile
 	memory.bearing = _memory_bearing(bearing)
 	memory.departed_at = _run.simulation_time
+	memory.expected_at = agent.expected_tick * SimulationClock.TICK_INTERVAL
 	_run.scout_missions[agent.id] = memory
 
 
@@ -306,14 +339,58 @@ func _remember_return(agent: ScoutAgent, home: Vector2) -> void:
 			continue
 		memory.course.append({"bearing": _memory_bearing(roundf(relative.angle() * 10.0) / 10.0),
 			"estimated_distance": roundf(relative.length() / 2.0) * 2.0})
+	_prune_history()
+
+
+func _prune_history() -> void:
 	var returned: Array[ScoutMissionMemory] = []
 	for record: ScoutMissionMemory in _run.scout_missions.values():
-		if record.returned_at >= 0.0:
+		if record.completed_at() >= 0.0:
 			returned.append(record)
 	returned.sort_custom(func(a: ScoutMissionMemory, b: ScoutMissionMemory) -> bool:
-		return a.returned_at < b.returned_at if a.returned_at != b.returned_at else a.id < b.id)
+		return a.completed_at() < b.completed_at() if a.completed_at() != b.completed_at() else a.id < b.id)
 	while returned.size() > Memory.RECENT_RETURNS:
 		_run.scout_missions.erase(returned.pop_front().id)
+
+
+func _ambush(agent: ScoutAgent, from: Vector2) -> bool:
+	if agent.predator_encountered or _run.clock.tick_count < PredatorSystem.CONFIG.first_tick:
+		return false
+	var edge: Vector2 = agent.position - from
+	var t: float = clampf((PredatorSystem.CONFIG.position - from).dot(edge) / maxf(edge.length_squared(), 0.000001), 0.0, 1.0)
+	var encounter: Vector2 = from + edge * t
+	if encounter.distance_to(PredatorSystem.CONFIG.position) > PredatorSystem.CONFIG.radius:
+		return false
+	agent.predator_encountered = true
+	if not _predator.encounter(encounter):
+		return false
+	var pile: PileState = _run.colony.piles[agent.origin_pile]
+	var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
+	var profile: String = pile.genetics.loss_profile(adapted == 1, pile.adaptation_repertoire, pile.workers_total, _run.rng)
+	assert(pile.lose_workers(agent.id, 1, adapted, "scout ambush", profile))
+	agent.lost = true
+	agent.lost_profile = profile
+	agent.observations.clear()
+	agent.investigating = ""
+	# Old saves did not capture an expectation. Do not invent departure history.
+	if agent.expected_tick == 0:
+		agent.expected_tick = _run.clock.tick_count + ceili(config.manual_expectation_seconds / SimulationClock.TICK_INTERVAL)
+	elif agent.expected_tick <= _run.clock.tick_count:
+		# A late mission must not reveal the exact tick of a new remote casualty.
+		agent.expected_tick = _run.clock.tick_count + ceili(config.return_grace_seconds / SimulationClock.TICK_INTERVAL)
+	_run.scout_losses[agent.origin_pile] = _run.scout_losses.get(agent.origin_pile, 0) + 1
+	return true
+
+
+func _settle_missing(agent: ScoutAgent) -> void:
+	if _run.scout_missions.has(agent.id):
+		var memory: ScoutMissionMemory = _run.scout_missions[agent.id]
+		if memory.expected_at < 0.0:
+			memory.expected_at = agent.expected_tick * SimulationClock.TICK_INTERVAL
+		memory.missing_at = _run.simulation_time
+	assert(_run.colony.piles[agent.origin_pile].workers.retire_commitment(agent.id))
+	_run.scouts.erase(agent.id)
+	_prune_history()
 
 
 static func _memory_bearing(value: float) -> float:
@@ -457,14 +534,20 @@ func _move(agent: ScoutAgent, delta: float, exploring: bool) -> void:
 		var speed: float = config.speed * (config.trail_travel_multiplier if _on_trunk_edge(agent, target) else 1.0)
 		var needed: float = distance * cost / speed
 		if needed <= budget:
+			var from: Vector2 = agent.position
 			agent.position = target
 			agent.cursor += 1
 			budget -= needed
 			if exploring:
 				agent.return_path.append(target)
+			if _ambush(agent, from):
+				return
 		else:
+			var from: Vector2 = agent.position
 			agent.position = agent.position.move_toward(target, budget * speed / cost)
 			budget = 0.0
+			if _ambush(agent, from):
+				return
 
 
 func _on_trunk_edge(agent: ScoutAgent, target: Vector2) -> bool:

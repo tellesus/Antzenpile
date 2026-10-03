@@ -83,6 +83,10 @@ func dispatch_scout(origin_id: String, bearing: Variant = null) -> bool:
 	return scouting.dispatch(origin_id, bearing)
 
 
+func recall_scout(id: String) -> bool:
+	return scouting.recall(id)
+
+
 func set_exploration(target: Variant) -> bool:
 	return scouting.set_effort(target)
 

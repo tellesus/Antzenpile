@@ -1,5 +1,7 @@
 # Architecture
 
+Card 097 applies the existing shared PredatorSystem to capped ScoutAgents through swept physical travel. A private casualty remains a zero-count scout commitment and reserved slot until captured return expectation (or conservative late-loss grace); observations are discarded. RunState includes pending scout profiles in expected population/recognition/expression and validates cumulative pile scout losses against shared predator kills. Only settlement adds known missing memory; recall sends a semantic request with the same acknowledgement for an unresolved absence and a living scout. No normal provider receives survival fields.
+
 096 adds reusable neutral smoke and a local Home finish through SensoryArt only. Surface images are packed in an editable offline Blender source; rendering consumes approved detached summaries and existing view time. No simulation, perception, saved state or engine contract changes.
 
 095 uses baked rear/body/front organ triplets, a dark shared substrate and thick textured functional ribbons. All live contents/representatives render before foreground lips; all text/UI renders afterward. Layout and fixed hit ellipses remain authored presentation geometry, separate from hidden positions and simulation. Editable Blender sources combine original sculpt with packed imagegen surface finishing; there is no runtime 3D or new dependency. Mobile-specific production/testing is deferred by the player; touch-friendly commands remain.

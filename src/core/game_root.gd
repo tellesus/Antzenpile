@@ -37,6 +37,7 @@ func _ready() -> void:
 		outward.signal_provider = sensory_snapshot.bind("home")
 		outward.status_provider = outward_status.bind("home")
 		outward.dispatch_command = dispatch_facing
+		outward.scout_recall_command = recall_scout
 		outward.exploration_command = set_exploration
 		outward.exploration_bias_command = set_exploration_bias
 		outward.pause_command = simulation.toggle_pause
@@ -253,7 +254,8 @@ func inspect_internal_pressure() -> Dictionary:
 
 func exploration_summary() -> Dictionary:
 	return {"target": simulation.run.exploration.target, "bias": simulation.run.exploration.bias,
-		"away": simulation.scouting.standing_count(), "priorities": simulation.run.exploration.priorities.duplicate()}
+		"away": simulation.scouting.standing_count(), "priorities": simulation.run.exploration.priorities.duplicate(),
+		"missing": simulation.run.missing_scouts("home")}
 
 
 func toggle_investigation_priority(knowledge_id: String) -> Dictionary:
@@ -285,11 +287,13 @@ func scout_mission_summaries(pile_id: String) -> Array[Dictionary]:
 			continue
 		var record: Dictionary = memory.to_dict()
 		record["age"] = simulation.run.simulation_time - memory.departed_at
-		record["away_seconds"] = record.age if memory.returned_at < 0.0 else memory.returned_at - memory.departed_at
+		record["away_seconds"] = record.age if memory.completed_at() < 0.0 else memory.completed_at() - memory.departed_at
+		record["awaiting"] = memory.completed_at() < 0.0
+		record["overdue"] = memory.completed_at() < 0.0 and memory.expected_at >= 0.0 and simulation.run.simulation_time >= memory.expected_at
 		result.append(record)
 	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		if (a.returned_at < 0.0) != (b.returned_at < 0.0):
-			return a.returned_at < 0.0
+		if a.awaiting != b.awaiting:
+			return a.awaiting
 		return a.departed_at > b.departed_at if a.departed_at != b.departed_at else a.id > b.id)
 	return result
 
@@ -614,6 +618,11 @@ func respond_to_journey(action: String, route_id: String) -> Dictionary:
 
 func dispatch_facing(bearing: float) -> bool:
 	return simulation.dispatch_scout("home", bearing)
+
+
+func recall_scout(id: String) -> Dictionary:
+	var accepted: bool = simulation.recall_scout(id)
+	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func investigate_known_source(knowledge_id: String) -> Dictionary:

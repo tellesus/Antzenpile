@@ -28,3 +28,5 @@ extends Resource
 @export var distance_uncertainty: float = 0.5
 @export var departure_scent_half_life: float = 180.0
 @export var rain_scent_half_life: float = 12.0
+@export var return_grace_seconds: float = 30.0
+@export var manual_expectation_seconds: float = 600.0

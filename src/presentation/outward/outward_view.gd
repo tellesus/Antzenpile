@@ -17,6 +17,7 @@ var source_page: int = 0
 var signal_provider: Callable
 var status_provider: Callable
 var dispatch_command: Callable
+var scout_recall_command: Callable
 var exploration_command: Callable
 var exploration_bias_command: Callable
 var exploration_open: bool = false
@@ -176,7 +177,7 @@ func _exploration_panel_rect() -> Rect2:
 
 
 func _context_panel_rect() -> Rect2:
-	var height: float = 448 if _journey_attention() else 226 if not _selected_mission().is_empty() else 344 + _evidence_offset()
+	var height: float = 448 if _journey_attention() else 292 if not _selected_mission().is_empty() else 344 + _evidence_offset()
 	return Rect2(get_viewport_rect().size.x - 316, 144, 292, height)
 
 
@@ -215,6 +216,12 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 func _run_command(command: String) -> void:
 	_request_rejected = false
+	if command == "scout_recall":
+		var mission: Dictionary = _selected_mission()
+		if mission.get("awaiting", mission.get("returned_at", 0.0) < 0.0) and scout_recall_command.is_valid():
+			var result: Dictionary = scout_recall_command.call(mission.id)
+			show_feedback("Return requested · await arrival" if result.get("accepted", false) else result.get("reason", "Recall unavailable"), not result.get("accepted", false))
+		return
 	if command == "journey_open": journey_open = true; return
 	if command == "journey_close":
 		journey_open = false
@@ -374,6 +381,9 @@ func _button_at(at: Vector2) -> String:
 		for command: String in ["explore_0", "explore_2", "explore_5", "explore_8", "exploration_bias", "exploration_general"]:
 			if _exploration_rect(command).has_point(at):
 				return command
+	var mission: Dictionary = _selected_mission()
+	if not mission.is_empty() and mission.get("awaiting", mission.get("returned_at", 0.0) < 0.0) and _scout_recall_rect().has_point(at):
+		return "scout_recall"
 	if not _selected_signal().is_empty():
 		var chosen_route: Dictionary = _selected_route(_selected_signal())
 		if _journey_attention():
@@ -532,7 +542,7 @@ func _draw_scout_traces(size: Vector2) -> void:
 		draw_arc(entry.center, 6.0, 0.2, 2.4 if entry.stub else 5.8, 16, Color(color, 0.55), 1.0, true)
 		if selected:
 			draw_arc(entry.center, 15.0, PI, TAU, 20, Color("dce5d9"), 1.0, true)
-		var label: String = "SCOUT" if entry.missions[0].returned_at < 0.0 else "RETURNED"
+		var label: String = "NOT RETURNED" if entry.missions[0].get("missing_at", -1.0) >= 0.0 else "OVERDUE" if entry.missions[0].get("overdue", false) else "SCOUT" if entry.missions[0].returned_at < 0.0 else "RETURNED"
 		if entry.missions.size() > 1:
 			label += " ×%d" % entry.missions.size()
 		var text_size: Vector2 = _font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 10)
@@ -747,10 +757,21 @@ func _draw_mission_context(mission: Dictionary, size: Vector2) -> void:
 	UIStyle.surface(self, box, Color("41535a"), true)
 	_label(box.position + Vector2(16, 31), "Scout " + str(mission.id).trim_prefix("scout_"), Color("d9d3be"), 20)
 	_label(box.position + Vector2(16, 65), "Dispatched %.0f° · %s ago" % [rad_to_deg(mission.bearing), _mission_duration(mission.age)], Color("a9b9bc"), 14)
-	_label(box.position + Vector2(16, 91), "Awaiting return · away " + _mission_duration(mission.away_seconds) if mission.returned_at < 0.0 else "Returned · journey " + _mission_duration(mission.away_seconds), Color("a9b9bc"), 14)
+	var state: String = "Not returned · cause unknown" if mission.get("missing_at", -1.0) >= 0.0 else "Overdue · still awaiting return" if mission.get("overdue", false) else "Awaiting return · away " + _mission_duration(mission.away_seconds) if mission.returned_at < 0.0 else "Returned · journey " + _mission_duration(mission.away_seconds)
+	_label(box.position + Vector2(16, 91), state, Color("c7b196") if mission.get("missing_at", -1.0) >= 0.0 else Color("a9b9bc"), 14)
 	_label(box.position + Vector2(16, 125), "Departure scent faint" if mission.scent >= 0.1 else "Scent faded · departure remembered", Color("8fa1a8"), 13)
 	_label(box.position + Vector2(16, 151), "Course unknown until a report returns" if mission.returned_at < 0.0 else "Coarse remembered course from return", Color("8fa1a8"), 13)
 	_label(box.position + Vector2(16, 187), "Tap a grouped trace again to cycle scouts", Color("82939c"), 12)
+	if mission.get("awaiting", mission.returned_at < 0.0):
+		var recall_box: Rect2 = _scout_recall_rect()
+		UIStyle.surface(self, recall_box, Color("293b3b"))
+		_label(recall_box.position + Vector2(recall_box.size.x * 0.5, 29), "RECALL SCOUT", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+	else:
+		_label(box.position + Vector2(16, 239), "Change exploration effort or direction", Color("8fa1a8"), 13)
+
+
+func _scout_recall_rect() -> Rect2:
+	return Rect2(_context_panel_rect().position + Vector2(16, 210), Vector2(260, 44))
 
 
 static func _mission_duration(seconds: float) -> String:
@@ -922,7 +943,7 @@ func _draw_exploration() -> void:
 		_label(box.position + Vector2(137,29), title, Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	_label(Vector2(40, 395), "%d source priorities share scout effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 14)
 	_label(Vector2(40, 416), "Set 2, 5 or 8 to keep scouts searching", Color("a8b9b6"), 14)
-	_label(Vector2(40, 437), "Turning only changes your attention", Color("a8b9b6"), 14)
+	_label(Vector2(40, 437), "Not returned: %d · cause unknown" % policy.missing if policy.get("missing", 0) > 0 else "Turning only changes your attention", Color("a8b9b6"), 14)
 
 func _signal_title(category: String) -> String:
 	match category:
