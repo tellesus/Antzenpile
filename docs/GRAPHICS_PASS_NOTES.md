@@ -26,6 +26,27 @@ Texture memory at standard INWARD: 24.92 -> **55.02 MiB**, +30.10 MiB. Rich laye
 
 The only first-run sandbox messages concerned external engine log/editor settings/certificates; final authorized verification runs wrote normal engine files without those errors. Existing probe shutdown ObjectDB warnings remain; no parse, runtime or test failures. No minimum hardware, release export or Android/Pixel validation is claimed.
 
-## Next bounded section
+## 096 — OUTWARD and combined desktop evidence
 
-096: local OUTWARD Home/near-ground depth and smoky knowledge-derived signals. Preserve trail/scout anchors and returned-only recognition, captions, controls, unknown darkness and existing representative limits. No distant scenery or baked ants. Follow with combined desktop comparison; original gameplay roadmap resumes afterward.
+Home now sits in a broad, shallow near-ground field with dark side roots and a rugged recessed opening aligned to the existing trail/scout anchor. Three bounded drifting layers of one neutral smoke mask replace crystalline lace; category/strength come only from approved returned summaries. Water recognition still requires confidence; empty reports leave hollow remnants; unknown space remains dark. Existing organic route geometry, luminous ant atlas, caps, gestures, captions and panels are preserved. No remote landscape, invented signals or baked occupants.
+
+Native [Home sculpt](../tools/art/colony_material/outward_material.blend) and [packed finish/smoke source](../tools/art/colony_material/outward_material_finished.blend) retain geometry/materials/camera and editable projection planes. Both consumed exports reproduce pixel-for-pixel from packed images. See the production README/scripts. Reviewed [busy field](evidence/card096_outward_1280.png), [compact](evidence/card096_outward_900.png), [quiet unknown space](evidence/card096_quiet.png), [selected context](evidence/card096_selected_1280.png), [rain](evidence/card096_rain.png), [uncertain](evidence/card096_water_uncertain.png), [clear](evidence/card096_water_clear.png) and [empty](evidence/card096_water_empty.png) water. Actual mouse/touch source selection, paused decoration and exact authoritative snapshot preservation passed at standard/compact windows.
+
+Same desktop/engine/probe/actual render dimensions as 095; isolated combined run, not a GPU timer or device guarantee:
+
+| Workload | Pre-pass p95 ms | 095 p95 ms | 095+096 p95 ms | Pre-pass / combined draws |
+| --- | --- | --- | --- | --- |
+| Normal OUTWARD, 1280 | 1.866 | 1.718 | 1.756 | 189 / 187 |
+| Busy OUTWARD, 1280 | 3.040 | 3.445 | 3.287 | 342 / 337 |
+| Busy OUTWARD, compact | 2.958 | 3.071 | 3.260 | 342 / 337 |
+| Busy OUTWARD, large | 2.820 | 2.922 | 2.782 | 342 / 337 |
+| Busy OUTWARD, paced 240 Hz | 4.260 | 4.240 | 4.224 | 342 / 337 |
+| Busy INWARD, 1280 | 1.805 | 1.799 | 1.814 | 196 / 185 |
+
+The standard busy OUTWARD interval is about 8% higher than pre-pass in this short sample, still 3.287 ms; INWARD is essentially unchanged. Texture memory at standard INWARD is now **57.46 MiB**, about **32.54 MiB above pre-pass**; 096 adds about 2.44 MiB to 095. No sustained desktop slowdown was observed. A single 19.142 ms live-64x interval occurred in the initial two-second measurement. A targeted isolated **20-second / 31,526-frame** follow-up at 64x recorded p95 **0.758 ms**, worst **2.139 ms**, and **zero** intervals over 16.667 ms. Keep the initial outlier in the evidence; short OS-inclusive samples do not establish worst-case guarantees. Raw [combined report](evidence/card096_desktop_after.json) and [longer live follow-up](evidence/card096_live_interval.json).
+
+Final full suite: **6060 checks / zero failures**. Final import and 90-frame Main smoke passed; input/render/snapshot probes and packed-source comparisons passed. Existing probe shutdown ObjectDB warnings remain, with no parse/runtime/test errors. Mobile work is intentionally deferred; controls remain touch-friendly, Compatibility remains pinned, no paid dependencies were added and no mobile/minimum-hardware claim is made.
+
+## Handoff
+
+Both bounded sections are complete on `codex/graphics-proof`. Restart the game to load the new art; existing saves/gameplay/music work as before. Current world/organ functions are represented, with a shared auxiliary material rather than pretending every later organ has a unique final sculpt. Further organ-specific variants, broader confidence-gated object impressions and human visual polish can follow this playtest. The original scout survivability/experience milestone remains the next broader gameplay section; mobile stays tabled.

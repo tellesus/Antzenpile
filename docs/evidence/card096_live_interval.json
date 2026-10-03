@@ -1,0 +1,15 @@
+{
+	"above_16_667_ms": 0,
+	"above_33_333_ms": 0,
+	"cpu": "AMD Ryzen 7 7800X3D 8-Core Processor",
+	"engine": "4.7.2-stable (official)",
+	"frames": 31526,
+	"gpu": "AMD Radeon RX 6650 XT",
+	"p50_ms": 0.616,
+	"p95_ms": 0.758,
+	"p99_ms": 0.884,
+	"render_texture": "(1280.0, 720.0)",
+	"seconds": 20.000622,
+	"speed": 64,
+	"worst_ms": 2.139
+}

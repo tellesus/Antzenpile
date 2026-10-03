@@ -4,13 +4,13 @@ extends RefCounted
 
 const MAX_MOTES: int = 12
 const CONTOUR_STEPS: int = 32
-const CLOUD = preload("res://assets/graphics/proof/scent_cloud.svg")
+const CLOUD = preload("res://assets/graphics/colony/material/scent_smoke.png")
 const WATER = preload("res://assets/graphics/proof/water_impression.svg")
 const WORKER = preload("res://assets/graphics/proof/worker_walk.png")
 const SCENT_WORKER = preload("res://assets/graphics/proof/worker_scent.png")
 const EARTH = preload("res://assets/graphics/proof/nursery_earth.svg")
 const FILAMENT = preload("res://assets/graphics/colony/chemical_cloud.png")
-const ENTRANCE = preload("res://assets/graphics/colony/home_entrance.png")
+const ENTRANCE = preload("res://assets/graphics/colony/material/local_home.png")
 const WALK_FRAMES: int = 12
 const WALK_CELL: int = 128
 
@@ -50,12 +50,15 @@ static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool) -
 	var drift: float = time * 0.25 + phase
 	var recognition: float = smoothstep(0.25, 0.75, clampf(float(signal_data.get("confidence", 0.0)), 0.0, 1.0))
 	if not empty:
-		var lace_size := Vector2.ONE * radius * 2.7
-		canvas.draw_texture_rect(FILAMENT, Rect2(center-lace_size*0.5, lace_size), false, Color(color, salience*0.66))
+		# Neutral baked density carries no object identity. Bounded drift exposes
+		# smoke-like structure, never hidden reality or simulation randomness.
 		for layer: int in 3:
-			var offset := Vector2(sin(drift + layer * 2.1), cos(drift * 0.7 + layer)) * radius * 0.09
-			var extent := Vector2.ONE * radius * (2.2 - layer * 0.18)
-			canvas.draw_texture_rect(CLOUD, Rect2(center + offset - extent * 0.5, extent), false, Color(color, salience * 0.23))
+			var offset := Vector2(sin(drift+layer*2.1),cos(drift*0.7+layer))*radius*0.09
+			var extent := Vector2.ONE*radius*(2.6-layer*0.18)
+			var rotation: float = float(layer)*0.7+0.17*sin(drift*0.27+layer)
+			canvas.draw_set_transform(center+offset,rotation)
+			canvas.draw_texture_rect(CLOUD,Rect2(-extent*0.5,extent),false,Color(color,salience*[0.42,0.30,0.20][layer]))
+			canvas.draw_set_transform(Vector2.ZERO)
 		var gain: float = impression_gain(signal_data, empty)
 		if gain > 0.0:
 			var extent := Vector2.ONE * radius * 2.0
@@ -124,5 +127,6 @@ static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, w
 
 static func home_entrance(canvas: Node2D, center: Vector2) -> void:
 	# Only immediate home substrate; no remote landscape or world coordinates.
-	var pixels: Vector2 = ENTRANCE.get_size()
-	canvas.draw_texture_rect_region(ENTRANCE, Rect2(center-Vector2(480,180),Vector2(960,320)), Rect2(Vector2(0,pixels.y*0.5),Vector2(pixels.x,pixels.y*0.5)))
+	# Broad immediate Home field. Its opening aligns with the existing sensory
+	# anchor; transparent upper space cannot introduce remote scenery.
+	canvas.draw_texture_rect(ENTRANCE,Rect2(center-Vector2(640,204),Vector2(1280,336)),false)

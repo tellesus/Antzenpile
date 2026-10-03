@@ -1,5 +1,7 @@
 # Architecture
 
+096 adds reusable neutral smoke and a local Home finish through SensoryArt only. Surface images are packed in an editable offline Blender source; rendering consumes approved detached summaries and existing view time. No simulation, perception, saved state or engine contract changes.
+
 095 uses baked rear/body/front organ triplets, a dark shared substrate and thick textured functional ribbons. All live contents/representatives render before foreground lips; all text/UI renders afterward. Layout and fixed hit ellipses remain authored presentation geometry, separate from hidden positions and simulation. Editable Blender sources combine original sculpt with packed imagegen surface finishing; there is no runtime 3D or new dependency. Mobile-specific production/testing is deferred by the player; touch-friendly commands remain.
 
 094 separates editable adaptation intent from paid laying. PileState owns one queued trait; AdaptationSystem validates replacement/cancellation and atomic trial funding. BroodSystem shares that run-scoped system and tries the pending trial after current cohorts advance, before ordinary Grow, including in Manual. Manual Lay also honors the queue. Selection spends/commits nothing; actual laying clears intent and captures the cohort's immutable trait bundle. Controller/GameRoot expose semantic queue commands and detached queue/waiting summaries. Existing exclusive branches, revealed candidates, one focused trial, nurse ledger and emergence expression stay intact.
