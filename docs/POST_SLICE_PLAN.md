@@ -2,7 +2,19 @@
 
 ## Current priority — first satellite network
 
-[102 returned nest sites](tasks/102_returned_nest_sites.md) is complete: physical scout/return evidence now supplies dated possible shelter and rechecks without food traffic or a map claim. 6,302 checks, six ordinary discovery trials and standard/compact mouse/touch evidence passed. [Evaluation](NEST_SITE_EVALUATION.md). [103 reproductive investment](tasks/103_reproductive_investment.md) is complete: a separate paid Queen choice raises a prepared young queen/males using real nurses, Nursery space and food. 6,341 checks, four ordinary colonies and standard/compact input/art passed. [Evaluation](REPRODUCTIVE_INVESTMENT_EVALUATION.md). [104 physical founding camp](tasks/104_physical_founding_camp.md) is complete: a paid aggregate party follows remembered shelter, prepares it and physically returns a messenger before reporting eleven settlers. 6,379 checks and four fresh ordinary camps passed. [Evidence](FOUNDING_CAMP_EVALUATION.md). [105 first daughter pile](tasks/105_first_daughter_pile.md) is complete: eleven genuine settlers transfer ownership without death/duplication, founder traits stay separate from incoming adult expression, and local brood/stores/jobs are inspectable in a simplified INWARD network. 6,417 checks, four paid camp continuations and standard/compact input/art passed. [Evidence](DAUGHTER_PILE_EVALUATION.md). Next add physical parent supplies through that existing connection; a finite pack alone cannot sustain local growth. The first satellite may use a simplified functional interior and colony-wide knowledge, as permitted by the original design. Inspect multi-pile population/genetic transfers before expanding the transport card; do not retrofit full lineage selection or invent queens during founding. Later reinforce/supply/local labor choices follow the verified first connection. Mobile and session targets stay tabled.
+The first supported satellite milestone is complete. Keep implementing one bounded outcome at a time, using the original Part 3 §§84–89/128 and Part 2 shared-route contracts.
+
+| Completed section | Player-visible result | Evidence |
+| --- | --- | --- |
+| [102 returned nest sites](tasks/102_returned_nest_sites.md) | Returned, dated Shelter memory/rechecks; occupants/safety unknown. | [Discovery](NEST_SITE_EVALUATION.md) |
+| [103 reproductive investment](tasks/103_reproductive_investment.md) | Paid queen/males use food, nurses and Nursery space. | [Reproductives](REPRODUCTIVE_INVESTMENT_EVALUATION.md) |
+| [104 physical founding camp](tasks/104_physical_founding_camp.md) | Paid party follows remembered shelter; messenger reports actual camp. | [Founding](FOUNDING_CAMP_EVALUATION.md) |
+| [105 first daughter pile](tasks/105_first_daughter_pile.md) | Eleven settlers transfer without death/copy; captured queen lineage, local stores/brood/jobs and simplified INWARD inspection. | [Daughter](DAUGHTER_PILE_EVALUATION.md) |
+| [106 parent supplies](tasks/106_parent_supply_transport.md) | Eight Home workers carry real packs and return; supplies enable local emergence and paid Nursery/Food Exchange development. | [Support](PARENT_SUPPLY_EVALUATION.md) |
+
+Final support gate: 6,456 checks, four ordinary paid colonies with exact phased save continuation, standard/compact actual mouse/touch input and inspected organ graphics. Initial colony-wide knowledge and simplified first interior are explicitly permitted; broader biology/independence remain open.
+
+Next bounded section: review longer supported daughter growth, local care/store pressure and conservation while attending Home; resolve any concrete pressure-attention or ownership failure before expanding independent routes/reinforcement. Full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats are later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
 
 ## Current priority — internal health and weather (2026-10-03)
 

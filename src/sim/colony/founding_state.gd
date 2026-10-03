@@ -45,4 +45,8 @@ func restore(data: Dictionary, colony: ColonyState, tick: int) -> bool:
 	contaminant_mass=roundf(float(data.contaminant_mass)*100000000.0)/100000000.0
 	return true
 func valid_route(route: TrailRouteState) -> bool:
-	return route.id==route_id and route.purpose==("interpile" if phase=="established" else "founding") and route.origin_pile=="home" and route.allocated_workers==assigned() and route.active_workers==assigned() and route.desired_workers==assigned() and route.status==("inactive" if phase in ["failed","established"] else "active") and not route.reported_depleted and route.delivered_total==0 and route.receipt.is_empty() and route.reported_losses==0 and route.foreign_reports==0 and route.conflict_report.is_empty() and not route.energy_limited and not route.resume_on_report and route.departure_cooldown_ticks==0
+	if route.id!=route_id or route.origin_pile!="home" or route.purpose!=("interpile" if phase=="established" else "founding"): return false
+	if route.reported_depleted or route.reported_losses!=0 or route.foreign_reports!=0 or not route.conflict_report.is_empty() or route.energy_limited or route.resume_on_report or route.departure_cooldown_ticks!=0: return false
+	# The physical supply owner validates active interpile labor/cargo/receipts separately.
+	if phase=="established": return true
+	return route.allocated_workers==assigned() and route.active_workers==assigned() and route.desired_workers==assigned() and route.status==("inactive" if phase=="failed" else "active") and route.delivered_total==0 and route.receipt.is_empty()

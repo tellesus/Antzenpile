@@ -63,6 +63,7 @@ func _ready() -> void:
 		var inward: Node2D = Inward.new()
 		inward.status_provider = focused_inward_status
 		inward.pile_command = inspect_pile
+		inward.supply_command = set_daughter_supply
 		inward.mode_command = set_mode.bind("outward")
 		inward.pause_command = simulation.toggle_pause
 		inward.speed_command = simulation.set_time_scale
@@ -361,7 +362,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
-	return {"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
+	return {"supply":simulation.supply.summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
 		"reproduction": simulation.reproduction.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
 			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
@@ -623,6 +624,11 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 func journey_addressed(route: TrailRouteState) -> bool:
 	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
 	return outcome.get("outcome","") == "secured" and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
+
+
+func set_daughter_supply(enabled: bool) -> Dictionary:
+	var accepted: bool=simulation.set_daughter_supply(enabled)
+	return {"accepted":accepted,"reason":simulation.supply.last_error}
 
 
 func establish_daughter(knowledge_id: String) -> Dictionary:

@@ -36,6 +36,7 @@ var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
 var brood_health: BroodHealthSystem
 var heat: HeatSystem
+var supply: InterpileSupplySystem
 var founding: FoundingSystem
 var reproduction: ReproductionSystem
 
@@ -75,6 +76,7 @@ func _attach_run(next_run: RunState) -> void:
 	food_toxicity = FoodToxicitySystem.new(run)
 	brood_health = BroodHealthSystem.new(run, brood.lose_one)
 	heat = HeatSystem.new(run)
+	supply = InterpileSupplySystem.new(run)
 	founding = FoundingSystem.new(run)
 	reproduction = ReproductionSystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
@@ -187,6 +189,10 @@ func start_guest_rejection() -> bool:
 	return guest.start_rejection()
 
 
+func set_daughter_supply(enabled: Variant) -> bool:
+	return supply.set_enabled(enabled)
+
+
 func establish_daughter(knowledge_id: String) -> bool:
 	return founding.establish(knowledge_id)
 
@@ -225,4 +231,5 @@ func _tick(delta: float) -> void:
 	brood.tick(delta)
 	reproduction.tick()
 	founding.tick()
+	supply.tick()
 	food_toxicity.tick(delta)

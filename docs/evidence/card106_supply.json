@@ -1,0 +1,149 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"captures": {
+				"developed": 2700.0,
+				"outbound": 2233.75,
+				"returning": 2255.5,
+				"waiting": 2277.25
+			},
+			"events": [],
+			"final": {
+				"daughter_emerged": 8,
+				"daughter_losses": 0,
+				"daughter_stores": {
+					"carbohydrate": 11.00012,
+					"protein": 11.38006,
+					"water": 14.72506
+				},
+				"daughter_workers": 19,
+				"exchange": "developed",
+				"nursery": "developed",
+				"parent_available": 24,
+				"parent_workers": 66,
+				"reported_supplies": {
+					"carbohydrate": 4490920,
+					"protein": 2245460,
+					"water": 2245460
+				},
+				"returned_trips": 10
+			},
+			"first_emerged_at": 2395.0,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"standing_growth": true,
+			"support_at": 2233.5
+		},
+		{
+			"captures": {
+				"developed": 3790.0,
+				"outbound": 3233.25,
+				"returning": 3254.75,
+				"waiting": 3276.25
+			},
+			"events": [],
+			"final": {
+				"daughter_emerged": 8,
+				"daughter_losses": 0,
+				"daughter_stores": {
+					"carbohydrate": 11.44468,
+					"protein": 11.60234,
+					"water": 13.72234
+				},
+				"daughter_workers": 19,
+				"exchange": "developed",
+				"nursery": "developed",
+				"parent_available": 30,
+				"parent_workers": 72,
+				"reported_supplies": {
+					"carbohydrate": 4531136,
+					"protein": 2265568,
+					"water": 2265568
+				},
+				"returned_trips": 10
+			},
+			"first_emerged_at": 3395.0,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591,
+			"standing_growth": true,
+			"support_at": 3233.0
+		},
+		{
+			"captures": {
+				"developed": 3135.0,
+				"outbound": 2668.75,
+				"returning": 2690.5,
+				"waiting": 2712.25
+			},
+			"events": [],
+			"final": {
+				"daughter_emerged": 8,
+				"daughter_losses": 0,
+				"daughter_stores": {
+					"carbohydrate": 11.22628,
+					"protein": 11.49314,
+					"water": 13.61314
+				},
+				"daughter_workers": 19,
+				"exchange": "developed",
+				"nursery": "developed",
+				"parent_available": 19,
+				"parent_workers": 60,
+				"reported_supplies": {
+					"carbohydrate": 4511480,
+					"protein": 2255740,
+					"water": 2255740
+				},
+				"returned_trips": 10
+			},
+			"first_emerged_at": 2830.0,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"standing_growth": true,
+			"support_at": 2668.5
+		},
+		{
+			"captures": {
+				"developed": 2895.0,
+				"outbound": 2437.75,
+				"returning": 2459.0,
+				"waiting": 2480.25
+			},
+			"events": [],
+			"final": {
+				"daughter_emerged": 8,
+				"daughter_losses": 0,
+				"daughter_stores": {
+					"carbohydrate": 9.725,
+					"protein": 10.7425,
+					"water": 12.8625
+				},
+				"daughter_workers": 19,
+				"exchange": "developed",
+				"nursery": "developed",
+				"parent_available": 22,
+				"parent_workers": 64,
+				"reported_supplies": {
+					"carbohydrate": 4375000,
+					"protein": 2187500,
+					"water": 2187500
+				},
+				"returned_trips": 10
+			},
+			"first_emerged_at": 2600.0,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591,
+			"standing_growth": true,
+			"support_at": 2437.5
+		}
+	]
+}

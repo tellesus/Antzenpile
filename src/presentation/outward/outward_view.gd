@@ -772,7 +772,7 @@ func _draw_founding_context(box: Rect2) -> void:
 	elif status=="ready":
 		lines=["Founding camp reported","11 settlers · young queen + 2 males","Pack arrived: 6 carbs / 3 protein / 3 water","Occupants and hazards unassessed","Ready to establish a daughter pile"]
 	elif status=="established":
-		lines=["Daughter pile established","Settlers now belong to the daughter","Separate local stores and worker brood","Home exploration remains shared","Supplies are limited to the carried pack"]
+		lines=["Daughter pile established","Settlers now belong to the daughter","Separate local stores and worker brood","Home exploration remains shared","Supplies: inspect either Entrance"]
 	elif status=="failed":
 		lines=["Shelter not confirmed on arrival","Party and reproductives returned","Supplies returned; travel food spent","Return report "+Copy.duration(_status.time-camp.reported_at)+" ago",camp.get("blocker","")]
 	else:
