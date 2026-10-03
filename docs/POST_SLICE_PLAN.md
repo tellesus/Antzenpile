@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Combat/conflict review — complete (118)
+
+The player requested a review before more features. [Card 118](tasks/118_combat_conflict_review.md) and [findings](COMBAT_CONFLICT_REVIEW.md) confirm the paid ambusher loop and identify guest warning/navigation, rival response/aftermath and pending-reinforcement clarity gaps. Fifteen ordinary rival continuations, three guest branches, current ambusher comparisons, 28 graphical contexts and 6,982 full-suite checks passed integrity gates. No gameplay/rates changed. Recommended bounded follow-ups precede further conflict expansion; rival standing-order changes remain proposals requiring a design decision. Daughter-to-Home resource supplies remain the next previously planned feature below.
+
 ## Current priority — first satellite network
 
 The first supported satellite milestone is complete. Keep implementing one bounded outcome at a time, using the original Part 3 §§84–89/128 and Part 2 shared-route contracts.
