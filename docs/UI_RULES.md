@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 100 reports current Nursery temperature as steady/warm/hot, alongside existing climate staff. Known heat joins voluntary Nursery attention, its restrained pulse and explicit water-care text. Cooling/humidification share the same four staffing buttons and on-hand water; written total climate water use includes both. No exact ambient degrees, front clock, future weather, automatic view switch or death forecast.
+
 Card 099 exposes stable/strained/severe/recovering local brood symptoms and losses during health strain, separately from guest and home adult food-sharing evidence. Nursery text directs cleanup at Midden; Midden shows persistent recovery, and existing voluntary attention/organ pulses include known brood health. No infection meter, pathogen name, death countdown, hidden exterior diagnosis or new visual effects.
 
 Card 098 adds “General scouts favor safer ground” to Exploration only when unresolved home-delivered route losses support caution. It exposes neither hazard coordinates nor private scout observations. Manual and deliberate source missions remain available; a missing scout alone supplies no danger corridor.

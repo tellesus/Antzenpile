@@ -586,6 +586,8 @@ func _draw_context(size: Vector2) -> void:
 			var health: Dictionary = _status.get("brood_health", {})
 			if health.get("condition", "stable") != "stable":
 				_detail_line(box, 162, "Brood recovering · keep Midden clean" if health.condition == "recovering" else "Brood failing · clean Midden" if health.condition == "severe" else "Unhealthy brood · clean Midden")
+			elif _status.get("temperature", {}).get("larval_rate", 1.0) < 1.0:
+				_detail_line(box, 162, "Heat strain · climate care uses water")
 			elif dirty or climate:
 				_detail_line(box, 162, "Climate + sanitation slow larvae" if dirty and climate else "Nest climate slows larvae" if climate else "Sanitation slows larvae · visit Midden")
 			if _status.nursery_state == "primitive":
@@ -600,7 +602,7 @@ func _draw_context(size: Vector2) -> void:
 				var humidity: Dictionary = _status.get("humidity", {"moisture": 65.0, "carers": 0, "water_used": 0.0})
 				var condition: String = "dry" if humidity.moisture < 45.0 else "damp" if humidity.moisture > 80.0 else "steady"
 				_detail_line(box, 209, "Humidity: %.0f%% · %s" % [humidity.moisture, condition])
-				_detail_line(box, 235, "Climate workers: %d · water / air" % humidity.carers)
+				_detail_line(box, 235, "Temp: %s · climate workers: %d" % [_status.get("temperature", {}).get("condition", "steady"), humidity.carers])
 				for target: int in [0, 1, 2, 4]:
 					var button: Rect2 = _humidity_rect(target)
 					UIStyle.surface(self, button, Color("355059") if target == humidity.carers else Color("263038"))
@@ -614,8 +616,8 @@ func _draw_context(size: Vector2) -> void:
 					_detail_line(box, 306, "Expanding: %.0f / %.0fs" % [expansion.progress_seconds, expansion.duration])
 					_detail_line(box, 330, "%d workers · existing space online" % expansion.workers)
 				else:
-					_detail_line(box, 306, "Dry: humidify with stored water")
-					_detail_line(box, 330, "%.1f water used · damp brood is aired" % humidity.water_used)
+					_detail_line(box, 306, "Climate workers humidify / cool")
+					_detail_line(box, 330, "%.1f water used · damp brood aired" % humidity.water_used)
 			_draw_brood_button()
 		"food_exchange":
 			if _status.food_exchange_state == "primitive":

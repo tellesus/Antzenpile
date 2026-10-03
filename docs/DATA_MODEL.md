@@ -1,5 +1,7 @@
 # Data model
 
+Card 100 adds optional pile temperature {temperature, water_used_units}: integer milli-degrees and exact cooling-water units. Legacy version-five fields default to sheltered 26°C/zero use; primitive/developing state must remain baseline/zero. Strict shape/type/thermal bounds validate before attachment. Existing humidity labor remains the sole climate commitment; normal humidity summary reports combined actual humidity/cooling water use. Front phase derives from the saved fixed tick, so no second schedule/RNG state exists.
+
 Card 099 adds optional pile brood_health {burden, severe_ticks, losses, last_loss_tick}; old version-five saves default clean. Integer bounds, threshold/interval consistency, cause totals, last-loss time and total brood conservation validate atomically. Total brood losses = guest losses + local health losses; no adult debit. Fractional source pickups/rain refills now use canonical five-decimal quantities, and coverage restore reconstructs the existing ten-decimal scale, correcting tiny JSON continuation discrepancies found in long ordinary trials.
 
 Card 098 adds optional ScoutAgent.avoid_routes (legacy empty): unique same-pile route IDs with delivered losses, captured only for general standing missions. Restore rejects malformed, unknown, duplicate or cross-pile IDs atomically. Captured mission knowledge persists after newer home reports; no snapshot version bump or individual experience state.

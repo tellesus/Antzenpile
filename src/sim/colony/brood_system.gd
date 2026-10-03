@@ -136,7 +136,7 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 	if cohort.care < 1.0:
 		cohort.nutrition = 0.0 if cohort.stage == "larva" else 1.0
 		return
-	var environment_rate: float = minf(pile.brood_health.larval_rate(), minf(pile.midden.larval_rate(), pile.humidity.larval_rate()))
+	var environment_rate: float = minf(pile.temperature.larval_rate(), minf(pile.brood_health.larval_rate(), minf(pile.midden.larval_rate(), pile.humidity.larval_rate())))
 	var effective_delta: float = delta * (environment_rate if cohort.stage == "larva" else 1.0)
 	if cohort.stage == "larva":
 		var food_multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0

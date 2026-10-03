@@ -35,6 +35,7 @@ var predator: PredatorSystem
 var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
 var brood_health: BroodHealthSystem
+var heat: HeatSystem
 
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
@@ -71,6 +72,7 @@ func _attach_run(next_run: RunState) -> void:
 	brood = Brood.new(run, adaptation)
 	food_toxicity = FoodToxicitySystem.new(run)
 	brood_health = BroodHealthSystem.new(run, brood.lose_one)
+	heat = HeatSystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
@@ -201,6 +203,7 @@ func _tick(delta: float) -> void:
 	nursery.tick(delta)
 	sanitation.tick()
 	humidity.tick()
+	heat.tick()
 	guest.tick()
 	brood_health.tick()
 	brood.tick(delta)

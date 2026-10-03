@@ -2,7 +2,7 @@
 
 ## Current priority — internal health and weather (2026-10-03)
 
-[099 local brood health](tasks/099_local_brood_health.md) is complete: sanitation-driven delayed larval strain/loss, cleanup recovery and separate local evidence passed 6,176 checks and twelve ordinary trials. [Evidence](BROOD_HEALTH_EVALUATION.md). Next: Nursery temperature and one bounded authored heat event from the original Parts 3/6, using existing climate labor and on-hand water before broad season/ecology/network scope. Scout milestone below is complete; mobile and session targets stay tabled.
+[099 local brood health](tasks/099_local_brood_health.md) is complete: sanitation-driven delayed larval strain/loss, cleanup recovery and separate local evidence passed 6,176 checks and twelve ordinary trials. [Evidence](BROOD_HEALTH_EVALUATION.md). [100 Nursery heat](tasks/100_nursery_heat.md) is complete with shared water-paid climate care, rain cooling and current coarse thermal attention; 6,222 checks and six ordinary front trials passed. [Evidence](NURSERY_HEAT_EVALUATION.md). Next: one physical hot/dry resource effect and an observable current Home weather cue from Part 6, then reassess broader seasons/network dependencies. Scout milestone below is complete; mobile and session targets stay tabled.
 
 ## Current priority — scout survivability and learned caution (2026-10-03)
 

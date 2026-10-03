@@ -15,6 +15,7 @@ static func health(status: Dictionary, organ: String) -> float:
 	if organ != "nursery":
 		return 1.0
 	var result: float = minf(minf(status.get("brood_health", {}).get("larval_rate", 1.0), status.get("humidity", {}).get("larval_rate", 1.0)), status.get("midden", {}).get("larval_rate", 1.0))
+	result = minf(result, status.get("temperature", {}).get("larval_rate", 1.0))
 	for cohort: Dictionary in status.get("brood", []):
 		result = minf(result, minf(cohort.get("nutrition", 1.0), cohort.get("care", 1.0)))
 	return clampf(result, 0.0, 1.0)

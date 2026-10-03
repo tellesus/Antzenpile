@@ -1,5 +1,7 @@
 # Architecture
 
+Card 100 adds run-scoped HeatSystem and pile-owned TemperatureState. An authored tick-derived rise/plateau/fall front recurs later in all current outdoor settings; actual rain cools local ambient. Only developed Nursery temperature drifts; HeatSystem follows humidity and uses its existing climate commitment for water-paid cooling. Brood takes the minimum of thermal/health/moisture/refuse rates. Detached coarse current Nursery temperature feeds existing attention and organ health, with no forecast or surface mortality.
+
 Card 099 adds pile-owned BroodHealthState and run-scoped BroodHealthSystem after sanitation/humidity/guest, before brood progression. Fixed integer exposure/recovery depends on local heavy refuse, live larvae and developed damp Nursery. Severe strain uses BroodSystem.lose_one with a larval filter, preserving trial nurse release and aggregate brood conservation. Guest and health losses reconcile separately. Detached symptoms feed existing Nursery/Midden attention and organ health; no private burden, pathogen identity or exterior attribution reaches normal views.
 
 Card 098 adds a pure ScoutCaution helper over home-delivered TrailRoute loss/outcome summaries. General standing missions capture unresolved route IDs at dispatch and favor safer estimated corridors; bounded attempts/frontier preferences preserve unavoidable exploration. Manual/source-priority missions bypass this preference. No hidden predator/source geography is consulted. Successful defense changes future caution only after its report returns.
