@@ -2,6 +2,8 @@
 
 ## Combat/conflict review — complete (118)
 
+The player's follow-up explicitly includes play/counterplay after dispatch through momentary settlement. [119 review extension](tasks/119_conflict_counterplay_review.md) finds that the active portion remains thin: ambusher choices lack fresh intermediate evidence, rivals do not counter-recruit from reserves, and settlement can trigger repeated recruitment alarms. The [expanded review](COMBAT_CONFLICT_REVIEW.md) proposes warning/action repairs followed by a bounded physical pressure-report, second-decision, rival-response and settlement milestone. No such gameplay is implemented or locked by this review.
+
 The player requested a review before more features. [Card 118](tasks/118_combat_conflict_review.md) and [findings](COMBAT_CONFLICT_REVIEW.md) confirm the paid ambusher loop and identify guest warning/navigation, rival response/aftermath and pending-reinforcement clarity gaps. Fifteen ordinary rival continuations, three guest branches, current ambusher comparisons, 28 graphical contexts and 6,982 full-suite checks passed integrity gates. No gameplay/rates changed. Recommended bounded follow-ups precede further conflict expansion; rival standing-order changes remain proposals requiring a design decision. Daughter-to-Home resource supplies remain the next previously planned feature below.
 
 ## Current priority — first satellite network
