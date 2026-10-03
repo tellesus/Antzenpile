@@ -27,7 +27,9 @@ The first supported satellite milestone is complete. Keep implementing one bound
 
 Latest worker-support gate: 6,970 checks, four ordinary paid daughters with exact mixed-trait migration/recall continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain permitted; local defense/support are verified, full independent reproductive biology is not claimed.
 
-Next bounded section: sustained reinforced daughter review. Exercise new workers in local exploration, care/growth and existing support-route reuse; preserve exact migrations/phenotypes and original queen inheritance. Then audit the next original network/reproductive player outcome against current dependencies. Full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
+| [116 reinforced daughter review](tasks/116_reinforced_daughter_review.md) | Eight exact young-daughter paired continuations; reinforcement enables three routes and brood care, with real food constraints and physical supply reuse. | [Reinforced daughter review](REINFORCED_DAUGHTER_EVALUATION.md) |
+
+Next bounded section: update in-game colony-network guidance to explain physical founding, inspecting/looking from either pile, worker versus resource support and care competition. Then audit paid daughter resource supply back to Home (original Part3§88) against the existing shared connection and local funding/returned reports. Full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
 
 ## Current priority — internal health and weather (2026-10-03)
 
