@@ -70,6 +70,7 @@ func _ready() -> void:
 		inward.humidity_command = set_humidity_workers
 		inward.brood_command = start_brood
 		inward.brood_intent_command = set_brood_intent
+		inward.reproduction_command = start_reproduction
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
 		inward.adaptation_command = queue_adaptation
@@ -338,6 +339,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
 	return {"pile_id": pile_id, "queens": pile.queen_count,
+		"reproduction": simulation.reproduction.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
 			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
 			"water_used": (pile.humidity.water_used_units + pile.temperature.water_used_units) / 100000.0},
@@ -499,6 +501,11 @@ func set_guest_rejection(enabled: bool) -> Dictionary:
 func start_brood() -> Dictionary:
 	var accepted: bool = simulation.start_brood("home")
 	return {"accepted": accepted, "reason": simulation.brood.last_error}
+
+
+func start_reproduction() -> Dictionary:
+	var accepted: bool = simulation.start_reproduction("home")
+	return {"accepted":accepted,"reason":simulation.reproduction.last_error}
 
 
 func set_brood_intent(intent: String) -> Dictionary:

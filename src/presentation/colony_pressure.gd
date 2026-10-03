@@ -24,6 +24,9 @@ static func nursery_causes(status: Dictionary) -> Array[String]:
 static func food_shortages(status: Dictionary) -> Array[String]:
 	var result: Array[String] = []
 	for resource_id: String in ["carbohydrate", "protein", "water"]:
+		if resource_id in status.get("reproduction",{}).get("food_shortfalls",[]):
+			result.append(resource_id)
+			continue
 		for cohort: Dictionary in status.get("brood", []):
 			if cohort.get("care", 1.0) >= 1.0 and cohort.get("nutrition", 1.0) < 1.0 and resource_id in cohort.get("nutrition_shortfalls", []):
 				result.append(resource_id)

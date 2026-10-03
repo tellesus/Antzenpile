@@ -402,6 +402,13 @@ func restore(data: Dictionary) -> bool:
 				return false
 		if pile.brood_health.last_loss_tick > restored_clock.tick_count:
 			return false
+		if pile.reproduction.laid_tick > restored_clock.tick_count: return false
+		var reproductive: ReproductionState = pile.reproduction
+		var minimum_ticks: float = float(reproductive.progress_quarters)/4.0
+		if reproductive.phase in ["larva","pupa","ready"]: minimum_ticks+=reproductive.CONFIG.egg_ticks
+		if reproductive.phase in ["pupa","ready"]: minimum_ticks+=reproductive.CONFIG.larva_ticks
+		if reproductive.phase=="ready": minimum_ticks+=reproductive.CONFIG.pupa_ticks
+		if minimum_ticks > restored_clock.tick_count-reproductive.laid_tick: return false
 		if pile.brood_lost_total != pile.brood_health.losses + (restored_guest.reported_losses if pile.id == "home" else 0):
 			return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):

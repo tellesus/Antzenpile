@@ -66,7 +66,7 @@ func production_status(pile_id: String) -> Dictionary:
 	elif pile.brood_intent == "manual": waiting = "manual"
 	elif pile.queen_count < 1: waiting = "queen"
 	elif pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pending > pile.nursery_brood_capacity(): waiting = "space"
-	elif pending > pile.nursery_care_capacity(): waiting = "care"
+	elif pending-pile.reproduction.occupied_space() > pile.nursery_care_capacity(): waiting = "care"
 	elif pile.brood_started_total >= WorkerLedger.MAX_COUNT or pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending or pile.workers_total > WorkerLedger.MAX_COUNT - pending: waiting = "population"
 	else:
 		var reserve: Dictionary = remaining_food_reserve(pile)
@@ -83,6 +83,9 @@ func remaining_food_reserve(pile: PileState) -> Dictionary:
 	for cohort: BroodCohort in pile.brood_cohorts:
 		if cohort.stage == "egg": ant_seconds += cohort.count * CONFIG.larva_seconds
 		elif cohort.stage == "larva": ant_seconds += cohort.count * (CONFIG.larva_seconds - cohort.progress_seconds)
+	var reproductive: ReproductionState = pile.reproduction
+	if reproductive.phase=="egg": ant_seconds+=reproductive.CONFIG.space*reproductive.CONFIG.larva_ticks*SimulationClock.TICK_INTERVAL
+	elif reproductive.phase=="larva": ant_seconds+=reproductive.CONFIG.space*(reproductive.CONFIG.larva_ticks*SimulationClock.TICK_INTERVAL-reproductive.progress_quarters*SimulationClock.TICK_INTERVAL/4.0)
 	var multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0
 	return {"carbohydrate": ant_seconds * CONFIG.carbohydrate_per_larva_second * multiplier,
 		"protein": ant_seconds * CONFIG.protein_per_larva_second * multiplier,
@@ -118,7 +121,8 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var pile: PileState = _run.colony.piles[id]
-		var occupied: int = pile.nursery_occupied_space()
+		# Dedicated reproductive nurses support their own equivalent-space group.
+		var occupied: int = pile.nursery_occupied_space()-pile.reproduction.occupied_space()
 		var care_fraction: float = minf(1.0, float(pile.nursery_care_capacity()) / occupied) if occupied > 0 else 1.0
 		for cohort: BroodCohort in pile.brood_cohorts.duplicate():
 			_advance(pile, cohort, delta, care_fraction)

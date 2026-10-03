@@ -6,6 +6,7 @@ var humidity := HumidityState.new()
 var food_toxicity := FoodToxicityState.new()
 var brood_health := BroodHealthState.new()
 var temperature := TemperatureState.new()
+var reproduction := ReproductionState.new()
 
 const Ledger = preload("res://src/sim/colony/worker_ledger.gd")
 const Brood = preload("res://src/sim/colony/brood_cohort.gd")
@@ -62,7 +63,7 @@ func to_dict() -> Dictionary:
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"nursery_expansion": {"state": nursery_expansion_state, "progress_seconds": nursery_expansion_progress},
 		"food_exchange_state": food_exchange_state, "food_toxicity": food_toxicity.to_dict(),
-		"brood_health": brood_health.to_dict(), "temperature": temperature.to_dict(),
+		"brood_health": brood_health.to_dict(), "temperature": temperature.to_dict(), "reproduction": reproduction.to_dict(),
 		"food_exchange_progress_seconds": food_exchange_progress_seconds, "midden": midden.to_dict(), "humidity": humidity.to_dict()}
 
 
@@ -72,7 +73,7 @@ func nursery_brood_capacity() -> int:
 
 
 func nursery_occupied_space() -> int:
-	var occupied: int = 0
+	var occupied: int = reproduction.occupied_space()
 	for cohort: BroodCohort in brood_cohorts:
 		occupied += cohort.count
 	return occupied
@@ -312,6 +313,10 @@ func restore(data: Dictionary) -> bool:
 	var restored_queue: Variant = data.get("queued_adaptation", "")
 	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), restored_genetics.established, candidate, recognition_available, locked_trait)):
 		return false
+	var restored_reproduction := ReproductionState.new()
+	var reproduction_data: Variant = data.get("reproduction",restored_reproduction.to_dict())
+	if not reproduction_data is Dictionary or not restored_reproduction.restore(reproduction_data,restored,data.id,restored_genetics.established,emerged,restored_nursery_state,data.food_exchange_state,int(data.queen_count)): return false
+	if occupied+restored_reproduction.occupied_space()>brood_limit: return false
 	var adaptation_commitment: String = "adaptation:" + data.id
 	var adaptation_record: Dictionary = restored.to_dict().commitments.get(adaptation_commitment, {})
 	if trials == 1:
@@ -359,6 +364,7 @@ func restore(data: Dictionary) -> bool:
 	var thermal_data: Variant = data.get("temperature", restored_temperature.to_dict())
 	if not thermal_data is Dictionary or not restored_temperature.restore(thermal_data, restored_nursery_state): return false
 	temperature = restored_temperature
+	reproduction = restored_reproduction
 	brood_health = restored_health
 	midden = restored_midden
 	humidity = restored_humidity

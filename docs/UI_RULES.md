@@ -1,5 +1,7 @@
 # UI and visual rules
 
+103 splits Queen context into free Worker Brood/Reproduction attention tabs (128×44). Reproduction names upfront cost, ongoing food, real nurses/space, growth requirements and known feeding shortages; actual funded laying is separate. A small attached support lobe shows capped reproductive brood/ready young queen using existing artwork. Ready explicitly remains separate from workers/active laying queens and requires a future expedition. There is no hidden worker-laying hit behind the reproductive context; tabs survive ordinary attention but are presentation-only.
+
 102 adds a subdued green-gray smoky Shelter trace and SITES filter beside the three resource filters (72×44 shared mouse/touch targets). Site context shows dated possible shelter and unknown occupants/safety, with the existing scout recheck priority. No gather button, food delivery, physical floorplan or founding guarantee. A failed returned recheck says UNCONFIRMED rather than food EMPTY. No immediate site status or hidden occupants appear.
 Card 101 keeps panorama instructions visible and adds a quiet coarse current Home-air line only in warm/hot or rainy conditions. Rain still names scent disturbance. The cue is local sensation, never a weather countdown, source forecast, remote quantity update or automatic view change.
 

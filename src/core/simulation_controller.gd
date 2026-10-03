@@ -36,6 +36,7 @@ var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
 var brood_health: BroodHealthSystem
 var heat: HeatSystem
+var reproduction: ReproductionSystem
 
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
@@ -73,6 +74,7 @@ func _attach_run(next_run: RunState) -> void:
 	food_toxicity = FoodToxicitySystem.new(run)
 	brood_health = BroodHealthSystem.new(run, brood.lose_one)
 	heat = HeatSystem.new(run)
+	reproduction = ReproductionSystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
@@ -183,6 +185,10 @@ func start_guest_rejection() -> bool:
 	return guest.start_rejection()
 
 
+func start_reproduction(pile_id: String) -> bool:
+	return reproduction.start(pile_id)
+
+
 func stop_guest_rejection() -> bool:
 	return guest.stop_rejection()
 
@@ -207,4 +213,5 @@ func _tick(delta: float) -> void:
 	guest.tick()
 	brood_health.tick()
 	brood.tick(delta)
+	reproduction.tick()
 	food_toxicity.tick(delta)
