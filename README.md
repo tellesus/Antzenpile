@@ -1,6 +1,6 @@
 # Antzenpile
 
-Later warm fronts can heat a developed Nursery. Existing climate workers cool brood with stored water as well as maintaining humidity; rain reduces the local heat. Current warm/hot conditions appear in Nursery and voluntary attention, without a weather forecast. [Nursery heat evidence](docs/NURSERY_HEAT_EVALUATION.md).
+Later warm fronts can heat a developed Nursery. Existing climate workers cool brood with stored water as well as maintaining humidity; rain reduces the local heat. Current warm/hot conditions appear in Nursery and voluntary attention, without a weather forecast. OUTWARD also senses current air at Home. Hot, dry air mildly evaporates exposed water and reduces new nectar/honeydew output; actual rain and cooler conditions restore ordinary behavior, with remote changes learned on return. [Nursery heat evidence](docs/NURSERY_HEAT_EVALUATION.md).
 
 Prolonged heavy refuse can now strain larval health and eventually cause brood losses. Nursery shows local symptoms and points to Midden cleanup; recovery takes time after isolation. Developed damp conditions accelerate exposure. Guest losses and adult food-sharing failures remain separate. [Local brood-health evidence](docs/BROOD_HEALTH_EVALUATION.md).
 

@@ -605,7 +605,9 @@ func _draw_hud(size: Vector2) -> void:
 	_label(Vector2(24, 38), "OUTWARD  /  HOME", Color("dad7c8"), 22)
 	_label(Vector2(24, 63), "Drag to turn. Tap a trace to listen.", Color("82939c"), 13)
 	if _status.get("rain_phase", "") == "raining":
-		_label(Vector2(24, 92), "RAIN  /  scent disturbed", Color("8aadb8"), 13)
+		_label(Vector2(24, 92), "RAIN / cooled air · scent disturbed", Color("8aadb8"), 13)
+	elif not _status.get("home_air", "").is_empty():
+		_label(Vector2(24, 92), _status.home_air, Color("b6a286"), 13)
 	_label(Vector2(size.x * 0.5, 38), facing_text(facing), Color("a9bbc1"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	draw_line(Vector2(size.x * 0.5, 53), Vector2(size.x * 0.5, 72), Color("769aa3"), 1.0)
 	if not _status.is_empty():

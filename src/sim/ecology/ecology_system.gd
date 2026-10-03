@@ -74,7 +74,8 @@ func _tick_nectar(now: int) -> void:
 	if now < PULSE.first_tick or (now - PULSE.first_tick) % PULSE.interval_ticks != 0:
 		return
 	var node: WorldNodeState = _run.world.nodes[PULSE.source_id]
-	var added: float = minf(PULSE.quantity, maxf(0.0, PULSE.capacity - node.quantity))
+	var multiplier: float = HeatSystem.CONFIG.dry_producer_multiplier if HeatSystem.hot_dry(_run) else 1.0
+	var added: float = minf(PULSE.quantity * multiplier, maxf(0.0, PULSE.capacity - node.quantity))
 	if added <= 0.0:
 		return
 	node.quantity += added
@@ -112,7 +113,8 @@ func _tick_honeydew(now: int) -> void:
 	state.condition = minf(100.0, state.condition + HONEYDEW.protected_gain_per_interval) if tended else maxf(HONEYDEW.minimum_condition, state.condition - HONEYDEW.pressure_loss_per_interval)
 	var node: WorldNodeState = _run.world.nodes[HONEYDEW.source_id]
 	var rate: float = HONEYDEW.tended_output if tended else HONEYDEW.untended_output
-	var produced: float = roundf(rate * state.condition * 1000.0) / 100000.0
+	var multiplier: float = HeatSystem.CONFIG.dry_producer_multiplier if HeatSystem.hot_dry(_run) else 1.0
+	var produced: float = roundf(rate * state.condition * multiplier * 1000.0) / 100000.0
 	var added: float = minf(produced, maxf(0.0, HONEYDEW.source_capacity - node.quantity))
 	if added <= 0.0:
 		return

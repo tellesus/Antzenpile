@@ -1,5 +1,7 @@
 # Architecture
 
+Card 101 extends the authored HeatSystem with a pure hot/dry gate shared by EcologySystem. It evaporates only the authored exposed water source and scales new nectar/honeydew production; physical rain remains the refill/cooling authority. GameRoot detaches current Home-air words into OUTWARD, leaving movement guidance and all remote knowledge/report rules unchanged. No additional state, randomness, forecast or mortality.
+
 Card 100 adds run-scoped HeatSystem and pile-owned TemperatureState. An authored tick-derived rise/plateau/fall front recurs later in all current outdoor settings; actual rain cools local ambient. Only developed Nursery temperature drifts; HeatSystem follows humidity and uses its existing climate commitment for water-paid cooling. Brood takes the minimum of thermal/health/moisture/refuse rates. Detached coarse current Nursery temperature feeds existing attention and organ health, with no forecast or surface mortality.
 
 Card 099 adds pile-owned BroodHealthState and run-scoped BroodHealthSystem after sanitation/humidity/guest, before brood progression. Fixed integer exposure/recovery depends on local heavy refuse, live larvae and developed damp Nursery. Severe strain uses BroodSystem.lose_one with a larval filter, preserving trial nurse release and aggregate brood conservation. Guest and health losses reconcile separately. Detached symptoms feed existing Nursery/Midden attention and organ health; no private burden, pathogen identity or exterior attribution reaches normal views.
