@@ -24,6 +24,7 @@ var exploration_bias_command: Callable
 var exploration_open: bool = false
 var pause_command: Callable
 var speed_command: Callable
+var founding_command: Callable
 var trail_create_command: Callable
 var trail_set_command: Callable
 var trail_recheck_command: Callable
@@ -179,6 +180,7 @@ func _exploration_panel_rect() -> Rect2:
 
 func _context_panel_rect() -> Rect2:
 	var height: float = 448 if _journey_attention() else 292 if not _selected_mission().is_empty() else 344 + _evidence_offset()
+	if _selected_signal().get("category")=="nest_site": height=400
 	return Rect2(get_viewport_rect().size.x - 316, 144, 292, height)
 
 
@@ -217,6 +219,12 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 func _run_command(command: String) -> void:
 	_request_rejected = false
+	if command=="founding":
+		var selected: Dictionary=_selected_signal()
+		if selected.get("category")=="nest_site" and founding_command.is_valid():
+			var result: Dictionary=founding_command.call(selected.source_knowledge_id)
+			show_feedback("Founding party dispatched · await report" if result.get("accepted",false) else result.get("reason","Founding unavailable"),not result.get("accepted",false))
+		return
 	if command == "scout_recall":
 		var mission: Dictionary = _selected_mission()
 		if mission.get("awaiting", mission.get("returned_at", 0.0) < 0.0) and scout_recall_command.is_valid():
@@ -392,6 +400,7 @@ func _button_at(at: Vector2) -> String:
 	if not _selected_signal().is_empty():
 		var chosen_route: Dictionary = _selected_route(_selected_signal())
 		if _selected_signal().category == "nest_site":
+			if _founding_rect().has_point(at) and _camp_summary().get("status","none") in ["none","failed"]: return "founding"
 			if _investigate_button_rect().has_point(at): return "investigate"
 			if _context_panel_rect().has_point(at): return ""
 		if _journey_attention():
@@ -522,7 +531,7 @@ func _prepare_signal_captions(size: Vector2) -> void:
 	if not _selected_mission().is_empty():
 		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 226))
 	elif not _selected_signal().is_empty():
-		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 448 if _journey_attention() else 344 + _evidence_offset()))
+		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 400 if _selected_signal().get("category")=="nest_site" else 448 if _journey_attention() else 344 + _evidence_offset()))
 	if sources_open: _caption_blocks.append(_sources_panel_rect())
 	if exploration_open: _caption_blocks.append(_exploration_panel_rect())
 	var ordered: Array[Dictionary] = _placed.duplicate()
@@ -642,14 +651,7 @@ func _draw_context(size: Vector2) -> void:
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 15)
 	_label(box.position + Vector2(16, 109), "Last sensed " + Copy.duration(selected.age) + " ago", Color("8fa1a8"), 15)
 	if selected.category == "nest_site":
-		_label(box.position + Vector2(16, 145), "Last recheck did not confirm site" if _reported_empty(selected) else "Possible shelter · earlier report", Color("b9c5a1"), 15)
-		_label(box.position + Vector2(16, 172), "Occupants and safety unknown", Color("8fa1a8"), 15)
-		_label(box.position + Vector2(16, 211), "Founding needs a reproductive", Color("a8b8bd"), 15)
-		_label(box.position + Vector2(16, 233), "and a supported expedition.", Color("a8b8bd"), 15)
-		_label(box.position + Vector2(16, 266), "Site memory only; no nest claimed.", Color("8fa1a8"), 14)
-		var recheck: Rect2 = _investigate_button_rect()
-		UIStyle.surface(self, recheck, Color("27383c"))
-		_label(recheck.get_center() + Vector2(0, 5), _investigation_title(selected), Color("d5ded8"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+		_draw_founding_context(box)
 		return
 	var hint: Dictionary = _status.get("temporal_hints", {}).get(selected.source_knowledge_id, {})
 	var loss_route: Dictionary = _selected_route(selected)
@@ -742,6 +744,34 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 	var investigate_box: Rect2 = _investigate_button_rect()
 	UIStyle.surface(self, investigate_box, Color("27383c") if scout_available else Color("202326"))
 	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), _investigation_title(selected), Color("d5ded8"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+
+
+func _camp_summary() -> Dictionary:
+	return _status.get("founding",{}).get(_selected_signal().get("source_knowledge_id",""),{})
+func _founding_rect() -> Rect2: return Rect2(get_viewport_rect().size.x-300,424,260,44)
+func _draw_founding_context(box: Rect2) -> void:
+	var camp: Dictionary=_camp_summary()
+	var status: String=camp.get("status","none")
+	var lines: Array[String]=[]
+	if status=="awaiting":
+		lines=["Founding party away · 12 workers","Result unknown · awaiting return","Dispatched "+Copy.duration(camp.age)+" ago","Queen and supplies are committed","Home worker brood can continue"]
+	elif status=="ready":
+		lines=["Founding camp reported","11 settlers · young queen + 2 males","Pack arrived: 6 carbs / 3 protein / 3 water","Occupants and hazards unassessed","No daughter-colony laying yet"]
+	elif status=="failed":
+		lines=["Shelter not confirmed on arrival","Party and reproductives returned","Supplies returned; travel food spent","Return report "+Copy.duration(_status.time-camp.reported_at)+" ago",camp.get("blocker","")]
+	else:
+		lines=["Commit 12 workers + queen + 2 males","Pack: 6 carbs · 3 protein · 3 water","Travel also spends carbohydrate","Settlers stay; a report returns",camp.get("blocker","Occupants and safety unknown")]
+	for index: int in lines.size(): _label(box.position+Vector2(16,145+index*24),lines[index],Color("b9c5a1") if index==0 else Color("8fa1a8"),14 if index==0 else 12)
+	if status in ["none","failed"]:
+		var available: bool=camp.get("blocker","").is_empty() and not camp.is_empty()
+		UIStyle.surface(self,_founding_rect(),Color("354039") if available else Color("202326"))
+		_label(_founding_rect().get_center()+Vector2(0,5),"SEND FOUNDING PARTY",Color("d5ded8") if available else Color("929a95"),14,HORIZONTAL_ALIGNMENT_CENTER)
+	else:
+		_label(box.position+Vector2(16,308),"Founding report stays separate from",Color("8fa1a8"),12)
+		_label(box.position+Vector2(16,329),"the dated scout shelter memory.",Color("8fa1a8"),12)
+	var recheck: Rect2=_investigate_button_rect()
+	UIStyle.surface(self,recheck,Color("27383c"))
+	_label(recheck.get_center()+Vector2(0,5),_investigation_title(_selected_signal()),Color("d5ded8"),14,HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _investigation_title(selected: Dictionary) -> String:
@@ -844,6 +874,7 @@ func _trail_button_rect(command: String) -> Rect2:
 
 
 func _investigate_button_rect() -> Rect2:
+	if _selected_signal().get("category")=="nest_site": return Rect2(get_viewport_rect().size.x-300,488,260,44)
 	return Rect2(get_viewport_rect().size.x - 300.0, (444.0 if _is_honeydew(_selected_signal()) else 438.0) + _evidence_offset(), 260.0, 44.0)
 
 

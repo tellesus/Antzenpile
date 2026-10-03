@@ -739,6 +739,12 @@ func _draw_context(size: Vector2) -> void:
 func _draw_reproduction_context(box: Rect2) -> void:
 	var state: Dictionary = _status.get("reproduction",{})
 	var phase: String = state.get("phase","none")
+	if phase=="departed":
+		_detail_line(box,111,"Reproductives committed away")
+		_detail_line(box,139,"Inspect Shelter in OUTWARD")
+		_detail_line(box,179,"Active laying queens: %d" % _status.queens)
+		_detail_line(box,207,"Home worker brood can continue")
+		return
 	if phase=="ready":
 		_detail_line(box,111,"1 young queen · 2 supporting males")
 		_detail_line(box,139,"Ready for a founding expedition")

@@ -42,6 +42,7 @@ func _ready() -> void:
 		outward.exploration_bias_command = set_exploration_bias
 		outward.pause_command = simulation.toggle_pause
 		outward.speed_command = simulation.set_time_scale
+		outward.founding_command = start_founding
 		outward.trail_create_command = create_trail_for
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
@@ -228,7 +229,10 @@ func outward_status(pile_id: String) -> Dictionary:
 	var temporal_hints: Dictionary = {}
 	for known_id: String in simulation.run.knowledge.nodes:
 		temporal_hints[known_id] = simulation.run.knowledge.temporal_hint(known_id)
-	return {"home_air": simulation.heat.home_air(),
+	var camps: Dictionary={}
+	for known_id: String in simulation.run.knowledge.nodes:
+		if simulation.run.knowledge.nodes[known_id].definition_id=="nest_site": camps[known_id]=simulation.founding.summary(known_id)
+	return {"founding":camps,"home_air": simulation.heat.home_air(),
 		"available_workers": simulation.run.colony.piles[pile_id].workers_available,
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
@@ -579,7 +583,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				status = "recalling" if route.desired_workers == 0 else "depleted" if route.reported_depleted else "active"
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
 				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers + pending,
-				"active_workers": route.active_workers + pending, "checking_workers": checking, "status": status,
+				"purpose":route.purpose, "founding_intent":route.purpose=="founding" and simulation.run.founding.phase!="failed", "active_workers":0 if route.purpose=="founding" and simulation.run.founding.phase=="ready" else route.active_workers + pending, "checking_workers": checking, "status": status,
 				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
@@ -599,6 +603,11 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 func journey_addressed(route: TrailRouteState) -> bool:
 	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
 	return outcome.get("outcome","") == "secured" and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
+
+
+func start_founding(knowledge_id: String) -> Dictionary:
+	var accepted: bool=simulation.start_founding(knowledge_id)
+	return {"accepted":accepted,"reason":simulation.founding.last_error}
 
 
 func create_trail_for(knowledge_id: String) -> Dictionary:

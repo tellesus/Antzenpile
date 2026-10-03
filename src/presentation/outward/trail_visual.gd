@@ -52,8 +52,9 @@ static func paths(routes: Array, placed: Array[Dictionary], viewport: Vector2) -
 		var familiarity: float = float(route.get("route_familiarity", 0.0))
 		if not is_finite(chemical) or not is_finite(familiarity):
 			continue
-		var ghost: bool = chemical < 0.1 and familiarity >= 0.1
-		var strength: float = familiarity if ghost else chemical
+		var intent: bool=route.get("purpose", "food")=="founding" and route.get("founding_intent",false)
+		var ghost: bool = chemical < 0.1 and (familiarity >= 0.1 or intent)
+		var strength: float = maxf(familiarity,0.18 if intent else 0.0) if ghost else chemical
 		if strength < 0.1:
 			continue
 		var destination_id: String = str(route.get("destination_knowledge_id", ""))

@@ -21,6 +21,7 @@ const Predator = preload("res://src/sim/ecology/predator_state.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 const Exploration = preload("res://src/sim/scouting/exploration_state.gd")
+var founding := FoundingState.new()
 var exploration: ExplorationState = Exploration.new()
 var world: WorldState
 var colony: ColonyState = Colony.new()
@@ -83,7 +84,7 @@ func to_dict() -> Dictionary:
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
-		"knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(),
+		"founding": founding.to_dict(), "knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(),
 		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
 
 
@@ -253,8 +254,11 @@ func restore(data: Dictionary) -> bool:
 				return false
 		if not agent.investigation_source_id.is_empty() and not restored_knowledge.nodes.has("known:" + agent.investigation_source_id):
 			return false
+	var restored_founding:=FoundingState.new()
+	var founding_data: Variant=data.get("founding",restored_founding.to_dict())
+	if not founding_data is Dictionary or not restored_founding.restore(founding_data,restored_colony,restored_clock.tick_count): return false
 	var restored_trails := Trails.new()
-	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time):
+	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding):
 		return false
 	for agent: ScoutAgent in restored_scouts.values():
 		for route_id: String in agent.avoid_routes:
@@ -427,6 +431,7 @@ func restore(data: Dictionary) -> bool:
 	next_scout_id = int(data.next_scout_id)
 	delivered_observations = restored_delivered
 	knowledge = restored_knowledge
+	founding = restored_founding
 	trails = restored_trails
 	rain = restored_rain
 	honeydew = restored_honeydew

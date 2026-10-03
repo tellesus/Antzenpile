@@ -79,7 +79,7 @@ static func _layer(canvas: Node2D, status: Dictionary, id: String, at: Vector2, 
 	match id:
 		"queen":
 			canvas.draw_texture_rect(QUEEN[layer],area,false,tint)
-			if status.get("reproduction",{}).get("phase","none")!="none":
+			if status.get("reproduction",{}).get("phase","none") in ["egg","larva","pupa","ready"]:
 				var support_size := Vector2(126,105)
 				canvas.draw_texture_rect(NURSERY_DEVELOPED[layer],Rect2(at+Vector2(54,-49)-support_size*0.5,support_size),false,Color(tint,tint.a*0.9))
 		"entrance": canvas.draw_texture_rect(ENTRANCE[layer],area,false,tint)

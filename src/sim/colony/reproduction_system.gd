@@ -9,6 +9,7 @@ var last_error: String = ""
 func _init(run_state: RunState) -> void: _run=run_state
 
 func blocker(pile: PileState) -> String:
+	if pile.id=="home" and _run.founding.phase not in ["none","failed"]: return "Founding group is committed away from Home"
 	if pile.reproduction.phase!="none": return "A reproductive group is already growing or ready"
 	if pile.queen_count<1: return "No queen can lay reproductive brood"
 	if pile.brood_matured_total<CONFIG.emerged_required: return "Raise %d workers before reproductive brood" % CONFIG.emerged_required
@@ -71,4 +72,4 @@ func summary(pile_id: String) -> Dictionary:
 	if not _run.colony.piles.has(pile_id): return {}
 	var pile: PileState = _run.colony.piles[pile_id]
 	var state: ReproductionState = pile.reproduction
-	return {"phase":state.phase,"progress":float(state.progress_quarters)/maxi(1,CONFIG.stage_ticks(state.phase)*4),"space":CONFIG.space,"occupied_space":state.occupied_space(),"nurses":CONFIG.nurses,"costs":CONFIG.costs(),"emerged_required":CONFIG.emerged_required,"ready_queens":1 if state.phase=="ready" else 0,"ready_males":2 if state.phase=="ready" else 0,"food_shortfalls":state.food_shortfalls.duplicate(),"blocker":blocker(pile)}
+	return {"phase":"departed" if pile_id=="home" and _run.founding.phase not in ["none","failed"] else state.phase,"progress":float(state.progress_quarters)/maxi(1,CONFIG.stage_ticks(state.phase)*4),"space":CONFIG.space,"occupied_space":state.occupied_space(),"nurses":CONFIG.nurses,"costs":CONFIG.costs(),"emerged_required":CONFIG.emerged_required,"ready_queens":1 if state.phase=="ready" else 0,"ready_males":2 if state.phase=="ready" else 0,"food_shortfalls":state.food_shortfalls.duplicate(),"blocker":blocker(pile)}

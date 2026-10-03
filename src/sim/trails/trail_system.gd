@@ -75,6 +75,7 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	var route: TrailRouteState = _run.trails.routes[route_id]
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "trail:" + route.id
+	if route.purpose!="food": return _reject("Founding workers belong to their expedition")
 	var requested: int = int(target)
 	var expected: int = route.allocated_workers + _run.trails.pending_losses(route.id)
 	if requested == route.desired_workers and requested <= expected:
@@ -192,7 +193,7 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var route: TrailRouteState = _run.trails.routes[id]
-		if route.status == "active" and route.departure_cooldown_ticks == 0:
+		if route.purpose=="food" and route.status == "active" and route.departure_cooldown_ticks == 0:
 			_depart(route)
 
 

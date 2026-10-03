@@ -36,6 +36,7 @@ var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
 var brood_health: BroodHealthSystem
 var heat: HeatSystem
+var founding: FoundingSystem
 var reproduction: ReproductionSystem
 
 
@@ -74,6 +75,7 @@ func _attach_run(next_run: RunState) -> void:
 	food_toxicity = FoodToxicitySystem.new(run)
 	brood_health = BroodHealthSystem.new(run, brood.lose_one)
 	heat = HeatSystem.new(run)
+	founding = FoundingSystem.new(run)
 	reproduction = ReproductionSystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
@@ -185,6 +187,10 @@ func start_guest_rejection() -> bool:
 	return guest.start_rejection()
 
 
+func start_founding(knowledge_id: String) -> bool:
+	return founding.start(knowledge_id)
+
+
 func start_reproduction(pile_id: String) -> bool:
 	return reproduction.start(pile_id)
 
@@ -214,4 +220,5 @@ func _tick(delta: float) -> void:
 	brood_health.tick()
 	brood.tick(delta)
 	reproduction.tick()
+	founding.tick()
 	food_toxicity.tick(delta)
