@@ -15,6 +15,7 @@ const Pressure = preload("res://src/presentation/colony_pressure.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
 var pile_command: Callable
+var pressure_command: Callable
 var supply_command: Callable
 var mode_command: Callable
 var pause_command: Callable
@@ -88,7 +89,11 @@ func activate_at(at: Vector2) -> bool:
 	if selected_id=="food_exchange" and _status.get("daughter",false) and not Pressure.food_sources_needed(_status).is_empty() and _supply_link_rect().has_point(at):
 		selected_id="entrance"; queue_redraw(); return true
 	if _status.get("daughter_available",false) and _pile_rect().has_point(at):
-		if pile_command.is_valid(): pile_command.call("home" if _status.get("daughter",false) else "satellite_1")
+		var target: String = "home" if _status.get("daughter",false) else "satellite_1"
+		if not _status.get("other_pile_attention", {}).is_empty() and pressure_command.is_valid():
+			var result: Dictionary = pressure_command.call(target)
+			if not result.get("accepted",false): show_feedback(result.get("reason", "Internal attention unavailable"))
+		elif pile_command.is_valid(): pile_command.call(target)
 		return true
 	if selected_id == "queen":
 		for tab: String in (["workers"] if _status.get("daughter",false) else ["workers","reproduction"]):
@@ -704,7 +709,7 @@ func _draw_context(size: Vector2) -> void:
 				if recent_food_losses:
 					var base: float = 230 if _status.food_exchange_state == "developed" else 300
 					_label(box.position + Vector2(16, base), "Workers lost after food sharing", Color("c7ad98"), 15)
-					_label(box.position + Vector2(16, base + 24), "%d lost at home · %s ago" % [food_losses.losses, Copy.duration(food_losses.age)], Color("a9b9bc"), 15)
+					_label(box.position + Vector2(16, base + 24), "%d lost locally · %s ago" % [food_losses.losses, Copy.duration(food_losses.age)], Color("a9b9bc"), 15)
 					_label(box.position + Vector2(16, base + 48), "Cause remains uncertain", Color("8fa1a8"), 15)
 					_label(box.position + Vector2(16, base + 74), "Review returned food supplies", Color("8fa1a8"), 15)
 				else:
@@ -717,7 +722,7 @@ func _draw_context(size: Vector2) -> void:
 					UIStyle.surface(self, button, Color("263038"))
 					_label(button.get_center() + Vector2(0, 5), "CARBS" if resource_id == "carbohydrate" else resource_id.to_upper(), Color("dce5d9"), 12, HORIZONTAL_ALIGNMENT_CENTER)
 			elif food_losses.get("losses",0) > 0:
-				_label(box.position + Vector2(16, 213), "Home losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 15)
+				_label(box.position + Vector2(16, 213), "Local losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 15)
 		"entrance":
 			_detail_line(box, 65, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
@@ -920,7 +925,11 @@ func _draw_nursery_develop_button() -> void:
 func _draw_controls(size: Vector2) -> void:
 	if _status.get("daughter_available",false):
 		UIStyle.surface(self,_pile_rect(),Color("29392f"))
-		_label(_pile_rect().get_center()+Vector2(0,6),"INSPECT HOME" if _status.get("daughter",false) else "INSPECT DAUGHTER",Color("d3dcd4"),16,HORIZONTAL_ALIGNMENT_CENTER)
+		var attention: Dictionary = _status.get("other_pile_attention", {})
+		var title: String = attention.get("title", "INSPECT HOME" if _status.get("daughter",false) else "INSPECT DAUGHTER")
+		_label(_pile_rect().get_center()+Vector2(0,-4 if not attention.is_empty() else 6),title,Color("d3dcd4"),14 if not attention.is_empty() else 16,HORIZONTAL_ALIGNMENT_CENTER)
+		if not attention.is_empty():
+			_label(_pile_rect().get_center()+Vector2(0,17),Copy.fit_line(" / ".join(attention.causes),_font,12,_pile_rect().size.x-24),Color("c4ac95"),12,HORIZONTAL_ALIGNMENT_CENTER)
 	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "save", "load"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale

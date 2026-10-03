@@ -46,7 +46,14 @@ static func food_sources_needed(status: Dictionary) -> Array[String]:
 static func attention(status: Dictionary) -> Dictionary:
 	var causes: Array[String] = nursery_causes(status)
 	if status.get("food_sharing",{}).get("recent",false):
-		return {"organ":"food_exchange","causes":["HOME LOSSES · CAUSE UNCERTAIN"],"title":"CHECK FOOD EXCHANGE"}
-	if causes.is_empty(): return {}
+		return {"organ":"food_exchange","causes":[("DAUGHTER" if status.get("daughter",false) else "HOME") + " LOSSES · CAUSE UNCERTAIN"],"title":"CHECK FOOD EXCHANGE"}
+	if causes.is_empty():
+		# A conservative daughter can stop laying before larvae fail to feed.
+		# This is a known local reserve gate, not a predicted food crisis.
+		var production: Dictionary = status.get("brood_production", {})
+		var waiting: String = production.get("waiting", "")
+		if status.get("daughter", false) and production.get("intent", "manual") == "grow" and waiting in ["carbohydrate", "protein", "water", "care"]:
+			return {"organ":"queen", "causes":["GROW WAITING · " + ("CARE" if waiting == "care" else "CARB RESERVE" if waiting == "carbohydrate" else waiting.to_upper() + " RESERVE")], "title":"CHECK QUEEN"}
+		return {}
 	var organ: String = "midden" if causes == ["REFUSE"] and status.get("midden", {}).get("revealed", false) else "nursery"
 	return {"organ": organ, "causes": causes, "title": "CHECK " + organ.to_upper()}

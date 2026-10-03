@@ -11,10 +11,11 @@ The first supported satellite milestone is complete. Keep implementing one bound
 | [104 physical founding camp](tasks/104_physical_founding_camp.md) | Paid party follows remembered shelter; messenger reports actual camp. | [Founding](FOUNDING_CAMP_EVALUATION.md) |
 | [105 first daughter pile](tasks/105_first_daughter_pile.md) | Eleven settlers transfer without death/copy; captured queen lineage, local stores/brood/jobs and simplified INWARD inspection. | [Daughter](DAUGHTER_PILE_EVALUATION.md) |
 | [106 parent supplies](tasks/106_parent_supply_transport.md) | Eight Home workers carry real packs and return; supplies enable local emergence and paid Nursery/Food Exchange development. | [Support](PARENT_SUPPLY_EVALUATION.md) |
+| [107 sustained daughter review](tasks/107_supported_daughter_review.md) | Repeated supplied growth, stopped-support comparison and named voluntary attention to daughter strain/reserve waiting from Home. | [Sustained growth](SUPPORTED_DAUGHTER_EVALUATION.md) |
 
 Final support gate: 6,456 checks, four ordinary paid colonies with exact phased save continuation, standard/compact actual mouse/touch input and inspected organ graphics. Initial colony-wide knowledge and simplified first interior are explicitly permitted; broader biology/independence remain open.
 
-Next bounded section: review longer supported daughter growth, local care/store pressure and conservation while attending Home; resolve any concrete pressure-attention or ownership failure before expanding independent routes/reinforcement. Full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats are later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
+Next bounded section: daughter-owned gathering from shared returned resource memories. Audit existing origin-pile route/labor/cargo ownership and normal attention/controls before expanding independence; preserve returned information and keep unsupported Home-owned response systems explicitly scoped. Reinforcement, full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats are later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
 
 ## Current priority — internal health and weather (2026-10-03)
 

@@ -63,6 +63,7 @@ func _ready() -> void:
 		var inward: Node2D = Inward.new()
 		inward.status_provider = focused_inward_status
 		inward.pile_command = inspect_pile
+		inward.pressure_command = inspect_internal_pressure
 		inward.supply_command = set_daughter_supply
 		inward.mode_command = set_mode.bind("outward")
 		inward.pause_command = simulation.toggle_pause
@@ -203,7 +204,9 @@ func start_new_colony(seed_value: Variant, scenario: Variant = "") -> Dictionary
 
 
 func focused_inward_status() -> Dictionary:
-	return inward_status(inward_pile_id)
+	var status: Dictionary = inward_status(inward_pile_id)
+	status["other_pile_attention"] = pile_internal_attention("home" if inward_pile_id != "home" else "satellite_1")
+	return status
 
 
 func inspect_pile(pile_id: String) -> bool:
@@ -261,13 +264,22 @@ func outward_status(pile_id: String) -> Dictionary:
 		"scout_missions": scout_mission_summaries(pile_id),
 		"honeydew": honeydew_summary(pile_id), "exploration": exploration_summary(),
 		"journey_response": simulation.journey_response.summary(),
-		"internal_attention": Pressure.attention(inward_status(pile_id))}
+		"internal_attention": Pressure.attention(inward_status(pile_id)),
+		"daughter_attention": pile_internal_attention("satellite_1")}
 
 
-func inspect_internal_pressure() -> Dictionary:
-	inward_pile_id="home"
-	var attention: Dictionary = Pressure.attention(inward_status("home"))
+func pile_internal_attention(pile_id: String) -> Dictionary:
+	var attention: Dictionary = Pressure.attention(inward_status(pile_id))
+	if attention.is_empty(): return {}
+	attention["pile_id"] = pile_id
+	attention["title"] = "CHECK %s %s" % ["HOME" if pile_id == "home" else "DAUGHTER", attention.organ.to_upper().replace("_", " ")]
+	return attention
+
+
+func inspect_internal_pressure(pile_id: String = "home") -> Dictionary:
+	var attention: Dictionary = pile_internal_attention(pile_id)
 	if attention.is_empty(): return {"accepted": false, "reason": "Internal conditions are steady"}
+	inspect_pile(pile_id)
 	if _inward_view != null:
 		_inward_view.selected_id = attention.organ
 		_inward_view._process(0)

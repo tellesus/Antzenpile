@@ -275,6 +275,10 @@ func _run_command(command: String) -> void:
 			_placed = Panorama.project(_signals, facing, get_viewport_rect().size)
 		return
 	match command:
+		"daughter_pressure":
+			if not _status.get("daughter_attention", {}).is_empty() and pressure_command.is_valid():
+				var result: Dictionary = pressure_command.call("satellite_1")
+				if not result.get("accepted", false): show_feedback(result.get("reason", "Internal attention unavailable"))
 		"internal_pressure":
 			if not _status.get("internal_attention", {}).is_empty() and pressure_command.is_valid():
 				var result: Dictionary = pressure_command.call()
@@ -373,6 +377,7 @@ func _button_rect(command: String) -> Rect2:
 	var y: float = get_viewport_rect().size.y - 104.0
 	match command:
 		"internal_pressure": return Rect2(264, 100, 300, 44)
+		"daughter_pressure": return Rect2(264, 100 if _status.get("internal_attention", {}).is_empty() else 152, 300, 44)
 		"sources": return Rect2(24, 100, 220, 44)
 		"scout": return Rect2(24, y, 148, 64)
 		"pause": return Rect2(188, y, 104, 64)
@@ -389,6 +394,8 @@ func _button_rect(command: String) -> Rect2:
 func _button_at(at: Vector2) -> String:
 	if not _status.get("internal_attention", {}).is_empty() and _button_rect("internal_pressure").has_point(at):
 		return "internal_pressure"
+	if not sources_open and not exploration_open and not _status.get("daughter_attention", {}).is_empty() and _button_rect("daughter_pressure").has_point(at):
+		return "daughter_pressure"
 	if sources_open and _sources_panel_rect().has_point(at):
 		for category: String in MEMORY_CATEGORIES:
 			if _source_filter_rect(category).has_point(at):
@@ -480,12 +487,17 @@ func _draw() -> void:
 
 func _draw_pressure_attention() -> void:
 	var attention: Dictionary = _status.get("internal_attention", {})
-	if attention.is_empty(): return
-	var box: Rect2 = _button_rect("internal_pressure")
+	if not attention.is_empty(): _draw_pressure_badge(_button_rect("internal_pressure"), attention)
+	if not sources_open and not exploration_open:
+		attention = _status.get("daughter_attention", {})
+		if not attention.is_empty(): _draw_pressure_badge(_button_rect("daughter_pressure"), attention)
+
+
+func _draw_pressure_badge(box: Rect2, attention: Dictionary) -> void:
 	UIStyle.surface(self, box, Color("211c1b"))
 	draw_line(box.position, box.position + Vector2(0, box.size.y), Color("b58c79"), 1.0, true)
 	_label(box.position + Vector2(16, 18), attention.title, Color("d3c3b8"), 12)
-	_label(box.position + Vector2(16, 35), " / ".join(attention.causes), Color("bca08e"), 11)
+	_label(box.position + Vector2(16, 35), Copy.fit_line(" / ".join(attention.causes),_font,11,box.size.x-32), Color("bca08e"), 11)
 
 
 func _draw_rain(size: Vector2) -> void:

@@ -82,7 +82,7 @@ static func brood_stages(status: Dictionary) -> Array[String]:
 
 
 static func pressure(status: Dictionary, organ: String) -> String:
-	if organ == "food_exchange": return "HOME LOSSES" if status.get("food_sharing",{}).get("recent",false) else ""
+	if organ == "food_exchange": return ("DAUGHTER LOSSES" if status.get("daughter",false) else "HOME LOSSES") if status.get("food_sharing",{}).get("recent",false) else ""
 	var midden: Dictionary = status.get("midden", {})
 	if organ == "midden":
 		return "REFUSE PRESSURE" if midden.get("larval_rate", 1.0) < 1.0 else ""
