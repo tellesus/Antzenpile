@@ -25,11 +25,13 @@ The first supported satellite milestone is complete. Keep implementing one bound
 
 | [115 daughter worker reinforcement](tasks/115_daughter_worker_reinforcement.md) | Paid nine-worker Home departure, eight real arriving settlers and returned messenger confirmation/recall; exclusive connection reuse with supplies. | [Worker support](WORKER_REINFORCEMENT_EVALUATION.md) |
 
-Latest worker-support gate: 6,970 checks, four ordinary paid daughters with exact mixed-trait migration/recall continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain permitted; local defense/support are verified, full independent reproductive biology is not claimed.
+Latest worker-support gate: 6,982 checks, four ordinary paid daughters with exact mixed-trait migration/recall continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain permitted; local defense/support are verified, full independent reproductive biology is not claimed.
 
 | [116 reinforced daughter review](tasks/116_reinforced_daughter_review.md) | Eight exact young-daughter paired continuations; reinforcement enables three routes and brood care, with real food constraints and physical supply reuse. | [Reinforced daughter review](REINFORCED_DAUGHTER_EVALUATION.md) |
 
-Next bounded section: update in-game colony-network guidance to explain physical founding, inspecting/looking from either pile, worker versus resource support and care competition. Then audit paid daughter resource supply back to Home (original Part3§88) against the existing shared connection and local funding/returned reports. Full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
+| [117 colony network guidance](tasks/117_colony_network_guidance.md) | Optional Help explains physical founding, pile attention, separate worker/resource support and care competition. | Six pages, both normal views/sizes, actual input; full 6,982 checks |
+
+Next bounded section: paid daughter resource supply back to Home (original Part3§88). Audit the original shared connection, locally funded aggregate party/store cost and endpoint-specific returned reports before expanding its executable card. Do not reverse/copy current Home supply history or fund daughter traffic from Home workers; source resources leave on departure, arrive after physical travel, and the real party returns to its payer. Keep supplies/migrant reinforcement mutually exclusive on that one connection. Full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
 
 ## Current priority — internal health and weather (2026-10-03)
 
