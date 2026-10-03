@@ -257,7 +257,7 @@ func inspect_outward_pile(pile_id: String) -> bool:
 
 
 func focused_source_investigation(knowledge_id: String) -> Dictionary:
-	return toggle_investigation_priority(knowledge_id) if inward_pile_id == "home" else investigate_known_source(knowledge_id)
+	return toggle_investigation_priority(knowledge_id)
 
 
 func _home_order() -> Dictionary:
@@ -319,7 +319,7 @@ func outward_status(pile_id: String) -> Dictionary:
 		"journey_response": simulation.journey_response.summary() if pile_id == "home" else {},
 		"internal_attention": Pressure.attention(inward_status(pile_id)),
 		"daughter_attention": pile_internal_attention("satellite_1" if pile_id == "home" else "home")}
-	if pile_id == "home": status["exploration"] = exploration_summary()
+	status["exploration"] = exploration_summary(pile_id)
 	return status
 
 
@@ -345,35 +345,35 @@ func inspect_internal_pressure(pile_id: String = "home") -> Dictionary:
 	return {"accepted": true, "reason": ""}
 
 
-func exploration_summary() -> Dictionary:
-	return {"target": simulation.run.exploration.target, "bias": simulation.run.exploration.bias,
-		"away": simulation.scouting.standing_count(), "priorities": simulation.run.exploration.priorities.duplicate(),
-		"missing": simulation.run.missing_scouts("home"),
-		"cautious_routes": simulation.scouting.Caution.routes(simulation.run, "home").size()}
+func exploration_summary(pile_id: String = "home") -> Dictionary:
+	var policy: ExplorationState = simulation.run.exploration_for(pile_id)
+	if policy == null: return {}
+	var other: ExplorationState = simulation.run.daughter_exploration if pile_id == "home" else simulation.run.exploration
+	return {"other_target":other.target,"target": policy.target, "bias": policy.bias,
+		"away": simulation.scouting.standing_count(pile_id), "priorities": policy.priorities.duplicate(),
+		"missing": simulation.run.missing_scouts(pile_id),
+		"cautious_routes": simulation.scouting.Caution.routes(simulation.run, pile_id).size()}
 
 
 func toggle_investigation_priority(knowledge_id: String) -> Dictionary:
-	if inward_pile_id != "home": return _home_order()
-	var route: TrailRouteState = simulation.run.trails.find_route("home", knowledge_id)
+	var route: TrailRouteState = simulation.run.trails.find_route(inward_pile_id, knowledge_id)
 	var recovery: bool = route != null and (route.status == "depleted" or route.resume_on_report)
-	var enabled: bool = not route.resume_on_report if recovery else knowledge_id not in simulation.run.exploration.priorities
-	var accepted: bool = simulation.set_investigation_priority(knowledge_id, enabled)
+	var enabled: bool = not route.resume_on_report if recovery else knowledge_id not in simulation.run.exploration_for(inward_pile_id).priorities
+	var accepted: bool = simulation.set_investigation_priority(knowledge_id, enabled, inward_pile_id)
 	if accepted and recovery:
 		var watched: bool = simulation.trails.set_recovery_watch(route.id, enabled)
 		assert(watched)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error,
-		"standing_priority": true, "recovery_watch": recovery, "enabled": enabled, "exploration_off": simulation.run.exploration.target == 0}
+		"standing_priority": true, "recovery_watch": recovery, "enabled": enabled, "exploration_off": simulation.run.exploration_for(inward_pile_id).target == 0}
 
 
 func set_exploration(target: int) -> Dictionary:
-	if inward_pile_id != "home": return _home_order()
-	var accepted: bool = simulation.set_exploration(target)
+	var accepted: bool = simulation.set_exploration(target, inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func set_exploration_bias(bearing: Variant) -> Dictionary:
-	if inward_pile_id != "home": return _home_order()
-	var accepted: bool = simulation.set_exploration_bias(bearing)
+	var accepted: bool = simulation.set_exploration_bias(bearing, inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 

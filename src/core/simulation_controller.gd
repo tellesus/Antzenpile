@@ -97,16 +97,16 @@ func recall_scout(id: String) -> bool:
 	return scouting.recall(id)
 
 
-func set_exploration(target: Variant) -> bool:
-	return scouting.set_effort(target)
+func set_exploration(target: Variant, origin_id: String = "home") -> bool:
+	return scouting.set_effort(target, origin_id)
 
 
-func set_exploration_bias(bearing: Variant) -> bool:
-	return scouting.set_bias(bearing)
+func set_exploration_bias(bearing: Variant, origin_id: String = "home") -> bool:
+	return scouting.set_bias(bearing, origin_id)
 
 
-func set_investigation_priority(knowledge_id: String, enabled: bool) -> bool:
-	return scouting.set_priority(knowledge_id, enabled)
+func set_investigation_priority(knowledge_id: String, enabled: bool, origin_id: String = "home") -> bool:
+	return scouting.set_priority(knowledge_id, enabled, origin_id)
 
 
 func investigate_known_source(origin_id: String, knowledge_id: String) -> bool:

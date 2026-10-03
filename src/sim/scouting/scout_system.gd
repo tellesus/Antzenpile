@@ -43,7 +43,7 @@ func dispatch(origin_id: String, bearing: Variant = null, standing: bool = false
 		if route.size() > 1:
 			if not cautions.is_empty() and Caution.path_risk(route, cautions, _run.trails, origin.position) > 0.0 and attempt < config.target_attempts - 1:
 				continue
-			var freshness: float = _run.exploration.coverage.get(_run.exploration.cell_key(target, _run.world.bounds), 0.0) if standing else 0.0
+			var freshness: float = _run.exploration_for(origin_id).coverage.get(_run.exploration.cell_key(target, _run.world.bounds), 0.0) if standing else 0.0
 			if freshness > 0 and _run.rng.randf() < freshness * config.novelty_rejection and attempt < config.target_attempts - 1:
 				continue
 			break
@@ -105,20 +105,24 @@ func _dispatch_general(origin_id: String, bearing: Variant) -> bool:
 	if not candidates.is_empty() and _run.rng.randf() < config.trail_exploration_share:
 		var selected: TrailRouteState = candidates[_run.rng.randi_range(0, candidates.size() - 1)]
 		var origin: PileState = _run.colony.piles[origin_id]
-		var path: Array[Vector2] = Pathfinder.new(_run.world).path(origin.position, selected.estimated_destination.round())
+		var path: Array[Vector2] = Pathfinder.new(_run.world).path_from_origin(origin.position, selected.estimated_destination.round(), _run.world)
 		if path.size() > 1 and Caution.path_risk(path, Caution.routes(_run, origin_id), _run.trails, origin.position) == 0.0:
 			return _dispatch_route(origin, path, true, (path.back() - origin.position).angle(), "", selected.id)
 	return dispatch(origin_id, bearing, true)
 
 
 
-func set_effort(target: Variant) -> bool:
+func set_effort(target: Variant, origin_id: String = "home") -> bool:
+	var policy: ExplorationState = _run.exploration_for(origin_id)
+	if policy == null: return _reject("Unknown exploration pile")
 	if typeof(target) != TYPE_INT or not WorkerLedger.valid_count(target) or target > config.active_cap:
 		return _reject("Exploration target must fit the scout capacity")
-	_run.exploration.target = target
+	var other: ExplorationState = _run.daughter_exploration if origin_id == "home" else _run.exploration
+	if target + other.target > config.active_cap: return _reject("Shared exploration cap reached; lower effort at the other pile")
+	policy.target = target
 	var active: Array[ScoutAgent] = []
 	for agent: ScoutAgent in _run.scouts.values():
-		if agent.standing and not agent.lost and agent.phase not in ["returning", "blocked_returning"]:
+		if agent.origin_pile == origin_id and agent.standing and not agent.lost and agent.phase not in ["returning", "blocked_returning"]:
 			active.append(agent)
 	active.sort_custom(func(a: ScoutAgent, b: ScoutAgent) -> bool: return a.id.trim_prefix("scout_").to_int() > b.id.trim_prefix("scout_").to_int())
 	while active.size() > target:
@@ -127,18 +131,20 @@ func set_effort(target: Variant) -> bool:
 	return true
 
 
-func set_bias(bearing: Variant) -> bool:
+func set_bias(bearing: Variant, origin_id: String = "home") -> bool:
+	var policy: ExplorationState = _run.exploration_for(origin_id)
+	if policy == null: return _reject("Unknown exploration pile")
 	if bearing != null and (not typeof(bearing) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(bearing))):
 		return _reject("Exploration bearing must be finite")
-	_run.exploration.bias = null if bearing == null else _memory_bearing(float(bearing))
+	policy.bias = null if bearing == null else _memory_bearing(float(bearing))
 	last_error = ""
 	return true
 
 
-func standing_count() -> int:
+func standing_count(origin_id: String = "home") -> int:
 	var count: int = 0
 	for agent: ScoutAgent in _run.scouts.values():
-		count += 1 if agent.standing else 0
+		count += 1 if agent.standing and agent.origin_pile == origin_id else 0
 	return count
 
 
@@ -154,18 +160,23 @@ func recall(id: String) -> bool:
 
 
 func maintain_effort() -> void:
-	var policy: ExplorationState = _run.exploration
+	_maintain_pile_effort("home")
+	if _run.colony.piles.has("satellite_1"): _maintain_pile_effort("satellite_1")
+
+
+func _maintain_pile_effort(origin_id: String) -> void:
+	var policy: ExplorationState = _run.exploration_for(origin_id)
 	policy.cooldown_ticks = maxi(0, policy.cooldown_ticks - 1)
-	if policy.cooldown_ticks > 0 or standing_count() >= policy.target or _run.active_scout_count() >= config.active_cap or _run.colony.piles.home.workers_available < 1:
+	if policy.cooldown_ticks > 0 or standing_count(origin_id) >= policy.target or _run.active_scout_count() >= config.active_cap or _run.colony.piles[origin_id].workers_available < 1:
 		return
 	var saved_rng: int = _run.rng.state
 	var bearing: Variant = policy.bias if policy.bias != null and _run.rng.randf() < config.directional_share else null
 	var id: String = "scout_%d" % _run.next_scout_id
-	var priority: String = _next_investigation() if policy.investigation_turn else ""
-	var accepted: bool = dispatch_investigation("home", priority) if not priority.is_empty() else _dispatch_general("home", bearing)
+	var priority: String = _next_investigation(origin_id) if policy.investigation_turn else ""
+	var accepted: bool = dispatch_investigation(origin_id, priority) if not priority.is_empty() else _dispatch_general(origin_id, bearing)
 	if not accepted and not priority.is_empty():
 		priority = ""
-		accepted = _dispatch_general("home", bearing)
+		accepted = _dispatch_general(origin_id, bearing)
 	if accepted:
 		_run.scouts[id].standing = true
 		_run.scouts[id].search_memory = policy.coverage.duplicate()
@@ -178,7 +189,7 @@ func maintain_effort() -> void:
 				_run.scouts[id].known_sources.append(source_id)
 		_run.scouts[id].known_sources.sort()
 		for resource: String in PileState.RESOURCE_IDS:
-			_run.scouts[id].need_weights[resource] = roundf((1.0 + config.need_weight / (1.0 + _run.colony.piles.home.resources[resource])) * 1e8) / 1e8
+			_run.scouts[id].need_weights[resource] = roundf((1.0 + config.need_weight / (1.0 + _run.colony.piles[origin_id].resources[resource])) * 1e8) / 1e8
 		policy.investigation_turn = not policy.investigation_turn
 		if not priority.is_empty():
 			policy.priority_last_sent[priority] = _run.simulation_time
@@ -187,10 +198,11 @@ func maintain_effort() -> void:
 	policy.cooldown_ticks = config.departure_interval_ticks
 
 
-func set_priority(knowledge_id: String, enabled: bool) -> bool:
+func set_priority(knowledge_id: String, enabled: bool, origin_id: String = "home") -> bool:
+	var policy: ExplorationState = _run.exploration_for(origin_id)
+	if policy == null: return _reject("Unknown exploration pile")
 	if not _run.knowledge.nodes.has(knowledge_id):
 		return _reject("Investigation needs a returned source report")
-	var policy: ExplorationState = _run.exploration
 	if enabled and knowledge_id not in policy.priorities:
 		if policy.priorities.size() >= config.active_cap:
 			return _reject("Investigation priorities full")
@@ -203,12 +215,12 @@ func set_priority(knowledge_id: String, enabled: bool) -> bool:
 	return true
 
 
-func _next_investigation() -> String:
-	var policy: ExplorationState = _run.exploration
+func _next_investigation(origin_id: String = "home") -> String:
+	var policy: ExplorationState = _run.exploration_for(origin_id)
 	var investigating: int = 0
 	var busy: Array[String] = []
 	for agent: ScoutAgent in _run.scouts.values():
-		if agent.standing and not agent.investigation_source_id.is_empty():
+		if agent.origin_pile == origin_id and agent.standing and not agent.investigation_source_id.is_empty():
 			investigating += 1
 			busy.append("known:" + agent.investigation_source_id)
 	if investigating >= maxi(1, policy.target / 2):
@@ -241,6 +253,7 @@ func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 
 func tick(delta: float) -> void:
 	_run.exploration.decay(delta, _run.rain.phase == "raining")
+	_run.daughter_exploration.decay(delta, _run.rain.phase == "raining")
 	for memory: ScoutMissionMemory in _run.scout_missions.values():
 		var half_life: float = config.rain_scent_half_life if _run.rain.phase == "raining" else config.departure_scent_half_life
 		memory.scent = roundf(memory.scent * pow(0.5, delta / half_life) * 1e10) / 1e10
@@ -304,7 +317,7 @@ func tick(delta: float) -> void:
 			assert(agent.position == home.position)
 			_remember_return(agent, home.position)
 			if agent.standing:
-				_run.exploration.record_return(agent.return_path, _run.world.bounds)
+				_run.exploration_for(agent.origin_pile).record_return(agent.return_path, _run.world.bounds)
 			for observation: Observation in agent.observations.values():
 				observation.collective_search = agent.standing
 				assert(not _run.delivered_observations.has(observation.id))

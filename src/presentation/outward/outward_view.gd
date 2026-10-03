@@ -341,7 +341,7 @@ func _run_command(command: String) -> void:
 			_feedback = ("Gatherers resumed from returned evidence" if route.get("recovery_ready", false) else "Gatherers sent · availability still uncertain") if command == "trail_recheck" and result.get("accepted", false) else "Trail updated" if result.get("accepted", false) else result.get("reason", "Trail unavailable")
 		"scout":
 			sources_open = false
-			if exploration_command.is_valid() and not _daughter():
+			if exploration_command.is_valid():
 				exploration_open = not exploration_open
 				return
 			if not dispatch_command.is_valid() or _status.get("available_workers", 0) < 1 or _status.get("active_scouts", 0) >= _status.get("scout_cap", 0):
@@ -960,7 +960,7 @@ func _draw_controls(size: Vector2) -> void:
 	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load", "sources"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale
-		var unavailable: bool = command == "scout" and (_daughter() or not exploration_command.is_valid()) and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)
+		var unavailable: bool = command == "scout" and not exploration_command.is_valid() and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)
 		var color: Color = Color("28342f") if command == "scout" else Color("18252b")
 		if active:
 			color = Color("31505a")
@@ -968,7 +968,7 @@ func _draw_controls(size: Vector2) -> void:
 			color = Color("202326")
 		UIStyle.surface(self, box, color)
 		var title: String = "REMEMBERED SOURCES" if command == "sources" else "SEND SCOUT" if command == "scout" else "INWARD" if command == "inward" else "SAVE" if command == "save" else "LOAD" if command == "load" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
-		if command == "scout" and exploration_command.is_valid() and not _daughter():
+		if command == "scout" and exploration_command.is_valid():
 			title = "EXPLORATION"
 		_label(box.position + Vector2(box.size.x * 0.5, 29 if command == "sources" else 40), title, Color("d3dcd4") if not unavailable else Color("78817e"), 14 if command in ["save", "load", "sources"] else 16, HORIZONTAL_ALIGNMENT_CENTER)
 	if not _feedback.is_empty() and (Time.get_ticks_msec() < _feedback_until or _request_rejected and _request_selection == selected_id):
@@ -1038,7 +1038,7 @@ func _draw_exploration() -> void:
 	_label(Vector2(40, 203), "Target %d scouts · %d currently away" % [policy.target, policy.away], Color("a8b9b6"), 14)
 	for target: int in [0, 2, 5, 8]:
 		var box: Rect2 = _exploration_rect("explore_%d" % target)
-		UIStyle.surface(self, box, Color("31505a") if target == policy.target else Color("18252b"))
+		UIStyle.surface(self, box, Color("202326") if target + policy.get("other_target",0) > _status.get("scout_cap",8) else Color("31505a") if target == policy.target else Color("18252b"))
 		_label(box.position + Vector2(32,29), "OFF" if target == 0 else str(target), Color("d3dcd4"), 15, HORIZONTAL_ALIGNMENT_CENTER)
 	for command: String in ["exploration_bias", "exploration_general"]:
 		var box: Rect2 = _exploration_rect(command)
@@ -1046,7 +1046,7 @@ func _draw_exploration() -> void:
 		var title: String = "FAVOR THIS DIRECTION" if command == "exploration_bias" else "NO DIRECTIONAL BIAS" if policy.bias == null else "CLEAR DIRECTION · %03d°" % roundi(rad_to_deg(policy.bias))
 		_label(box.position + Vector2(137,29), title, Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	_label(Vector2(40, 395), "%d source priorities share scout effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 14)
-	_label(Vector2(40, 416), "Set 2, 5 or 8 to keep scouts searching", Color("a8b9b6"), 14)
+	_label(Vector2(40, 416), "Shared cap %d · other pile effort %d" % [_status.get("scout_cap",8),policy.get("other_target",0)], Color("a8b9b6"), 14)
 	_label(Vector2(40, 437), "Not returned: %d · cause unknown" % policy.missing if policy.get("missing", 0) > 0 else "Turning only changes your attention", Color("a8b9b6"), 14)
 	if policy.get("cautious_routes", 0) > 0:
 		_label(Vector2(40, 459), "General scouts favor safer ground", Color("c7b196"), 14)

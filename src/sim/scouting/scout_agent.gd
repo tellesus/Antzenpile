@@ -124,7 +124,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if not data.get("investigation_source_id", "") is String or (not data.get("investigation_source_id", "").is_empty() and not world.nodes.has(data.investigation_source_id)):
 		return false
-	if not data.get("standing", false) is bool or data.get("standing", false) and data.origin_pile != "home":
+	if not data.get("standing", false) is bool:
 		return false
 	var needs: Variant = data.get("need_weights", {})
 	var memory: Variant = data.get("search_memory", {})
@@ -166,7 +166,9 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 			if not _point(point, world.bounds):
 				return false
 			var step := Vector2(point[0], point[1])
-			if step != step.round() or step in restored_trunk or not restored_trunk.is_empty() and absf((step - restored_trunk.back()).abs().x + (step - restored_trunk.back()).abs().y - 1.0) > 0.0001:
+			var origin: Vector2 = colony.piles[data.origin_pile].position
+			var anchor: bool = restored_trunk.is_empty() and step == origin or not restored_trunk.is_empty() and restored_trunk.back() == origin and step == origin.round()
+			if step != step.round() and step != origin or step in restored_trunk or not anchor and not restored_trunk.is_empty() and absf((step - restored_trunk.back()).abs().x + (step - restored_trunk.back()).abs().y - 1.0) > 0.0001:
 				return false
 			restored_trunk.append(step)
 		if restored_trunk[0] != home:

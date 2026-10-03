@@ -1,6 +1,6 @@
 class_name ExplorationState
 extends RefCounted
-## Home colony's standing intent; active workers remain in individual ledger commitments.
+## One pile's standing intent; active workers remain in individual ledger commitments.
 
 const CONFIG = preload("res://data/scouting/default_scouts.tres")
 var target: int = 0

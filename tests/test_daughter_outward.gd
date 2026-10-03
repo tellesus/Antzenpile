@@ -13,18 +13,18 @@ func run(test: Object) -> bool:
  var before: Dictionary=game.run.to_dict()
  test.check(colony.set_mode("outward") and colony.inward_pile_id=="satellite_1","Daughter INWARD to OUTWARD preserves selected pile")
  view._process(0)
- test.check(view._status.pile_name=="Daughter" and not view._status.has("exploration") and view._status.honeydew.is_empty() and view._status.journey_response.is_empty(),"Daughter projection omits Home standing policy/tending/defense")
+ test.check(view._status.pile_name=="Daughter" and view._status.honeydew.is_empty() and view._status.journey_response.is_empty(),"Daughter projection omits Home tending/defense")
  var signal_data: Dictionary=colony.focused_outward_signals().filter(func(a:Dictionary)->bool:return a.source_knowledge_id==SOURCE)[0]
  var home_signal: Dictionary=colony.sensory_snapshot("home").filter(func(a:Dictionary)->bool:return a.source_knowledge_id==SOURCE)[0]
  test.check(signal_data.bearing!=home_signal.bearing and signal_data.estimated_distance!=home_signal.estimated_distance,"Shared memory bearing/distance is relative to actual selected entrance")
  test.check(not colony.inspect_outward_pile("unknown") and game.run.to_dict()==before,"Unknown pile attention rejects without sim mutation")
- var results: Array=[colony.set_exploration(5),colony.set_exploration_bias(PI),colony.toggle_investigation_priority(SOURCE),colony.start_honeydew_tending(SOURCE),colony.stop_honeydew_tending(SOURCE),colony.start_founding("known:nest_site_01"),colony.establish_daughter("known:nest_site_01"),colony.respond_to_journey("recall","route_1")]
+ var results: Array=[colony.start_honeydew_tending(SOURCE),colony.stop_honeydew_tending(SOURCE),colony.start_founding("known:nest_site_01"),colony.establish_daughter("known:nest_site_01"),colony.respond_to_journey("recall","route_1")]
  test.check(results.all(func(result:Dictionary)->bool:return not result.accepted) and before==game.run.to_dict(),"Home-owned orders reject atomically from Daughter attention")
  var home: PileState=game.run.colony.piles.home;var daughter: PileState=game.run.colony.piles.satellite_1
  var parent: int=home.workers_available;var local: int=daughter.workers_available
- view._run_command("scout")
+ colony.dispatch_facing(view.facing)
  var id: String="scout_%d" % (game.run.next_scout_id-1)
- test.check(not view.exploration_open and game.run.scouts.has(id) and game.run.scouts[id].origin_pile==daughter.id and daughter.workers_available==local-1 and home.workers_available==parent,"Daughter Send Scout starts a local new-source mission instead of Home policy")
+ test.check(not view.exploration_open and game.run.scouts.has(id) and game.run.scouts[id].origin_pile==daughter.id and daughter.workers_available==local-1 and home.workers_available==parent,"Manual daughter search retains local origin under separate standing policy")
  test.check(Exact.new().exact(game,20),"Fractional-origin manual search restores exactly through travel")
  view.selected_id="mission:"+id;view.facing=PI;view.sources_open=true;view.exploration_open=true;view.journey_open=true;view._pointer_kind="mouse"
  before=game.run.to_dict()
@@ -42,11 +42,11 @@ func run(test: Object) -> bool:
  test.check(not colony.set_trail_target(game.run.founding.route_id,0).accepted and before==game.run.to_dict(),"Gathering controls cannot alter parent supply connection")
  test.check(colony.recall_scout(id).accepted and Exact.new().exact(game,160),"Local manual scout physically recalls with exact saved transit")
  test.check(not game.run.scouts.has(id) and game.run.scout_missions[id].returned_at>=0,"Manual local worker returns before report")
- test.check(colony.focused_source_investigation(SOURCE).accepted and not colony.focused_source_investigation(SOURCE).accepted,"Daughter context rechecks once rather than modifying Home priorities")
+ test.check(colony.investigate_known_source(SOURCE).accepted and not colony.investigate_known_source(SOURCE).accepted,"Daughter context rechecks once rather than modifying Home priorities")
  var recheck: String="scout_%d" % (game.run.next_scout_id-1)
  test.check(colony.recall_scout(recheck).accepted and Exact.new().exact(game,120),"Known local recheck retains physical return/saved continuation")
  view._process(0);view.selected_id=signal_data.id
- test.check(view._investigation_title(signal_data)=="SEND SCOUT TO RECHECK" and view._button_at(view._journey_rect("journey_open").get_center())!="journey_open","Daughter offers deliberate recheck with no Home paid journey control")
+ test.check(view._investigation_title(signal_data).contains("PRIORITIZE") and view._button_at(view._journey_rect("journey_open").get_center())!="journey_open","Daughter offers deliberate recheck with no Home paid journey control")
  colony.set_mode("inward");test.check(colony.inward_pile_id==daughter.id,"OUTWARD to INWARD retains daughter context")
  colony._refresh_loaded_views();test.check(colony.inward_pile_id=="home" and view._status.pile_name=="Home","Load/new-run reset baselines Home before rebinding projection")
  colony._outward_view=null;view.queue_free();colony.free();return true

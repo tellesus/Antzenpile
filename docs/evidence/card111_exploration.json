@@ -1,0 +1,61 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"daughter_coverage": 63,
+			"daughter_losses": 0,
+			"final_workers": 113,
+			"home_coverage": 99,
+			"home_losses": 0,
+			"local_away": 2,
+			"max_active": 7,
+			"new_departures": 42,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"daughter_coverage": 68,
+			"daughter_losses": 1,
+			"final_workers": 120,
+			"home_coverage": 99,
+			"home_losses": 4,
+			"local_away": 2,
+			"max_active": 7,
+			"new_departures": 40,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591
+		},
+		{
+			"daughter_coverage": 71,
+			"daughter_losses": 0,
+			"final_workers": 105,
+			"home_coverage": 96,
+			"home_losses": 6,
+			"local_away": 2,
+			"max_active": 7,
+			"new_departures": 46,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		},
+		{
+			"daughter_coverage": 58,
+			"daughter_losses": 1,
+			"final_workers": 136,
+			"home_coverage": 99,
+			"home_losses": 0,
+			"local_away": 2,
+			"max_active": 7,
+			"new_departures": 39,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591
+		}
+	]
+}
