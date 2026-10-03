@@ -400,7 +400,9 @@ func restore(data: Dictionary) -> bool:
 		for commitment: String in pile.workers.to_dict().commitments:
 			if commitment.begins_with("rejection:") and (pile.id != "home" or commitment != "rejection:home" or restored_guest.phase != "rejecting"):
 				return false
-		if pile.brood_lost_total != (restored_guest.reported_losses if pile.id == "home" else 0):
+		if pile.brood_health.last_loss_tick > restored_clock.tick_count:
+			return false
+		if pile.brood_lost_total != pile.brood_health.losses + (restored_guest.reported_losses if pile.id == "home" else 0):
 			return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false

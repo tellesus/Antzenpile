@@ -8,6 +8,7 @@ static func nursery_causes(status: Dictionary) -> Array[String]:
 	if humidity.get("larval_rate", 1.0) < 1.0:
 		causes.append("DRY" if humidity.get("moisture", 65.0) < 45.0 else "DAMP")
 	if status.get("midden", {}).get("larval_rate", 1.0) < 1.0: causes.append("REFUSE")
+	if status.get("brood_health", {}).get("condition", "stable") != "stable": causes.append("BROOD HEALTH")
 	var food: bool = false
 	var care: bool = false
 	for cohort: Dictionary in status.get("brood", []):

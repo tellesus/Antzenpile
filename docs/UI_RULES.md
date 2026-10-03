@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 099 exposes stable/strained/severe/recovering local brood symptoms and losses during health strain, separately from guest and home adult food-sharing evidence. Nursery text directs cleanup at Midden; Midden shows persistent recovery, and existing voluntary attention/organ pulses include known brood health. No infection meter, pathogen name, death countdown, hidden exterior diagnosis or new visual effects.
+
 Card 098 adds “General scouts favor safer ground” to Exploration only when unresolved home-delivered route losses support caution. It exposes neither hazard coordinates nor private scout observations. Manual and deliberate source missions remain available; a missing scout alone supplies no danger corridor.
 
 Card 097 distinguishes awaiting, overdue, returned and not-returned scout memories. Lateness alone never asserts death; a missing record says cause unknown and retains a directional stub. Selected awaiting missions offer a 260×44 Recall Scout action using shared mouse/touch input; acknowledgement never reports whether a distant scout survives. Exploration shows known missing count, with existing Off/effort/bias controls as responses. No instant casualty notice, remote course, predator identity or hidden source discovery appears.

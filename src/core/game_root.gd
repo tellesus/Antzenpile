@@ -341,6 +341,7 @@ func inward_status(pile_id: String) -> Dictionary:
 			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
 			"water_used": pile.humidity.water_used_units / 100000.0},
 		"midden": midden_summary(pile_id),
+		"brood_health": simulation.brood_health.summary(pile_id),
 		"workers_total": expected_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
 		"brood_losses": pile.brood_lost_total, "guest": guest_summary(pile_id),

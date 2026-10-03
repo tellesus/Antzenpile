@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Current priority — internal health and weather (2026-10-03)
+
+[099 local brood health](tasks/099_local_brood_health.md) is complete: sanitation-driven delayed larval strain/loss, cleanup recovery and separate local evidence passed 6,176 checks and twelve ordinary trials. [Evidence](BROOD_HEALTH_EVALUATION.md). Next: Nursery temperature and one bounded authored heat event from the original Parts 3/6, using existing climate labor and on-hand water before broad season/ecology/network scope. Scout milestone below is complete; mobile and session targets stay tabled.
+
 ## Current priority — scout survivability and learned caution (2026-10-03)
 
 The scout survivability/collective caution milestone is complete: [097](tasks/097_scout_survivability.md) adds physical ambusher losses, delayed missing memory and actual recall; [098](tasks/098_learned_scout_caution.md) adds general exploration preferences from returned route alarms. Final combined suite passed 6,124 checks; 18 survivability trials and six paired caution trials preserved resource access and exact saves. See [survival](SCOUT_SURVIVAL_EVALUATION.md) and [caution evaluation](SCOUT_CAUTION_EVALUATION.md). No individual XP or private danger forecasts were added.

@@ -4,6 +4,7 @@ extends RefCounted
 var midden := SanitationState.new()
 var humidity := HumidityState.new()
 var food_toxicity := FoodToxicityState.new()
+var brood_health := BroodHealthState.new()
 
 const Ledger = preload("res://src/sim/colony/worker_ledger.gd")
 const Brood = preload("res://src/sim/colony/brood_cohort.gd")
@@ -60,6 +61,7 @@ func to_dict() -> Dictionary:
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"nursery_expansion": {"state": nursery_expansion_state, "progress_seconds": nursery_expansion_progress},
 		"food_exchange_state": food_exchange_state, "food_toxicity": food_toxicity.to_dict(),
+		"brood_health": brood_health.to_dict(),
 		"food_exchange_progress_seconds": food_exchange_progress_seconds, "midden": midden.to_dict(), "humidity": humidity.to_dict()}
 
 
@@ -348,6 +350,11 @@ func restore(data: Dictionary) -> bool:
 	var humidity_data: Variant = data.get("humidity", restored_humidity.to_dict())
 	if not humidity_data is Dictionary or not restored_humidity.restore(humidity_data, restored, data.id, restored_nursery_state):
 		return false
+	var restored_health := BroodHealthState.new()
+	var health_data: Variant = data.get("brood_health", restored_health.to_dict())
+	if not health_data is Dictionary or not restored_health.restore(health_data, int(brood_lost)):
+		return false
+	brood_health = restored_health
 	midden = restored_midden
 	humidity = restored_humidity
 	food_toxicity = restored_toxicity

@@ -67,7 +67,7 @@ func restore(data: Dictionary, pile: PileState, tick: int) -> bool:
 			return false
 	elif due != 0:
 		return false
-	if data.integration_ticks > mini(CONFIG.integration_ticks, elapsed) or data.damage_ticks >= CONFIG.damage_ticks or data.damage_ticks > elapsed or data.reported_losses != pile.brood_lost_total or data.reported_losses > lifetime_elapsed / CONFIG.damage_ticks:
+	if data.integration_ticks > mini(CONFIG.integration_ticks, elapsed) or data.damage_ticks >= CONFIG.damage_ticks or data.damage_ticks > elapsed or data.reported_losses != pile.brood_lost_total - pile.brood_health.losses or data.reported_losses > lifetime_elapsed / CONFIG.damage_ticks:
 		return false
 	var commitment: Dictionary = pile.workers.to_dict().commitments.get("rejection:home", {})
 	var duration: int = AdaptationRules.rejection_duration(int(data.integration_ticks), float(share))

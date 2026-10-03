@@ -351,7 +351,8 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if not node.active or node.quantity <= 0.0 or node.position.distance_to(route.estimated_destination) > CONFIG.interaction_radius * (1.0 + 0.5 * reliability(segment)):
 		return
 	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
-	node.quantity = maxf(0.0, node.quantity - amount)
+	# Canonical decimal quantities match saved resource precision.
+	node.quantity = float(String.num(maxf(0.0, node.quantity - amount), 5))
 	if node.quantity == 0.0:
 		node.active = false
 	cohort.payload = amount

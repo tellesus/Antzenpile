@@ -517,7 +517,7 @@ func _draw_context(size: Vector2) -> void:
 			var midden: Dictionary = _status.get("midden", {})
 			_detail_line(box, 65, "Refuse burden: %.1f" % midden.get("burden", 0.0))
 			_detail_line(box, 89, "Developed isolation" if midden.get("state") == "developed" else "Basic refuse isolation")
-			_detail_line(box, 113, "Larval growth: %.0f%%" % (midden.get("larval_rate", 1.0) * 100.0))
+			_detail_line(box, 113, "Brood recovering · keep cleaning" if _status.get("brood_health", {}).get("condition", "stable") == "recovering" else "Unhealthy brood · isolate refuse" if _status.get("brood_health", {}).get("condition", "stable") != "stable" else "Larval growth: %.0f%%" % (midden.get("larval_rate", 1.0) * 100.0))
 			_detail_line(box, 137, "Cleanup workers: %d" % midden.get("cleaners", 0))
 			for target: int in [0, 1, 2, 5]:
 				var button: Rect2 = _cleaner_rect(target)
@@ -580,10 +580,13 @@ func _draw_context(size: Vector2) -> void:
 					care_enough = care_enough and cohort.care >= 1.0
 				var feeding: String = "Last short: " + Pressure.food_names(_status) if not Pressure.food_shortages(_status).is_empty() else "Brood waits for care" if not care_enough and food_enough else "Food %s · care %s" % ["enough" if food_enough else "short", "enough" if care_enough else "short"]
 				_label(box.position + Vector2(16, 143), feeding, Color("a9b9bc"), 15)
-			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)])
+			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)] if _status.get("brood_health", {}).get("losses", 0) == 0 else "%d lost · %d during health strain" % [_status.get("brood_losses", 0), _status.brood_health.losses])
 			var dirty: bool = _status.get("midden", {}).get("larval_rate", 1.0) < 1.0
 			var climate: bool = _status.get("humidity", {}).get("larval_rate", 1.0) < 1.0
-			if dirty or climate:
+			var health: Dictionary = _status.get("brood_health", {})
+			if health.get("condition", "stable") != "stable":
+				_detail_line(box, 162, "Brood recovering · keep Midden clean" if health.condition == "recovering" else "Brood failing · clean Midden" if health.condition == "severe" else "Unhealthy brood · clean Midden")
+			elif dirty or climate:
 				_detail_line(box, 162, "Climate + sanitation slow larvae" if dirty and climate else "Nest climate slows larvae" if climate else "Sanitation slows larvae · visit Midden")
 			if _status.nursery_state == "primitive":
 				_detail_line(box, 209, "Develop for %d brood space" % _status.nursery_developed_capacity)

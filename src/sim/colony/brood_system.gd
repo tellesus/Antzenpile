@@ -89,14 +89,16 @@ func remaining_food_reserve(pile: PileState) -> Dictionary:
 		"water": ant_seconds * CONFIG.water_per_larva_second * multiplier}
 
 
-func lose_one(pile_id: String) -> bool:
+func lose_one(pile_id: String, stage: String = "") -> bool:
 	if not _run.colony.piles.has(pile_id):
 		return false
 	var pile: PileState = _run.colony.piles[pile_id]
 	if pile.brood_cohorts.is_empty() or pile.brood_lost_total >= WorkerLedger.MAX_COUNT:
 		return false
 	# Stable oldest-first choice, no individual brood agents or adult ledger debit.
-	var cohort: BroodCohort = pile.brood_cohorts[0]
+	var candidates: Array[BroodCohort] = pile.brood_cohorts.filter(func(item): return stage.is_empty() or item.stage == stage)
+	if candidates.is_empty(): return false
+	var cohort: BroodCohort = candidates[0]
 	cohort.count -= 1
 	cohort.lost_count += 1
 	pile.brood_lost_total += 1
@@ -134,7 +136,7 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 	if cohort.care < 1.0:
 		cohort.nutrition = 0.0 if cohort.stage == "larva" else 1.0
 		return
-	var environment_rate: float = minf(pile.midden.larval_rate(), pile.humidity.larval_rate())
+	var environment_rate: float = minf(pile.brood_health.larval_rate(), minf(pile.midden.larval_rate(), pile.humidity.larval_rate()))
 	var effective_delta: float = delta * (environment_rate if cohort.stage == "larva" else 1.0)
 	if cohort.stage == "larva":
 		var food_multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0
