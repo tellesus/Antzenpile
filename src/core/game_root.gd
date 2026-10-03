@@ -65,6 +65,7 @@ func _ready() -> void:
 		inward.pile_command = inspect_pile
 		inward.pressure_command = inspect_internal_pressure
 		inward.supply_command = set_daughter_supply
+		inward.gathering_command = daughter_gathering_command
 		inward.mode_command = set_mode.bind("outward")
 		inward.pause_command = simulation.toggle_pause
 		inward.speed_command = simulation.set_time_scale
@@ -206,6 +207,7 @@ func start_new_colony(seed_value: Variant, scenario: Variant = "") -> Dictionary
 func focused_inward_status() -> Dictionary:
 	var status: Dictionary = inward_status(inward_pile_id)
 	status["other_pile_attention"] = pile_internal_attention("home" if inward_pile_id != "home" else "satellite_1")
+	if inward_pile_id == "satellite_1": status["gathering"] = daughter_gathering_summary()
 	return status
 
 
@@ -215,6 +217,7 @@ func inspect_pile(pile_id: String) -> bool:
 	set_mode("inward")
 	if _inward_view!=null:
 		_inward_view.selected_id=""; _inward_view.queen_tab="workers"; _inward_view._feedback=""; _inward_view._process(0)
+		_inward_view.gathering.reset()
 	return true
 
 
@@ -473,6 +476,7 @@ func _refresh_loaded_views() -> void:
 		_inward_view._focus_gains.clear()
 		_inward_view.web_selection = "foraging"
 		_inward_view.web_family = "foraging"
+		_inward_view.gathering.reset()
 		_inward_view._feedback = ""
 		_inward_view._process(0)
 	if _debug_view != null:
@@ -641,6 +645,34 @@ func journey_addressed(route: TrailRouteState) -> bool:
 func set_daughter_supply(enabled: bool) -> Dictionary:
 	var accepted: bool=simulation.set_daughter_supply(enabled)
 	return {"accepted":accepted,"reason":simulation.supply.last_error}
+
+
+func daughter_gathering_summary() -> Dictionary:
+	if not simulation.run.colony.piles.has("satellite_1"): return {}
+	var hints: Dictionary = {}
+	for id: String in simulation.run.knowledge.nodes: hints[id] = simulation.run.knowledge.temporal_hint(id)
+	var status: Dictionary = {"trails":trail_summaries("satellite_1"), "temporal_hints":hints, "honeydew":honeydew_summary("home")}
+	var signals: Array[Dictionary] = sensory_snapshot("satellite_1")
+	var sources: Dictionary = {}
+	for category: String in PileState.RESOURCE_IDS:
+		sources[category] = SourceMemory.entries(signals,status,category)
+	return {"sources":sources, "workers":simulation.trails.CONFIG.initial_workers, "time":simulation.run.simulation_time}
+
+
+func daughter_gathering_command(knowledge_id: String, action: String) -> Dictionary:
+	if inward_pile_id != "satellite_1" or not simulation.run.colony.piles.has("satellite_1"):
+		return {"accepted":false,"reason":"Inspect the daughter to assign its gatherers"}
+	if not simulation.run.knowledge.nodes.has(knowledge_id) or simulation.run.knowledge.nodes[knowledge_id].definition_id not in PileState.RESOURCE_IDS:
+		return {"accepted":false,"reason":"Gatherers need a returned food or water memory"}
+	var route: TrailRouteState = simulation.run.trails.find_route("satellite_1",knowledge_id)
+	var accepted: bool = false
+	match action:
+		"gather": accepted = simulation.create_trail("satellite_1",knowledge_id)
+		"add": accepted = route != null and route.purpose == "food" and simulation.set_trail_workers(route.id,route.desired_workers+simulation.trails.CONFIG.initial_workers)
+		"recheck": accepted = route != null and simulation.recheck_trail(route.id)
+		"stop": accepted = route != null and route.purpose == "food" and simulation.set_trail_workers(route.id,0)
+		_: return {"accepted":false,"reason":"Unknown gathering order"}
+	return {"accepted":accepted,"reason":"" if accepted else simulation.trails.last_error if route != null or action == "gather" else "No local gathering route"}
 
 
 func establish_daughter(knowledge_id: String) -> Dictionary:

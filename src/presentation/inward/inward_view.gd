@@ -12,6 +12,8 @@ const Activity = preload("res://src/presentation/inward/colony_activity.gd")
 const TISSUE = preload("res://assets/graphics/colony/material/bridge.png")
 const SUBSTRATE = preload("res://assets/graphics/colony/material/substrate.png")
 const Pressure = preload("res://src/presentation/colony_pressure.gd")
+var gathering: DaughterGathering = preload("res://src/presentation/inward/daughter_gathering.gd").new()
+var gathering_command: Callable
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
 var pile_command: Callable
@@ -80,6 +82,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "food_exchange" and _status.get("daughter",false):
+		if gathering.activate(self,at,_status.get("gathering",{}),gathering_command): return true
+		if not gathering.opened and _gather_link_rect().has_point(at): gathering.opened=true;return true
 	if selected_id=="entrance" and not _status.get("supply",{}).is_empty() and _supply_rect().has_point(at):
 		if supply_command.is_valid():
 			var enable: bool=not _status.supply.enabled
@@ -291,7 +296,11 @@ func _supply_rect() -> Rect2:
 
 
 func _supply_link_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x-300,470,260,44)
+	return Rect2(get_viewport_rect().size.x-300,532,260,44)
+
+
+func _gather_link_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x-300,480 if not Pressure.food_sources_needed(_status).is_empty() else 430,260,44)
 
 
 func _pile_rect() -> Rect2:
@@ -313,7 +322,7 @@ func _button_rect(command: String) -> Rect2:
 
 
 func _develop_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
+	return Rect2(get_viewport_rect().size.x - 300.0, 324.0 if _status.get("daughter",false) and _status.get("food_sharing",{}).get("recent",false) else 380.0, 260.0, 44.0)
 
 
 func _cleaner_rect(target: int) -> Rect2:
@@ -554,12 +563,15 @@ func _draw_hud(size: Vector2) -> void:
 func _draw_context(size: Vector2) -> void:
 	if selected_id.is_empty() or _status.is_empty():
 		return
+	if selected_id == "food_exchange" and _status.get("daughter",false) and gathering.opened:
+		gathering.draw(self,_status.get("gathering",{}));return
 	var expansion: Dictionary = _status.get("nursery_expansion", {})
 	var expansion_action: bool = expansion.get("state", "") == "available"
 	var food_attention: bool = selected_id == "food_exchange" and not Pressure.food_sources_needed(_status).is_empty()
 	var food_losses: Dictionary = _status.get("food_sharing",{})
 	var recent_food_losses: bool = food_losses.get("recent",false)
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses and _status.food_exchange_state != "developed" else 388 if food_attention or selected_id == "queen" or selected_id=="entrance" and not _status.get("supply",{}).is_empty() else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses and _status.food_exchange_state != "developed" else 388 if food_attention or selected_id == "queen" or selected_id=="food_exchange" and _status.get("daughter",false) or selected_id=="entrance" and not _status.get("supply",{}).is_empty() else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
+	if selected_id == "food_exchange" and _status.get("daughter",false): box.size.y = 444 if food_attention else 388
 	var web: bool = selected_id == "adaptation"
 	UIStyle.surface(self, box, Color("17141f") if web else Color("111921"))
 	UIStyle.surface(self, box, Color("786683") if web else Color("41535a"), true)
@@ -688,6 +700,7 @@ func _draw_context(size: Vector2) -> void:
 					_detail_line(box, 330, "%.1f water used · damp brood aired" % humidity.water_used)
 			_draw_brood_button()
 		"food_exchange":
+			if _status.get("daughter",false): _draw_action(_gather_link_rect(),"LOCAL GATHERING")
 			if _status.food_exchange_state == "primitive":
 				_detail_line(box, 65, "Primitive Food Exchange")
 				_detail_line(box, 99, "Needs %.0f carbs · %.0f protein" % [_status.food_exchange_costs.carbohydrate, _status.food_exchange_costs.protein])
@@ -707,11 +720,11 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 189, "Water: %.1f" % _status.resources.water)
 			if food_attention:
 				if recent_food_losses:
-					var base: float = 230 if _status.food_exchange_state == "developed" else 300
+					var base: float = 230 if _status.food_exchange_state == "developed" or _status.get("daughter",false) else 300
 					_label(box.position + Vector2(16, base), "Workers lost after food sharing", Color("c7ad98"), 15)
 					_label(box.position + Vector2(16, base + 24), "%d lost locally · %s ago" % [food_losses.losses, Copy.duration(food_losses.age)], Color("a9b9bc"), 15)
 					_label(box.position + Vector2(16, base + 48), "Cause remains uncertain", Color("8fa1a8"), 15)
-					_label(box.position + Vector2(16, base + 74), "Review returned food supplies", Color("8fa1a8"), 15)
+					_label(box.position + Vector2(16, base + 74), "Review local supplies" if _status.get("daughter",false) else "Review returned food supplies", Color("8fa1a8"), 15)
 				else:
 					_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 15)
 					_label(box.position + Vector2(16, 316), "Needs supplies from Home" if _status.get("daughter",false) else "Browse returned sources", Color("8fa1a8"), 15)
