@@ -35,8 +35,8 @@ func _ready() -> void:
 	if DisplayServer.get_name() != "headless":
 		audio_preferences.load_file()
 		var outward: OutwardView = Outward.new()
-		outward.signal_provider = sensory_snapshot.bind("home")
-		outward.status_provider = outward_status.bind("home")
+		outward.signal_provider = focused_outward_signals
+		outward.status_provider = focused_outward_status
 		outward.dispatch_command = dispatch_facing
 		outward.scout_recall_command = recall_scout
 		outward.exploration_command = set_exploration
@@ -46,10 +46,11 @@ func _ready() -> void:
 		outward.founding_command = start_founding
 		outward.establish_command = establish_daughter
 		outward.inspect_daughter_command = inspect_pile
+		outward.pile_command = inspect_outward_pile
 		outward.trail_create_command = create_trail_for
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
-		outward.investigate_command = toggle_investigation_priority
+		outward.investigate_command = focused_source_investigation
 		outward.journey_command = respond_to_journey
 		outward.honeydew_start_command = start_honeydew_tending
 		outward.honeydew_stop_command = stop_honeydew_tending
@@ -153,7 +154,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func set_mode(next_mode: String) -> bool:
-	if next_mode=="outward": inward_pile_id="home"
 	if not next_mode in ["outward", "inward"]:
 		return false
 	cancel_field_gesture()
@@ -213,12 +213,60 @@ func focused_inward_status() -> Dictionary:
 
 func inspect_pile(pile_id: String) -> bool:
 	if not simulation.run.colony.piles.has(pile_id): return false
+	if inward_pile_id != pile_id: _reset_outward_attention()
 	inward_pile_id=pile_id
 	set_mode("inward")
 	if _inward_view!=null:
 		_inward_view.selected_id=""; _inward_view.queen_tab="workers"; _inward_view._feedback=""; _inward_view._process(0)
 		_inward_view.gathering.reset()
 	return true
+
+
+func focused_outward_signals() -> Array[Dictionary]:
+	return sensory_snapshot(inward_pile_id)
+
+
+func focused_outward_status() -> Dictionary:
+	return outward_status(inward_pile_id)
+
+
+func _reset_outward_attention() -> void:
+	if _outward_view == null: return
+	cancel_field_gesture()
+	_outward_view.facing = 0.0
+	_outward_view.selected_id = ""
+	_outward_view.sources_open = false
+	_outward_view.source_page = 0
+	_outward_view.exploration_open = false
+	_outward_view.journey_open = false
+	_outward_view._feedback = ""
+	_outward_view._request_rejected = false
+	_outward_view.reset_mission_visuals()
+
+
+func inspect_outward_pile(pile_id: String) -> bool:
+	if not simulation.run.colony.piles.has(pile_id): return false
+	if inward_pile_id != pile_id: _reset_outward_attention()
+	inward_pile_id = pile_id
+	if _inward_view != null:
+		_inward_view.selected_id = ""
+		_inward_view.gathering.reset()
+	set_mode("outward")
+	if _outward_view != null: _outward_view._process(0)
+	return true
+
+
+func focused_source_investigation(knowledge_id: String) -> Dictionary:
+	return toggle_investigation_priority(knowledge_id) if inward_pile_id == "home" else investigate_known_source(knowledge_id)
+
+
+func _home_order() -> Dictionary:
+	return {"accepted": false, "reason": "Inspect Home to give this order"}
+
+
+func _owns_food_route(route_id: String) -> bool:
+	var route: TrailRouteState = simulation.run.trails.routes.get(route_id)
+	return route != null and route.origin_pile == inward_pile_id and route.purpose == "food"
 
 
 func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
@@ -257,7 +305,9 @@ func outward_status(pile_id: String) -> Dictionary:
 	var camps: Dictionary={}
 	for known_id: String in simulation.run.knowledge.nodes:
 		if simulation.run.knowledge.nodes[known_id].definition_id=="nest_site": camps[known_id]=simulation.founding.summary(known_id)
-	return {"founding":camps,"home_air": simulation.heat.home_air(),
+	var status: Dictionary = {"pile_id":pile_id, "pile_name":"Home" if pile_id == "home" else "Daughter",
+		"other_pile":"satellite_1" if pile_id == "home" and simulation.run.colony.piles.has("satellite_1") else "home" if pile_id != "home" else "",
+		"founding":camps if pile_id == "home" else {},"home_air": simulation.heat.home_air(),
 		"available_workers": simulation.run.colony.piles[pile_id].workers_available,
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
@@ -265,10 +315,12 @@ func outward_status(pile_id: String) -> Dictionary:
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
 		"scout_missions": scout_mission_summaries(pile_id),
-		"honeydew": honeydew_summary(pile_id), "exploration": exploration_summary(),
-		"journey_response": simulation.journey_response.summary(),
+		"honeydew": honeydew_summary(pile_id),
+		"journey_response": simulation.journey_response.summary() if pile_id == "home" else {},
 		"internal_attention": Pressure.attention(inward_status(pile_id)),
-		"daughter_attention": pile_internal_attention("satellite_1")}
+		"daughter_attention": pile_internal_attention("satellite_1" if pile_id == "home" else "home")}
+	if pile_id == "home": status["exploration"] = exploration_summary()
+	return status
 
 
 func pile_internal_attention(pile_id: String) -> Dictionary:
@@ -301,6 +353,7 @@ func exploration_summary() -> Dictionary:
 
 
 func toggle_investigation_priority(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	var route: TrailRouteState = simulation.run.trails.find_route("home", knowledge_id)
 	var recovery: bool = route != null and (route.status == "depleted" or route.resume_on_report)
 	var enabled: bool = not route.resume_on_report if recovery else knowledge_id not in simulation.run.exploration.priorities
@@ -313,11 +366,13 @@ func toggle_investigation_priority(knowledge_id: String) -> Dictionary:
 
 
 func set_exploration(target: int) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	var accepted: bool = simulation.set_exploration(target)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func set_exploration_bias(bearing: Variant) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	var accepted: bool = simulation.set_exploration_bias(bearing)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
@@ -458,6 +513,7 @@ func quick_load() -> Dictionary:
 
 
 func _refresh_loaded_views() -> void:
+	inward_pile_id = "home"
 	_discovery_notice.baseline(sensory_snapshot("home"))
 	_discovery_reports = 0
 	if _outward_view != null:
@@ -592,6 +648,7 @@ func set_honeydew_protection(enabled: bool) -> Dictionary:
 
 
 func start_honeydew_tending(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	if knowledge_id != "known:" + HONEYDEW_CONFIG.source_id or not simulation.run.knowledge.nodes.has(knowledge_id):
 		return {"accepted": false, "reason": "Honeydew source unknown"}
 	var accepted: bool = simulation.start_honeydew_tending("home")
@@ -599,6 +656,7 @@ func start_honeydew_tending(knowledge_id: String) -> Dictionary:
 
 
 func stop_honeydew_tending(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	if knowledge_id != "known:" + HONEYDEW_CONFIG.source_id or not simulation.run.knowledge.nodes.has(knowledge_id):
 		return {"accepted": false, "reason": "Honeydew source unknown"}
 	var accepted: bool = simulation.stop_honeydew_tending("home")
@@ -694,32 +752,37 @@ func daughter_gathering_command(knowledge_id: String, action: String) -> Diction
 
 
 func establish_daughter(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	var accepted: bool=simulation.establish_daughter(knowledge_id)
 	if accepted: inspect_pile("satellite_1")
 	return {"accepted":accepted,"reason":simulation.founding.last_error}
 
 
 func start_founding(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	var accepted: bool=simulation.start_founding(knowledge_id)
 	return {"accepted":accepted,"reason":simulation.founding.last_error}
 
 
 func create_trail_for(knowledge_id: String) -> Dictionary:
-	var accepted: bool = simulation.create_trail("home", knowledge_id)
+	var accepted: bool = simulation.create_trail(inward_pile_id, knowledge_id)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
 
 func set_trail_target(route_id: String, target: int) -> Dictionary:
+	if not _owns_food_route(route_id): return {"accepted":false, "reason":"Trail belongs to another pile or job"}
 	var accepted: bool = simulation.set_trail_workers(route_id, target)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
 
 func recheck_trail(route_id: String) -> Dictionary:
+	if not _owns_food_route(route_id): return {"accepted":false, "reason":"Trail belongs to another pile or job"}
 	var accepted: bool = simulation.recheck_trail(route_id)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
 
 func respond_to_journey(action: String, route_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	var system: JourneyResponseSystem = simulation.journey_response
 	var accepted: bool = false
 	match action:
@@ -731,16 +794,21 @@ func respond_to_journey(action: String, route_id: String) -> Dictionary:
 
 
 func dispatch_facing(bearing: float) -> bool:
-	return simulation.dispatch_scout("home", bearing)
+	return simulation.dispatch_scout(inward_pile_id, bearing)
 
 
 func recall_scout(id: String) -> Dictionary:
+	var memory: ScoutMissionMemory = simulation.run.scout_missions.get(id)
+	if memory == null or memory.origin_pile != inward_pile_id: return {"accepted":false,"reason":"Scout belongs to another pile"}
 	var accepted: bool = simulation.recall_scout(id)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func investigate_known_source(knowledge_id: String) -> Dictionary:
-	var accepted: bool = simulation.investigate_known_source("home", knowledge_id)
+	for memory: ScoutMissionMemory in simulation.run.scout_missions.values():
+		if memory.origin_pile == inward_pile_id and memory.target_knowledge_id == knowledge_id and memory.completed_at() < 0:
+			return {"accepted":false,"reason":"A local scout is already rechecking this memory"}
+	var accepted: bool = simulation.investigate_known_source(inward_pile_id, knowledge_id)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 

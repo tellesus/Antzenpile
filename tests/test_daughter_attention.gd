@@ -26,8 +26,8 @@ func run(test: Object) -> bool:
  var touch:=InputEventScreenTouch.new();touch.pressed=true;touch.position=outward._button_rect("daughter_pressure").get_center()
  outward._unhandled_input(touch)
  test.check(colony.mode=="inward" and colony.inward_pile_id=="satellite_1" and inward.selected_id=="nursery","Touch voluntarily opens the daughter function")
- test.check(before==colony.simulation.run.to_dict() and outward.facing==1.8 and outward.selected_id=="retained","Paused navigation preserves clock/RNG/labor/resources and outward attention")
- colony.set_mode("outward");home.humidity.moisture=350000;outward._process(0)
+ test.check(before==colony.simulation.run.to_dict() and outward.facing==0 and outward.selected_id.is_empty(),"Paused navigation preserves clock/RNG/labor/resources and resets obsolete outward attention")
+ colony.inspect_outward_pile("home");home.humidity.moisture=350000;outward._process(0)
  test.check(not outward._status.internal_attention.is_empty() and not outward._status.daughter_attention.is_empty() and not outward._button_rect("internal_pressure").intersects(outward._button_rect("daughter_pressure")),"Home and daughter pressure have distinct usable targets")
  outward.sources_open=true
  test.check(outward._button_at(outward._button_rect("daughter_pressure").get_center())!="daughter_pressure","Source browser shields an underlying daughter badge")
@@ -41,7 +41,7 @@ func run(test: Object) -> bool:
  inward._process(0)
  test.check(inward._status.other_pile_attention.pile_id=="home","While attending daughter, Home pressure remains reachable")
  daughter.humidity.moisture=650000;home.humidity.moisture=650000
- colony.set_mode("outward");outward._status.daughter_attention={"organ":"nursery"}
+ colony.inspect_outward_pile("home");outward._status.daughter_attention={"organ":"nursery"}
  before=colony.simulation.run.to_dict();touch.position=outward._button_rect("daughter_pressure").get_center();outward._unhandled_input(touch)
  test.check(colony.mode=="outward" and colony.inward_pile_id=="home" and before==colony.simulation.run.to_dict(),"Stale daughter badge revalidates recovery before moving attention")
  outward._process(0);test.check(outward._status.daughter_attention.is_empty(),"Recovered daughter removes its warning")

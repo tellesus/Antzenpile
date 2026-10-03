@@ -26,6 +26,7 @@ var pause_command: Callable
 var speed_command: Callable
 var founding_command: Callable
 var establish_command: Callable
+var pile_command: Callable
 var inspect_daughter_command: Callable
 var trail_create_command: Callable
 var trail_set_command: Callable
@@ -220,6 +221,9 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 
 func _run_command(command: String) -> void:
+	if command == "pile":
+		if pile_command.is_valid(): pile_command.call(_status.get("other_pile", ""))
+		return
 	_request_rejected = false
 	if command=="establish":
 		if establish_command.is_valid():
@@ -277,11 +281,11 @@ func _run_command(command: String) -> void:
 	match command:
 		"daughter_pressure":
 			if not _status.get("daughter_attention", {}).is_empty() and pressure_command.is_valid():
-				var result: Dictionary = pressure_command.call("satellite_1")
+				var result: Dictionary = pressure_command.call(_status.daughter_attention.get("pile_id","satellite_1"))
 				if not result.get("accepted", false): show_feedback(result.get("reason", "Internal attention unavailable"))
 		"internal_pressure":
 			if not _status.get("internal_attention", {}).is_empty() and pressure_command.is_valid():
-				var result: Dictionary = pressure_command.call()
+				var result: Dictionary = pressure_command.call(_status.get("pile_id","home"))
 				if not result.get("accepted", false): _feedback = result.get("reason", "Internal attention unavailable")
 		"sources":
 			sources_open = not sources_open
@@ -337,7 +341,7 @@ func _run_command(command: String) -> void:
 			_feedback = ("Gatherers resumed from returned evidence" if route.get("recovery_ready", false) else "Gatherers sent · availability still uncertain") if command == "trail_recheck" and result.get("accepted", false) else "Trail updated" if result.get("accepted", false) else result.get("reason", "Trail unavailable")
 		"scout":
 			sources_open = false
-			if exploration_command.is_valid():
+			if exploration_command.is_valid() and not _daughter():
 				exploration_open = not exploration_open
 				return
 			if not dispatch_command.is_valid() or _status.get("available_workers", 0) < 1 or _status.get("active_scouts", 0) >= _status.get("scout_cap", 0):
@@ -378,6 +382,7 @@ func _button_rect(command: String) -> Rect2:
 	match command:
 		"internal_pressure": return Rect2(264, 100, 300, 44)
 		"daughter_pressure": return Rect2(264, 100 if _status.get("internal_attention", {}).is_empty() else 152, 300, 44)
+		"pile": return Rect2(24, 152, 220, 44)
 		"sources": return Rect2(24, 100, 220, 44)
 		"scout": return Rect2(24, y, 148, 64)
 		"pause": return Rect2(188, y, 104, 64)
@@ -392,6 +397,7 @@ func _button_rect(command: String) -> Rect2:
 
 
 func _button_at(at: Vector2) -> String:
+	if not sources_open and not exploration_open and not _status.get("other_pile", "").is_empty() and _button_rect("pile").has_point(at): return "pile"
 	if not _status.get("internal_attention", {}).is_empty() and _button_rect("internal_pressure").has_point(at):
 		return "internal_pressure"
 	if not sources_open and not exploration_open and not _status.get("daughter_attention", {}).is_empty() and _button_rect("daughter_pressure").has_point(at):
@@ -417,7 +423,7 @@ func _button_at(at: Vector2) -> String:
 	if not _selected_signal().is_empty():
 		var chosen_route: Dictionary = _selected_route(_selected_signal())
 		if _selected_signal().category == "nest_site":
-			if _founding_rect().has_point(at):
+			if not _daughter() and _founding_rect().has_point(at):
 				var camp_status: String=_camp_summary().get("status","none")
 				if camp_status in ["none","failed"]: return "founding"
 				if camp_status=="ready": return "establish"
@@ -433,7 +439,7 @@ func _button_at(at: Vector2) -> String:
 				if own_party and state.get("reinforcement_available",false): return "journey_reinforce"
 				if not own_party and _can_mobilize(chosen_route): return "journey_defend"
 			if Rect2(get_viewport_rect().size.x - 316,144,292,448).has_point(at): return "journey_panel"
-		elif chosen_route.get("reported_losses",0) > 0 and _journey_rect("journey_open").has_point(at): return "journey_open"
+		elif not _daughter() and chosen_route.get("reported_losses",0) > 0 and _journey_rect("journey_open").has_point(at): return "journey_open"
 		if _journey_attention():
 			for command: String in ["scout","pause","speed_1","speed_4","speed_16","speed_64","inward","save","load","sources"]:
 				if _button_rect(command).has_point(at): return command
@@ -550,6 +556,7 @@ func _draw_trails(size: Vector2) -> void:
 func _prepare_signal_captions(size: Vector2) -> void:
 	_signal_labels.clear()
 	_caption_blocks.clear()
+	if not sources_open and not exploration_open and not _status.get("other_pile", "").is_empty(): _caption_blocks.append(_button_rect("pile"))
 	for entry: Dictionary in _placed:
 		_caption_blocks.append(Rect2(entry.center - Vector2.ONE * entry.radius, Vector2.ONE * entry.radius * 2))
 	for marker: Dictionary in Scent.alarm_markers(_status.get("trails", []), _placed, size):
@@ -617,7 +624,7 @@ func _draw_anchor(size: Vector2) -> void:
 		var rep: Dictionary = ScoutTrace.departure(entry.age, entry.side, size)
 		if not rep.is_empty():
 			Art.ant(self, rep.position, rep.direction, Color(0.68, 0.61, 0.45, 0.70), _animation_time, 1.15)
-	_label(center + Vector2(0, 33), "HOME", Color("d8c9ae"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(center + Vector2(0, 33), _status.get("pile_name","Home").to_upper(), Color("d8c9ae"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_signal(entry: Dictionary) -> void:
@@ -645,7 +652,7 @@ func _signal_caption(signal_data: Dictionary) -> String:
 
 
 func _draw_hud(size: Vector2) -> void:
-	_label(Vector2(24, 38), "OUTWARD  /  HOME", Color("dad7c8"), 22)
+	_label(Vector2(24, 38), "OUTWARD  /  " + _status.get("pile_name","Home").to_upper(), Color("dad7c8"), 22)
 	_label(Vector2(24, 63), "Drag to turn. Tap a trace to listen.", Color("82939c"), 13)
 	if _status.get("rain_phase", "") == "raining":
 		_label(Vector2(24, 92), "RAIN / cooled air · scent disturbed", Color("8aadb8"), 13)
@@ -654,9 +661,14 @@ func _draw_hud(size: Vector2) -> void:
 	_label(Vector2(size.x * 0.5, 38), facing_text(facing), Color("a9bbc1"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	draw_line(Vector2(size.x * 0.5, 53), Vector2(size.x * 0.5, 72), Color("769aa3"), 1.0)
 	if not _status.is_empty():
-		_label(Vector2(size.x - 24, 36), "%d available  /  scouts %d/%d" % [_status.available_workers, _status.active_scouts, _status.scout_cap], Color("c9d1c5"), 15, HORIZONTAL_ALIGNMENT_RIGHT)
+		_label(Vector2(size.x - 24, 36), "%d available  /  shared scouts %d/%d" % [_status.available_workers, _status.active_scouts, _status.scout_cap], Color("c9d1c5"), 15, HORIZONTAL_ALIGNMENT_RIGHT)
 		var pause_word: String = "PAUSED" if _status.paused else "%dx" % _status.time_scale
 		_label(Vector2(size.x - 24, 61), "%s  ·  %s" % [pause_word, Copy.duration(_status.time)], Color("83969d"), 13, HORIZONTAL_ALIGNMENT_RIGHT)
+
+	if not sources_open and not exploration_open and not _status.get("other_pile", "").is_empty():
+		var switch: Rect2 = _button_rect("pile")
+		UIStyle.surface(self,switch,Color("26383a"))
+		_label(switch.get_center()+Vector2(0,5),"LOOK FROM " + ("HOME" if _daughter() else "DAUGHTER"),Color("dce5d9"),13,HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_context(size: Vector2) -> void:
@@ -711,7 +723,7 @@ func _draw_context(size: Vector2) -> void:
 	if route.is_empty() or route.status == "inactive":
 		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" and float(route.get("route_familiarity", 0.0)) < 0.1 else "No workers · scent " + _scent_label(route)
 		_label(body.position + Vector2(16, 165), idle_text, Color("a8b8bd"), 15)
-		_label(body.position + Vector2(16, 187), "Home %s: %.1f" % [Copy.resource(selected.category), _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 15)
+		_label(body.position + Vector2(16, 187), "%s %s: %.1f" % [_status.get("pile_name","Home"), Copy.resource(selected.category), _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 15)
 		_draw_trail_button("trail_create", "ASSIGN 5 GATHERERS")
 	elif route.status == "recalling":
 		_label(body.position + Vector2(16, 165), "Recalling: %d workers away" % route.active_workers, Color("a8b8bd"), 15)
@@ -776,6 +788,13 @@ func _camp_summary() -> Dictionary:
 	return _status.get("founding",{}).get(_selected_signal().get("source_knowledge_id",""),{})
 func _founding_rect() -> Rect2: return Rect2(get_viewport_rect().size.x-300,424,260,44)
 func _draw_founding_context(box: Rect2) -> void:
+	if _daughter():
+		_label(box.position+Vector2(16,145),"Shared shelter memory · safety unknown",Color("8fa1a8"),13)
+		_label(box.position+Vector2(16,169),"Inspect Home for founding orders",Color("8fa1a8"),13)
+		var button: Rect2 = _investigate_button_rect()
+		UIStyle.surface(self,button,Color("27383c"))
+		_label(button.get_center()+Vector2(0,5),_investigation_title(_selected_signal()),Color("d5ded8"),13,HORIZONTAL_ALIGNMENT_CENTER)
+		return
 	var camp: Dictionary=_camp_summary()
 	var status: String=camp.get("status","none")
 	var lines: Array[String]=[]
@@ -851,7 +870,7 @@ func _draw_mission_context(mission: Dictionary, size: Vector2) -> void:
 		UIStyle.surface(self, recall_box, Color("293b3b"))
 		_label(recall_box.position + Vector2(recall_box.size.x * 0.5, 29), "RECALL SCOUT", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	else:
-		_label(box.position + Vector2(16, 239), "Change exploration effort or direction", Color("8fa1a8"), 13)
+		_label(box.position + Vector2(16, 239), "Send another scout toward a new direction" if _daughter() else "Change exploration effort or direction", Color("8fa1a8"), 13)
 
 
 func _scout_recall_rect() -> Rect2:
@@ -941,7 +960,7 @@ func _draw_controls(size: Vector2) -> void:
 	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load", "sources"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale
-		var unavailable: bool = command == "scout" and not exploration_command.is_valid() and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)
+		var unavailable: bool = command == "scout" and (_daughter() or not exploration_command.is_valid()) and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)
 		var color: Color = Color("28342f") if command == "scout" else Color("18252b")
 		if active:
 			color = Color("31505a")
@@ -949,7 +968,7 @@ func _draw_controls(size: Vector2) -> void:
 			color = Color("202326")
 		UIStyle.surface(self, box, color)
 		var title: String = "REMEMBERED SOURCES" if command == "sources" else "SEND SCOUT" if command == "scout" else "INWARD" if command == "inward" else "SAVE" if command == "save" else "LOAD" if command == "load" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
-		if command == "scout" and exploration_command.is_valid():
+		if command == "scout" and exploration_command.is_valid() and not _daughter():
 			title = "EXPLORATION"
 		_label(box.position + Vector2(box.size.x * 0.5, 29 if command == "sources" else 40), title, Color("d3dcd4") if not unavailable else Color("78817e"), 14 if command in ["save", "load", "sources"] else 16, HORIZONTAL_ALIGNMENT_CENTER)
 	if not _feedback.is_empty() and (Time.get_ticks_msec() < _feedback_until or _request_rejected and _request_selection == selected_id):
@@ -997,7 +1016,7 @@ func _draw_sources() -> void:
 		var title: String = Memories.display_name(entry)
 		_label(box.position + Vector2(10, 20), "%s · %s ago" % [title, Copy.duration(entry.age)], Color("d4c6a8"), 14)
 		_label(box.position + Vector2(10, 42), entry.state if entry.category == "nest_site" else "%s · %d gathering%s" % [entry.state, entry.workers, " · ALARM" if entry.danger else ""], Color("c48c7c") if entry.danger else Color("96aab0"), 14)
-		_label(box.position + Vector2(10, 61), Memories.receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 14)
+		_label(box.position + Vector2(10, 61), Memories.receipt_label(entry, _status.get("time", 0.0), "here" if _daughter() else "home"), Color("96aab0"), 14)
 		_label(box.position + Vector2(10, 80), Memories.first_receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 14)
 	if entries.is_empty():
 		_label(Vector2(40, 275), "No returned memory of a nest site" if source_category == "nest_site" else "No returned memory of this resource", Color("96aab0"), 14)
@@ -1055,14 +1074,18 @@ func _label(at: Vector2, value: String, color: Color, font_size: int, align: Hor
 	draw_string(_font, placed, value, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
 
 
+func _daughter() -> bool:
+	return _status.get("pile_id","home") != "home"
+
+
 func _journey_attention() -> bool:
-	return journey_open or _selected_signal().get("category") == "threat"
+	return not _daughter() and (journey_open or _selected_signal().get("category") == "threat")
 
 func _journey_rect(command: String) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300,548 if command in ["journey_open","journey_close"] else 494 if command in ["journey_defend","journey_reinforce"] else 446,260,44)
 
 func _draw_journey_link() -> void:
-	if _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
+	if _daughter() or _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
 	var box: Rect2 = _journey_rect("journey_open")
 	UIStyle.surface(self, box,Color("39302b"))
 	_label(box.get_center() + Vector2(0,5),"JOURNEY REPORTS AND RESPONSE",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
