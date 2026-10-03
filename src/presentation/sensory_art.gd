@@ -26,6 +26,7 @@ static func color_for(category: String) -> Color:
 		"carbohydrate": return Color("dcb477")
 		"water": return Color("7fbfcf")
 		"protein": return Color("b8a1cf")
+		"nest_site": return Color("b9c5a1")
 		"threat": return Color("c58d79")
 	return Color("a0b1ae")
 
@@ -74,6 +75,10 @@ static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool) -
 		for index: int in 3:
 			var ripple: PackedVector2Array = membrane(center, radius * (0.35 + 0.18 * index), drift * 0.45 + index, 0.43)
 			canvas.draw_polyline(ripple.slice(2 + index * 3, 15 + index * 4), Color(color, 0.18 * salience * recognition), 1.0, true)
+	elif signal_data.category == "nest_site" and not empty:
+		# A soft sheltered hollow from returned identity; no occupants or floorplan.
+		var rim: PackedVector2Array = membrane(center, radius * 0.55, phase, 0.62)
+		canvas.draw_polyline(rim.slice(1, 20), Color(color, 0.23 * salience * recognition), 1.0, true)
 	elif signal_data.category == "protein" and not empty:
 		for index: int in 3:
 			var fiber: PackedVector2Array = membrane(center + Vector2(index * 7 - 7, 0), radius * 0.55, drift + index, 0.65)

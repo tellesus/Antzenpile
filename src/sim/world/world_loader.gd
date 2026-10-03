@@ -2,7 +2,7 @@ class_name WorldLoader
 extends RefCounted
 
 const World = preload("res://src/sim/world/world_state.gd")
-const RESOURCE_PATHS: Array[String] = ["res://data/resources/carbohydrate.tres", "res://data/resources/protein.tres", "res://data/resources/water.tres"]
+const RESOURCE_PATHS: Array[String] = ["res://data/resources/carbohydrate.tres", "res://data/resources/protein.tres", "res://data/resources/water.tres", "res://data/resources/nest_site.tres"]
 var last_error: String = ""
 
 

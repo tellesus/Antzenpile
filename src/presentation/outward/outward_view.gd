@@ -11,6 +11,7 @@ const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd
 const LossEvidence = preload("res://src/presentation/returned_loss_evidence.gd")
 const Copy = preload("res://src/presentation/interface_text.gd")
 const Memories = preload("res://src/presentation/outward/source_memory.gd")
+const MEMORY_CATEGORIES: Array[String] = ["carbohydrate", "protein", "water", "nest_site"]
 var sources_open: bool = false
 var source_category: String = "carbohydrate"
 var source_page: int = 0
@@ -286,6 +287,10 @@ func _run_command(command: String) -> void:
 				_feedback = "Source recheck priority removed" if not result.enabled else "Priority queued · set Exploration effort" if result.exploration_off else "Source prioritized for scout rechecks"
 				if result.get("recovery_watch", false):
 					_feedback = "Recovery watch stopped" if not result.enabled else "Watch queued · set Exploration effort" if result.exploration_off else "Watch set · fresh return can resume gathering"
+			if signal_data.category == "nest_site" and result.get("accepted", false):
+				_feedback = "Scout sent to recheck site"
+				if result.get("standing_priority", false):
+					_feedback = "Site recheck priority removed" if not result.enabled else "Site queued · set Exploration effort" if result.exploration_off else "Site prioritized for scout rechecks"
 		"trail_create", "trail_less", "trail_more", "trail_cancel", "trail_recheck":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty():
@@ -367,7 +372,7 @@ func _button_at(at: Vector2) -> String:
 	if not _status.get("internal_attention", {}).is_empty() and _button_rect("internal_pressure").has_point(at):
 		return "internal_pressure"
 	if sources_open and _sources_panel_rect().has_point(at):
-		for category: String in ["carbohydrate", "protein", "water"]:
+		for category: String in MEMORY_CATEGORIES:
 			if _source_filter_rect(category).has_point(at):
 				return "source_filter_" + category
 		var entries: Array[Dictionary] = _source_entries()
@@ -386,6 +391,9 @@ func _button_at(at: Vector2) -> String:
 		return "scout_recall"
 	if not _selected_signal().is_empty():
 		var chosen_route: Dictionary = _selected_route(_selected_signal())
+		if _selected_signal().category == "nest_site":
+			if _investigate_button_rect().has_point(at): return "investigate"
+			if _context_panel_rect().has_point(at): return ""
 		if _journey_attention():
 			var own_party: bool = _status.get("journey_response",{}).get("away",false) and _status.get("journey_response",{}).get("route_id","") == chosen_route.get("id")
 			if _journey_rect("journey_close").has_point(at): return "journey_close"
@@ -595,7 +603,7 @@ func _draw_signal(entry: Dictionary) -> void:
 func _signal_caption(signal_data: Dictionary) -> String:
 	if signal_data.category == "threat": return _threat_caption(signal_data)
 	var empty: bool = _reported_empty(signal_data)
-	var title: String = _signal_title_for(signal_data) + " · EMPTY" if empty else _signal_title_for(signal_data)
+	var title: String = _signal_title_for(signal_data) + (" · UNCONFIRMED" if signal_data.category == "nest_site" else " · EMPTY") if empty else _signal_title_for(signal_data)
 	if not empty and _status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {}).get("renewed_report", false): title += " · FOUND AGAIN"
 	if signal_data.get("foreign_contact", false): title += " · FOREIGN"
 	return title
@@ -633,6 +641,16 @@ func _draw_context(size: Vector2) -> void:
 	var distance_word: String = "nearby" if selected.estimated_distance < 6.0 else "within reach" if selected.estimated_distance < 14.0 else "distant"
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 15)
 	_label(box.position + Vector2(16, 109), "Last sensed " + Copy.duration(selected.age) + " ago", Color("8fa1a8"), 15)
+	if selected.category == "nest_site":
+		_label(box.position + Vector2(16, 145), "Last recheck did not confirm site" if _reported_empty(selected) else "Possible shelter · earlier report", Color("b9c5a1"), 15)
+		_label(box.position + Vector2(16, 172), "Occupants and safety unknown", Color("8fa1a8"), 15)
+		_label(box.position + Vector2(16, 211), "Founding needs a reproductive", Color("a8b8bd"), 15)
+		_label(box.position + Vector2(16, 233), "and a supported expedition.", Color("a8b8bd"), 15)
+		_label(box.position + Vector2(16, 266), "Site memory only; no nest claimed.", Color("8fa1a8"), 14)
+		var recheck: Rect2 = _investigate_button_rect()
+		UIStyle.surface(self, recheck, Color("27383c"))
+		_label(recheck.get_center() + Vector2(0, 5), _investigation_title(selected), Color("d5ded8"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+		return
 	var hint: Dictionary = _status.get("temporal_hints", {}).get(selected.source_knowledge_id, {})
 	var loss_route: Dictionary = _selected_route(selected)
 	var losses: int = int(loss_route.get("reported_losses", 0))
@@ -727,6 +745,9 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 
 
 func _investigation_title(selected: Dictionary) -> String:
+	if selected.get("category") == "nest_site":
+		if not _status.has("exploration"): return "SEND SCOUT TO RECHECK SITE"
+		return "STOP SITE RECHECKS" if selected.source_knowledge_id in _status.exploration.get("priorities", []) else "PRIORITIZE SITE RECHECKS"
 	if not _status.has("exploration"):
 		return "SEND SCOUT TO RECHECK"
 	var route: Dictionary = _selected_route(selected)
@@ -884,7 +905,7 @@ func _source_entries() -> Array[Dictionary]:
 
 
 func _source_filter_rect(category: String) -> Rect2:
-	return Rect2(40 + ["carbohydrate", "protein", "water"].find(category) * 100, 190, 94, 44)
+	return Rect2(40 + MEMORY_CATEGORIES.find(category) * 76, 190, 72, 44)
 
 
 func _source_row_rect(index: int) -> Rect2:
@@ -898,10 +919,10 @@ func _source_page_rect() -> Rect2:
 func _draw_sources() -> void:
 	UIStyle.surface(self, _sources_panel_rect(), Color("111921"))
 	_label(Vector2(40, 177), "Remembered sources", Color("d3dcd4"), 20)
-	for category: String in ["carbohydrate", "protein", "water"]:
+	for category: String in MEMORY_CATEGORIES:
 		var button: Rect2 = _source_filter_rect(category)
 		UIStyle.surface(self, button, Color("31505a") if category == source_category else Color("18252b"))
-		_label(button.get_center() + Vector2(0, 6), "CARBS" if category == "carbohydrate" else category.to_upper(), Art.color_for(category), 13, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(button.get_center() + Vector2(0, 6), "CARBS" if category == "carbohydrate" else "SITES" if category == "nest_site" else category.to_upper(), Art.color_for(category), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	var entries: Array[Dictionary] = _source_entries()
 	source_page = mini(source_page, maxi(0, ceili(entries.size() / 3.0) - 1))
 	for index: int in 3:
@@ -913,11 +934,11 @@ func _draw_sources() -> void:
 		UIStyle.surface(self, box, Color("30382f") if entry.id == selected_id else Color("182329"))
 		var title: String = Memories.display_name(entry)
 		_label(box.position + Vector2(10, 20), "%s · %s ago" % [title, Copy.duration(entry.age)], Color("d4c6a8"), 14)
-		_label(box.position + Vector2(10, 42), "%s · %d gathering%s" % [entry.state, entry.workers, " · ALARM" if entry.danger else ""], Color("c48c7c") if entry.danger else Color("96aab0"), 14)
+		_label(box.position + Vector2(10, 42), entry.state if entry.category == "nest_site" else "%s · %d gathering%s" % [entry.state, entry.workers, " · ALARM" if entry.danger else ""], Color("c48c7c") if entry.danger else Color("96aab0"), 14)
 		_label(box.position + Vector2(10, 61), Memories.receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 14)
 		_label(box.position + Vector2(10, 80), Memories.first_receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 14)
 	if entries.is_empty():
-		_label(Vector2(40, 275), "No returned memory of this resource", Color("96aab0"), 14)
+		_label(Vector2(40, 275), "No returned memory of a nest site" if source_category == "nest_site" else "No returned memory of this resource", Color("96aab0"), 14)
 	UIStyle.surface(self, _source_page_rect(), Color("18252b"))
 	_label(_source_page_rect().get_center() + Vector2(0, 6), "NEXT PAGE · %d / %d" % [source_page + 1, maxi(1, ceili(entries.size() / 3.0))], Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
@@ -954,6 +975,7 @@ func _signal_title(category: String) -> String:
 		"carbohydrate": return "Carbs trace"
 		"protein": return "Protein trace"
 		"water": return "Water trace"
+		"nest_site": return "Shelter trace"
 	return "Unknown trace"
 
 

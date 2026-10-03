@@ -81,7 +81,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	# Legacy senses derive float64 uncertainty from a float32 physical distance.
 	# Recover that exact calculation when JSON changed only its final bit.
 	var physical_distance: float = Vector2(closest_distance, 0).x
-	if absf(physical_distance - closest_distance) <= 1e-15:
+	if absf(physical_distance - closest_distance) <= 1e-12:
 		closest_distance = physical_distance
 	var config: ScoutConfig = preload("res://data/scouting/default_scouts.tres")
 	var physical_radius: float = config.localization_floor + closest_distance * config.distance_uncertainty
@@ -91,7 +91,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		var rounded_radius: float = roundf(uncertainty_radius * 1e8) / 1e8
 		if absf(rounded_radius - uncertainty_radius) <= 1e-15:
 			uncertainty_radius = rounded_radius
-	elif absf(physical_radius - uncertainty_radius) <= 1e-15:
+	elif absf(physical_radius - uncertainty_radius) <= 1e-12:
 		uncertainty_radius = physical_radius
 	proximity_confirmed = data.proximity_confirmed
 	collective_search = data.get("collective_search", false)

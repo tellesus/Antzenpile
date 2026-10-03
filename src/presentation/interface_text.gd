@@ -12,7 +12,7 @@ static func reason(value: String) -> String:
 
 
 static func resource(id: String) -> String:
-	return {"carbohydrate": "carbs", "protein": "protein", "water": "water"}.get(id, id)
+	return {"carbohydrate": "carbs", "protein": "protein", "water": "water", "nest_site": "nest site"}.get(id, id)
 
 
 static func duration(seconds: float) -> String:

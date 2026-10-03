@@ -15,7 +15,7 @@ func poll(signals: Array[Dictionary]) -> String:
 		if _known_ids.has(record.id): continue
 		_known_ids[record.id] = true
 		count += 1
-		var label: String = "food" if record.category == "carbohydrate" else "water" if record.category == "water" else "protein" if record.category == "protein" else "chemical"
+		var label: String = "food" if record.category == "carbohydrate" else "water" if record.category == "water" else "protein" if record.category == "protein" else "shelter" if record.category == "nest_site" else "chemical"
 		if label not in labels: labels.append(label)
 	if count == 0: return ""
 	labels.sort()

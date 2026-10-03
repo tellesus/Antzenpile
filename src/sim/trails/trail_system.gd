@@ -25,6 +25,8 @@ func _init(run_state: RunState, predator_system: PredatorSystem = null, rival_sy
 func create_route(origin_id: String, knowledge_id: String) -> bool:
 	if not _run.colony.piles.has(origin_id) or not _run.knowledge.nodes.has(knowledge_id):
 		return _reject("Destination is not known to this colony")
+	if _run.knowledge.nodes[knowledge_id].definition_id not in PileState.RESOURCE_IDS:
+		return _reject("Gatherers need a food or water source")
 	var existing: TrailRouteState = _run.trails.find_route(origin_id, knowledge_id)
 	if existing != null:
 		if existing.status in ["inactive", "recalling"]:

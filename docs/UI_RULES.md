@@ -1,5 +1,6 @@
 # UI and visual rules
 
+102 adds a subdued green-gray smoky Shelter trace and SITES filter beside the three resource filters (72×44 shared mouse/touch targets). Site context shows dated possible shelter and unknown occupants/safety, with the existing scout recheck priority. No gather button, food delivery, physical floorplan or founding guarantee. A failed returned recheck says UNCONFIRMED rather than food EMPTY. No immediate site status or hidden occupants appear.
 Card 101 keeps panorama instructions visible and adds a quiet coarse current Home-air line only in warm/hot or rainy conditions. Rain still names scent disturbance. The cue is local sensation, never a weather countdown, source forecast, remote quantity update or automatic view change.
 
 Card 100 reports current Nursery temperature as steady/warm/hot, alongside existing climate staff. Known heat joins voluntary Nursery attention, its restrained pulse and explicit water-care text. Cooling/humidification share the same four staffing buttons and on-hand water; written total climate water use includes both. No exact ambient degrees, front clock, future weather, automatic view switch or death forecast.
