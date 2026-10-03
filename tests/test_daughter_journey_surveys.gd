@@ -3,8 +3,8 @@ const Parent=preload("res://tests/test_parent_supply.gd")
 const Controller=preload("res://src/core/simulation_controller.gd")
 const Root=preload("res://src/core/game_root.gd")
 const View=preload("res://src/presentation/outward/outward_view.gd")
-func fixture() -> SimulationController:
- var game: SimulationController=Parent.new().fixture()
+func fixture(game: SimulationController = null) -> SimulationController:
+ if game == null: game=Parent.new().fixture()
  var source: WorldNodeState=Controller.new().run.world.nodes.carb_exposed
  source.position=Vector2(34,33);game.run.world.nodes[source.id]=source
  game.dispatch_scout("home",0)
@@ -52,7 +52,7 @@ func run(test: Object) -> bool:
  test.check(game.run.journey_response.reports[route.id].finding=="ambush" and daughter.workers_available==local and daughter.workers.count("journey:satellite_1")==-1,"Daughter return delivers evidence and releases own actual workers")
  test.check(root.outward_status("home").journey_response.reports.is_empty() and str(root.sensory_snapshot(daughter.id)).contains("threat:"),"Returned route evidence is projected only from its owner entrance")
  before=game.run.to_dict()
- test.check(not root.respond_to_journey("defend",route.id).accepted and before==game.run.to_dict(),"Daughter defense remains separately gated until casualty audit")
+ test.check(not root.respond_to_journey("defend",route.id).accepted and before==game.run.to_dict(),"Insufficient daughter defense workers cannot borrow Home labor")
  test.check(root.respond_to_journey("investigate",route.id).accepted,"Returned local survey can be repeated")
  game.advance(2);var committed: int=daughter.workers_available
  test.check(root.respond_to_journey("recall",route.id).accepted and daughter.workers_available==committed,"Recall keeps workers committed until physical local arrival")
@@ -72,7 +72,7 @@ func run(test: Object) -> bool:
  view._pointer_press(view._journey_rect("journey_open").get_center(),"mouse")
  test.check(view.journey_open and not game.run.journey_response.active(),"Daughter Journey Reports opens as free attention")
  view._pointer_press(view._journey_rect("journey_investigate").get_center(),"touch")
- test.check(game.run.journey_response.active() and not view._can_mobilize({"id":route.id}),"Touch pays local survey with no premature defensive controls")
+ test.check(game.run.journey_response.active(),"Touch pays local survey through the same semantic control")
  view._status=root.outward_status(daughter.id);game.advance(2);view._pointer_press(view._journey_rect("journey_investigate").get_center(),"mouse")
  test.check(game.run.journey_response.phase=="inbound","Mouse recalls local paid party through real travel")
  view.queue_free();root.free();return true

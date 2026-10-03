@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 113 enables local Send 12 Defenders, Request 4 Defenders and Recall on the daughter’s own returned ambusher survey. Payment/labor wording uses the selected pile’s stores; command validation rejects foreign routes and insufficient local food/workers. Away counts retain all sent workers, including private casualties; physical return alone delivers survivors/losses/outcome and turns its threat into Ambush Memory. Current one-party bounds, 44-pixel targets and no position/combat/survivor preview remain.
+
 Card 112 makes Journey Reports and Response available on daughter routes with returned losses, with local three-worker survey cost, Daughter carbohydrate/available labor, real Recall and dated returned evidence. Away information includes commanded workers and elapsed time only. Another pile’s shared response slot is explicitly named; Home routes cannot be commanded from Daughter. Defense/reinforcement controls remain Home-only until 113.
 
 Card 111 gives both piles Exploration effort Off/2/5/8 and explicit direction/priority/watch orders. Each panel names selected pile through the OUTWARD heading and shows Shared cap / other pile effort; excessive choices are dimmed and reject without changing either intent. Reduce the other pile's effort deliberately to make room. Off recalls own surplus physically and retains unrelated/manual/other-pile missions. Priorities share that pile's effort, with availability and course unknown until return. Daughter Food Exchange's single-local-scout recheck remains a separate deliberate action.

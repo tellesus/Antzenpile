@@ -22,7 +22,6 @@ func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	if state.active() or not _run.trails.routes.has(route_id): return _reject("Another party is away or the journey is unknown")
 	var route: TrailRouteState = _run.trails.routes[route_id]
 	if route.purpose != "food" or route.reported_losses <= 0: return _reject("A returned journey loss is required")
-	if mode == "defend" and route.origin_pile != "home": return _reject("Defensive parties currently depart from Home")
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "journey:" + pile.id
 	var cost: float = _cost(route_id,count)
@@ -43,10 +42,10 @@ func reinforce(route_id: String) -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	var defense: JourneyDefenseState = state.defense
 	if not state.active() or state.route_id != route_id or defense.mode != "defend" or defense.extra_workers > 0 or defense.sent + CONFIG.reinforcement_workers > CONFIG.dispatched_cap: return _reject("No further reinforcement can be dispatched")
-	var pile: PileState = _run.colony.piles.home
+	var pile: PileState = _run.colony.piles[state.origin_id(_run.trails)]
 	var cost: float = _cost(route_id,CONFIG.reinforcement_workers)
 	if pile.workers_available < CONFIG.reinforcement_workers or pile.resources.carbohydrate < cost: return _reject("Reinforcement needs four workers and travel food")
-	var allocated: bool = pile.workers.allocate("journey:home",CONFIG.reinforcement_workers)
+	var allocated: bool = pile.workers.allocate("journey:"+pile.id,CONFIG.reinforcement_workers)
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
 	assert(allocated and paid)
 	defense.extra_workers = CONFIG.reinforcement_workers; defense.extra_ticks = 0; defense.sent += CONFIG.reinforcement_workers
@@ -107,10 +106,10 @@ func _combat() -> void:
 	if _run.rng.randf() < float(state.workers) / (state.workers + _run.predator.resistance):
 		_run.predator.resistance -= 1
 	else:
-		var pile: PileState = _run.colony.piles.home
+		var pile: PileState = _run.colony.piles[state.origin_id(_run.trails)]
 		var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
 		var profile: String = pile.genetics.loss_profile(adapted == 1,pile.adaptation_repertoire,pile.workers_total,_run.rng)
-		var removed: bool = pile.lose_workers("journey:home",1,adapted,"defensive ambusher swarm",profile)
+		var removed: bool = pile.lose_workers("journey:"+pile.id,1,adapted,"defensive ambusher swarm",profile)
 		assert(removed)
 		state.workers -= 1; defense.lost += 1; defense.adapted_lost += adapted; _run.predator.defense_losses += 1
 		if profile != "": defense.lost_profiles[profile] = defense.lost_profiles.get(profile,0) + 1
@@ -148,6 +147,8 @@ func _arrive() -> void:
 	if state.defense.mode == "defend":
 		state.defense.outcomes[state.route_id] = {"outcome":state.defense.outcome,"lost":state.defense.lost,"sent":state.defense.sent,"observed_at":state.defense.observed_at,"received_at":_run.simulation_time}
 		state.defense.reported_losses += state.defense.lost
+		var owner: String = state.origin_id(_run.trails)
+		if state.defense.lost > 0: state.defense.reported_by_pile[owner] = state.defense.reported_for_pile(owner) + state.defense.lost
 	else:
 		state.reports[state.route_id] = {"finding":finding,"fraction":state.ambush_fraction,"observed_at":state.sampled_at,"received_at":_run.simulation_time}
 		if state.foreign_seen:
@@ -173,7 +174,7 @@ func summary(origin_id: String = "home") -> Dictionary:
 	return {"away":own_party,"route_id":state.route_id if own_party else "","mode":state.defense.mode if own_party else "investigate",
 		"workers":state.workers + state.defense.extra_workers + state.defense.lost if own_party else 0,
 		"age":_run.simulation_time - state.departed_at if own_party else 0.0,"reports":reports,"outcomes":outcomes,
-		"reported_losses":state.defense.reported_losses if origin_id == "home" else 0,
+		"reported_losses":state.defense.reported_for_pile(origin_id),
 		"other_party":"Home" if other == "home" else "Daughter" if other != "" else "",
 		"reinforcement_available":own_party and state.defense.mode == "defend" and state.defense.sent + CONFIG.reinforcement_workers <= CONFIG.dispatched_cap}
 

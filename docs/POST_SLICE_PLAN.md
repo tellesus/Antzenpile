@@ -19,9 +19,11 @@ The first supported satellite milestone is complete. Keep implementing one bound
 
 | [112 daughter journey surveys](tasks/112_daughter_journey_surveys.md) | Local paid three-worker surveys/recall and returned danger evidence under one shared party slot. | [Surveys](DAUGHTER_JOURNEY_EVALUATION.md) |
 
-Latest local-independence gate: 6,758 checks, four ordinary paid daughters with exact dual-pile standing exploration continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain explicitly permitted; full independent biology/defense is not claimed.
+| [113 daughter defensive response](tasks/113_daughter_defensive_response.md) | Locally paid defenders/reinforcements/recall, conserved private casualties and delivered intervention. | [Defense](DAUGHTER_DEFENSE_EVALUATION.md) |
 
-Next bounded section: daughter-funded defensive response. Surveys now work locally; audit Home-owned defender/reinforcement ledger, per-origin lifetime/pending casualty and phenotype accounting, report timing and restore invariants before enabling daughter swarms. Preserve single-party bounds and real travel; do not treat shared reports as a free/instant response. Reinforcement, full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
+Latest local-independence gate: 6,925 checks, four ordinary paid daughters with exact dual-pile standing exploration continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain explicitly permitted; local defense is verified, full independent reproductive biology is not claimed.
+
+Next bounded section: combined daughter independence review. Exercise both standing scout policies, own gathering/care/brood and delivered paid response together in ordinary saved colonies; keep physical ownership, exact continuation and meaningful strain evidence. Preserve single-party bounds and real travel; do not treat shared reports as a free/instant response. Reinforcement, full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
 
 ## Current priority — internal health and weather (2026-10-03)
 

@@ -486,7 +486,7 @@ func inward_status(pile_id: String) -> Dictionary:
 
 
 func returned_losses(pile_id: String) -> int:
-	var total: int = simulation.run.journey_response.defense.reported_losses if pile_id == "home" else 0
+	var total: int = simulation.run.journey_response.defense.reported_for_pile(pile_id)
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile == pile_id:
 			total += route.reported_losses
@@ -783,7 +783,6 @@ func recheck_trail(route_id: String) -> Dictionary:
 
 func respond_to_journey(action: String, route_id: String) -> Dictionary:
 	if not _owns_food_route(route_id): return {"accepted":false,"reason":"Journey belongs to another pile or job"}
-	if inward_pile_id != "home" and action in ["defend","reinforce"]: return _home_order()
 	var system: JourneyResponseSystem = simulation.journey_response
 	var accepted: bool = false
 	match action:

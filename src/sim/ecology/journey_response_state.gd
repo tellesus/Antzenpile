@@ -15,6 +15,8 @@ var reports: Dictionary = {}
 var defense: JourneyDefenseState = JourneyDefenseState.new()
 
 func active() -> bool: return phase != "idle"
+func origin_id(trails: TrailNetwork) -> String:
+	return trails.routes[route_id].origin_pile if active() and trails.routes.has(route_id) else ""
 func to_dict() -> Dictionary:
 	return {"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
 		"ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict()}
@@ -51,7 +53,7 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	else:
 		if not trails.routes.has(data.route_id) or trails.routes[data.route_id].purpose != "food" or trails.routes[data.route_id].reported_losses <= 0: return false
 		if restored_defense.mode == "investigate" and data.workers != CONFIG.investigation_workers: return false
-		if restored_defense.mode == "defend" and (origin != "home" or not data.reports.has(data.route_id) or data.reports[data.route_id].finding not in ["ambush","mixed"]): return false
+		if restored_defense.mode == "defend" and (not data.reports.has(data.route_id) or data.reports[data.route_id].finding not in ["ambush","mixed"]): return false
 		if restored_defense.mode == "defend" and (data.ambush_fraction != -1 or data.foreign_seen or data.sampled_at != 0): return false
 		var segment: TrailSegmentState = trails.segments[trails.routes[data.route_id].segment_id]
 		if data.elapsed_ticks >= TRAILS.leg_ticks(segment.start.distance_to(segment.end)) or (data.sampled_at > 0 and data.sampled_at < data.departed_at) or (data.ambush_fraction == -1 and data.sampled_at != 0 and not data.foreign_seen): return false

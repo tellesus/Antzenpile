@@ -1143,4 +1143,4 @@ func _threat_caption(signal_data: Dictionary) -> String:
 
 func _can_mobilize(route: Dictionary) -> bool:
 	var state: Dictionary = _status.get("journey_response",{})
-	return not _daughter() and state.get("reports",{}).get(route.get("id"),{}).get("finding","") in ["ambush","mixed"] and state.get("outcomes",{}).get(route.get("id"),{}).get("outcome","") != "secured"
+	return state.get("reports",{}).get(route.get("id"),{}).get("finding","") in ["ambush","mixed"] and state.get("outcomes",{}).get(route.get("id"),{}).get("outcome","") != "secured"

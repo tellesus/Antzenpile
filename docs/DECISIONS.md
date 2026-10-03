@@ -1,5 +1,7 @@
 # Decision register
 
+A73 (113; original independent satellite routes and Part 4 response): daughter-funded defensive parties use existing twelve-worker mobilization/four-worker reinforcement/cap/seeded combat and physical return. One physical ambusher is shared; victory is learned per returning route report. Attribute real/pending genetic and lifetime casualties to the owning pile, never Home by default; optional legacy history inference preserves old Home-only saves. No new rates, automatic retaliation or broader rival warfare.
+
 A72 (112; original Part 3 gradual independence and existing Part 4 response): daughter route losses permit the same cautious three-worker survey, funded/released at Daughter with real travel and delivered evidence. Keep one colony-wide party slot, current sensing/costs and Home-only defensive casualty model until the next bounded audit. No automatic retaliation, free worker copying or live danger knowledge.
 
 A71 (111; original gradual independent daughter exploration, delegated routine ownership defaults): retain eight shared detailed agents and separate Home/daughter standing targets, bias, priorities and returned coverage. Combined standing targets must fit eight; reject overcommitment rather than stealing another pile's chosen labor or changing the performance cap. Existing timing/caution/search/intake rules apply from the actual local entrance, with legacy daughter effort off. Manual scouts/detours/private missing missions can temporarily delay launches under the same cap. No broader balance or genetics change.

@@ -28,6 +28,6 @@ func run_probe() -> void:
   saved=JSON.parse_string(FileAccess.get_file_as_string("res://.godot/card112_backyard_slice_482817_returned.json"))
   failed=failed or not root.simulation.restore_snapshot(saved)
   root.simulation.run.clock.paused=true;view._process(0);view.selected_id="threat:"+route_id;await capture("returned_%d" % size.x)
-  failed=failed or not view._journey_attention() or view._can_mobilize({"id":route_id})
+  failed=failed or not view._journey_attention() or not view._can_mobilize({"id":route_id})
  print("[DAUGHTER-SURVEY-UI] actual mouse/touch paid survey/recall/returned threat at 1280/900; passed=",not failed)
  root.queue_free();await create_timer(0.3).timeout;quit(1 if failed else 0)

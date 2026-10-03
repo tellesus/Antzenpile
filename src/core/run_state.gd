@@ -113,7 +113,7 @@ func recognition_share(pile_id: String) -> float:
 
 func pending_for_pile(pile_id: String, adapted: bool = false) -> int:
 	var total: int = trails.pending_for_pile(pile_id, adapted)
-	if pile_id == "home":
+	if pile_id == journey_response.origin_id(trails):
 		total += journey_response.defense.adapted_lost if adapted else journey_response.defense.lost
 	for agent: ScoutAgent in scouts.values():
 		if agent.origin_pile == pile_id and agent.lost:
@@ -121,7 +121,7 @@ func pending_for_pile(pile_id: String, adapted: bool = false) -> int:
 	return total
 
 func pending_trait(pile_id: String, trait_id: String) -> int:
-	var total: int = trails.pending_trait(pile_id,trait_id) + (journey_response.defense.pending_trait(trait_id) if pile_id == "home" else 0)
+	var total: int = trails.pending_trait(pile_id,trait_id) + (journey_response.defense.pending_trait(trait_id) if pile_id == journey_response.origin_id(trails) else 0)
 	for agent: ScoutAgent in scouts.values():
 		if agent.origin_pile == pile_id:
 			total += agent.pending_trait(trait_id)
@@ -388,8 +388,11 @@ func restore(data: Dictionary) -> bool:
 		losses_by_pile[pile_id] = recorded
 	var defense: JourneyDefenseState = restored_response.defense
 	if defense.reported_losses + defense.lost != restored_predator.defense_losses: return false
-	if restored_predator.defense_losses > restored_colony.piles.home.workers.lost_total - losses_by_pile.get("home",0): return false
-	losses_by_pile["home"] = losses_by_pile.get("home",0) + restored_predator.defense_losses
+	var defense_origin: String = restored_response.origin_id(restored_trails)
+	for pile: PileState in restored_colony.piles.values():
+		var owned_losses: int = defense.reported_for_pile(pile.id) + (defense.lost if pile.id == defense_origin else 0)
+		if owned_losses > pile.workers.lost_total - losses_by_pile.get(pile.id,0): return false
+		losses_by_pile[pile.id] = losses_by_pile.get(pile.id,0) + owned_losses
 	if defense.outcome == "secured" and defense.observed_at != restored_predator.defeated_at: return false
 	for record: Dictionary in defense.outcomes.values():
 		if record.outcome == "secured" and record.observed_at != restored_predator.defeated_at: return false
@@ -398,10 +401,10 @@ func restore(data: Dictionary) -> bool:
 		var point: Vector2 = segment.start.lerp(segment.end,float(restored_response.elapsed_ticks) / JourneyResponseState.TRAILS.leg_ticks(segment.start.distance_to(segment.end)))
 		if restored_predator.defeated_at > 0 or restored_clock.tick_count < Predator.CONFIG.first_tick or point.distance_to(Predator.CONFIG.position) > Predator.CONFIG.radius: return false
 	for pile: PileState in restored_colony.piles.values():
-		var pending: int = restored_trails.pending_for_pile(pile.id) + (defense.lost if pile.id == "home" else 0)
-		var pending_adapted: int = restored_trails.pending_for_pile(pile.id,true) + (defense.adapted_lost if pile.id == "home" else 0)
+		var pending: int = restored_trails.pending_for_pile(pile.id) + (defense.lost if pile.id == defense_origin else 0)
+		var pending_adapted: int = restored_trails.pending_for_pile(pile.id,true) + (defense.adapted_lost if pile.id == defense_origin else 0)
 		var profiles: Dictionary[String,int] = {}
-		if pile.id=="home": profiles.assign(defense.lost_profiles)
+		if pile.id==defense_origin: profiles.assign(defense.lost_profiles)
 		for agent: ScoutAgent in restored_scouts.values():
 			if agent.origin_pile == pile.id and agent.lost:
 				pending += 1
@@ -414,7 +417,7 @@ func restore(data: Dictionary) -> bool:
 		if pile.rain_trace_observed and restored_rain.phase == "waiting":
 			return false
 		for trait_id: String in pile.genetics.established:
-			var pending_count: int = restored_trails.pending_trait(pile.id, trait_id) + (defense.pending_trait(trait_id) if pile.id == "home" else 0)
+			var pending_count: int = restored_trails.pending_trait(pile.id, trait_id) + (defense.pending_trait(trait_id) if pile.id == defense_origin else 0)
 			for agent: ScoutAgent in restored_scouts.values():
 				if agent.origin_pile == pile.id:
 					pending_count += agent.pending_trait(trait_id)
