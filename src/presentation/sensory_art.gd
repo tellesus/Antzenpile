@@ -108,7 +108,7 @@ static func nursery_earth(canvas: Node2D, at: Vector2, focus: float) -> void:
 	canvas.draw_texture_rect(EARTH, Rect2(at + Vector2(-48,-34), Vector2(96,68)), false, Color(1,1,1,lerpf(0.72,1.0,focus)))
 
 
-static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, width: float) -> void:
+static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, width: float, texture: Texture2D = FILAMENT) -> void:
 	if points.size() < 2: return
 	var edges := PackedVector2Array()
 	var uv := PackedVector2Array()
@@ -118,7 +118,7 @@ static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, w
 			var tangent: Vector2 = points[mini(index+1,points.size()-1)] - points[maxi(0,index-1)]
 			edges.append(points[index] + tangent.normalized().orthogonal()*width*0.5*side)
 			uv.append(Vector2(float(index)/(points.size()-1), 0.0 if side == 1 else 1.0))
-	canvas.draw_polygon(edges, PackedColorArray([color]), uv, FILAMENT)
+	canvas.draw_polygon(edges, PackedColorArray([color]), uv, texture)
 	canvas.draw_polyline(points, Color(color.lightened(0.3),color.a*0.85), 0.8, true)
 
 

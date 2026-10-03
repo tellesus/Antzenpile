@@ -1,5 +1,7 @@
 # Architecture
 
+091 selects modular returned textures inside ChamberArt without changing state ownership. Nursery blends primitive/developed materials from approved progress and draws a separate known expansion annex. SensoryArt's optional ribbon texture lets INWARD use a neutral imported fiber bundle; OUTWARD retains its prior texture. All assets/lighting remain baked and draw caps/input ownership unchanged.
+
 Card 089 adds presentation-only ChamberArt/ChamberContents and a shared cached canvas skin. Detached local construction controls organ growth and the Nursery expansion lobe; observed conditional functions remain gated. Original queen/brood meshes and modular generated RGBA textures contain no gameplay. Imported texture dimensions govern entrance sampling. Immediate Home substrate draws beneath sensory routes and returned alarms; label reserves account for larger worker sprites. No simulation, save, runtime light or addon is introduced.
 
 Card 081 records one bounded receipt summary per route only after a positive net home deposit. Root detaches it into approved trail summaries; SourceMemory renders sensing and home intake separately. Browser rows remain free attention, with stable order/IDs and existing pagination. No new RNG, chemistry projection or event-log growth.

@@ -3,6 +3,11 @@ extends RefCounted
 ## Art stages depend exclusively on detached, locally known functional state.
 
 const SHELL = preload("res://assets/graphics/colony/chamber.png")
+const QUEEN = preload("res://assets/graphics/colony/returned/queen_shell.png")
+const NURSERY_PRIMITIVE = preload("res://assets/graphics/colony/returned/nursery_primitive.png")
+const NURSERY_DEVELOPED = preload("res://assets/graphics/colony/returned/nursery_developed.png")
+const NURSERY_LOBE = preload("res://assets/graphics/colony/returned/nursery_expansion_lobe.png")
+const ENTRANCE = preload("res://assets/graphics/colony/returned/entrance_shell.png")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Activity = preload("res://src/presentation/inward/colony_activity.gd")
 
@@ -36,7 +41,8 @@ static func shell(canvas: Node2D, status: Dictionary, id: String, at: Vector2, f
 	var size: Vector2 = extent(status, id)
 	var developed: float = maturity(status, id)
 	var tint := Color(1.0, 0.93, 0.79)
-	if id == "entrance": tint = Color(0.40, 0.95, 1.55)
+	# Returned color art already carries its lighting; do not recolor cyan as amber.
+	if id in ["queen", "nursery", "entrance"]: tint = Color.WHITE
 	if id == "adaptation" or id == "guest": tint = Color(0.88, 0.58, 1.32)
 	if id == "midden": tint = Color(0.78, 0.55, 0.42)
 	var health: float = Activity.health(status, id)
@@ -46,8 +52,19 @@ static func shell(canvas: Node2D, status: Dictionary, id: String, at: Vector2, f
 	var growth: float = lobe_gain(status) if id == "nursery" else 0.0
 	if growth > 0.0:
 		var lobe: Vector2 = Vector2(126, 102) * lerpf(0.45,1.0,growth)
-		canvas.draw_texture_rect(SHELL, Rect2(at + Vector2(64,-43) - lobe*0.5, lobe), false, Color(tint, tint.a*0.84*growth))
-	canvas.draw_texture_rect(SHELL, Rect2(at-size*0.5, size), false, tint)
+		canvas.draw_texture_rect(NURSERY_LOBE, Rect2(at + Vector2(64,-43) - lobe*0.5, lobe), false, Color(tint, tint.a*0.84*growth))
+	var area := Rect2(at-size*0.5, size)
+	match id:
+		"queen": canvas.draw_texture_rect(QUEEN, area, false, tint)
+		"entrance": canvas.draw_texture_rect(ENTRANCE, area, false, tint)
+		"nursery":
+			# Primitive remains a simpler, quieter material; both layers share the
+			# same cavity center. Only approved construction changes the blend.
+			if developed < 1.0:
+				canvas.draw_texture_rect(NURSERY_PRIMITIVE, area, false, Color(tint * Color(0.72,0.69,0.65), tint.a))
+			if developed > 0.0:
+				canvas.draw_texture_rect(NURSERY_DEVELOPED, area, false, Color(tint, tint.a*developed))
+		_: canvas.draw_texture_rect(SHELL, area, false, tint)
 	if focus > 0.0:
 		var ring: PackedVector2Array = Art.membrane(at, size.x*0.54, 1.5, size.y/size.x)
 		canvas.draw_polyline(ring.slice(1,8), Color("ead4a8",focus*0.8), 1.0, true)

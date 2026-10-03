@@ -9,6 +9,7 @@ const Web = preload("res://src/presentation/inward/adaptation_web.gd")
 const Contents = preload("res://src/presentation/inward/chamber_contents.gd")
 const Chambers = preload("res://src/presentation/inward/chamber_art.gd")
 const Activity = preload("res://src/presentation/inward/colony_activity.gd")
+const FIBER = preload("res://assets/graphics/colony/returned/functional_fiber_strip.png")
 const Pressure = preload("res://src/presentation/colony_pressure.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
@@ -371,7 +372,8 @@ func _draw_flow(start: Vector2, finish: Vector2, representative: bool, tint: Col
 	for step: int in 25:
 		var t: float = float(step) / 24.0
 		points.append(start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t)
-	Art.filament(self, points, Color(Color("7fbfcf") if representative else tint, 0.55), 24.0)
+	# Fine baked bundles stay subordinate to organs, labels and representative ants.
+	Art.filament(self, points, Color(Color("a5d8df") if representative else tint.lightened(0.3), 0.78), 28.0, FIBER)
 	for strand: int in 2:
 		var fibers := PackedVector2Array()
 		for index: int in points.size():
