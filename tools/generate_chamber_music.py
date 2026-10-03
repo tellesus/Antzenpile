@@ -1,4 +1,6 @@
-"""Author the two additional additive prototype stems; Python standard library only.
+"""Historical task-068 prototype; Python standard library only.
+
+Current four-layer music: tools/music/compose_colony_music.py.
 
 Four two-second nursery phrases and a sparse half-second wooden rhythm share
 the existing eight-second A/E arrangement. No composition happens at runtime.
@@ -10,7 +12,7 @@ import wave
 
 RATE = 22050
 FRAMES = RATE * 8
-OUT = Path(__file__).resolve().parents[1] / "assets" / "audio"
+OUT = Path(__file__).resolve().parents[1] / "builds" / "historical_music_068"
 
 
 def nursery(time):

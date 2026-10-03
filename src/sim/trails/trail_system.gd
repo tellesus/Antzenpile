@@ -25,6 +25,8 @@ func _init(run_state: RunState, predator_system: PredatorSystem = null, rival_sy
 func create_route(origin_id: String, knowledge_id: String) -> bool:
 	if not _run.colony.piles.has(origin_id) or not _run.knowledge.nodes.has(knowledge_id):
 		return _reject("Destination is not known to this colony")
+	if _run.knowledge.nodes[knowledge_id].definition_id not in PileState.RESOURCE_IDS:
+		return _reject("Gatherers need a food or water source")
 	var existing: TrailRouteState = _run.trails.find_route(origin_id, knowledge_id)
 	if existing != null:
 		if existing.status in ["inactive", "recalling"]:
@@ -73,6 +75,7 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	var route: TrailRouteState = _run.trails.routes[route_id]
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "trail:" + route.id
+	if route.purpose!="food": return _reject("Founding workers belong to their expedition")
 	var requested: int = int(target)
 	var expected: int = route.allocated_workers + _run.trails.pending_losses(route.id)
 	if requested == route.desired_workers and requested <= expected:
@@ -190,7 +193,7 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var route: TrailRouteState = _run.trails.routes[id]
-		if route.status == "active" and route.departure_cooldown_ticks == 0:
+		if route.purpose=="food" and route.status == "active" and route.departure_cooldown_ticks == 0:
 			_depart(route)
 
 
@@ -351,7 +354,8 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if not node.active or node.quantity <= 0.0 or node.position.distance_to(route.estimated_destination) > CONFIG.interaction_radius * (1.0 + 0.5 * reliability(segment)):
 		return
 	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
-	node.quantity = maxf(0.0, node.quantity - amount)
+	# Canonical decimal quantities match saved resource precision.
+	node.quantity = float(String.num(maxf(0.0, node.quantity - amount), 5))
 	if node.quantity == 0.0:
 		node.active = false
 	cohort.payload = amount

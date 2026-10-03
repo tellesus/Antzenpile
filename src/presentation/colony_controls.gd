@@ -1,5 +1,7 @@
 class_name ColonyControls
 extends Node2D
+
+const UIStyle = preload("res://src/presentation/organic_ui.gd")
 ## Explicit restart choices, separate from colony actions and save slots.
 
 var seed_provider: Callable
@@ -95,25 +97,25 @@ func _input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	if blocked.is_valid() and blocked.call(): return
-	draw_rect(button_rect(),Color("18252b"))
+	UIStyle.surface(self, button_rect(),Color("18252b"))
 	_label(button_rect().position + Vector2(5,38),"COLONY MENU",13,Color("d3dcd4"))
-	draw_rect(help_button_rect(), Color("18252b"))
+	UIStyle.surface(self, help_button_rect(), Color("18252b"))
 	_label(help_button_rect().position + Vector2(31,38), "HELP", 14, Color("d3dcd4"))
 	if not opened: return
 	draw_rect(get_viewport_rect(),Color(0.025,0.04,0.06,0.82))
 	var panel: Rect2 = panel_rect()
-	draw_rect(panel,Color("111921"))
-	draw_rect(panel,Color("41535a"),false)
+	UIStyle.surface(self, panel,Color("111921"))
+	UIStyle.surface(self, panel,Color("41535a"),true)
 	if guide_open:
 		_draw_guide(panel)
 		return
 	_label(panel.position+Vector2(24,32),"Start a new colony",22,Color("d9d3be"))
 	_label(panel.position+Vector2(24,64),"Unsaved progress will be replaced.",15,Color("ccac91"))
 	_label(panel.position+Vector2(24,86),"Saved colony and sound settings stay.",14,Color("a9b9bc"))
-	draw_rect(scenario_rect(),Color("263038"))
+	UIStyle.surface(self, scenario_rect(),Color("263038"))
 	_label(scenario_rect().position+Vector2(16,28),"SETTING: %s  ·  CHANGE" % ScenarioCatalog.label_for(selected_scenario),14,Color("a9b9bc"))
 	for choice: String in ["repeat","fresh","cancel","guide"]:
-		draw_rect(choice_rect(choice),Color("35483c") if choice in ["repeat","fresh"] else Color("263038"))
+		UIStyle.surface(self, choice_rect(choice),Color("35483c") if choice in ["repeat","fresh"] else Color("263038"))
 		_label(choice_rect(choice).position+Vector2(32,28),"REPEAT THIS SEED" if choice == "repeat" else "START WITH A FRESH SEED" if choice == "fresh" else "HOW TO PLAY" if choice == "guide" else "CANCEL",14,Color("dce5d9"))
 
 
@@ -124,7 +126,7 @@ func _draw_guide(panel: Rect2) -> void:
 		_label(panel.position + Vector2(24,72 + index * 28),page.lines[index],15,Color("a9b9bc"))
 	_label(panel.position + Vector2(24,244),"HOW TO PLAY  ·  %d / %d" % [guide_page+1,GUIDE.size()],14,Color("82939c"))
 	for command: String in ["previous","next","back"]:
-		draw_rect(guide_rect(command),Color("263038"))
+		UIStyle.surface(self, guide_rect(command),Color("263038"))
 		_label(guide_rect(command).position + Vector2(20,28),"CLOSE HELP" if command == "back" else "PREVIOUS" if command == "previous" else "FIRST PAGE" if guide_page == GUIDE.size()-1 else "NEXT",14,Color("dce5d9"))
 
 func _label(at: Vector2,text: String,size: int,color: Color) -> void:

@@ -34,6 +34,8 @@ static func node_at(at: Vector2, size: Vector2, status: Dictionary, family: Stri
 	return ""
 
 static func trait_state(status: Dictionary, id: String) -> String:
+	if status.get("adaptation_queue", {}).get("trait_id", "") == id:
+		return "Queued · next brood"
 	if status.get("adaptation_trial", {}).get("adaptation_id", "") == id:
 		return "Growing trial brood"
 	if id in ["persistent", "security", "tolerance"]:
@@ -44,9 +46,14 @@ static func trait_state(status: Dictionary, id: String) -> String:
 			var other: String = "tolerance" if id == "security" else "security"
 			if status.get("adaptation_options", {}).get(other, {}).get("inherited", false) or status.get("adaptation_trial", {}).get("adaptation_id", "") == other:
 				return "Other branch chosen"
+		if option.get("available", false): return "Available · queue next brood"
 		return "Candidate · variation observed" if status.get("adaptation_trial", {}).is_empty() else "Another trial is growing"
 	if status.get("adaptation_repertoire", "") == id:
 		return "Inherited · %d adult carriers" % status.get("adapted_workers", 0)
+	if status.get("adaptation_repertoire", "") != "" or status.get("adaptation_trial", {}).get("adaptation_id", "") in ["lean", "load"]:
+		return "Other branch chosen"
+	if status.get("adaptation_options", {}).get(id, {}).get("available", false):
+		return "Available · queue next brood"
 	if status.get("adaptation_trial", {}).get("adaptation_id", "") in ["persistent", "security", "tolerance"]:
 		return "Another trial is growing"
 	if status.get("adaptation_repertoire", "") != "" or not status.get("adaptation_trial", {}).is_empty():
@@ -55,6 +62,20 @@ static func trait_state(status: Dictionary, id: String) -> String:
 
 static func title(id: String) -> String:
 	return {"foraging": "Colony repertoire", "lean": "Lean Foragers", "load": "Load Bearers", "persistent": "Persistent chemistry", "security": "Foreign Chemical Sensitivity", "tolerance": "Flexible Recognition Envelope", "honeydew": "Honeydew relationship"}.get(id, "Trait")
+
+
+static func short_title(id: String) -> String:
+	return {"security": "Chemical sensitivity", "tolerance": "Flexible recognition"}.get(id, title(id))
+
+
+static func queue_wait(status: Dictionary) -> String:
+	var waiting: String = status.get("adaptation_queue", {}).get("waiting", "none")
+	if waiting == "ready":
+		return "Ready · resume to lay" if status.get("paused", false) else "Ready · lays on next tick"
+	return {"space": "Waiting for Nursery space", "trial": "Waiting for current trial to finish",
+		"nurses": "Waiting for two available nurses", "population": "Population limit reached",
+		"carbohydrate": "Waiting for trial carbs", "protein": "Waiting for trial protein",
+		"water": "Waiting for trial water", "unavailable": "Trait unavailable"}.get(waiting, "")
 
 
 static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected: String, phase: float, family: String = "foraging") -> void:
@@ -86,6 +107,9 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 			view.draw_circle(at, 18.0, Color(color, 0.15))
 		elif state == "Growing trial brood":
 			view.draw_arc(at, 33.0, -PI * 0.5, PI * 0.8, 24, Color(color, 0.72), 1.5, true)
+		elif state == "Queued · next brood":
+			view.draw_arc(at, 33.0, 0.0, PI * 0.4, 12, Color("d9c5a5"), 2.0, true)
+			view.draw_arc(at, 33.0, PI, PI * 1.4, 12, Color("d9c5a5"), 2.0, true)
 		if ecological:
 			for offset: int in [-1, 1]:
 				view.draw_arc(at + Vector2(offset * 7, 0), 7, 0.1, 4.6, 18, Color(color, 0.6), 1.0, true)

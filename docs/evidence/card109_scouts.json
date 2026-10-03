@@ -1,0 +1,129 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"captures": {
+				"outbound": 5700.0,
+				"recall": 5755.0,
+				"returned": 5752.75
+			},
+			"departed_at": 5700.0,
+			"early_recall_kept_memory": true,
+			"entrance": "(4.129757, 5.161475)",
+			"events": [],
+			"final": {
+				"daughter_losses": 2,
+				"daughter_workers": 105,
+				"home_losses": 10,
+				"local_awaiting": 0,
+				"local_mission": {
+					"awaiting": false,
+					"away_seconds": 2.25,
+					"id": "scout_281",
+					"missing_at": -1.0,
+					"overdue": false,
+					"returned_at": 5756.0
+				}
+			},
+			"passed": true,
+			"returned_at": 5752.75,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"source": "known:water_01"
+		},
+		{
+			"captures": {
+				"outbound": 6790.0,
+				"recall": 6846.0,
+				"returned": 6843.75
+			},
+			"departed_at": 6790.0,
+			"early_recall_kept_memory": true,
+			"entrance": "(5.39797, 4.365136)",
+			"events": [],
+			"final": {
+				"daughter_losses": 2,
+				"daughter_workers": 113,
+				"home_losses": 11,
+				"local_awaiting": 0,
+				"local_mission": {
+					"awaiting": false,
+					"away_seconds": 2.25,
+					"id": "scout_333",
+					"missing_at": -1.0,
+					"overdue": false,
+					"returned_at": 6847.0
+				}
+			},
+			"passed": true,
+			"returned_at": 6843.75,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591,
+			"source": "known:water_01"
+		},
+		{
+			"captures": {
+				"outbound": 6135.0,
+				"recall": 6174.5,
+				"returned": 6172.25
+			},
+			"departed_at": 6135.0,
+			"early_recall_kept_memory": true,
+			"entrance": "(5.035225, 4.406798)",
+			"events": [],
+			"final": {
+				"daughter_losses": 2,
+				"daughter_workers": 97,
+				"home_losses": 16,
+				"local_awaiting": 0,
+				"local_mission": {
+					"awaiting": false,
+					"away_seconds": 2.25,
+					"id": "scout_264",
+					"missing_at": -1.0,
+					"overdue": false,
+					"returned_at": 6175.5
+				}
+			},
+			"passed": true,
+			"returned_at": 6172.25,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"source": "known:water_01"
+		},
+		{
+			"captures": {
+				"outbound": 5895.0,
+				"recall": 5930.5,
+				"returned": 5928.25
+			},
+			"departed_at": 5895.0,
+			"early_recall_kept_memory": true,
+			"entrance": "(5.664154, 4.651575)",
+			"events": [],
+			"final": {
+				"daughter_losses": 2,
+				"daughter_workers": 129,
+				"home_losses": 12,
+				"local_awaiting": 0,
+				"local_mission": {
+					"awaiting": false,
+					"away_seconds": 2.5,
+					"id": "scout_282",
+					"missing_at": -1.0,
+					"overdue": false,
+					"returned_at": 5931.75
+				}
+			},
+			"passed": true,
+			"returned_at": 5928.25,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591,
+			"source": "known:water_01"
+		}
+	]
+}

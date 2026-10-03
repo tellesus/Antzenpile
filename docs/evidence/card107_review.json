@@ -1,0 +1,581 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"events": [],
+			"final": {
+				"brood_losses": 0,
+				"climate": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 9.78233
+				},
+				"emerged": 72,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"losses": 0,
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 1,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"parent_workers": 66,
+				"production": {
+					"intent": "grow",
+					"waiting": "space"
+				},
+				"stores": {
+					"carbohydrate": 15.95996,
+					"protein": 32.31898,
+					"water": 21.19765
+				},
+				"supply_reports": 38,
+				"time": 4500.0,
+				"workers": 83
+			},
+			"first_growth_at": 3060.25,
+			"passed": true,
+			"pressures": {
+				"GROW WAITING · CARB RESERVE": {
+					"at": 2705.0,
+					"daughter_attention": {
+						"causes": [
+							"GROW WAITING · CARB RESERVE"
+						],
+						"organ": "queen",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER QUEEN"
+					},
+					"home_attention": {}
+				}
+			},
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"standing_growth": true,
+			"start": 2700.0,
+			"supported": true
+		},
+		{
+			"events": [],
+			"final": {
+				"brood_losses": 0,
+				"climate": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 9.78233
+				},
+				"emerged": 16,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"losses": 0,
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 1,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 0.0,
+					"revealed": true,
+					"state": "primitive"
+				},
+				"parent_workers": 66,
+				"production": {
+					"intent": "grow",
+					"waiting": "carbohydrate"
+				},
+				"stores": {
+					"carbohydrate": 0.20012,
+					"protein": 8.14006,
+					"water": 7.31773
+				},
+				"supply_reports": 11,
+				"time": 4500.0,
+				"workers": 27
+			},
+			"first_growth_at": 3060.0,
+			"passed": true,
+			"pressures": {
+				"GROW WAITING · CARB RESERVE": {
+					"at": 2700.0,
+					"daughter_attention": {
+						"causes": [
+							"GROW WAITING · CARB RESERVE"
+						],
+						"organ": "queen",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER QUEEN"
+					},
+					"home_attention": {}
+				}
+			},
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"standing_growth": true,
+			"start": 2700.0,
+			"supported": false
+		},
+		{
+			"events": [],
+			"final": {
+				"brood_losses": 0,
+				"climate": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 9.20379
+				},
+				"emerged": 64,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"losses": 0,
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 1,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"parent_workers": 72,
+				"production": {
+					"intent": "grow",
+					"waiting": "space"
+				},
+				"stores": {
+					"carbohydrate": 32.51096,
+					"protein": 39.41548,
+					"water": 30.05169
+				},
+				"supply_reports": 40,
+				"time": 5590.0,
+				"workers": 75
+			},
+			"first_growth_at": 4347.0,
+			"passed": true,
+			"pressures": {
+				"CARB": {
+					"at": 4035.0,
+					"daughter_attention": {
+						"causes": [
+							"CARB"
+						],
+						"organ": "nursery",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER NURSERY"
+					},
+					"home_attention": {}
+				},
+				"GROW WAITING · CARB RESERVE": {
+					"at": 3795.0,
+					"daughter_attention": {
+						"causes": [
+							"GROW WAITING · CARB RESERVE"
+						],
+						"organ": "queen",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER QUEEN"
+					},
+					"home_attention": {}
+				}
+			},
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591,
+			"standing_growth": true,
+			"start": 3790.0,
+			"supported": true
+		},
+		{
+			"events": [],
+			"final": {
+				"brood_losses": 0,
+				"climate": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 9.20379
+				},
+				"emerged": 16,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"losses": 0,
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 1,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 0.0,
+					"revealed": true,
+					"state": "primitive"
+				},
+				"parent_workers": 72,
+				"production": {
+					"intent": "grow",
+					"waiting": "carbohydrate"
+				},
+				"stores": {
+					"carbohydrate": 0.64468,
+					"protein": 8.36234,
+					"water": 8.11855
+				},
+				"supply_reports": 11,
+				"time": 5590.0,
+				"workers": 27
+			},
+			"first_growth_at": 4150.0,
+			"passed": true,
+			"pressures": {
+				"GROW WAITING · CARB RESERVE": {
+					"at": 3790.0,
+					"daughter_attention": {
+						"causes": [
+							"GROW WAITING · CARB RESERVE"
+						],
+						"organ": "queen",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER QUEEN"
+					},
+					"home_attention": {}
+				}
+			},
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591,
+			"standing_growth": true,
+			"start": 3790.0,
+			"supported": false
+		},
+		{
+			"events": [],
+			"final": {
+				"brood_losses": 0,
+				"climate": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 9.71233
+				},
+				"emerged": 72,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"losses": 0,
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 1,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"parent_workers": 60,
+				"production": {
+					"intent": "grow",
+					"waiting": "carbohydrate"
+				},
+				"stores": {
+					"carbohydrate": 9.30628,
+					"protein": 27.81314,
+					"water": 17.94081
+				},
+				"supply_reports": 35,
+				"time": 4935.0,
+				"workers": 83
+			},
+			"first_growth_at": 3495.25,
+			"passed": true,
+			"pressures": {
+				"GROW WAITING · CARB RESERVE": {
+					"at": 3140.0,
+					"daughter_attention": {
+						"causes": [
+							"GROW WAITING · CARB RESERVE"
+						],
+						"organ": "queen",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER QUEEN"
+					},
+					"home_attention": {}
+				}
+			},
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"standing_growth": true,
+			"start": 3135.0,
+			"supported": true
+		},
+		{
+			"events": [],
+			"final": {
+				"brood_losses": 0,
+				"climate": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 9.71233
+				},
+				"emerged": 16,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"losses": 0,
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 1,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 0.0,
+					"revealed": true,
+					"state": "primitive"
+				},
+				"parent_workers": 60,
+				"production": {
+					"intent": "grow",
+					"waiting": "carbohydrate"
+				},
+				"stores": {
+					"carbohydrate": 0.42628,
+					"protein": 8.25314,
+					"water": 7.50081
+				},
+				"supply_reports": 11,
+				"time": 4935.0,
+				"workers": 27
+			},
+			"first_growth_at": 3495.0,
+			"passed": true,
+			"pressures": {
+				"GROW WAITING · CARB RESERVE": {
+					"at": 3135.0,
+					"daughter_attention": {
+						"causes": [
+							"GROW WAITING · CARB RESERVE"
+						],
+						"organ": "queen",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER QUEEN"
+					},
+					"home_attention": {}
+				}
+			},
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"standing_growth": true,
+			"start": 3135.0,
+			"supported": false
+		},
+		{
+			"events": [],
+			"final": {
+				"brood_losses": 0,
+				"climate": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 9.53069
+				},
+				"emerged": 72,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"losses": 0,
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 1,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 1.0,
+					"revealed": true,
+					"state": "developed"
+				},
+				"parent_workers": 64,
+				"production": {
+					"intent": "grow",
+					"waiting": "space"
+				},
+				"stores": {
+					"carbohydrate": 27.93,
+					"protein": 38.529,
+					"water": 27.43431
+				},
+				"supply_reports": 42,
+				"time": 4695.0,
+				"workers": 83
+			},
+			"first_growth_at": 3289.5,
+			"passed": true,
+			"pressures": {
+				"GROW WAITING · CARB RESERVE": {
+					"at": 2895.0,
+					"daughter_attention": {
+						"causes": [
+							"GROW WAITING · CARB RESERVE"
+						],
+						"organ": "queen",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER QUEEN"
+					},
+					"home_attention": {}
+				}
+			},
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591,
+			"standing_growth": true,
+			"start": 2895.0,
+			"supported": true
+		},
+		{
+			"events": [],
+			"final": {
+				"brood_losses": 0,
+				"climate": {
+					"carers": 1,
+					"larval_rate": 1.0,
+					"moisture": 65.0,
+					"water_used": 9.53069
+				},
+				"emerged": 8,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"losses": 0,
+				"midden": {
+					"build_seconds": 90.0,
+					"build_workers": 4,
+					"burden": 0.0,
+					"cleaners": 1,
+					"costs": {
+						"carbohydrate": 24.0,
+						"protein": 12.0,
+						"water": 6.0
+					},
+					"larval_rate": 1.0,
+					"progress": 0.0,
+					"revealed": true,
+					"state": "primitive"
+				},
+				"parent_workers": 64,
+				"production": {
+					"intent": "grow",
+					"waiting": "carbohydrate"
+				},
+				"stores": {
+					"carbohydrate": 0.005,
+					"protein": 7.8265,
+					"water": 7.47181
+				},
+				"supply_reports": 11,
+				"time": 4695.0,
+				"workers": 19
+			},
+			"first_growth_at": -1.0,
+			"passed": true,
+			"pressures": {
+				"CARB": {
+					"at": 3185.0,
+					"daughter_attention": {
+						"causes": [
+							"CARB"
+						],
+						"organ": "nursery",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER NURSERY"
+					},
+					"home_attention": {}
+				},
+				"GROW WAITING · CARB RESERVE": {
+					"at": 2895.0,
+					"daughter_attention": {
+						"causes": [
+							"GROW WAITING · CARB RESERVE"
+						],
+						"organ": "queen",
+						"pile_id": "satellite_1",
+						"title": "CHECK DAUGHTER QUEEN"
+					},
+					"home_attention": {}
+				}
+			},
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591,
+			"standing_growth": true,
+			"start": 2895.0,
+			"supported": false
+		}
+	]
+}

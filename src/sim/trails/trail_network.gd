@@ -65,7 +65,7 @@ func to_dict() -> Dictionary:
 		"routes": route_records, "segments": segment_records, "cohorts": cohort_records}
 
 
-func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float) -> bool:
+func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float, founding: FoundingState = null, supply: InterpileSupplyState = null) -> bool:
 	if not data.has_all(["next_route_id", "next_cohort_id", "routes", "segments", "cohorts"]) or not WorkerLedger.valid_count(data.next_route_id) or data.next_route_id < 1 or not WorkerLedger.valid_count(data.next_cohort_id) or data.next_cohort_id < 1 or not data.routes is Array or not data.segments is Array or not data.cohorts is Array:
 		return false
 	var restored_routes: Dictionary[String, TrailRouteState] = {}
@@ -76,6 +76,10 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		var route := Route.new()
 		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id) or route.last_loss_time > time or route.last_foreign_time > time or route.conflict_observed_at > time or route.last_empty_report_at > time:
 			return false
+		if route.purpose in ["founding","interpile"]:
+			if founding==null or knowledge.nodes[route.destination_knowledge_id].definition_id!="nest_site" or not founding.valid_route(route): return false
+			if route.purpose=="interpile" and (supply==null or not supply.valid_route(route)): return false
+		elif knowledge.nodes[route.destination_knowledge_id].definition_id not in PileState.RESOURCE_IDS: return false
 		if not route.receipt.is_empty() and route.receipt.last_at > time: return false
 		var suffix: String = route.id.trim_prefix("route_")
 		if route.id != "route_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_route_id or route.segment_id != "segment_" + suffix:
@@ -100,6 +104,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if cohort.id != "cohort_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_cohort_id:
 			return false
 		var route: TrailRouteState = restored_routes[cohort.route_id]
+		if route.purpose!="food": return false
 		if not restored_segments.has(route.segment_id) or cohort.worker_count + cohort.lost_workers > CONFIG.workers_per_cohort:
 			return false
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
@@ -149,7 +154,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		return false
 	var used_segments: Dictionary[String, bool] = {}
 	for route: TrailRouteState in restored_routes.values():
-		if active_counts.get(route.id, 0) != route.active_workers or cohort_counts.get(route.id, 0) > CONFIG.max_cohorts_per_route:
+		if (route.purpose=="food" and active_counts.get(route.id, 0) != route.active_workers) or cohort_counts.get(route.id, 0) > CONFIG.max_cohorts_per_route:
 			return false
 		if not restored_segments.has(route.segment_id) or used_segments.has(route.segment_id):
 			return false
@@ -188,6 +193,14 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 				var route_id: String = id.trim_prefix("trail:")
 				if id != "trail:" + route_id or not restored_routes.has(route_id) or restored_routes[route_id].origin_pile != pile.id or restored_routes[route_id].status == "inactive" or entry.kind != "trail" or entry.owner_id != route_id:
 					return false
+	if founding!=null and founding.phase!="none":
+		if not restored_routes.has(founding.route_id): return false
+		var owned: TrailRouteState=restored_routes[founding.route_id]
+		if founding.leg_ticks!=CONFIG.leg_ticks(owned.estimated_destination.distance_to(colony.piles.home.position)): return false
+	# Rebuild owned multi-resource receipts from integer cargo history, avoiding JSON sum rounding.
+	for route: TrailRouteState in restored_routes.values():
+		if route.purpose=="interpile":
+			route.receipt=supply.receipt(); route.delivered_total=supply.delivered_total()
 	routes = restored_routes
 	segments = restored_segments
 	cohorts = restored_cohorts

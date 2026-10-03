@@ -15,6 +15,8 @@ var reports: Dictionary = {}
 var defense: JourneyDefenseState = JourneyDefenseState.new()
 
 func active() -> bool: return phase != "idle"
+func origin_id(trails: TrailNetwork) -> String:
+	return trails.routes[route_id].origin_pile if active() and trails.routes.has(route_id) else ""
 func to_dict() -> Dictionary:
 	return {"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
 		"ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict()}
@@ -29,7 +31,7 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	for id: Variant in data.reports:
 		var report: Variant = data.reports[id]
 		if not id is String or not trails.routes.has(id) or not report is Dictionary or report.size() != 4 or not report.has_all(["finding","fraction","observed_at","received_at"]): return false
-		if trails.routes[id].origin_pile != "home" or trails.routes[id].reported_losses <= 0: return false
+		if trails.routes[id].purpose != "food" or trails.routes[id].reported_losses <= 0: return false
 		if report.finding not in ["ambush","foreign","mixed","inconclusive"]: return false
 		for key: String in ["fraction","observed_at","received_at"]:
 			if not typeof(report[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(report[key])): return false
@@ -41,14 +43,15 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	var legacy: Dictionary = restored_defense.to_dict(); legacy.sent = int(data.workers)
 	var defense_data: Variant = data.get("defense",legacy)
 	if not defense_data is Dictionary or not restored_defense.restore(defense_data,data,colony,trails,time): return false
-	var commitment: Dictionary = colony.piles.home.workers.to_dict().commitments.get("journey:home",{})
+	var origin: String = trails.routes[data.route_id].origin_pile if trails.routes.has(data.route_id) else ""
+	var commitment: Dictionary = colony.piles[origin].workers.to_dict().commitments.get("journey:"+origin,{}) if origin != "" else {}
 	for pile: PileState in colony.piles.values():
 		for id: String in pile.workers.to_dict().commitments:
-			if id.begins_with("journey:") and (pile.id != "home" or id != "journey:home"): return false
+			if id.begins_with("journey:") and (data.phase == "idle" or pile.id != origin or id != "journey:"+origin): return false
 	if data.phase == "idle":
 		if data.route_id != "" or data.workers != 0 or data.elapsed_ticks != 0 or data.departed_at != 0 or data.ambush_fraction != -1 or data.foreign_seen or data.sampled_at != 0 or not commitment.is_empty(): return false
 	else:
-		if not trails.routes.has(data.route_id) or trails.routes[data.route_id].origin_pile != "home" or trails.routes[data.route_id].reported_losses <= 0: return false
+		if not trails.routes.has(data.route_id) or trails.routes[data.route_id].purpose != "food" or trails.routes[data.route_id].reported_losses <= 0: return false
 		if restored_defense.mode == "investigate" and data.workers != CONFIG.investigation_workers: return false
 		if restored_defense.mode == "defend" and (not data.reports.has(data.route_id) or data.reports[data.route_id].finding not in ["ambush","mixed"]): return false
 		if restored_defense.mode == "defend" and (data.ambush_fraction != -1 or data.foreign_seen or data.sampled_at != 0): return false

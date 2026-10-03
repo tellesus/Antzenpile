@@ -1,0 +1,101 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"conserved": true,
+			"exact_saved_continuation": true,
+			"known_nodes": 8,
+			"known_types": [
+				"carbohydrate",
+				"nest_site",
+				"protein",
+				"water"
+			],
+			"passed": true,
+			"scenario": "backyard_slice",
+			"seconds": 3600,
+			"seed": 482817,
+			"site_returned_at": 240.5
+		},
+		{
+			"conserved": true,
+			"exact_saved_continuation": true,
+			"known_nodes": 8,
+			"known_types": [
+				"carbohydrate",
+				"nest_site",
+				"protein",
+				"water"
+			],
+			"passed": true,
+			"scenario": "backyard_slice",
+			"seconds": 3600,
+			"seed": 591,
+			"site_returned_at": 279.0
+		},
+		{
+			"conserved": true,
+			"exact_saved_continuation": true,
+			"known_nodes": 8,
+			"known_types": [
+				"carbohydrate",
+				"nest_site",
+				"protein",
+				"water"
+			],
+			"passed": true,
+			"scenario": "garden_edge",
+			"seconds": 3600,
+			"seed": 482817,
+			"site_returned_at": 246.5
+		},
+		{
+			"conserved": true,
+			"exact_saved_continuation": true,
+			"known_nodes": 8,
+			"known_types": [
+				"carbohydrate",
+				"nest_site",
+				"protein",
+				"water"
+			],
+			"passed": true,
+			"scenario": "garden_edge",
+			"seconds": 3600,
+			"seed": 591,
+			"site_returned_at": 353.25
+		},
+		{
+			"conserved": true,
+			"exact_saved_continuation": true,
+			"known_nodes": 9,
+			"known_types": [
+				"carbohydrate",
+				"nest_site",
+				"protein",
+				"water"
+			],
+			"passed": true,
+			"scenario": "roadside",
+			"seconds": 3600,
+			"seed": 482817,
+			"site_returned_at": 287.0
+		},
+		{
+			"conserved": true,
+			"exact_saved_continuation": true,
+			"known_nodes": 9,
+			"known_types": [
+				"carbohydrate",
+				"nest_site",
+				"protein",
+				"water"
+			],
+			"passed": true,
+			"scenario": "roadside",
+			"seconds": 3600,
+			"seed": 591,
+			"site_returned_at": 279.0
+		}
+	]
+}

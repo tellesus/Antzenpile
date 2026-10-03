@@ -6,17 +6,26 @@ const MAX_COURSE: int = 8
 const RECENT_RETURNS: int = 16
 var id: String
 var origin_pile: String
+var target_knowledge_id: String = ""
 var bearing: float
 var departed_at: float
 var scent: float = 1.0
 var returned_at: float = -1.0
 var course: Array[Dictionary] = []
+var expected_at: float = -1.0
+var missing_at: float = -1.0
+
+
+func completed_at() -> float:
+	return maxf(returned_at, missing_at)
 
 
 func to_dict() -> Dictionary:
-	return {"id": id, "origin_pile": origin_pile, "bearing": bearing,
+	var result: Dictionary = {"id": id, "origin_pile": origin_pile, "bearing": bearing,
 		"departed_at": departed_at, "scent": scent, "returned_at": returned_at,
-		"course": course.duplicate(true)}
+		"course": course.duplicate(true), "expected_at": expected_at, "missing_at": missing_at}
+	if not target_knowledge_id.is_empty(): result["target_knowledge_id"] = target_knowledge_id
+	return result
 
 
 func restore(data: Dictionary, colony: ColonyState, scouts: Dictionary, next_id: int, time: float) -> bool:
@@ -24,6 +33,8 @@ func restore(data: Dictionary, colony: ColonyState, scouts: Dictionary, next_id:
 		return false
 	if not data.id is String or not data.id.begins_with("scout_") or not data.origin_pile is String or not colony.piles.has(data.origin_pile):
 		return false
+	var target: Variant = data.get("target_knowledge_id", "")
+	if not target is String or not target.is_empty() and not target.begins_with("known:"): return false
 	var suffix: String = data.id.trim_prefix("scout_")
 	if not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= next_id:
 		return false
@@ -34,8 +45,21 @@ func restore(data: Dictionary, colony: ColonyState, scouts: Dictionary, next_id:
 		return false
 	if data.returned_at != -1.0 and (data.returned_at < data.departed_at or data.returned_at > time):
 		return false
-	if (data.returned_at == -1.0) != scouts.has(data.id) or (scouts.has(data.id) and scouts[data.id].origin_pile != data.origin_pile):
+	var expected: Variant = data.get("expected_at", -1.0)
+	var missing: Variant = data.get("missing_at", -1.0)
+	for value: Variant in [expected, missing]:
+		if not typeof(value) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(value)):
+			return false
+	if expected != -1.0 and (expected <= data.departed_at or expected > WorkerLedger.MAX_COUNT * SimulationClock.TICK_INTERVAL):
 		return false
+	if missing != -1.0 and (expected < 0.0 or missing < expected or missing > time or data.returned_at != -1.0):
+		return false
+	if (data.returned_at == -1.0 and missing == -1.0) != scouts.has(data.id) or (scouts.has(data.id) and scouts[data.id].origin_pile != data.origin_pile):
+		return false
+	if scouts.has(data.id) and expected >= 0.0:
+		var deadline: float = scouts[data.id].expected_tick * SimulationClock.TICK_INTERVAL
+		if deadline < expected or (not scouts[data.id].lost and not is_equal_approx(expected, deadline)):
+			return false
 	if not data.course is Array or data.course.size() > MAX_COURSE or (data.returned_at == -1.0 and not data.course.is_empty()):
 		return false
 	for sample: Variant in data.course:
@@ -48,10 +72,13 @@ func restore(data: Dictionary, colony: ColonyState, scouts: Dictionary, next_id:
 			return false
 	id = data.id
 	origin_pile = data.origin_pile
+	target_knowledge_id = target
 	bearing = float(data.bearing)
 	departed_at = float(data.departed_at)
 	scent = float(data.scent)
 	returned_at = float(data.returned_at)
+	expected_at = float(expected)
+	missing_at = float(missing)
 	for sample: Dictionary in data.course:
 		course.append(sample.duplicate(true))
 	return true

@@ -31,7 +31,10 @@ func _run():
 	if not is_equal_approx(audio.nursery_gain, 0.775) or not is_equal_approx(audio.stem_gain, 0.85): failed = true
 	root.simulation.set_time_scale(64)
 	snapshot = root.simulation.run.to_dict()
-	await create_timer(4.2).timeout # Cross the actual eight-second loop boundary.
+	# Seek every running voice together near the actual longer loop boundary;
+	# development/condition tests above still use uninterrupted real playback.
+	for player: AudioStreamPlayer in audio._music_players(): player.seek(46.0)
+	await create_timer(2.5).timeout
 	_phase(audio, "paused_64x_looped")
 	if snapshot != root.simulation.run.to_dict(): failed = true
 	audio.restart_after_load()

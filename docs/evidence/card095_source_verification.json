@@ -1,0 +1,42 @@
+[
+  {
+    "file": "bridge.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "entrance_body.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "entrance_front.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "nursery_developed_body.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "nursery_developed_front.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "nursery_primitive_body.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "nursery_primitive_front.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "queen_body.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "queen_front.png",
+    "pixels_equal": true
+  },
+  {
+    "file": "substrate.png",
+    "pixels_equal": true
+  }
+]

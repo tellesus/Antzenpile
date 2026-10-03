@@ -1,10 +1,17 @@
-[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=16 format=3]
+[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=18 format=3]
 [ext_resource type="Script" path="res://src/sim/world/scenario_definition.gd" id="scenario"]
 [ext_resource type="Script" path="res://src/sim/world/world_node_definition.gd" id="node"]
 [ext_resource type="Script" path="res://src/sim/world/terrain_definition.gd" id="terrain"]
 [ext_resource type="Resource" path="res://data/resources/carbohydrate.tres" id="carb"]
 [ext_resource type="Resource" path="res://data/resources/protein.tres" id="protein"]
 [ext_resource type="Resource" path="res://data/resources/water.tres" id="water"]
+[ext_resource type="Resource" path="res://data/resources/nest_site.tres" id="nest"]
+[sub_resource type="Resource" id="nest_site"]
+script = ExtResource("node")
+id = "nest_site_01"
+definition = ExtResource("nest")
+position = Vector2(5, 5)
+initial_quantity = 1.0
 [sub_resource type="Resource" id="carb_exposed"]
 script = ExtResource("node")
 id = "carb_exposed"
@@ -57,5 +64,5 @@ bounds = Rect2(20, 0, 20, 40)
 exposure = 1.0
 [resource]
 script = ExtResource("scenario")
-nodes = Array[ExtResource("node")]([SubResource("carb_exposed"), SubResource("carb_sheltered"), SubResource("protein_01"), SubResource("protein_picnic"), SubResource("water_01"), SubResource("aphid_01"), SubResource("rival_food")])
+nodes = Array[ExtResource("node")]([SubResource("nest_site"), SubResource("carb_exposed"), SubResource("carb_sheltered"), SubResource("protein_01"), SubResource("protein_picnic"), SubResource("water_01"), SubResource("aphid_01"), SubResource("rival_food")])
 terrain = Array[ExtResource("terrain")]([SubResource("sheltered"), SubResource("exposed")])

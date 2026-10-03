@@ -22,11 +22,25 @@ static func compatible(traits: Array[String]) -> bool:
 
 
 static func can_select(pile: PileState, id: String) -> bool:
-	if not valid_trait(id) or pile.queen_count < 1 or pile.trial_cohort() != null or id in pile.genetics.established:
+	return pile.trial_cohort() == null and can_queue(pile, id)
+
+
+static func can_queue(pile: PileState, id: String) -> bool:
+	var trial: BroodCohort = pile.trial_cohort()
+	return queue_eligible(id, pile.queen_count, pile.genetics.established, pile.chemistry_candidate,
+		pile.recognition_candidate, trial.adaptation_id if trial != null else "")
+
+
+static func queue_eligible(id: String, queens: int, established: Array[String], chemistry: bool, recognition: bool, locked: String) -> bool:
+	if not valid_trait(id) or queens < 1 or id in established or id == locked:
 		return false
+	var future_traits: Array[String] = established.duplicate()
+	if not locked.is_empty(): future_traits.append(locked)
+	future_traits.append(id)
+	if not compatible(future_traits): return false
 	if id in ["security", "tolerance"]:
-		return pile.recognition_candidate and "security" not in pile.genetics.established and "tolerance" not in pile.genetics.established
-	return pile.chemistry_candidate if id == "persistent" else pile.adaptation_repertoire == ""
+		return recognition
+	return chemistry if id == "persistent" else true
 
 
 static func protection_workers(base: int, share: float) -> int:

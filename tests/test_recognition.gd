@@ -182,7 +182,7 @@ func _test_ui(test: Object) -> void:
 	test.get_root().add_child(view)
 	view._status = root.inward_status("home")
 	view.selected_id = "adaptation"
-	view.adaptation_command = root.start_adaptation
+	view.adaptation_command = root.queue_adaptation
 	var before: Dictionary = root.simulation.run.to_dict()
 	test.check(view.activate_at(view._web_family_rect().get_center()) and view.web_family == "recognition" and root.simulation.run.to_dict() == before, "Recognition family focus is navigation, not a trait purchase")
 	for size: Vector2 in [Vector2(1280,720), Vector2(900,600)]:
@@ -190,7 +190,9 @@ func _test_ui(test: Object) -> void:
 			test.check(Web.node_at(Web.positions(size)[id], size, view._status, "recognition") == id and Web.positions(size)[id].x + 44 <= size.x - 316, "Focused recognition graph keeps separated touch targets: " + id)
 	view.activate_at(Web.positions(view.get_viewport_rect().size).tolerance)
 	test.check(view.web_selection == "tolerance" and root.simulation.run.to_dict() == before, "Recognition leaf inspection is free")
-	test.check(view.activate_at(view._adaptation_rect("tolerance").get_center()) and root.simulation.run.colony.piles.home.trial_cohort().adaptation_id == "tolerance", "One contextual pointer action starts the selected recognition endpoint")
+	test.check(view.activate_at(view._adaptation_rect("tolerance").get_center()) and root.simulation.run.colony.piles.home.queued_adaptation == "tolerance", "One contextual pointer action queues the selected recognition endpoint")
+	root.simulation.advance(0.25)
+	test.check(root.simulation.run.colony.piles.home.trial_cohort().adaptation_id == "tolerance", "Next eligible tick lays and locks the selected recognition endpoint")
 	view.free()
 	root.free()
 

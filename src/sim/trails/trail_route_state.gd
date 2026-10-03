@@ -4,6 +4,7 @@ extends RefCounted
 
 const CONFIG = preload("res://data/trails/default_trails.tres")
 
+var purpose: String = "food"
 var id: String
 var origin_pile: String
 var destination_knowledge_id: String
@@ -34,7 +35,7 @@ var last_witness_time: float = 0.0
 
 
 func to_dict() -> Dictionary:
-	return {"id": id, "origin_pile": origin_pile,
+	var record: Dictionary = {"id": id, "origin_pile": origin_pile,
 		"destination_knowledge_id": destination_knowledge_id,
 		"estimated_destination": [estimated_destination.x, estimated_destination.y],
 		"segment_id": segment_id, "desired_workers": desired_workers,
@@ -46,6 +47,8 @@ func to_dict() -> Dictionary:
 		"conflict_observed_at": conflict_observed_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
 		"attack_reports": attack_reports, "fighting_reports": fighting_reports,
 		"missing_workers": missing_workers, "last_witness_time": last_witness_time}
+	if purpose != "food": record.purpose=purpose
+	return record
 
 
 func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bounds: Rect2) -> bool:
@@ -114,6 +117,9 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	var empty_at: Variant = data.get("last_empty_report_at", knowledge.last_empty_report(data.destination_knowledge_id) if data.reported_depleted else 0.0)
 	if not resume is bool or not typeof(empty_at) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(empty_at)) or empty_at < 0:
 		return false
+	var saved_purpose: Variant=data.get("purpose","food")
+	if not saved_purpose is String or saved_purpose not in ["food","founding","interpile"]: return false
+	purpose=saved_purpose
 	id = data.id
 	origin_pile = data.origin_pile
 	destination_knowledge_id = data.destination_knowledge_id

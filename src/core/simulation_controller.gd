@@ -34,6 +34,11 @@ var rival: RivalSystem
 var predator: PredatorSystem
 var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
+var brood_health: BroodHealthSystem
+var heat: HeatSystem
+var supply: InterpileSupplySystem
+var founding: FoundingSystem
+var reproduction: ReproductionSystem
 
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
@@ -66,14 +71,19 @@ func _attach_run(next_run: RunState) -> void:
 	trails = Trails.new(run, predator, rival)
 	swarm = Swarm.new(run, trails.apply_loss)
 	trails.swarm = swarm
-	brood = Brood.new(run)
+	adaptation = Adaptation.new(run)
+	brood = Brood.new(run, adaptation)
 	food_toxicity = FoodToxicitySystem.new(run)
+	brood_health = BroodHealthSystem.new(run, brood.lose_one)
+	heat = HeatSystem.new(run)
+	supply = InterpileSupplySystem.new(run)
+	founding = FoundingSystem.new(run)
+	reproduction = ReproductionSystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
 	sanitation = Sanitation.new(run)
 	humidity = Humidity.new(run)
-	adaptation = Adaptation.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
 	run.clock.tick.connect(_tick)
@@ -83,16 +93,20 @@ func dispatch_scout(origin_id: String, bearing: Variant = null) -> bool:
 	return scouting.dispatch(origin_id, bearing)
 
 
-func set_exploration(target: Variant) -> bool:
-	return scouting.set_effort(target)
+func recall_scout(id: String) -> bool:
+	return scouting.recall(id)
 
 
-func set_exploration_bias(bearing: Variant) -> bool:
-	return scouting.set_bias(bearing)
+func set_exploration(target: Variant, origin_id: String = "home") -> bool:
+	return scouting.set_effort(target, origin_id)
 
 
-func set_investigation_priority(knowledge_id: String, enabled: bool) -> bool:
-	return scouting.set_priority(knowledge_id, enabled)
+func set_exploration_bias(bearing: Variant, origin_id: String = "home") -> bool:
+	return scouting.set_bias(bearing, origin_id)
+
+
+func set_investigation_priority(knowledge_id: String, enabled: bool, origin_id: String = "home") -> bool:
+	return scouting.set_priority(knowledge_id, enabled, origin_id)
 
 
 func investigate_known_source(origin_id: String, knowledge_id: String) -> bool:
@@ -159,6 +173,10 @@ func start_adaptation(pile_id: String, trait_id: String) -> bool:
 	return adaptation.start(pile_id, trait_id)
 
 
+func queue_adaptation(pile_id: String, trait_id: Variant) -> bool:
+	return adaptation.queue_choice(pile_id, trait_id)
+
+
 func start_honeydew_tending(pile_id: String) -> bool:
 	return ecology.start_tending(pile_id)
 
@@ -169,6 +187,22 @@ func stop_honeydew_tending(pile_id: String) -> bool:
 
 func start_guest_rejection() -> bool:
 	return guest.start_rejection()
+
+
+func set_daughter_supply(enabled: Variant) -> bool:
+	return supply.set_enabled(enabled)
+
+
+func establish_daughter(knowledge_id: String) -> bool:
+	return founding.establish(knowledge_id)
+
+
+func start_founding(knowledge_id: String) -> bool:
+	return founding.start(knowledge_id)
+
+
+func start_reproduction(pile_id: String) -> bool:
+	return reproduction.start(pile_id)
 
 
 func stop_guest_rejection() -> bool:
@@ -191,6 +225,11 @@ func _tick(delta: float) -> void:
 	nursery.tick(delta)
 	sanitation.tick()
 	humidity.tick()
+	heat.tick()
 	guest.tick()
+	brood_health.tick()
 	brood.tick(delta)
+	reproduction.tick()
+	founding.tick()
+	supply.tick()
 	food_toxicity.tick(delta)

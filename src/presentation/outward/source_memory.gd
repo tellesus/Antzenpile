@@ -16,9 +16,11 @@ static func entries(signals: Array[Dictionary], status: Dictionary, category: St
 		var hint: Dictionary = status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {})
 		var reported_empty: bool = hint.get("last_return_empty", route.get("status", "") == "depleted")
 		var state: String = "Reported empty" if reported_empty else "Previously delivered" if route.get("delivered_total", 0.0) > 0 else "Trace reported"
+		if category == "nest_site": state = "Last recheck unconfirmed" if reported_empty else "Possible shelter reported"
 		result.append({"id": signal_data.id, "knowledge_id": signal_data.source_knowledge_id, "category": category,
 			"bearing": signal_data.get("bearing"), "age": signal_data.age, "state": state,
 			"workers": route.get("allocated_workers", 0),
+			"route_id": route.get("id", ""), "route_status": route.get("status", "none"), "desired_workers": route.get("desired_workers", 0),
 			"receipt": route.get("receipt", {}).duplicate(true),
 			"delivered_total": route.get("delivered_total", 0.0),
 			"danger": route.get("reported_losses", 0) > 0 and not route.get("ambusher_addressed",false) or route.get("foreign_reports", 0) > 0,
@@ -33,10 +35,11 @@ static func display_name(entry: Dictionary) -> String:
 	return ("Honeydew" if entry.get("honeydew", false) else Copy.resource(entry.get("category", "")).capitalize()) + " #" + tag
 
 
-static func receipt_label(entry: Dictionary, time: float) -> String:
+static func receipt_label(entry: Dictionary, time: float, destination: String = "home") -> String:
+	if entry.get("category") == "nest_site": return "Occupants and safety unknown"
 	var receipt: Dictionary = entry.get("receipt", {})
 	if receipt.is_empty():
-		return "Delivery dates unrecorded" if entry.get("delivered_total", 0.0) > 0 else "No delivery home yet"
+		return "Delivery dates unrecorded" if entry.get("delivered_total", 0.0) > 0 else "No delivery %s yet" % destination
 	return "Delivered %.1f %s · %s ago" % [receipt.last_amount, Copy.resource(entry.get("category", "")), Copy.duration(time - receipt.last_at)]
 
 

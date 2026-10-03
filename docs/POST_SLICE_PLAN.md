@@ -1,5 +1,64 @@
 # Post-slice development plan
 
+## Current priority — first satellite network
+
+The first supported satellite milestone is complete. Keep implementing one bounded outcome at a time, using the original Part 3 §§84–89/128 and Part 2 shared-route contracts.
+
+| Completed section | Player-visible result | Evidence |
+| --- | --- | --- |
+| [102 returned nest sites](tasks/102_returned_nest_sites.md) | Returned, dated Shelter memory/rechecks; occupants/safety unknown. | [Discovery](NEST_SITE_EVALUATION.md) |
+| [103 reproductive investment](tasks/103_reproductive_investment.md) | Paid queen/males use food, nurses and Nursery space. | [Reproductives](REPRODUCTIVE_INVESTMENT_EVALUATION.md) |
+| [104 physical founding camp](tasks/104_physical_founding_camp.md) | Paid party follows remembered shelter; messenger reports actual camp. | [Founding](FOUNDING_CAMP_EVALUATION.md) |
+| [105 first daughter pile](tasks/105_first_daughter_pile.md) | Eleven settlers transfer without death/copy; captured queen lineage, local stores/brood/jobs and simplified INWARD inspection. | [Daughter](DAUGHTER_PILE_EVALUATION.md) |
+| [106 parent supplies](tasks/106_parent_supply_transport.md) | Eight Home workers carry real packs and return; supplies enable local emergence and paid Nursery/Food Exchange development. | [Support](PARENT_SUPPLY_EVALUATION.md) |
+| [107 sustained daughter review](tasks/107_supported_daughter_review.md) | Repeated supplied growth, stopped-support comparison and named voluntary attention to daughter strain/reserve waiting from Home. | [Sustained growth](SUPPORTED_DAUGHTER_EVALUATION.md) |
+| [108 daughter resource gathering](tasks/108_daughter_resource_gathering.md) | Shared returned memories fund daughter-owned workers/routes; physical local intake, returned depletion and recall. | [Local gathering](DAUGHTER_GATHERING_EVALUATION.md) |
+| [109 daughter scout rechecks](tasks/109_daughter_scout_rechecks.md) | One local scout follows shared memory; real recall and awaiting/returned/missing facts preserve ownership and information delay. | [Local scouts](DAUGHTER_SCOUT_EVALUATION.md) |
+| [110 daughter OUTWARD attention](tasks/110_daughter_outward_attention.md) | Look from either named pile; origin-relative traces, local manual search/gathering and safe attention switching. | [OUTWARD attention](DAUGHTER_OUTWARD_EVALUATION.md) |
+| [111 daughter standing exploration](tasks/111_daughter_standing_exploration.md) | Separate effort/bias/priorities and returned coverage, local cycling/recall under the shared cap. | [Standing exploration](DAUGHTER_EXPLORATION_EVALUATION.md) |
+
+| [112 daughter journey surveys](tasks/112_daughter_journey_surveys.md) | Local paid three-worker surveys/recall and returned danger evidence under one shared party slot. | [Surveys](DAUGHTER_JOURNEY_EVALUATION.md) |
+
+| [113 daughter defensive response](tasks/113_daughter_defensive_response.md) | Locally paid defenders/reinforcements/recall, conserved private casualties and delivered intervention. | [Defense](DAUGHTER_DEFENSE_EVALUATION.md) |
+
+| [114 daughter independence review](tasks/114_daughter_independence_review.md) | Four exact sustained dual-pile scout/local intake/care/growth continuations after paid defense and stopped parent supplies. | [Independence review](DAUGHTER_INDEPENDENCE_EVALUATION.md) |
+
+Latest local-independence gate: 6,925 checks, four ordinary paid daughters with exact dual-pile standing exploration continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain explicitly permitted; local defense is verified, full independent reproductive biology is not claimed.
+
+Next bounded section: paid worker reinforcement of the existing daughter. Audit original Part 3 support, current physical connection/captured phenotype bundles, migration ledgers and fixed founding conservation; define a small paid transfer with real travel before coding. Do not create workers or change ownership at dispatch. Preserve single-party bounds and real travel; do not treat shared reports as a free/instant response. Reinforcement, full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
+
+## Current priority — internal health and weather (2026-10-03)
+
+[099 local brood health](tasks/099_local_brood_health.md) is complete: sanitation-driven delayed larval strain/loss, cleanup recovery and separate local evidence passed 6,176 checks and twelve ordinary trials. [Evidence](BROOD_HEALTH_EVALUATION.md). [100 Nursery heat](tasks/100_nursery_heat.md) is complete with shared water-paid climate care, rain cooling and current coarse thermal attention; 6,222 checks and six ordinary front trials passed. [Evidence](NURSERY_HEAT_EVALUATION.md). [101 hot/dry ecology](tasks/101_hot_dry_ecology.md) completes the milestone with mild exposed-water evaporation, new producer-output response and current Home-air cues; 6,234 checks and two ordinary front continuations passed. [Evidence](HOT_DRY_ECOLOGY_EVALUATION.md). Next scope the original network/satellite milestone against current multi-pile state/transport/information contracts. Preserve broader season, reproductive-lineage and replay milestones; add no future-system scaffolding before a bounded player outcome. Scout milestone below is complete; mobile and session targets stay tabled.
+
+## Current priority — scout survivability and learned caution (2026-10-03)
+
+The scout survivability/collective caution milestone is complete: [097](tasks/097_scout_survivability.md) adds physical ambusher losses, delayed missing memory and actual recall; [098](tasks/098_learned_scout_caution.md) adds general exploration preferences from returned route alarms. Final combined suite passed 6,124 checks; 18 survivability trials and six paired caution trials preserved resource access and exact saves. See [survival](SCOUT_SURVIVAL_EVALUATION.md) and [caution evaluation](SCOUT_CAUTION_EVALUATION.md). No individual XP or private danger forecasts were added.
+
+Next: scope one original-design internal-health/disease interaction against existing refuse, humidity, care and contaminated-food contracts, with observable local evidence and a meaningful response. Keep wider ecology/seasons, satellites and reproductive lineages as later milestones until their dependencies are concrete. Mobile and session-duration work remain tabled.
+
+## Current priority — desktop colony material pass (2026-10-03)
+
+The player uploaded the v2 graphics handoff and tabled mobile work. [095 layered colony material](tasks/095_layered_colony_material.md) is complete: original sculpt/packed finish sources, staggered embedded organs, structural tissue, front occlusion, known expansion and desktop input/performance evidence. 6060 full-suite checks passed. Static composition must succeed before adding motion. [096 OUTWARD material/smoke](tasks/096_outward_material_and_smoke.md) is also complete: broad local Home material, smoky returned signals and combined desktop/input evidence. Both sections passed 6060 regression checks; see GRAPHICS_PASS_NOTES.md for sources, paired measurements and limits. Restart for visual playtesting; broader gameplay resumes with the original scout survivability/experience milestone. Keep controls touch-friendly; mobile packaging, device tests, quality tiers and optimization are deferred. Earlier mobile-next statements below are historical, superseded by this priority. Preserve information boundaries, dynamic contents and the abstract functional network.
+
+## Current feedback — queued adaptation brood (authorized 2026-10-03)
+
+[094 queued adaptation choice](tasks/094_queued_adaptation_choice.md) is complete: one editable next-brood intent replaces the narrow immediate-purchase window. Laying locks the funded cohort; compatible follow-up selection remains pending. Saved continuation, actual mouse/touch states and 6060 full-suite checks passed. Resume the graphics milestones below when broader development continues; session-duration balancing remains tabled.
+
+## Current section — measured graphics development (authorized 2026-10-02)
+
+The player approved organic sensory trails, colored clouds resolving into smoky impressions from returned knowledge, luminous exterior ants, shaded interior ants, and earthen functional interiors. [088 release-style graphics proof](tasks/088_release_graphics_proof.md) is complete: cached organic routes, cloud/water masks, shared shaded/luminous worker atlases and a bounded Nursery vignette passed desktop graphics/input checks and 5979 full-suite checks. [Comparable measurements](GRAPHICS_EVALUATION.md) show lower draw counts/frame intervals on the named desktop, with about 3.20 MiB more monitored texture memory. Preserve Part 7A's darkness, rotating panorama and abstract INWARD relationships. Blender/Krita are free authoring tools, not runtime dependencies; keep generated assets reproducible.
+
+[089 textured colony art](tasks/089_textured_colony_art.md) substantially upgrades both views from the player's new references: large sculpted organs, visible construction/expansion, shaded contents, sensory lace, rich Home substrate and coherent framed controls. Next: distinct report-derived object impressions and art variety, then combined quality tiers and real Pixel 7 Pro measurements. Device access/export tooling remain pending; do not declare mobile performance from desktop results. Choose minimum hardware before declaring release performance. The original scout survivability/experience milestone resumes after this explicitly reprioritized graphics section; the session-duration target stays tabled.
+
+[090 web-chat art handoff](tasks/090_web_chat_art_handoff.md) prepares an offline Queen–Nursery–Entrance material kit commission with six modular textures and attached references. The player will run production in ordinary browser ChatGPT; no local tool access is assumed. Returned assets require quality/provenance review and a separate bounded integration card before broader material/object-impression work. This preparation does not claim finished art or quota savings.
+
+[091 returned art integration](tasks/091_returned_art_integration.md) is complete with distinct native-color organs, developing Nursery material/annex and fine functional fibers. Player next authorizes [092 warm layered music](tasks/092_warm_layered_music.md): longer pleasant phrases, soft bass drum/timpani and complementary voices. Finish that bounded audio section before broader graphics/gameplay milestones; actual mobile validation remains pending.
+
+092 is complete: original 48-second layered arrangement, recorded CC0 instruments and verified synchronization/preferences. Both art/music sections are ready for the player's combined playtest. Follow that visual/listening evidence before another material/composition pass; wider report-derived impressions and mobile quality/device validation remain next graphics milestones.
+
+[093 percussion feedback](tasks/093_soften_repeating_percussion.md) addresses the player's repeating high sound with removed wooden clicks and softer, sparse shaker accents. Keep this a bounded listening correction; other layers and gameplay remain unchanged.
+
 ## Interface clarity — complete (2026-10-02)
 
 The authorized [interface review](INTERFACE_REVIEW_PLAN.md) is implemented in [085 panel input/action wording](tasks/085_interface_actions_and_input.md), [086 local guidance/returned history](tasks/086_interface_guidance_and_history.md), and [087 readability/navigation](tasks/087_interface_readability_and_navigation.md). Panels absorb gestures; selected jobs/cost blockers and dated outcomes are distinct; Help opens directly; compact contexts have clearer typography/spacing. Existing mechanics and return-before-information remain unchanged. Cards record actual checks and desktop limits. Resume the next bounded original-design scout survivability/experience milestone when further development is requested; Android and human usability checks remain open.
