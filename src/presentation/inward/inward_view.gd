@@ -3,8 +3,11 @@ extends Node2D
 ## Abstract functional network; consumes detached pile summaries only.
 
 const Copy = preload("res://src/presentation/interface_text.gd")
+const UIStyle = preload("res://src/presentation/organic_ui.gd")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Web = preload("res://src/presentation/inward/adaptation_web.gd")
+const Contents = preload("res://src/presentation/inward/chamber_contents.gd")
+const Chambers = preload("res://src/presentation/inward/chamber_art.gd")
 const Activity = preload("res://src/presentation/inward/colony_activity.gd")
 const Pressure = preload("res://src/presentation/colony_pressure.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
@@ -142,7 +145,7 @@ func activate_at(at: Vector2) -> bool:
 			queue_redraw()
 			return true
 		return false
-	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty(), _status.get("midden", {}).get("revealed", false))
+	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty(), _status.get("midden", {}).get("revealed", false), Chambers.lobe_gain(_status) > 0.0)
 	if not picked.is_empty():
 		selected_id = picked
 		if picked == "adaptation":
@@ -230,15 +233,21 @@ static func positions(size: Vector2) -> Dictionary:
 		"midden": origin + Vector2(field_width * 0.08, field_height * 0.52)}
 
 
-static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, midden_visible: bool = false) -> String:
-	if midden_visible and at.distance_to(positions(size).midden) <= 44.0:
+static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, midden_visible: bool = false, nursery_lobe_visible: bool = false) -> String:
+	if nursery_lobe_visible and _organ_hit(at, positions(size).nursery + Vector2(64,-43), Vector2(57,43)):
+		return "nursery"
+	if midden_visible and _organ_hit(at, positions(size).midden, Vector2(66,54)):
 		return "midden"
-	if guest_visible and at.distance_to(positions(size).guest) <= 44.0:
+	if guest_visible and _organ_hit(at, positions(size).guest, Vector2(66,54)):
 		return "guest"
 	for id: String in NODES:
-		if at.distance_to(positions(size)[id]) <= 44.0:
+		if _organ_hit(at, positions(size)[id], Vector2(70,58) if id == "adaptation" else Vector2(98,73)):
 			return id
 	return ""
+
+
+static func _organ_hit(at: Vector2, center: Vector2, radii: Vector2) -> bool:
+	return ((at-center)/radii).length_squared() <= 1.0
 
 
 func _button_rect(command: String) -> Rect2:
@@ -325,10 +334,10 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
 	if selected_id == "adaptation":
 		Web.draw_graph(self, size, _status, web_selection, _animation_time, web_family)
-		draw_rect(_web_back_rect(), Color("18252b"))
+		UIStyle.surface(self, _web_back_rect(), Color("18252b"))
 		_label(_web_back_rect().position + Vector2(98, 29), "COLONY NETWORK", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		if _status.get("adaptation_options", {}).has("security"):
-			draw_rect(_web_family_rect(), Color("28212f"))
+			UIStyle.surface(self, _web_family_rect(), Color("28212f"))
 			_label(_web_family_rect().position + Vector2(110, 29), "OTHER TRAITS" if web_family == "recognition" else "INSPECT RECOGNITION", Color("d3c5df"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		_draw_hud(size)
 		_draw_context(size)
@@ -338,41 +347,48 @@ func _draw() -> void:
 	for pair: Array in [["queen", "nursery"], ["nursery", "food_exchange"], ["food_exchange", "entrance"], ["entrance", "queen"]]:
 		_draw_flow(centers[pair[0]], centers[pair[1]], pair[0] == "nursery" or pair[0] == "entrance")
 	for id: String in ["queen", "nursery"]:
-		draw_line(centers[id], centers["adaptation"], Color(0.43, 0.40, 0.55, 0.20), 1.0, true)
+		_draw_flow(centers[id], centers["adaptation"], false, Color("b79bcc"))
 	if _status.get("midden", {}).get("revealed", false):
 		_draw_flow(centers.entrance, centers.midden, false)
 	if not _status.get("guest", {}).is_empty():
-		draw_line(centers.guest, centers.nursery, Color(0.65, 0.53, 0.64, 0.18), 1.0, true)
-	Art.nursery_earth(self, centers.nursery, float(_focus_gains.get("nursery", 0.0)))
-	_draw_activity(centers)
+		_draw_flow(centers.guest, centers.nursery, false, Color("b79bcc"))
+
 	for id: String in NODES:
 		_draw_node(id, centers[id])
 	if _status.get("midden", {}).get("revealed", false):
 		_draw_node("midden", centers.midden)
 	if not _status.get("guest", {}).is_empty():
 		_draw_node("guest", centers.guest)
+	_draw_activity(centers)
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
 
 
-func _draw_flow(start: Vector2, finish: Vector2, _representative: bool) -> void:
+func _draw_flow(start: Vector2, finish: Vector2, representative: bool, tint: Color = Color("dcb477")) -> void:
 	var control: Vector2 = (start + finish) * 0.5 + Vector2(12, -18)
 	var points := PackedVector2Array()
 	for step: int in 25:
 		var t: float = float(step) / 24.0
 		points.append(start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t)
-	draw_polyline(points, Color(0.45, 0.59, 0.53, 0.18), 1.0, true)
+	Art.filament(self, points, Color(Color("7fbfcf") if representative else tint, 0.55), 24.0)
+	for strand: int in 2:
+		var fibers := PackedVector2Array()
+		for index: int in points.size():
+			var t: float = float(index)/(points.size()-1)
+			fibers.append(points[index] + Vector2(sin(t*21+strand*2),cos(t*17+strand))*sin(PI*t)*7.0)
+		draw_polyline(fibers, Color(tint,0.18),0.65,true)
 
 
 func _draw_activity(centers: Dictionary) -> void:
 	for ant: Dictionary in Activity.representatives(_status, centers, _animation_time):
 		var under_label: bool = false
-		for center: Vector2 in centers.values():
-			under_label = under_label or Rect2(center + Vector2(-90, 40), Vector2(180, 44)).grow(10.0).has_point(ant.position)
+		for id: String in centers:
+			var center: Vector2 = centers[id]
+			under_label = under_label or Rect2(center + Vector2(-90, Chambers.label_offset(id)-17), Vector2(180, 42)).grow(20.0).has_point(ant.position)
 		if under_label:
 			continue
-		Art.ant(self, ant.position, ant.direction, Color(ant.color, 0.62), _animation_time, 0.9, true)
+		Art.ant(self, ant.position, ant.direction, Color(ant.color, 0.62), _animation_time, 1.25, true)
 		if ant.role in ["climate", "cleanup"]:
 			draw_circle(ant.position + ant.direction.normalized() * 6, 1.6, Color(ant.color, 0.65))
 
@@ -385,15 +401,7 @@ func _draw_node(id: String, at: Vector2) -> void:
 	var strain: float = 1.0 - health
 	var pulse: float = Activity.pulse(health, _animation_time)
 	var phase: float = _animation_time * 0.18 + NODES.find(id)
-	var radius: float = 34.0 + pulse * (0.8 + strain * 0.8) if id in ["nursery", "midden", "food_exchange"] else 34.0
-	var outline: PackedVector2Array = Art.membrane(at, radius, phase, 0.86)
-	draw_colored_polygon(outline, Color(color, lerpf(0.045, 0.08, focus) * attention))
-	var edge: Color = Color(color.lerp(Color("cb927c"), strain * 0.55), lerpf(0.4, 0.7, focus) * attention)
-	if strain > 0.0:
-		for part: int in 3:
-			draw_polyline(outline.slice(1 + part * 9, 8 + part * 9), edge, 1.1, true)
-	else:
-		draw_polyline(outline.slice(1, 27), edge, 1.1, true)
+	Chambers.shell(self, _status, id, at, focus)
 	match id:
 		"midden":
 			var burden: float = _status.get("midden", {}).get("burden", 0.0)
@@ -404,54 +412,43 @@ func _draw_node(id: String, at: Vector2) -> void:
 			for index: int in 3:
 				draw_arc(at + Vector2(index * 5 - 5, index * 3 - 3), 9, 0.4, 4.1, 16, Color(color, 0.45), 1.0, true)
 		"nursery":
-			if _status.get("nursery_expansion", {}).get("state", "") == "developed":
-				draw_polyline(Art.membrane(at, 21, -phase, 0.82).slice(15, 29), Color(color, 0.32), 1.0, true)
 			var stages: Array[String] = Activity.brood_stages(_status)
 			for index: int in stages.size():
-				var seed_at: Vector2 = at + Vector2(index % 3 * 9 - 9, index / 3 * 11 - 5)
-				var brood_color: Color = Color(color, (0.55 + health * 0.2 + pulse * 0.025) * attention)
-				if stages[index] == "larva":
-					draw_arc(seed_at, 3.2, 0.2, 4.8, 12, brood_color, 2.0, true)
-				elif stages[index] == "pupa":
-					draw_polyline(Art.membrane(seed_at, 4.4, 0, 0.48), brood_color, 1.0, true)
-				else:
-					draw_circle(seed_at, 2.1, brood_color)
-			if _status.get("humidity", {}).get("carers", 0) > 0:
-				draw_polyline(Art.membrane(at, 26, -phase, 0.62).slice(3, 14), Color("7fbfcf", 0.4), 1.0, true)
+				var seed_at: Vector2 = at + Vector2(index % 3 * 22 - 22, index / 3 * 24 - 5)
+				Contents.brood(self, seed_at, stages[index], health*attention)
 		"adaptation":
 			for index: int in 3:
 				var seed_at: Vector2 = at + Vector2.from_angle(index * TAU / 3.0 + 0.3) * 13
 				draw_line(at, seed_at, Color(color, 0.4), 1.0, true)
 				draw_circle(seed_at, 3.2, Color(color, 0.64))
 		"food_exchange":
-			draw_polyline(Art.membrane(at, 16, -phase, 0.56).slice(3, 22), Color(color, 0.5), 1.2, true)
-			if _status.get("food_exchange_state", "") == "developed":
-				draw_polyline(Art.membrane(at, 24, phase * 0.5, 0.6).slice(12, 28), Color(color, 0.35), 1.0, true)
-				draw_circle(at + Vector2(sin(phase) * 7, cos(phase) * 4), 2.1, Color(color, 0.65))
+			var stores: Dictionary = _status.get("resources", {})
+			for resource: int in 3:
+				var key: String = ["carbohydrate","protein","water"][resource]
+				var amount: float = float(stores.get(key,0.0))
+				for index: int in 3:
+					if amount >= [0.001,4.0,12.0][index]:
+						Contents.brood(self, at+Vector2(resource*22-22,index*15-8), "egg",attention,Art.color_for(key))
 		"entrance":
-			draw_arc(at + Vector2(0, 5), 12, PI, TAU, 20, Color(color, 0.6), 1.5, true)
+			draw_arc(at+Vector2(0,8),20,PI,TAU,24,Color("b0d9df",0.55),1.0,true)
 		"queen":
-			draw_circle(at, 5.0, Color(color, 0.65))
-			draw_circle(at + Vector2(0, 9), 3.0, Color(color, 0.36))
+			if _status.get("queens",0) > 0: Contents.queen(self, at+Vector2(0,6),_animation_time)
 	if id == "nursery" and _status.get("guest", {}).get("observation", "") == "foreign":
 		draw_arc(at, 39.0, 0.3, 1.9, 20, Color("b79eaf"), 1.0, true)
-	if focus > 0.0:
-		var focus_outline: PackedVector2Array = Art.membrane(at, 43.0, 1.5)
-		draw_polyline(focus_outline.slice(1, 8), Color("dce5d9", focus), 1.0, true)
-		draw_polyline(focus_outline.slice(17, 24), Color("dce5d9", focus), 1.0, true)
-	_label(at + Vector2(0, 52), _title(id), color, 15, HORIZONTAL_ALIGNMENT_CENTER)
+	var label_y: float = Chambers.label_offset(id)
+	_label(at + Vector2(0, label_y), _title(id), color, 16, HORIZONTAL_ALIGNMENT_CENTER)
 	var pressure: String = Activity.pressure(_status, id)
 	var progress: float = Activity.project_progress(_status, id)
 	if progress >= 0.0:
-		draw_arc(at, 39, -PI * 0.5, -PI * 0.5 + TAU * maxf(progress, 0.005), 32, Color("c3b991"), 1.3, true)
+		draw_arc(at, 65, -PI * 0.5, -PI * 0.5 + TAU * maxf(progress, 0.005), 32, Color("c3b991"), 1.3, true)
 	if not pressure.is_empty():
 		draw_polyline(Art.membrane(at, 38, -phase).slice(2, 12), Color("cc967a", 0.65), 1.2, true)
-		_label(at + Vector2(0, 70), pressure, Color("ccac91"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(at + Vector2(0, label_y+19), pressure, Color("ccac91"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 	elif progress >= 0.0:
 		var project_title: String = "EXPANDING" if id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "developing" else "DEVELOPING"
-		_label(at + Vector2(0, 70), project_title, Color("b0ab8b"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(at + Vector2(0, label_y+19), project_title, Color("b0ab8b"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 	elif id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "available":
-		_label(at + Vector2(0, 70), "EXPANSION AVAILABLE", Color("a5b49a"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(at + Vector2(0, label_y+19), "EXPANSION AVAILABLE", Color("a5b49a"), 11, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_hud(size: Vector2) -> void:
@@ -475,8 +472,8 @@ func _draw_context(size: Vector2) -> void:
 	var recent_food_losses: bool = food_losses.get("recent",false)
 	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292, (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses and _status.food_exchange_state != "developed" else 388 if food_attention or selected_id == "queen" else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	var web: bool = selected_id == "adaptation"
-	draw_rect(box, Color("17141f") if web else Color("111921"))
-	draw_rect(box, Color("786683") if web else Color("41535a"), false, 1.0)
+	UIStyle.surface(self, box, Color("17141f") if web else Color("111921"))
+	UIStyle.surface(self, box, Color("786683") if web else Color("41535a"), true)
 	_label(box.position + Vector2(16, 31), "Adaptation Web" if web else _title(selected_id), Color("decce8") if web else Color("d9d3be"), 20)
 	if web and web_selection == "honeydew":
 		_draw_relationship_context(box)
@@ -493,7 +490,7 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 137, "Cleanup workers: %d" % midden.get("cleaners", 0))
 			for target: int in [0, 1, 2, 5]:
 				var button: Rect2 = _cleaner_rect(target)
-				draw_rect(button, Color("4b5141") if target == midden.get("cleaners", 0) else Color("263038"))
+				UIStyle.surface(self, button, Color("4b5141") if target == midden.get("cleaners", 0) else Color("263038"))
 				_label(button.get_center() + Vector2(0, 6), str(target), Color("dce5d9"), 16, HORIZONTAL_ALIGNMENT_CENTER)
 			if midden.get("state") == "primitive":
 				_detail_line(box, 218, "Develop for twice the cleanup")
@@ -516,7 +513,7 @@ func _draw_context(size: Vector2) -> void:
 			_label(box.position + Vector2(16, 195), "Brood laying", Color("a9b9bc"), 15)
 			for intent: String in ["manual", "grow"]:
 				var button: Rect2 = _brood_intent_rect(intent)
-				draw_rect(button, Color("354d55") if production.intent == intent else Color("263038"))
+				UIStyle.surface(self, button, Color("354d55") if production.intent == intent else Color("263038"))
 				_label(button.get_center() + Vector2(0, 5), ("MANUAL" if intent == "manual" else "AUTO BROOD"), Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 			var waiting_labels: Dictionary = {"manual":"Automatic laying is off", "ready":"Ready on next simulation tick", "space":"Waiting for Nursery space", "care":"Waiting for care workers", "queen":"No queen can lay", "population":"Population limit reached", "carbohydrate":"Waiting for carbs reserve", "protein":"Waiting for protein reserve", "water":"Waiting for water reserve"}
 			var wait_text: String = waiting_labels.get(production.waiting, "")
@@ -570,7 +567,7 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 235, "Climate workers: %d · water / air" % humidity.carers)
 				for target: int in [0, 1, 2, 4]:
 					var button: Rect2 = _humidity_rect(target)
-					draw_rect(button, Color("355059") if target == humidity.carers else Color("263038"))
+					UIStyle.surface(self, button, Color("355059") if target == humidity.carers else Color("263038"))
 					_label(button.get_center() + Vector2(0, 6), str(target), Color("dce5d9"), 16, HORIZONTAL_ALIGNMENT_CENTER)
 				if expansion.get("state", "") == "available":
 					_detail_line(box, 306, "Expansion: %.0f carbs · %.0f protein" % [expansion.costs.carbohydrate, expansion.costs.protein])
@@ -614,7 +611,7 @@ func _draw_context(size: Vector2) -> void:
 					_label(box.position + Vector2(16, 316), "Browse returned sources", Color("8fa1a8"), 15)
 				for resource_id: String in Pressure.food_sources_needed(_status):
 					var button: Rect2 = _food_source_rect(resource_id)
-					draw_rect(button, Color("263038"))
+					UIStyle.surface(self, button, Color("263038"))
 					_label(button.get_center() + Vector2(0, 5), "CARBS" if resource_id == "carbohydrate" else resource_id.to_upper(), Color("dce5d9"), 12, HORIZONTAL_ALIGNMENT_CENTER)
 			elif food_losses.get("losses",0) > 0:
 				_label(box.position + Vector2(16, 213), "Home losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 15)
@@ -690,7 +687,7 @@ func _draw_genetic_context(box: Rect2) -> void:
 		_detail_line(box, 211, "%d nurses · %d brood slots" % [_status.adaptation_nurses, _status.brood_batch_count])
 		var rect: Rect2 = _adaptation_rect(web_selection)
 		_draw_action(rect, "START SELECTED TRAIT TRIAL", _trial_shortage(costs), Color("28212f"))
-		draw_rect(rect, Color("a28aaf"), false, 1.5)
+		UIStyle.surface(self, rect, Color("a28aaf"), true)
 	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
 		_detail_line(box, 185, "Stage: " + str(_status.adaptation_trial.stage).capitalize())
 		_detail_line(box, 211, "Expresses only with surviving adults")
@@ -745,7 +742,7 @@ func _brood_block_reason() -> String:
 
 
 func _draw_action(box: Rect2, title: String, shortage: String = "", color: Color = Color("35483c")) -> void:
-	draw_rect(box, color if shortage.is_empty() else Color("24272b"))
+	UIStyle.surface(self, box, color if shortage.is_empty() else Color("24272b"))
 	_label(box.position + Vector2(box.size.x * 0.5, 29 if shortage.is_empty() else 17), title, Color("dce5d9"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	if not shortage.is_empty():
 		_label(box.position + Vector2(box.size.x * 0.5, 36), shortage, Color("ccac91"), 13, HORIZONTAL_ALIGNMENT_CENTER)
@@ -763,7 +760,7 @@ func _draw_controls(size: Vector2) -> void:
 	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "save", "load"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale
-		draw_rect(box, Color("31505a") if active else Color("18252b"))
+		UIStyle.surface(self, box, Color("31505a") if active else Color("18252b"))
 		var title: String = "OUTWARD" if command == "outward" else "SAVE" if command == "save" else "LOAD" if command == "load" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
 		_label(box.position + Vector2(box.size.x * 0.5, 40), title, Color("d3dcd4"), 14 if command in ["save", "load"] else 16, HORIZONTAL_ALIGNMENT_CENTER)
 	var footer: String = _feedback if Time.get_ticks_msec() < _feedback_until else "Tab: switch view  ·  Space: pause  ·  1–4: time"

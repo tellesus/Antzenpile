@@ -1,5 +1,7 @@
 # Architecture
 
+Card 089 adds presentation-only ChamberArt/ChamberContents and a shared cached canvas skin. Detached local construction controls organ growth and the Nursery expansion lobe; observed conditional functions remain gated. Original queen/brood meshes and modular generated RGBA textures contain no gameplay. Imported texture dimensions govern entrance sampling. Immediate Home substrate draws beneath sensory routes and returned alarms; label reserves account for larger worker sprites. No simulation, save, runtime light or addon is introduced.
+
 Card 081 records one bounded receipt summary per route only after a positive net home deposit. Root detaches it into approved trail summaries; SourceMemory renders sensing and home intake separately. Browser rows remain free attention, with stable order/IDs and existing pagination. No new RNG, chemistry projection or event-log growth.
 
 Card 080 composes FoodToxicitySystem after brood on fixed ticks. Hidden contaminant travels in actual aggregate cargo and enters the liquid-food pool through net home delivery. Consumption/cargo losses remove proportional material; fixed decay/dose can remove only available home adults through existing ledger/genetics. Root exposes locally observed loss count/age/recent evidence, never chemistry or source attribution. Roadside is an optional third authored setting sharing established ecology; old settings acquire no contaminated source.

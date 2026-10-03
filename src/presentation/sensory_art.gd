@@ -9,6 +9,8 @@ const WATER = preload("res://assets/graphics/proof/water_impression.svg")
 const WORKER = preload("res://assets/graphics/proof/worker_walk.png")
 const SCENT_WORKER = preload("res://assets/graphics/proof/worker_scent.png")
 const EARTH = preload("res://assets/graphics/proof/nursery_earth.svg")
+const FILAMENT = preload("res://assets/graphics/colony/chemical_cloud.png")
+const ENTRANCE = preload("res://assets/graphics/colony/home_entrance.png")
 const WALK_FRAMES: int = 12
 const WALK_CELL: int = 128
 
@@ -48,10 +50,12 @@ static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool) -
 	var drift: float = time * 0.25 + phase
 	var recognition: float = smoothstep(0.25, 0.75, clampf(float(signal_data.get("confidence", 0.0)), 0.0, 1.0))
 	if not empty:
+		var lace_size := Vector2.ONE * radius * 2.7
+		canvas.draw_texture_rect(FILAMENT, Rect2(center-lace_size*0.5, lace_size), false, Color(color, salience*0.66))
 		for layer: int in 3:
 			var offset := Vector2(sin(drift + layer * 2.1), cos(drift * 0.7 + layer)) * radius * 0.09
 			var extent := Vector2.ONE * radius * (2.2 - layer * 0.18)
-			canvas.draw_texture_rect(CLOUD, Rect2(center + offset - extent * 0.5, extent), false, Color(color, salience * 0.5))
+			canvas.draw_texture_rect(CLOUD, Rect2(center + offset - extent * 0.5, extent), false, Color(color, salience * 0.23))
 		var gain: float = impression_gain(signal_data, empty)
 		if gain > 0.0:
 			var extent := Vector2.ONE * radius * 2.0
@@ -102,3 +106,23 @@ static func ant(canvas: Node2D, at: Vector2, direction: Vector2, color: Color, p
 
 static func nursery_earth(canvas: Node2D, at: Vector2, focus: float) -> void:
 	canvas.draw_texture_rect(EARTH, Rect2(at + Vector2(-48,-34), Vector2(96,68)), false, Color(1,1,1,lerpf(0.72,1.0,focus)))
+
+
+static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, width: float) -> void:
+	if points.size() < 2: return
+	var edges := PackedVector2Array()
+	var uv := PackedVector2Array()
+	for side: int in [1,-1]:
+		for offset: int in points.size():
+			var index: int = offset if side == 1 else points.size()-1-offset
+			var tangent: Vector2 = points[mini(index+1,points.size()-1)] - points[maxi(0,index-1)]
+			edges.append(points[index] + tangent.normalized().orthogonal()*width*0.5*side)
+			uv.append(Vector2(float(index)/(points.size()-1), 0.0 if side == 1 else 1.0))
+	canvas.draw_polygon(edges, PackedColorArray([color]), uv, FILAMENT)
+	canvas.draw_polyline(points, Color(color.lightened(0.3),color.a*0.85), 0.8, true)
+
+
+static func home_entrance(canvas: Node2D, center: Vector2) -> void:
+	# Only immediate home substrate; no remote landscape or world coordinates.
+	var pixels: Vector2 = ENTRANCE.get_size()
+	canvas.draw_texture_rect_region(ENTRANCE, Rect2(center-Vector2(480,180),Vector2(960,320)), Rect2(Vector2(0,pixels.y*0.5),Vector2(pixels.x,pixels.y*0.5)))

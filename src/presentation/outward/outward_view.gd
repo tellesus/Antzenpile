@@ -4,6 +4,7 @@ extends Node2D
 
 const Panorama = preload("res://src/presentation/outward/outward_projection.gd")
 const SWARM_CONFIG = preload("res://data/ecology/default_swarm.tres")
+const UIStyle = preload("res://src/presentation/organic_ui.gd")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd")
@@ -420,6 +421,7 @@ func _draw() -> void:
 	_prepare_signal_captions(size)
 	draw_rect(Rect2(Vector2.ZERO, size), Color("080b10"))
 	_draw_rain(size)
+	Art.home_entrance(self,Vector2(size.x*0.5,size.y*0.78))
 	_draw_trails(size)
 	_draw_scout_traces(size)
 	_draw_anchor(size)
@@ -439,7 +441,7 @@ func _draw_pressure_attention() -> void:
 	var attention: Dictionary = _status.get("internal_attention", {})
 	if attention.is_empty(): return
 	var box: Rect2 = _button_rect("internal_pressure")
-	draw_rect(box, Color("211c1b"))
+	UIStyle.surface(self, box, Color("211c1b"))
 	draw_line(box.position, box.position + Vector2(0, box.size.y), Color("b58c79"), 1.0, true)
 	_label(box.position + Vector2(16, 18), attention.title, Color("d3c3b8"), 12)
 	_label(box.position + Vector2(16, 35), " / ".join(attention.causes), Color("bca08e"), 11)
@@ -462,7 +464,7 @@ func _draw_trails(size: Vector2) -> void:
 		if stroke.ghost:
 			draw_polyline(stroke.points, Color(color, 0.06 + 0.05 * strength), 0.85, true)
 		else:
-			draw_polyline(stroke.points, Color(color, 0.025 + 0.045 * strength), 4.0, true)
+			Art.filament(self, stroke.points, Color(color, 0.16 + 0.20 * strength), 16.0)
 			draw_polyline(stroke.points, Color(color.lightened(0.18), 0.16 + 0.5 * strength), 1.1, true)
 	for path: Dictionary in Scent.paths(routes, _placed, size):
 		if path.ghost:
@@ -488,7 +490,8 @@ func _draw_trails(size: Vector2) -> void:
 		var at: Vector2 = marker.center
 		draw_arc(at, 8.0, 0.0, 2.2, 16, Color(0.82, 0.39, 0.27, 0.5), 1.3, true)
 		draw_arc(at, 8.0, PI, PI + 1.3, 12, Color(0.82, 0.39, 0.27, 0.4), 1.0, true)
-		_label(at + Vector2(0, -14), "JOURNEY ALARM", Color("b77d6c"), 10, HORIZONTAL_ALIGNMENT_CENTER)
+		UIStyle.surface(self,Rect2(at+Vector2(-50,-29),Vector2(100,20)),Color("392723"))
+		_label(at + Vector2(0, -14), "JOURNEY ALARM", Color("d3a08b"), 10, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _prepare_signal_captions(size: Vector2) -> void:
@@ -557,15 +560,11 @@ func _draw_scout_traces(size: Vector2) -> void:
 
 func _draw_anchor(size: Vector2) -> void:
 	var center := Vector2(size.x * 0.5, size.y * 0.78)
-	draw_circle(center + Vector2(0, 8), 57, Color(0.37, 0.25, 0.13, 0.08))
-	draw_arc(center, 52, PI, TAU, 40, Color(0.65, 0.45, 0.26, 0.25), 2.0)
-	draw_colored_polygon(PackedVector2Array([center + Vector2(-30, 17), center + Vector2(-15, -10), center + Vector2(0, -18), center + Vector2(15, -10), center + Vector2(30, 17)]), Color("191815"))
-	draw_arc(center + Vector2(0, 12), 14, PI, TAU, 24, Color("9b8d70"), 2.0)
 	for entry: Dictionary in _departures:
 		var rep: Dictionary = ScoutTrace.departure(entry.age, entry.side, size)
 		if not rep.is_empty():
-			Art.ant(self, rep.position, rep.direction, Color(0.68, 0.61, 0.45, 0.70), _animation_time)
-	_label(center + Vector2(-25, 42), "HOME", Color("8f988e"), 11)
+			Art.ant(self, rep.position, rep.direction, Color(0.68, 0.61, 0.45, 0.70), _animation_time, 1.15)
+	_label(center + Vector2(0, 33), "HOME", Color("d8c9ae"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_signal(entry: Dictionary) -> void:
@@ -615,8 +614,8 @@ func _draw_context(size: Vector2) -> void:
 		return
 	if _journey_attention(): _draw_journey_context(size); return
 	var box: Rect2 = _context_panel_rect()
-	draw_rect(box, Color("111921"))
-	draw_rect(box, Color("41535a"), false, 1.0)
+	UIStyle.surface(self, box, Color("111921"))
+	UIStyle.surface(self, box, Color("41535a"), true)
 	_label(box.position + Vector2(16, 31), Memories.display_name({"knowledge_id": selected.source_knowledge_id, "category": selected.category, "honeydew": _is_honeydew(selected)}), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
 	_label(box.position + Vector2(16, 58), "A %s trace" % selected.confidence_label, Color("d4d8d1"), 15)
 	var distance_word: String = "nearby" if selected.estimated_distance < 6.0 else "within reach" if selected.estimated_distance < 14.0 else "distant"
@@ -676,7 +675,7 @@ func _draw_context(size: Vector2) -> void:
 		_draw_trail_button("trail_cancel", "RECALL")
 	var scout_available: bool = _status.has("exploration") or _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
-	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
+	UIStyle.surface(self, investigate_box, Color("27383c") if scout_available else Color("202326"))
 	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), _investigation_title(selected), Color("d5ded8"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	_draw_journey_link()
 
@@ -697,7 +696,7 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 	if relationship in ["exploited", "tended"]:
 		var protect_box: Rect2 = _honeydew_button_rect()
 		var can_start: bool = relationship == "tended" or available >= required
-		draw_rect(protect_box, Color("3d3328") if can_start else Color("202326"))
+		UIStyle.surface(self, protect_box, Color("3d3328") if can_start else Color("202326"))
 		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "WITHDRAW TENDERS" if relationship == "tended" else "TEND PRODUCERS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	if route.is_empty() or route.status in ["inactive", "recalling"]:
 		_draw_trail_button("trail_create", "ASSIGN 5 GATHERERS" if route.is_empty() or route.status == "inactive" else "ASSIGN 5 GATHERERS")
@@ -711,7 +710,7 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 		_draw_trail_button("trail_cancel", "RECALL")
 	var scout_available: bool = _status.has("exploration") or available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
-	draw_rect(investigate_box, Color("27383c") if scout_available else Color("202326"))
+	UIStyle.surface(self, investigate_box, Color("27383c") if scout_available else Color("202326"))
 	_label(investigate_box.position + Vector2(investigate_box.size.x * 0.5, 29), _investigation_title(selected), Color("d5ded8"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 
 
@@ -744,8 +743,8 @@ func _selected_mission() -> Dictionary:
 
 func _draw_mission_context(mission: Dictionary, size: Vector2) -> void:
 	var box: Rect2 = _context_panel_rect()
-	draw_rect(box, Color("111921"))
-	draw_rect(box, Color("41535a"), false, 1.0)
+	UIStyle.surface(self, box, Color("111921"))
+	UIStyle.surface(self, box, Color("41535a"), true)
 	_label(box.position + Vector2(16, 31), "Scout " + str(mission.id).trim_prefix("scout_"), Color("d9d3be"), 20)
 	_label(box.position + Vector2(16, 65), "Dispatched %.0f° · %s ago" % [rad_to_deg(mission.bearing), _mission_duration(mission.age)], Color("a9b9bc"), 14)
 	_label(box.position + Vector2(16, 91), "Awaiting return · away " + _mission_duration(mission.away_seconds) if mission.returned_at < 0.0 else "Returned · journey " + _mission_duration(mission.away_seconds), Color("a9b9bc"), 14)
@@ -827,7 +826,7 @@ func _draw_trail_button(command: String, title: String) -> void:
 		title = "+4" if contested else "+1"
 		detail = "contest" if contested else "gatherer"
 	elif command == "trail_create": detail = Copy.local_shortage(_status, {}, 5)
-	draw_rect(box, Color("263b3c"))
+	UIStyle.surface(self, box, Color("263b3c"))
 	_label(box.position + Vector2(box.size.x * 0.5, 29 if detail.is_empty() else 17), title, Color("d5ded8"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	if not detail.is_empty(): _label(box.position + Vector2(box.size.x * 0.5, 36), detail, Color("a8b8bd"), 13 if command == "trail_create" else 12, HORIZONTAL_ALIGNMENT_CENTER)
 
@@ -842,7 +841,7 @@ func _draw_controls(size: Vector2) -> void:
 			color = Color("31505a")
 		if unavailable:
 			color = Color("202326")
-		draw_rect(box, color)
+		UIStyle.surface(self, box, color)
 		var title: String = "REMEMBERED SOURCES" if command == "sources" else "SEND SCOUT" if command == "scout" else "INWARD" if command == "inward" else "SAVE" if command == "save" else "LOAD" if command == "load" else "RESUME" if command == "pause" and _status.get("paused", false) else "PAUSE" if command == "pause" else command.trim_prefix("speed_") + "x"
 		if command == "scout" and exploration_command.is_valid():
 			title = "EXPLORATION"
@@ -874,11 +873,11 @@ func _source_page_rect() -> Rect2:
 
 
 func _draw_sources() -> void:
-	draw_rect(_sources_panel_rect(), Color("111921"))
+	UIStyle.surface(self, _sources_panel_rect(), Color("111921"))
 	_label(Vector2(40, 177), "Remembered sources", Color("d3dcd4"), 20)
 	for category: String in ["carbohydrate", "protein", "water"]:
 		var button: Rect2 = _source_filter_rect(category)
-		draw_rect(button, Color("31505a") if category == source_category else Color("18252b"))
+		UIStyle.surface(self, button, Color("31505a") if category == source_category else Color("18252b"))
 		_label(button.get_center() + Vector2(0, 6), "CARBS" if category == "carbohydrate" else category.to_upper(), Art.color_for(category), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	var entries: Array[Dictionary] = _source_entries()
 	source_page = mini(source_page, maxi(0, ceili(entries.size() / 3.0) - 1))
@@ -888,7 +887,7 @@ func _draw_sources() -> void:
 			break
 		var entry: Dictionary = entries[offset]
 		var box: Rect2 = _source_row_rect(index)
-		draw_rect(box, Color("30382f") if entry.id == selected_id else Color("182329"))
+		UIStyle.surface(self, box, Color("30382f") if entry.id == selected_id else Color("182329"))
 		var title: String = Memories.display_name(entry)
 		_label(box.position + Vector2(10, 20), "%s · %s ago" % [title, Copy.duration(entry.age)], Color("d4c6a8"), 14)
 		_label(box.position + Vector2(10, 42), "%s · %d gathering%s" % [entry.state, entry.workers, " · ALARM" if entry.danger else ""], Color("c48c7c") if entry.danger else Color("96aab0"), 14)
@@ -896,7 +895,7 @@ func _draw_sources() -> void:
 		_label(box.position + Vector2(10, 80), Memories.first_receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 14)
 	if entries.is_empty():
 		_label(Vector2(40, 275), "No returned memory of this resource", Color("96aab0"), 14)
-	draw_rect(_source_page_rect(), Color("18252b"))
+	UIStyle.surface(self, _source_page_rect(), Color("18252b"))
 	_label(_source_page_rect().get_center() + Vector2(0, 6), "NEXT PAGE · %d / %d" % [source_page + 1, maxi(1, ceili(entries.size() / 3.0))], Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
@@ -908,17 +907,17 @@ func _exploration_rect(command: String) -> Rect2:
 
 
 func _draw_exploration() -> void:
-	draw_rect(_exploration_panel_rect(), Color("111921"))
+	UIStyle.surface(self, _exploration_panel_rect(), Color("111921"))
 	var policy: Dictionary = _status.get("exploration", {"target": 0, "away": 0, "bias": null})
 	_label(Vector2(40, 177), "Exploration labor", Color("d3dcd4"), 20)
 	_label(Vector2(40, 203), "Target %d scouts · %d currently away" % [policy.target, policy.away], Color("a8b9b6"), 14)
 	for target: int in [0, 2, 5, 8]:
 		var box: Rect2 = _exploration_rect("explore_%d" % target)
-		draw_rect(box, Color("31505a") if target == policy.target else Color("18252b"))
+		UIStyle.surface(self, box, Color("31505a") if target == policy.target else Color("18252b"))
 		_label(box.position + Vector2(32,29), "OFF" if target == 0 else str(target), Color("d3dcd4"), 15, HORIZONTAL_ALIGNMENT_CENTER)
 	for command: String in ["exploration_bias", "exploration_general"]:
 		var box: Rect2 = _exploration_rect(command)
-		draw_rect(box, Color("283b3f"))
+		UIStyle.surface(self, box, Color("283b3f"))
 		var title: String = "FAVOR THIS DIRECTION" if command == "exploration_bias" else "NO DIRECTIONAL BIAS" if policy.bias == null else "CLEAR DIRECTION · %03d°" % roundi(rad_to_deg(policy.bias))
 		_label(box.position + Vector2(137,29), title, Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	_label(Vector2(40, 395), "%d source priorities share scout effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 14)
@@ -956,12 +955,12 @@ func _journey_rect(command: String) -> Rect2:
 func _draw_journey_link() -> void:
 	if _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
 	var box: Rect2 = _journey_rect("journey_open")
-	draw_rect(box,Color("39302b"))
+	UIStyle.surface(self, box,Color("39302b"))
 	_label(box.get_center() + Vector2(0,5),"JOURNEY REPORTS AND RESPONSE",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
 
 func _draw_journey_context(_size: Vector2) -> void:
 	var box: Rect2 = _context_panel_rect()
-	draw_rect(box, Color("17171b")); draw_rect(box, Color("665047"), false, 1)
+	UIStyle.surface(self, box, Color("17171b")); UIStyle.surface(self, box, Color("665047"), true)
 	var route: Dictionary = _selected_route(_selected_signal())
 	var state: Dictionary = _status.get("journey_response", {})
 	var report: Dictionary = state.get("reports", {}).get(route.get("id"), {})
@@ -988,7 +987,7 @@ func _draw_journey_context(_size: Vector2) -> void:
 	if own_party and state.get("reinforcement_available", false) or not own_party and _can_mobilize(route):
 		_draw_journey_action(_journey_rect("journey_defend"), "REQUEST 4 DEFENDERS" if own_party else "SEND 12 DEFENDERS", _party_requirement(4 if own_party else 12))
 	var back: Rect2 = _journey_rect("journey_close")
-	draw_rect(back, Color("263038"))
+	UIStyle.surface(self, back, Color("263038"))
 	_label(back.get_center() + Vector2(0, 5), "BACK TO SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
@@ -998,7 +997,7 @@ func _party_requirement(workers: int) -> String:
 
 
 func _draw_journey_action(box: Rect2, title: String, detail: String) -> void:
-	draw_rect(box, Color("39302b"))
+	UIStyle.surface(self, box, Color("39302b"))
 	_label(box.position + Vector2(130, 17), title, Color("e0c5b7"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	_label(box.position + Vector2(130, 36), detail, Color("c5b8b1"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
