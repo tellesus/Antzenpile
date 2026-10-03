@@ -53,6 +53,32 @@ func start(knowledge_id: String) -> bool:
 	pile.reproduction=ReproductionState.new(); _run.founding=state
 	route.desired_workers=CONFIG.workers; route.allocated_workers=CONFIG.workers; route.active_workers=CONFIG.workers; route.status="active"
 	last_error=""; return true
+func establish(knowledge_id: String) -> bool:
+	var state: FoundingState=_run.founding
+	if state.phase!="ready" or _run.colony.piles.has("satellite_1"):
+		last_error="A returned founding-camp report is required"; return false
+	var route: TrailRouteState=_run.trails.routes[state.route_id]
+	if route.destination_knowledge_id!=knowledge_id:
+		last_error="This shelter has no reported camp"; return false
+	var parent: PileState=_run.colony.piles.home
+	var daughter:=PileState.new()
+	daughter.id="satellite_1"; daughter.position=route.estimated_destination
+	daughter.brood_started_total=0
+	var traits: Array[String]=[]; traits.assign(state.reproductive_group.inherited_traits)
+	daughter.foundation={"parent_id":"home","route_id":route.id,"queen_traits":traits,"founded_tick":_run.clock.tick_count}
+	daughter.genetics.established=traits.duplicate()
+	# Experienced settlers bring the colony's existing knowledge, not live exterior truth.
+	daughter.rain_trace_observed=parent.rain_trace_observed; daughter.chemistry_candidate=parent.chemistry_candidate
+	daughter.recognition_experience=parent.recognition_experience; daughter.recognition_candidate=parent.recognition_candidate
+	if not parent.move_workers_to(daughter,"trail:"+route.id,CONFIG.workers-1):
+		last_error="Settler transfer unavailable"; return false
+	var retired: bool=parent.workers.retire_commitment("trail:"+route.id); assert(retired)
+	for id: String in PileState.RESOURCE_IDS:
+		var deposited: bool=daughter.deposit_resource(id,CONFIG.supplies()[id],state.contaminant_mass if id=="carbohydrate" else 0.0); assert(deposited)
+	_run.colony.piles[daughter.id]=daughter
+	route.purpose="interpile"; route.desired_workers=0; route.allocated_workers=0; route.active_workers=0; route.status="inactive"
+	state.phase="established"
+	last_error=""; return true
 func tick() -> void:
 	var state: FoundingState=_run.founding
 	if not state.awaiting(): return
@@ -91,7 +117,8 @@ func summary(knowledge_id: String) -> Dictionary:
 	var result: Dictionary={"status":"awaiting" if for_site and state.awaiting() else state.phase if for_site else "none","workers":CONFIG.workers,"supplies":CONFIG.supplies(),"blocker":blocker(knowledge_id)}
 	if for_site:
 		result.age=(_run.clock.tick_count-state.departed_tick)*SimulationClock.TICK_INTERVAL
-		if state.phase in ["ready","failed"]:
+		if state.phase in ["ready","failed","established"]:
 			result.reported_at=state.reported_tick*SimulationClock.TICK_INTERVAL
 			result.settlers=CONFIG.workers-1 if state.phase=="ready" else 0
+	if for_site and state.phase=="established": result.daughter_id="satellite_1"
 	return result

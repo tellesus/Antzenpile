@@ -25,6 +25,8 @@ var exploration_open: bool = false
 var pause_command: Callable
 var speed_command: Callable
 var founding_command: Callable
+var establish_command: Callable
+var inspect_daughter_command: Callable
 var trail_create_command: Callable
 var trail_set_command: Callable
 var trail_recheck_command: Callable
@@ -219,6 +221,14 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 func _run_command(command: String) -> void:
 	_request_rejected = false
+	if command=="establish":
+		if establish_command.is_valid():
+			var result: Dictionary=establish_command.call(_selected_signal().source_knowledge_id)
+			show_feedback("Daughter pile established" if result.get("accepted",false) else result.get("reason","Establishment unavailable"))
+		return
+	if command=="inspect_daughter":
+		if inspect_daughter_command.is_valid(): inspect_daughter_command.call(_camp_summary().daughter_id)
+		return
 	if command=="founding":
 		var selected: Dictionary=_selected_signal()
 		if selected.get("category")=="nest_site" and founding_command.is_valid():
@@ -400,7 +410,11 @@ func _button_at(at: Vector2) -> String:
 	if not _selected_signal().is_empty():
 		var chosen_route: Dictionary = _selected_route(_selected_signal())
 		if _selected_signal().category == "nest_site":
-			if _founding_rect().has_point(at) and _camp_summary().get("status","none") in ["none","failed"]: return "founding"
+			if _founding_rect().has_point(at):
+				var camp_status: String=_camp_summary().get("status","none")
+				if camp_status in ["none","failed"]: return "founding"
+				if camp_status=="ready": return "establish"
+				if camp_status=="established": return "inspect_daughter"
 			if _investigate_button_rect().has_point(at): return "investigate"
 			if _context_panel_rect().has_point(at): return ""
 		if _journey_attention():
@@ -756,7 +770,9 @@ func _draw_founding_context(box: Rect2) -> void:
 	if status=="awaiting":
 		lines=["Founding party away · 12 workers","Result unknown · awaiting return","Dispatched "+Copy.duration(camp.age)+" ago","Queen and supplies are committed","Home worker brood can continue"]
 	elif status=="ready":
-		lines=["Founding camp reported","11 settlers · young queen + 2 males","Pack arrived: 6 carbs / 3 protein / 3 water","Occupants and hazards unassessed","No daughter-colony laying yet"]
+		lines=["Founding camp reported","11 settlers · young queen + 2 males","Pack arrived: 6 carbs / 3 protein / 3 water","Occupants and hazards unassessed","Ready to establish a daughter pile"]
+	elif status=="established":
+		lines=["Daughter pile established","Settlers now belong to the daughter","Separate local stores and worker brood","Home exploration remains shared","Supplies are limited to the carried pack"]
 	elif status=="failed":
 		lines=["Shelter not confirmed on arrival","Party and reproductives returned","Supplies returned; travel food spent","Return report "+Copy.duration(_status.time-camp.reported_at)+" ago",camp.get("blocker","")]
 	else:
@@ -766,6 +782,9 @@ func _draw_founding_context(box: Rect2) -> void:
 		var available: bool=camp.get("blocker","").is_empty() and not camp.is_empty()
 		UIStyle.surface(self,_founding_rect(),Color("354039") if available else Color("202326"))
 		_label(_founding_rect().get_center()+Vector2(0,5),"SEND FOUNDING PARTY",Color("d5ded8") if available else Color("929a95"),14,HORIZONTAL_ALIGNMENT_CENTER)
+	elif status in ["ready","established"]:
+		UIStyle.surface(self,_founding_rect(),Color("354039"))
+		_label(_founding_rect().get_center()+Vector2(0,5),"ESTABLISH DAUGHTER PILE" if status=="ready" else "INSPECT DAUGHTER PILE",Color("d5ded8"),14,HORIZONTAL_ALIGNMENT_CENTER)
 	else:
 		_label(box.position+Vector2(16,308),"Founding report stays separate from",Color("8fa1a8"),12)
 		_label(box.position+Vector2(16,329),"the dated scout shelter memory.",Color("8fa1a8"),12)

@@ -14,6 +14,7 @@ const SUBSTRATE = preload("res://assets/graphics/colony/material/substrate.png")
 const Pressure = preload("res://src/presentation/colony_pressure.gd")
 const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "adaptation"]
 var status_provider: Callable
+var pile_command: Callable
 var mode_command: Callable
 var pause_command: Callable
 var speed_command: Callable
@@ -77,8 +78,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if _status.get("daughter_available",false) and _pile_rect().has_point(at):
+		if pile_command.is_valid(): pile_command.call("home" if _status.get("daughter",false) else "satellite_1")
+		return true
 	if selected_id == "queen":
-		for tab: String in ["workers","reproduction"]:
+		for tab: String in (["workers"] if _status.get("daughter",false) else ["workers","reproduction"]):
 			if _queen_tab_rect(tab).has_point(at):
 				queen_tab=tab; queue_redraw(); return true
 		if queen_tab=="reproduction":
@@ -95,7 +99,7 @@ func activate_at(at: Vector2) -> bool:
 					show_feedback(("Growth intent set" if intent == "grow" else "Manual laying selected") if result.get("accepted", false) else result.get("reason", "Intent unavailable"))
 				return true
 	if selected_id == "food_exchange":
-		for resource_id: String in Pressure.food_sources_needed(_status):
+		for resource_id: String in ([] if _status.get("daughter",false) else Pressure.food_sources_needed(_status)):
 			if _food_source_rect(resource_id).has_point(at):
 				if food_sources_command.is_valid():
 					var result: Dictionary = food_sources_command.call(resource_id)
@@ -162,7 +166,7 @@ func activate_at(at: Vector2) -> bool:
 			queue_redraw()
 			return true
 		return false
-	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty(), _status.get("midden", {}).get("revealed", false), Chambers.lobe_gain(_status) > 0.0)
+	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty(), _status.get("midden", {}).get("revealed", false), Chambers.lobe_gain(_status) > 0.0, _status.get("daughter",false))
 	if not picked.is_empty():
 		selected_id = picked
 		if picked == "adaptation":
@@ -250,7 +254,7 @@ static func positions(size: Vector2) -> Dictionary:
 		"midden": origin + Vector2(field_width * 0.11, field_height * 0.76)}
 
 
-static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, midden_visible: bool = false, nursery_lobe_visible: bool = false) -> String:
+static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, midden_visible: bool = false, nursery_lobe_visible: bool = false, daughter: bool = false) -> String:
 	if nursery_lobe_visible and _organ_hit(at, positions(size).nursery + Chambers.lobe_offset(), Vector2(64,48)):
 		return "nursery"
 	if midden_visible and _organ_hit(at, positions(size).midden, Vector2(66,54)):
@@ -258,6 +262,7 @@ static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, mid
 	if guest_visible and _organ_hit(at, positions(size).guest, Vector2(66,54)):
 		return "guest"
 	for id: String in NODES:
+		if daughter and id=="adaptation": continue
 		if _organ_hit(at, positions(size)[id], Chambers.hit_radii(id)):
 			return id
 	return ""
@@ -265,6 +270,10 @@ static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, mid
 
 static func _organ_hit(at: Vector2, center: Vector2, radii: Vector2) -> bool:
 	return ((at-center)/radii).length_squared() <= 1.0
+
+
+func _pile_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x-316, get_viewport_rect().size.y-104,292,64)
 
 
 func _button_rect(command: String) -> Rect2:
@@ -379,7 +388,7 @@ func _draw() -> void:
 	draw_texture_rect(SUBSTRATE,field,false,Color(1,1,1,0.80))
 	for pair: Array in [["queen", "nursery"], ["nursery", "food_exchange"], ["food_exchange", "entrance"], ["entrance", "queen"]]:
 		_draw_flow(centers[pair[0]], centers[pair[1]], pair[0] == "nursery" or pair[0] == "entrance")
-	for id: String in ["queen", "nursery"]:
+	for id: String in ([] if _status.get("daughter",false) else ["queen", "nursery"]):
 		_draw_flow(centers[id], centers["adaptation"], false, Color("b79bcc"))
 	if _status.get("midden", {}).get("revealed", false):
 		_draw_flow(centers.entrance, centers.midden, false)
@@ -387,6 +396,7 @@ func _draw() -> void:
 		_draw_flow(centers.guest, centers.nursery, false, Color("b79bcc"))
 
 	var visible_ids: Array[String] = NODES.duplicate()
+	if _status.get("daughter",false): visible_ids.erase("adaptation")
 	if _status.get("midden", {}).get("revealed", false): visible_ids.append("midden")
 	if not _status.get("guest", {}).is_empty(): visible_ids.append("guest")
 	for id: String in visible_ids:
@@ -508,9 +518,9 @@ func _draw_node_labels(id: String, at: Vector2) -> void:
 
 
 func _draw_hud(size: Vector2) -> void:
-	_label(Vector2(24, 38), "INWARD  /  ADAPTATION WEB" if selected_id == "adaptation" else "INWARD  /  HOME", Color("dad7c8"), 22)
+	_label(Vector2(24, 38), "INWARD  /  ADAPTATION WEB" if selected_id == "adaptation" else "INWARD  /  DAUGHTER" if _status.get("daughter",false) else "INWARD  /  HOME", Color("dad7c8"), 22)
 	var web_hint: String = "Next brood: %s · change until eggs are laid" % Web.short_title(_queued_trait()) if not _queued_trait().is_empty() else "Inspect a trait, then queue it for the next brood."
-	_label(Vector2(24, 63), web_hint if selected_id == "adaptation" else "Tap a function to inspect it.", Color("82939c"), 13)
+	_label(Vector2(24, 63), web_hint if selected_id == "adaptation" else "Local workers and stores · Home exploration shared" if _status.get("daughter",false) else "Tap a function to inspect it.", Color("82939c"), 13)
 	if not _status.is_empty():
 		var stores: Dictionary = _status.get("resources", {})
 		_label(Vector2(24, 96), "STORES   Carbs %.1f   ·   Protein %.1f   ·   Water %.1f" % [stores.get("carbohydrate", 0.0), stores.get("protein", 0.0), stores.get("water", 0.0)], Color("a9b9bc"), 13)
@@ -561,14 +571,14 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 224, "Cleanup efficiency doubled")
 				_detail_line(box, 246, "Isolated refuse stays unusable")
 		"queen":
-			for tab: String in ["workers","reproduction"]:
+			for tab: String in (["workers"] if _status.get("daughter",false) else ["workers","reproduction"]):
 				var button: Rect2 = _queen_tab_rect(tab)
 				UIStyle.surface(self,button,Color("354d55") if queen_tab==tab else Color("263038"))
 				_label(button.get_center()+Vector2(0,5),"WORKER BROOD" if tab=="workers" else "REPRODUCTION",Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)
 			if queen_tab=="reproduction":
 				_draw_reproduction_context(box)
 				return
-			_detail_line(box, 111, "Queens: %d · Colony workers: %d" % [_status.queens,_status.workers_total])
+			_detail_line(box, 111, "Queens: %d · Local workers: %d" % [_status.queens,_status.workers_total])
 			_detail_line(box, 137, "Available workers: %d" % _status.workers_available)
 			_detail_line(box, 157, "Nursery: %d / %d brood space" % [_status.nursery_occupied_space, _status.nursery_brood_capacity])
 			var production: Dictionary = _status.get("brood_production", {"intent":"manual", "waiting":"manual"})
@@ -586,7 +596,7 @@ func _draw_context(size: Vector2) -> void:
 			if production.waiting == "adaptation":
 				_label(box.position + Vector2(16, 273), "Next: " + Web.short_title(_queued_trait()), Color("d9c5a5"), 15)
 			_label(box.position + Vector2(16, 294), Web.queue_wait(_status) if production.waiting == "adaptation" else "Auto checks food, care and space.", Color("8fa1a8"), 15)
-			_label(box.position + Vector2(16, 313), "Queued trial has priority." if production.waiting == "adaptation" else "Manual brood still needs feeding.", Color("8fa1a8"), 15)
+			_label(box.position + Vector2(16, 313), "Queued trial has priority." if production.waiting == "adaptation" else "Brood inherits the founding queen." if _status.get("daughter",false) else "Manual brood still needs feeding.", Color("8fa1a8"), 15)
 			_draw_brood_button()
 		"nursery":
 			var brood: Array = _status.brood
@@ -682,8 +692,8 @@ func _draw_context(size: Vector2) -> void:
 					_label(box.position + Vector2(16, base + 74), "Review returned food supplies", Color("8fa1a8"), 15)
 				else:
 					_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 15)
-					_label(box.position + Vector2(16, 316), "Browse returned sources", Color("8fa1a8"), 15)
-				for resource_id: String in Pressure.food_sources_needed(_status):
+					_label(box.position + Vector2(16, 316), "Needs supplies from Home" if _status.get("daughter",false) else "Browse returned sources", Color("8fa1a8"), 15)
+				for resource_id: String in ([] if _status.get("daughter",false) else Pressure.food_sources_needed(_status)):
 					var button: Rect2 = _food_source_rect(resource_id)
 					UIStyle.surface(self, button, Color("263038"))
 					_label(button.get_center() + Vector2(0, 5), "CARBS" if resource_id == "carbohydrate" else resource_id.to_upper(), Color("dce5d9"), 12, HORIZONTAL_ALIGNMENT_CENTER)
@@ -874,6 +884,9 @@ func _draw_nursery_develop_button() -> void:
 
 
 func _draw_controls(size: Vector2) -> void:
+	if _status.get("daughter_available",false):
+		UIStyle.surface(self,_pile_rect(),Color("29392f"))
+		_label(_pile_rect().get_center()+Vector2(0,6),"INSPECT HOME" if _status.get("daughter",false) else "INSPECT DAUGHTER",Color("d3dcd4"),16,HORIZONTAL_ALIGNMENT_CENTER)
 	for command: String in ["outward", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "save", "load"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale

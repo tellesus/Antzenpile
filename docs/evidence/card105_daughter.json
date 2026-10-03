@@ -1,0 +1,193 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"activation": {
+				"at": 1933.5,
+				"colony_workers": 77,
+				"local_workers": 11,
+				"parent_available": 32,
+				"parent_workers": 66,
+				"queens": 1,
+				"stores": {
+					"carbohydrate": 6.0,
+					"protein": 3.0,
+					"water": 3.0
+				}
+			},
+			"local_brood": {
+				"cohort": {
+					"adaptation_id": "load",
+					"adaptation_trial": false,
+					"care": 1.0,
+					"count": 8,
+					"id": "brood_1",
+					"inherited_traits": [
+						"load"
+					],
+					"lost_count": 0,
+					"nutrition": 0.0,
+					"nutrition_shortfalls": [
+						"carbohydrate"
+					],
+					"progress_seconds": 50.0,
+					"rain_comparison": false,
+					"recognition_comparison": false,
+					"stage": "larva"
+				},
+				"emerged": 0,
+				"stores": {
+					"carbohydrate": 0.0,
+					"protein": 1.2,
+					"water": 3.0
+				}
+			},
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"activation": {
+				"at": 2933.0,
+				"colony_workers": 84,
+				"local_workers": 11,
+				"parent_available": 41,
+				"parent_workers": 73,
+				"queens": 1,
+				"stores": {
+					"carbohydrate": 6.0,
+					"protein": 3.0,
+					"water": 3.0
+				}
+			},
+			"local_brood": {
+				"cohort": {
+					"adaptation_id": "load",
+					"adaptation_trial": false,
+					"care": 1.0,
+					"count": 8,
+					"id": "brood_1",
+					"inherited_traits": [
+						"load",
+						"persistent"
+					],
+					"lost_count": 0,
+					"nutrition": 0.0,
+					"nutrition_shortfalls": [
+						"carbohydrate",
+						"water"
+					],
+					"progress_seconds": 50.0,
+					"rain_comparison": false,
+					"recognition_comparison": false,
+					"stage": "larva"
+				},
+				"emerged": 0,
+				"stores": {
+					"carbohydrate": 0.0,
+					"protein": 1.2,
+					"water": 0.0
+				}
+			},
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591
+		},
+		{
+			"activation": {
+				"at": 2368.5,
+				"colony_workers": 72,
+				"local_workers": 11,
+				"parent_available": 30,
+				"parent_workers": 61,
+				"queens": 1,
+				"stores": {
+					"carbohydrate": 6.0,
+					"protein": 3.0,
+					"water": 3.0
+				}
+			},
+			"local_brood": {
+				"cohort": {
+					"adaptation_id": "load",
+					"adaptation_trial": false,
+					"care": 1.0,
+					"count": 8,
+					"id": "brood_1",
+					"inherited_traits": [
+						"load",
+						"tolerance"
+					],
+					"lost_count": 0,
+					"nutrition": 0.0,
+					"nutrition_shortfalls": [
+						"carbohydrate",
+						"water"
+					],
+					"progress_seconds": 50.0,
+					"rain_comparison": false,
+					"recognition_comparison": false,
+					"stage": "larva"
+				},
+				"emerged": 0,
+				"stores": {
+					"carbohydrate": 0.0,
+					"protein": 1.2,
+					"water": 0.0
+				}
+			},
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		},
+		{
+			"activation": {
+				"at": 2137.5,
+				"colony_workers": 75,
+				"local_workers": 11,
+				"parent_available": 30,
+				"parent_workers": 64,
+				"queens": 1,
+				"stores": {
+					"carbohydrate": 6.0,
+					"protein": 3.0,
+					"water": 3.0
+				}
+			},
+			"local_brood": {
+				"cohort": {
+					"adaptation_id": "load",
+					"adaptation_trial": false,
+					"care": 1.0,
+					"count": 8,
+					"id": "brood_1",
+					"inherited_traits": [
+						"load"
+					],
+					"lost_count": 0,
+					"nutrition": 0.0,
+					"nutrition_shortfalls": [
+						"carbohydrate"
+					],
+					"progress_seconds": 50.0,
+					"rain_comparison": false,
+					"recognition_comparison": false,
+					"stage": "larva"
+				},
+				"emerged": 0,
+				"stores": {
+					"carbohydrate": 0.0,
+					"protein": 1.2,
+					"water": 3.0
+				}
+			},
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591
+		}
+	]
+}

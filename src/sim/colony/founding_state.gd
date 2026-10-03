@@ -16,7 +16,7 @@ func to_dict() -> Dictionary:
 	return {"phase":phase,"route_id":route_id,"elapsed_ticks":elapsed_ticks,"leg_ticks":leg_ticks,"departed_tick":departed_tick,"reported_tick":reported_tick,"reproductive_group":reproductive_group.duplicate(true),"contaminant_mass":contaminant_mass}
 func restore(data: Dictionary, colony: ColonyState, tick: int) -> bool:
 	if data.size()!=8 or not data.has_all(to_dict().keys()): return false
-	if not data.phase is String or data.phase not in ["none","outbound","settling","messenger","ready","returning","failed"] or not data.route_id is String: return false
+	if not data.phase is String or data.phase not in ["none","outbound","settling","messenger","ready","returning","failed","established"] or not data.route_id is String: return false
 	for key: String in ["elapsed_ticks","leg_ticks","departed_tick","reported_tick"]:
 		if not WorkerLedger.valid_count(data[key]): return false
 	if not data.reproductive_group is Dictionary or not typeof(data.contaminant_mass) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.contaminant_mass)) or data.contaminant_mass<0 or data.contaminant_mass>CONFIG.carbohydrate: return false
@@ -36,13 +36,13 @@ func restore(data: Dictionary, colony: ColonyState, tick: int) -> bool:
 		if data.elapsed_ticks>=data.leg_ticks: return false
 		minimum+=data.leg_ticks+(CONFIG.preparation_ticks if data.phase=="messenger" else 0)
 	else:
-		if data.elapsed_ticks!=0 or data.reported_tick<data.departed_tick+2*data.leg_ticks+(CONFIG.preparation_ticks if data.phase=="ready" else 0) or data.reported_tick>tick: return false
-		minimum=2*data.leg_ticks+(CONFIG.preparation_ticks if data.phase=="ready" else 0)
-	if minimum>tick-data.departed_tick or (data.phase not in ["ready","failed"] and data.reported_tick!=0): return false
-	if data.phase!="failed" and parent.reproduction.phase!="none": return false
+		if data.elapsed_ticks!=0 or data.reported_tick<data.departed_tick+2*data.leg_ticks+(CONFIG.preparation_ticks if data.phase in ["ready","established"] else 0) or data.reported_tick>tick: return false
+		minimum=2*data.leg_ticks+(CONFIG.preparation_ticks if data.phase in ["ready","established"] else 0)
+	if minimum>tick-data.departed_tick or (data.phase not in ["ready","failed","established"] and data.reported_tick!=0): return false
+	if data.phase not in ["failed","established"] and parent.reproduction.phase!="none": return false
 	phase=data.phase; route_id=data.route_id; elapsed_ticks=int(data.elapsed_ticks); leg_ticks=int(data.leg_ticks)
 	departed_tick=int(data.departed_tick); reported_tick=int(data.reported_tick); reproductive_group=group.to_dict()
 	contaminant_mass=roundf(float(data.contaminant_mass)*100000000.0)/100000000.0
 	return true
 func valid_route(route: TrailRouteState) -> bool:
-	return route.id==route_id and route.purpose=="founding" and route.origin_pile=="home" and route.allocated_workers==assigned() and route.active_workers==assigned() and route.desired_workers==assigned() and route.status==("inactive" if phase=="failed" else "active") and not route.reported_depleted and route.delivered_total==0 and route.receipt.is_empty() and route.reported_losses==0 and route.foreign_reports==0 and route.conflict_report.is_empty() and not route.energy_limited and not route.resume_on_report and route.departure_cooldown_ticks==0
+	return route.id==route_id and route.purpose==("interpile" if phase=="established" else "founding") and route.origin_pile=="home" and route.allocated_workers==assigned() and route.active_workers==assigned() and route.desired_workers==assigned() and route.status==("inactive" if phase in ["failed","established"] else "active") and not route.reported_depleted and route.delivered_total==0 and route.receipt.is_empty() and route.reported_losses==0 and route.foreign_reports==0 and route.conflict_report.is_empty() and not route.energy_limited and not route.resume_on_report and route.departure_cooldown_ticks==0

@@ -187,6 +187,10 @@ func start_guest_rejection() -> bool:
 	return guest.start_rejection()
 
 
+func establish_daughter(knowledge_id: String) -> bool:
+	return founding.establish(knowledge_id)
+
+
 func start_founding(knowledge_id: String) -> bool:
 	return founding.start(knowledge_id)
 

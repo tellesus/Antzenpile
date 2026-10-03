@@ -260,6 +260,19 @@ func restore(data: Dictionary) -> bool:
 	var restored_trails := Trails.new()
 	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding):
 		return false
+	# One paid, physically reported foundation owns the only current daughter.
+	var daughter: PileState=restored_colony.piles.get("satellite_1")
+	if (daughter!=null)!=(restored_founding.phase=="established"): return false
+	for pile: PileState in restored_colony.piles.values():
+		if pile.id not in ["home","satellite_1"]: return false
+		if pile.id=="home" and (not pile.foundation.is_empty() or pile.workers.transferred_in>0): return false
+	if daughter!=null:
+		var parent: PileState=restored_colony.piles.home
+		var route: TrailRouteState=restored_trails.routes[restored_founding.route_id]
+		if daughter.foundation.is_empty() or daughter.foundation.route_id!=route.id or daughter.position!=route.estimated_destination or daughter.foundation.queen_traits!=restored_founding.reproductive_group.inherited_traits: return false
+		if daughter.foundation.founded_tick<restored_founding.reported_tick or daughter.foundation.founded_tick>restored_clock.tick_count: return false
+		if parent.workers.transferred_out!=FoundingState.CONFIG.workers-1 or daughter.workers.transferred_in!=FoundingState.CONFIG.workers-1 or daughter.workers.transferred_out!=0: return false
+		if daughter.genetics.imported!=parent.genetics.exported: return false
 	for agent: ScoutAgent in restored_scouts.values():
 		for route_id: String in agent.avoid_routes:
 			if not restored_trails.routes.has(route_id) or restored_trails.routes[route_id].origin_pile != agent.origin_pile or restored_trails.routes[route_id].reported_losses < 1:
@@ -369,7 +382,8 @@ func restore(data: Dictionary) -> bool:
 	for pile: PileState in restored_colony.piles.values():
 		var pending: int = restored_trails.pending_for_pile(pile.id) + (defense.lost if pile.id == "home" else 0)
 		var pending_adapted: int = restored_trails.pending_for_pile(pile.id,true) + (defense.adapted_lost if pile.id == "home" else 0)
-		var profiles: Dictionary[String,int] = defense.lost_profiles.duplicate() if pile.id == "home" else {}
+		var profiles: Dictionary[String,int] = {}
+		if pile.id=="home": profiles.assign(defense.lost_profiles)
 		for agent: ScoutAgent in restored_scouts.values():
 			if agent.origin_pile == pile.id and agent.lost:
 				pending += 1

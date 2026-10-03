@@ -14,6 +14,7 @@ func queue_choice(pile_id: String, trait_id: Variant) -> bool:
 	if not _run.colony.piles.has(pile_id) or not trait_id is String:
 		return _reject("Unknown pile or adaptation")
 	var pile: PileState = _run.colony.piles[pile_id]
+	if not pile.foundation.is_empty(): return _reject("Daughter lineage selection is not yet available")
 	if trait_id != "" and not AdaptationRules.can_queue(pile, trait_id):
 		return _reject("Adaptation already locked, inherited or unavailable")
 	pile.queued_adaptation = trait_id
@@ -24,6 +25,7 @@ func queue_choice(pile_id: String, trait_id: Variant) -> bool:
 func start_queued(pile_id: String) -> bool:
 	if not _run.colony.piles.has(pile_id): return _reject("Unknown pile")
 	var pile: PileState = _run.colony.piles[pile_id]
+	if not pile.foundation.is_empty(): return _reject("Daughter lineage selection is not yet available")
 	if pile.queued_adaptation.is_empty(): return _reject("No adaptation queued")
 	if not start(pile_id, pile.queued_adaptation): return false
 	pile.queued_adaptation = ""
@@ -57,6 +59,7 @@ func start(pile_id: String, trait_id: String) -> bool:
 	if not _run.colony.piles.has(pile_id):
 		return _reject("Unknown pile")
 	var pile: PileState = _run.colony.piles[pile_id]
+	if not pile.foundation.is_empty(): return _reject("Daughter lineage selection is not yet available")
 	if not pile.queued_adaptation.is_empty() and pile.queued_adaptation != trait_id:
 		return _reject("Another adaptation is queued for the next brood")
 	var blocker: String = laying_blocker(pile, trait_id)

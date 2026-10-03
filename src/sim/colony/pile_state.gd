@@ -14,6 +14,7 @@ const BROOD_CONFIG = preload("res://data/resources/default_brood.tres")
 const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 const NURSERY_CONFIG = preload("res://data/resources/default_nursery_development.tres")
 const RESOURCE_IDS: Array[String] = ["carbohydrate", "protein", "water"]
+var foundation: Dictionary = {}
 var id: String = "home"
 var position: Vector2 = Vector2(20, 20)
 var queen_count: int = 1
@@ -49,7 +50,7 @@ func to_dict() -> Dictionary:
 	var brood_records: Array[Dictionary] = []
 	for cohort: BroodCohort in brood_cohorts:
 		brood_records.append(cohort.to_dict())
-	return {"id": id, "position": [position.x, position.y], "queen_count": queen_count,
+	var record: Dictionary={"id": id, "position": [position.x, position.y], "queen_count": queen_count,
 		"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
 		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
@@ -65,6 +66,14 @@ func to_dict() -> Dictionary:
 		"food_exchange_state": food_exchange_state, "food_toxicity": food_toxicity.to_dict(),
 		"brood_health": brood_health.to_dict(), "temperature": temperature.to_dict(), "reproduction": reproduction.to_dict(),
 		"food_exchange_progress_seconds": food_exchange_progress_seconds, "midden": midden.to_dict(), "humidity": humidity.to_dict()}
+	if not foundation.is_empty(): record.foundation=foundation.duplicate(true)
+	return record
+
+
+func offspring_traits() -> Array[String]:
+	var result: Array[String]=[]
+	result.assign(foundation.queen_traits if not foundation.is_empty() else genetics.established)
+	return result
 
 
 func nursery_brood_capacity() -> int:
@@ -139,6 +148,28 @@ func lose_workers(pool: String, amount: Variant, adapted_amount: Variant, reason
 	return true
 
 
+func move_workers_to(destination: PileState, pool: String, amount: int) -> bool:
+	if destination==null or destination==self or amount<=0 or workers.count(pool)<amount: return false
+	var plan: Dictionary[String,int]=genetics.migration_plan(amount,workers_total)
+	if genetics.migration_count(plan)!=amount: return false
+	var combined: Array[String]=destination.genetics.established.duplicate()
+	for key: String in plan:
+		for trait_id: String in GeneticRepertoire.traits_for(key):
+			if trait_id not in combined: combined.append(trait_id)
+	if not AdaptationRules.compatible(combined): return false
+	if not workers.move_to(destination.workers,pool,"available",amount,"Interpile worker transfer"): return false
+	for key: String in plan:
+		for trait_id: String in GeneticRepertoire.traits_for(key):
+			if trait_id not in destination.genetics.established: destination.genetics.established.append(trait_id)
+	destination.genetics.established.sort()
+	genetics.move_profiles_to(destination.genetics,plan)
+	for pile: PileState in [self,destination]:
+		for trait_id: String in pile.genetics.established:
+			if trait_id in ["lean","load"]: pile.adaptation_repertoire=trait_id
+		pile.adapted_workers_total=pile.genetics.count_trait(pile.adaptation_repertoire)
+	return true
+
+
 func register_emergence(cohort: BroodCohort) -> void:
 	genetics.emerge(cohort.inherited_traits, cohort.count, cohort.adaptation_id if cohort.adaptation_trial else "")
 	if cohort.adaptation_trial and cohort.adaptation_id in ["lean", "load"]:
@@ -189,6 +220,15 @@ func restore(data: Dictionary) -> bool:
 	for value: Variant in data.position:
 		if not typeof(value) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(value)):
 			return false
+	var founding_data: Variant=data.get("foundation",{})
+	if not founding_data is Dictionary: return false
+	var founder_traits: Array[String]=[]
+	if not founding_data.is_empty():
+		if data.id!="satellite_1" or founding_data.size()!=4 or not founding_data.has_all(["parent_id","route_id","queen_traits","founded_tick"]) or founding_data.parent_id!="home" or not founding_data.route_id is String or founding_data.route_id.is_empty() or not WorkerLedger.valid_count(founding_data.founded_tick) or not founding_data.queen_traits is Array: return false
+		for trait_id: Variant in founding_data.queen_traits:
+			if not trait_id is String or not AdaptationRules.valid_trait(trait_id) or trait_id in founder_traits: return false
+			founder_traits.append(trait_id)
+		if not AdaptationRules.compatible(founder_traits) or data.queen_count!=1: return false
 	var restored := Ledger.new()
 	if not restored.restore(data.workers):
 		return false
@@ -226,7 +266,7 @@ func restore(data: Dictionary) -> bool:
 	var legacy: bool = not data.has("brood_started_total")
 	var started: Variant = data.get("brood_started_total", emerged / BROOD_CONFIG.starting_count + restored_brood.size())
 	var brood_lost: Variant = data.get("brood_lost_total", 0)
-	if not Ledger.valid_count(started) or started < 1 or not Ledger.valid_count(brood_lost) or (legacy and (emerged % BROOD_CONFIG.starting_count != 0 or brood_lost != 0)):
+	if not Ledger.valid_count(started) or (started < 1 and founding_data.is_empty()) or not Ledger.valid_count(brood_lost) or (legacy and (emerged % BROOD_CONFIG.starting_count != 0 or brood_lost != 0)):
 		return false
 	var occupied: int = 0
 	var cohort_ids: Dictionary[String, bool] = {}
@@ -252,23 +292,26 @@ func restore(data: Dictionary) -> bool:
 	var candidate: Variant = data.get("chemistry_candidate", false)
 	var recognition_seen: Variant = data.get("recognition_experience", false)
 	var recognition_available: Variant = data.get("recognition_candidate", false)
-	if typeof(recognition_seen) != TYPE_BOOL or typeof(recognition_available) != TYPE_BOOL or (recognition_available and (not recognition_seen or emerged < 1)):
+	if typeof(recognition_seen) != TYPE_BOOL or typeof(recognition_available) != TYPE_BOOL or (recognition_available and (not recognition_seen or emerged+restored.transferred_in < 1)):
 		return false
-	if typeof(rain_observed) != TYPE_BOOL or typeof(candidate) != TYPE_BOOL or (candidate and (not rain_observed or emerged < 1)):
+	if typeof(rain_observed) != TYPE_BOOL or typeof(candidate) != TYPE_BOOL or (candidate and (not rain_observed or emerged+restored.transferred_in < 1)):
 		return false
 	var adapted: Variant = data.get("adapted_workers_total", 0)
 	var adapted_lost: Variant = data.get("adapted_workers_lost", 0)
-	if not repertoire is String or not (repertoire == "" or AdaptationRules.valid_trait(repertoire)) or not Ledger.valid_count(adapted) or not Ledger.valid_count(adapted_lost) or adapted > restored.total or adapted_lost > restored.lost_total or adapted > emerged or adapted_lost > emerged - adapted:
+	if not repertoire is String or not (repertoire == "" or AdaptationRules.valid_trait(repertoire)) or not Ledger.valid_count(adapted) or not Ledger.valid_count(adapted_lost) or adapted > restored.total or adapted_lost > restored.lost_total or adapted+adapted_lost>emerged+restored.transferred_in:
 		return false
 	var lifetime_adapted: int = int(adapted) + int(adapted_lost)
-	if brood_lost == 0 and lifetime_adapted % BROOD_CONFIG.starting_count != 0:
+	if brood_lost == 0 and restored.transferred_in==0 and restored.transferred_out==0 and lifetime_adapted % BROOD_CONFIG.starting_count != 0:
 		return false
-	if (repertoire == "") != (lifetime_adapted == 0):
+	if (repertoire == "") != (lifetime_adapted == 0) and repertoire not in founder_traits and restored.transferred_out==0:
 		return false
 	var genetic_data: Variant = data.get("genetics", {"established": [] if repertoire == "" else [repertoire], "living": {} if adapted == 0 else {repertoire: adapted}, "lost": {} if adapted_lost == 0 else {repertoire: adapted_lost}})
 	var restored_genetics := GeneticRepertoire.new()
-	if not genetic_data is Dictionary or not restored_genetics.restore(genetic_data, restored.total, restored.lost_total, emerged):
+	if not genetic_data is Dictionary or not restored_genetics.restore(genetic_data, restored.total, restored.lost_total, emerged, founder_traits):
 		return false
+	for trait_id: String in founder_traits:
+		if trait_id not in restored_genetics.established: return false
+	if restored_genetics.migration_count(restored_genetics.imported)!=restored.transferred_in or restored_genetics.migration_count(restored_genetics.exported)!=restored.transferred_out: return false
 	if restored_genetics.count_trait(repertoire) != adapted or restored_genetics.count_trait(repertoire, true) != adapted_lost or ("lean" in restored_genetics.established or "load" in restored_genetics.established) != (repertoire != ""):
 		return false
 	if "persistent" in restored_genetics.established and not candidate:
@@ -280,8 +323,11 @@ func restore(data: Dictionary) -> bool:
 		for key: String in restored_genetics.lost:
 			if key not in profiles:
 				profiles.append(key)
+		for histories: Dictionary in [restored_genetics.imported,restored_genetics.exported]:
+			for key: String in histories:
+				if key!="" and key not in profiles: profiles.append(key)
 		for key: String in profiles:
-			if (restored_genetics.living.get(key, 0) + restored_genetics.lost.get(key, 0)) % BROOD_CONFIG.starting_count != 0:
+			if (restored_genetics.living.get(key, 0) + restored_genetics.lost.get(key, 0)+restored_genetics.exported.get(key,0)-restored_genetics.imported.get(key,0)) % BROOD_CONFIG.starting_count != 0:
 				return false
 	var trials: int = 0
 	var locked_trait: String = ""
@@ -308,6 +354,10 @@ func restore(data: Dictionary) -> bool:
 			return false
 		if cohort.recognition_comparison and not recognition_seen:
 			return false
+	if not founding_data.is_empty():
+		if trials>0 or data.get("queued_adaptation", "")!="" or data.get("reproduction", {}).get("phase", "none")!="none": return false
+		for cohort: BroodCohort in restored_brood:
+			if cohort.inherited_traits!=founder_traits: return false
 	if trials > 1:
 		return false
 	var restored_queue: Variant = data.get("queued_adaptation", "")
@@ -363,6 +413,8 @@ func restore(data: Dictionary) -> bool:
 	var restored_temperature := TemperatureState.new()
 	var thermal_data: Variant = data.get("temperature", restored_temperature.to_dict())
 	if not thermal_data is Dictionary or not restored_temperature.restore(thermal_data, restored_nursery_state): return false
+	foundation=founding_data.duplicate(true)
+	if not foundation.is_empty(): foundation.queen_traits=founder_traits; foundation.founded_tick=int(foundation.founded_tick)
 	temperature = restored_temperature
 	reproduction = restored_reproduction
 	brood_health = restored_health

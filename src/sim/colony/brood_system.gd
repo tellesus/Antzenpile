@@ -39,8 +39,8 @@ func start(pile_id: String) -> bool:
 	var cohort := BroodCohort.new()
 	pile.brood_started_total += 1
 	cohort.id = "brood_%d" % pile.brood_started_total
-	cohort.adaptation_id = pile.adaptation_repertoire
-	cohort.inherited_traits = pile.genetics.established.duplicate()
+	cohort.inherited_traits = pile.offspring_traits()
+	cohort.adaptation_id = pile.adaptation_repertoire if pile.adaptation_repertoire in cohort.inherited_traits else ""
 	cohort.rain_comparison = pile.rain_trace_observed and not pile.chemistry_candidate
 	cohort.recognition_comparison = pile.recognition_experience and not pile.recognition_candidate
 	pile.brood_cohorts.append(cohort)

@@ -118,7 +118,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	if not resume is bool or not typeof(empty_at) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(empty_at)) or empty_at < 0:
 		return false
 	var saved_purpose: Variant=data.get("purpose","food")
-	if not saved_purpose is String or saved_purpose not in ["food","founding"]: return false
+	if not saved_purpose is String or saved_purpose not in ["food","founding","interpile"]: return false
 	purpose=saved_purpose
 	id = data.id
 	origin_pile = data.origin_pile
