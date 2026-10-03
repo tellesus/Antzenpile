@@ -1,5 +1,7 @@
 # Decision register
 
+092 music pass accepted 2026-10-02: supersede the prototype duration/rate in A16/A45 with an original 16-bar/80-BPM, 48-second/44.1-kHz mono arrangement. Soft recorded bass drum/tuned timpani and complementary harp/marimba/light percussion use seven pinned CC0 VCSL samples in offline authoring only. Four synchronized players, developed/known-condition/focus gates, -4 dB runtime gain, real-time fades and separate cues remain. Larger PCM footprint is explicit; subjective/mobile validation remains pending.
+
 089 palette follow-up (2026-10-02): the player selected pure black for empty INWARD/OUTWARD space, replacing inherited blue-black. Local art illumination and distinct dark control surfaces remain. This also applies to viewport clear color; no new effect or gameplay contract.
 
 Graphics clarification accepted 2026-10-02 (089): the player's new bioluminescent references authorize a substantial textured art upgrade. INWARD may visibly grow functional organs through existing construction and capacity expansion. Baked lighting, reusable generated empty shells and original shaded anatomy are authoring techniques; contents remain approved state projections. Local Home substrate is permitted in OUTWARD; distant space remains an information field. No new major system, engine upgrade, paid plugin or physical tunnel geography is authorized.
