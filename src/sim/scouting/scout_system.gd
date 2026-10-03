@@ -5,6 +5,7 @@ const Pathfinder = preload("res://src/sim/scouting/scout_pathfinder.gd")
 const Senses = preload("res://src/sim/scouting/scout_senses.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
 const Memory = preload("res://src/sim/knowledge/scout_mission_memory.gd")
+const Caution = preload("res://src/sim/scouting/scout_caution.gd")
 var config: ScoutConfig = preload("res://data/scouting/default_scouts.tres")
 var last_error: String = ""
 var _run: RunState
@@ -31,12 +32,17 @@ func dispatch(origin_id: String, bearing: Variant = null, standing: bool = false
 	var saved_rng: int = _run.rng.state
 	var finder := Pathfinder.new(_run.world)
 	var route: Array[Vector2] = []
+	var cautions: Array[String] = []
+	if standing:
+		cautions = Caution.routes(_run, origin_id)
 	for attempt: int in config.target_attempts:
 		var angle: float = _run.rng.randf_range(-PI, PI) if bearing == null else float(bearing) + _run.rng.randf_range(-config.cone_radians, config.cone_radians)
 		var distance: float = _run.rng.randf_range(config.minimum_distance, config.maximum_distance)
 		var target: Vector2 = (origin.position + Vector2.from_angle(angle) * distance).round()
 		route = finder.path(origin.position, target)
 		if route.size() > 1:
+			if not cautions.is_empty() and Caution.path_risk(route, cautions, _run.trails, origin.position) > 0.0 and attempt < config.target_attempts - 1:
+				continue
 			var freshness: float = _run.exploration.coverage.get(_run.exploration.cell_key(target, _run.world.bounds), 0.0) if standing else 0.0
 			if freshness > 0 and _run.rng.randf() < freshness * config.novelty_rejection and attempt < config.target_attempts - 1:
 				continue
@@ -59,6 +65,8 @@ func _dispatch_route(origin: PileState, route: Array[Vector2], standing: bool, b
 	agent.id = id
 	agent.origin_pile = origin.id
 	agent.standing = standing
+	if standing and source_id.is_empty():
+		agent.avoid_routes = Caution.routes(_run, origin.id)
 	agent.position = origin.position
 	agent.path = route
 	agent.mission_target = route.back()
@@ -87,7 +95,7 @@ func _dispatch_general(origin_id: String, bearing: Variant) -> bool:
 	var candidates: Array[TrailRouteState] = []
 	for route: TrailRouteState in _run.trails.routes.values():
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-		if route.origin_pile != origin_id or route.delivered_total <= 0 or segment.route_familiarity < config.established_trail_familiarity or route.reported_losses > 0 or route.conflict_report not in ["", "secured", "dispersed"] or route.foreign_reports > 0:
+		if route.origin_pile != origin_id or route.delivered_total <= 0 or segment.route_familiarity < config.established_trail_familiarity or route.reported_losses > 0 and not Caution.addressed(route, _run.journey_response.defense.outcomes) or route.conflict_report not in ["", "secured", "dispersed"] or route.foreign_reports > 0:
 			continue
 		var direction: float = (route.estimated_destination - _run.colony.piles[origin_id].position).angle()
 		if bearing != null and absf(wrapf(direction - float(bearing), -PI, PI)) > config.cone_radians:
@@ -98,7 +106,7 @@ func _dispatch_general(origin_id: String, bearing: Variant) -> bool:
 		var selected: TrailRouteState = candidates[_run.rng.randi_range(0, candidates.size() - 1)]
 		var origin: PileState = _run.colony.piles[origin_id]
 		var path: Array[Vector2] = Pathfinder.new(_run.world).path(origin.position, selected.estimated_destination.round())
-		if path.size() > 1:
+		if path.size() > 1 and Caution.path_risk(path, Caution.routes(_run, origin_id), _run.trails, origin.position) == 0.0:
 			return _dispatch_route(origin, path, true, (path.back() - origin.position).angle(), "", selected.id)
 	return dispatch(origin_id, bearing, true)
 
@@ -508,6 +516,8 @@ func _frontier_path(agent: ScoutAgent, center: Vector2, radius: int) -> Array[Ve
 				var score: float = -candidate.distance_to(center) if radius >= 0 else (candidate - current).dot(outward)
 				if agent.standing and radius < 0:
 					score -= config.coverage_frontier_penalty * agent.search_memory.get(_run.exploration.cell_key(candidate, _run.world.bounds), 0.0) * pow(0.5, agent.elapsed / config.coverage_half_life)
+				if not agent.avoid_routes.is_empty():
+					score -= config.caution_frontier_penalty * Caution.path_risk(route.slice(1), agent.avoid_routes, _run.trails, _run.colony.piles[agent.origin_pile].position)
 				if score > best_score:
 					best_score = score
 					best_path = route

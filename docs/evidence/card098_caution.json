@@ -1,0 +1,83 @@
+{
+	"failures": 0,
+	"rows": [
+		{
+			"exact_saved_continuation": true,
+			"known_sources": 7,
+			"policy": "previous_card",
+			"resource_types": [
+				"carbohydrate",
+				"protein",
+				"water"
+			],
+			"scout_losses": 1,
+			"seed": 3043,
+			"start_at": 441.25
+		},
+		{
+			"exact_saved_continuation": true,
+			"known_sources": 7,
+			"policy": "learned_caution",
+			"resource_types": [
+				"carbohydrate",
+				"protein",
+				"water"
+			],
+			"scout_losses": 0,
+			"seed": 3043,
+			"start_at": 441.25
+		},
+		{
+			"exact_saved_continuation": true,
+			"known_sources": 7,
+			"policy": "previous_card",
+			"resource_types": [
+				"carbohydrate",
+				"protein",
+				"water"
+			],
+			"scout_losses": 2,
+			"seed": 104729,
+			"start_at": 439.25
+		},
+		{
+			"exact_saved_continuation": true,
+			"known_sources": 7,
+			"policy": "learned_caution",
+			"resource_types": [
+				"carbohydrate",
+				"protein",
+				"water"
+			],
+			"scout_losses": 0,
+			"seed": 104729,
+			"start_at": 439.25
+		},
+		{
+			"exact_saved_continuation": true,
+			"known_sources": 7,
+			"policy": "previous_card",
+			"resource_types": [
+				"carbohydrate",
+				"protein",
+				"water"
+			],
+			"scout_losses": 5,
+			"seed": 8675309,
+			"start_at": 858.0
+		},
+		{
+			"exact_saved_continuation": true,
+			"known_sources": 7,
+			"policy": "learned_caution",
+			"resource_types": [
+				"carbohydrate",
+				"protein",
+				"water"
+			],
+			"scout_losses": 3,
+			"seed": 8675309,
+			"start_at": 858.0
+		}
+	]
+}

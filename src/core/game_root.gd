@@ -255,7 +255,8 @@ func inspect_internal_pressure() -> Dictionary:
 func exploration_summary() -> Dictionary:
 	return {"target": simulation.run.exploration.target, "bias": simulation.run.exploration.bias,
 		"away": simulation.scouting.standing_count(), "priorities": simulation.run.exploration.priorities.duplicate(),
-		"missing": simulation.run.missing_scouts("home")}
+		"missing": simulation.run.missing_scouts("home"),
+		"cautious_routes": simulation.scouting.Caution.routes(simulation.run, "home").size()}
 
 
 func toggle_investigation_priority(knowledge_id: String) -> Dictionary:

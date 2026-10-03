@@ -173,7 +173,7 @@ func _sources_panel_rect() -> Rect2:
 
 
 func _exploration_panel_rect() -> Rect2:
-	return Rect2(24, 148, 308, 308)
+	return Rect2(24, 148, 308, 330)
 
 
 func _context_panel_rect() -> Rect2:
@@ -944,6 +944,8 @@ func _draw_exploration() -> void:
 	_label(Vector2(40, 395), "%d source priorities share scout effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 14)
 	_label(Vector2(40, 416), "Set 2, 5 or 8 to keep scouts searching", Color("a8b9b6"), 14)
 	_label(Vector2(40, 437), "Not returned: %d · cause unknown" % policy.missing if policy.get("missing", 0) > 0 else "Turning only changes your attention", Color("a8b9b6"), 14)
+	if policy.get("cautious_routes", 0) > 0:
+		_label(Vector2(40, 459), "General scouts favor safer ground", Color("c7b196"), 14)
 
 func _signal_title(category: String) -> String:
 	match category:

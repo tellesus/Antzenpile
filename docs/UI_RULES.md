@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 098 adds “General scouts favor safer ground” to Exploration only when unresolved home-delivered route losses support caution. It exposes neither hazard coordinates nor private scout observations. Manual and deliberate source missions remain available; a missing scout alone supplies no danger corridor.
+
 Card 097 distinguishes awaiting, overdue, returned and not-returned scout memories. Lateness alone never asserts death; a missing record says cause unknown and retains a directional stub. Selected awaiting missions offer a 260×44 Recall Scout action using shared mouse/touch input; acknowledgement never reports whether a distant scout survives. Exploration shows known missing count, with existing Off/effort/bias controls as responses. No instant casualty notice, remote course, predator identity or hidden source discovery appears.
 
 096 embeds local Home in a wide shallow near-ground material field, aligned with the existing sensory/scout anchor. Neutral baked smoke replaces crystalline resource lace: three bounded drifting layers use only returned category/strength, with existing confidence-gated water recognition and hollow empty remnants. No remote landscape, baked occupants, new signals, increased representative caps or volumetric runtime effects. Global transforms reset after each cloud layer; captions, gestures and reserved panels remain separate.

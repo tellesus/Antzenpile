@@ -25,6 +25,7 @@ var predator_encountered: bool = false
 var lost: bool = false
 var lost_profile: String = ""
 var expected_tick: int = 0
+var avoid_routes: Array[String] = []
 
 
 func pending_trait(trait_id: String) -> int:
@@ -44,7 +45,7 @@ func to_dict() -> Dictionary:
 		"investigation_source_id": investigation_source_id, "standing": standing, "observations": evidence,
 		"need_weights": need_weights.duplicate(), "search_memory": search_memory.duplicate(), "known_sources": known_sources.duplicate(),
 		"trunk_route_id": trunk_route_id, "trunk_path": _points(trunk_path),
-		"survival": {"encountered": predator_encountered, "lost": lost,
+		"avoid_routes": avoid_routes.duplicate(), "survival": {"encountered": predator_encountered, "lost": lost,
 			"profile": lost_profile, "expected_tick": expected_tick}}
 
 
@@ -135,6 +136,14 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	if not needs is Dictionary or not memory is Dictionary or not data.get("standing", false) and (not needs.is_empty() or not memory.is_empty()):
 		return false
 	var restored_needs: Dictionary[String, float] = {}
+	var cautions: Variant = data.get("avoid_routes", [])
+	if not cautions is Array or cautions.size() > world.nodes.size() or not cautions.is_empty() and (not data.get("standing", false) or not data.get("investigation_source_id", "").is_empty()):
+		return false
+	var restored_cautions: Array[String] = []
+	for key: Variant in cautions:
+		if not key is String or key in restored_cautions:
+			return false
+		restored_cautions.append(key)
 	for key: Variant in needs:
 		if key not in PileState.RESOURCE_IDS or not typeof(needs[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(needs[key])) or needs[key] < 1 or needs[key] > 1 + load("res://data/scouting/default_scouts.tres").need_weight:
 			return false
@@ -200,6 +209,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	lost = survival.lost
 	lost_profile = survival.profile
 	expected_tick = int(survival.expected_tick)
+	avoid_routes = restored_cautions
 	return true
 
 

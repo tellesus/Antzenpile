@@ -257,6 +257,9 @@ func restore(data: Dictionary) -> bool:
 	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time):
 		return false
 	for agent: ScoutAgent in restored_scouts.values():
+		for route_id: String in agent.avoid_routes:
+			if not restored_trails.routes.has(route_id) or restored_trails.routes[route_id].origin_pile != agent.origin_pile or restored_trails.routes[route_id].reported_losses < 1:
+				return false
 		if not agent.trunk_route_id.is_empty():
 			if not restored_trails.routes.has(agent.trunk_route_id):
 				return false

@@ -30,3 +30,6 @@ extends Resource
 @export var rain_scent_half_life: float = 12.0
 @export var return_grace_seconds: float = 30.0
 @export var manual_expectation_seconds: float = 600.0
+@export var caution_radius: float = 2.0
+@export var caution_home_radius: float = 4.0
+@export var caution_frontier_penalty: float = 6.0

@@ -2,7 +2,9 @@
 
 ## Current priority — scout survivability and learned caution (2026-10-03)
 
-Player approved resuming feature development after the graphics pass. [097 scout survivability](tasks/097_scout_survivability.md) is complete: physical ambusher loss, delayed missing memory, private evidence discard and actual individual recall. All 6,102 checks passed; 18 unfunded/counterfactual exploration trials preserved resource access and exact saved continuation. See [evaluation](SCOUT_SURVIVAL_EVALUATION.md). Next: one bounded collective learned-caution card, using returned route-loss geography for general exploration while preserving deliberate source rechecks and manual exploration. Do not add individual XP, private danger forecasts or a global risk control without a defined need. Mobile and session-duration work remain tabled.
+The scout survivability/collective caution milestone is complete: [097](tasks/097_scout_survivability.md) adds physical ambusher losses, delayed missing memory and actual recall; [098](tasks/098_learned_scout_caution.md) adds general exploration preferences from returned route alarms. Final combined suite passed 6,124 checks; 18 survivability trials and six paired caution trials preserved resource access and exact saves. See [survival](SCOUT_SURVIVAL_EVALUATION.md) and [caution evaluation](SCOUT_CAUTION_EVALUATION.md). No individual XP or private danger forecasts were added.
+
+Next: scope one original-design internal-health/disease interaction against existing refuse, humidity, care and contaminated-food contracts, with observable local evidence and a meaningful response. Keep wider ecology/seasons, satellites and reproductive lineages as later milestones until their dependencies are concrete. Mobile and session-duration work remain tabled.
 
 ## Current priority — desktop colony material pass (2026-10-03)
 

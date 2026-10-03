@@ -1,5 +1,7 @@
 # Architecture
 
+Card 098 adds a pure ScoutCaution helper over home-delivered TrailRoute loss/outcome summaries. General standing missions capture unresolved route IDs at dispatch and favor safer estimated corridors; bounded attempts/frontier preferences preserve unavoidable exploration. Manual/source-priority missions bypass this preference. No hidden predator/source geography is consulted. Successful defense changes future caution only after its report returns.
+
 Card 097 applies the existing shared PredatorSystem to capped ScoutAgents through swept physical travel. A private casualty remains a zero-count scout commitment and reserved slot until captured return expectation (or conservative late-loss grace); observations are discarded. RunState includes pending scout profiles in expected population/recognition/expression and validates cumulative pile scout losses against shared predator kills. Only settlement adds known missing memory; recall sends a semantic request with the same acknowledgement for an unresolved absence and a living scout. No normal provider receives survival fields.
 
 096 adds reusable neutral smoke and a local Home finish through SensoryArt only. Surface images are packed in an editable offline Blender source; rendering consumes approved detached summaries and existing view time. No simulation, perception, saved state or engine contract changes.
