@@ -22,6 +22,7 @@ const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 const Exploration = preload("res://src/sim/scouting/exploration_state.gd")
 var supply := InterpileSupplyState.new()
+var reinforcement := WorkerReinforcementState.new()
 var founding := FoundingState.new()
 var exploration: ExplorationState = Exploration.new()
 var daughter_exploration: ExplorationState = Exploration.new()
@@ -91,7 +92,7 @@ func to_dict() -> Dictionary:
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
-		"supply": supply.to_dict(), "founding": founding.to_dict(), "knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(), "daughter_exploration": daughter_exploration.to_dict(),
+		"reinforcement": reinforcement.to_dict(), "supply": supply.to_dict(), "founding": founding.to_dict(), "knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(), "daughter_exploration": daughter_exploration.to_dict(),
 		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
 
 
@@ -275,8 +276,11 @@ func restore(data: Dictionary) -> bool:
 	var restored_supply:=InterpileSupplyState.new()
 	var supply_data: Variant=data.get("supply",restored_supply.to_dict())
 	if not supply_data is Dictionary or not restored_supply.restore(supply_data,restored_colony,restored_founding,restored_clock.tick_count): return false
+	var restored_reinforcement:=WorkerReinforcementState.new()
+	var reinforcement_data: Variant=data.get("reinforcement",restored_reinforcement.to_dict())
+	if not reinforcement_data is Dictionary or not restored_reinforcement.restore(reinforcement_data,restored_colony,restored_founding,restored_supply,restored_clock.tick_count): return false
 	var restored_trails := Trails.new()
-	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, restored_supply):
+	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, restored_supply, restored_reinforcement):
 		return false
 	# One paid, physically reported foundation owns the only current daughter.
 	var daughter: PileState=restored_colony.piles.get("satellite_1")
@@ -289,7 +293,8 @@ func restore(data: Dictionary) -> bool:
 		var route: TrailRouteState=restored_trails.routes[restored_founding.route_id]
 		if daughter.foundation.is_empty() or daughter.foundation.route_id!=route.id or daughter.position!=route.estimated_destination or daughter.foundation.queen_traits!=restored_founding.reproductive_group.inherited_traits: return false
 		if daughter.foundation.founded_tick<restored_founding.reported_tick or daughter.foundation.founded_tick>restored_clock.tick_count: return false
-		if parent.workers.transferred_out!=FoundingState.CONFIG.workers-1 or daughter.workers.transferred_in!=FoundingState.CONFIG.workers-1 or daughter.workers.transferred_out!=0: return false
+		var migrants: int=FoundingState.CONFIG.workers-1+restored_reinforcement.arrivals*WorkerReinforcementState.CONFIG.reinforcement_workers
+		if parent.workers.transferred_out!=migrants or daughter.workers.transferred_in!=migrants or daughter.workers.transferred_out!=0: return false
 		if daughter.genetics.imported!=parent.genetics.exported: return false
 	for agent: ScoutAgent in restored_scouts.values():
 		for route_id: String in agent.avoid_routes:
@@ -466,6 +471,7 @@ func restore(data: Dictionary) -> bool:
 	next_scout_id = int(data.next_scout_id)
 	delivered_observations = restored_delivered
 	knowledge = restored_knowledge
+	reinforcement = restored_reinforcement
 	supply = restored_supply
 	founding = restored_founding
 	trails = restored_trails

@@ -9,6 +9,7 @@ func set_enabled(value: Variant) -> bool:
  if not value is bool: return _reject("Supply intent must be on or off")
  if _run.founding.phase!="established" or not _run.colony.piles.has("satellite_1"): return _reject("Establish a reported daughter pile first")
  var state: InterpileSupplyState=_run.supply
+ if _run.reinforcement.active(): return _reject("Wait for the worker reinforcement party to return")
  if value==state.enabled: return _reject("Supply intent already set")
  var route: TrailRouteState=_run.trails.routes[_run.founding.route_id]
  var home: PileState=_run.colony.piles.home
@@ -89,4 +90,5 @@ func summary() -> Dictionary:
  elif state.phase=="waiting": result.blocker=_food_blocker(_plan())
  else: result.blocker="Need %d available Home workers" % CONFIG.workers if _run.colony.piles.home.workers_available<CONFIG.workers else ""
  if state.trips_reported>0: result.report_age=(_run.clock.tick_count-state.last_reported_tick)*SimulationClock.TICK_INTERVAL
+ if _run.reinforcement.active():result.blocker="Worker party away; await return"
  return result

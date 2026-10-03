@@ -163,6 +163,14 @@ func move_workers_to(destination: PileState, pool: String, amount: int) -> bool:
 			if trait_id not in destination.genetics.established: destination.genetics.established.append(trait_id)
 	destination.genetics.established.sort()
 	genetics.move_profiles_to(destination.genetics,plan)
+	# Arriving expressed adults retain the earned repertoire prerequisites. Their
+	# phenotype does not replace the destination queen's captured lineage.
+	if "persistent" in destination.genetics.established:
+		destination.rain_trace_observed = destination.rain_trace_observed or rain_trace_observed
+		destination.chemistry_candidate = destination.chemistry_candidate or chemistry_candidate
+	if "security" in destination.genetics.established or "tolerance" in destination.genetics.established:
+		destination.recognition_experience = destination.recognition_experience or recognition_experience
+		destination.recognition_candidate = destination.recognition_candidate or recognition_candidate
 	for pile: PileState in [self,destination]:
 		for trait_id: String in pile.genetics.established:
 			if trait_id in ["lean","load"]: pile.adaptation_repertoire=trait_id

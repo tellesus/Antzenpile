@@ -66,6 +66,7 @@ func _ready() -> void:
 		inward.pile_command = inspect_pile
 		inward.pressure_command = inspect_internal_pressure
 		inward.supply_command = set_daughter_supply
+		inward.reinforcement_command = daughter_worker_reinforcement
 		inward.gathering_command = daughter_gathering_command
 		inward.mode_command = set_mode.bind("outward")
 		inward.pause_command = simulation.toggle_pause
@@ -432,7 +433,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
-	return {"supply":simulation.supply.summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
+	return {"reinforcement":simulation.reinforcement.summary(), "supply":simulation.supply.summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
 		"reproduction": simulation.reproduction.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
 			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
@@ -673,12 +674,14 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				if cohort.route_id == route.id and cohort.detour != null:
 					checking += 1
 			var pending: int = simulation.run.trails.pending_losses(route.id)
+			var settlers_away: bool = route.purpose=="interpile" and simulation.run.reinforcement.active()
+			var sent: int = WorkerReinforcementState.CONFIG.reinforcement_workers+WorkerReinforcementState.CONFIG.reinforcement_messengers
 			var status: String = route.status
 			if pending > 0 and status == "inactive":
 				status = "recalling" if route.desired_workers == 0 else "depleted" if route.reported_depleted else "active"
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
-				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers + pending,
-				"purpose":route.purpose, "founding_intent":route.purpose in ["founding","interpile"] and simulation.run.founding.phase!="failed", "active_workers":0 if route.purpose=="founding" and simulation.run.founding.phase=="ready" else route.active_workers + pending, "checking_workers": checking, "status": status,
+				"desired_workers": sent if settlers_away else route.desired_workers, "allocated_workers": sent if settlers_away else route.allocated_workers + pending,
+				"purpose":route.purpose, "founding_intent":route.purpose in ["founding","interpile"] and simulation.run.founding.phase!="failed", "active_workers":sent if settlers_away else 0 if route.purpose=="founding" and simulation.run.founding.phase=="ready" else route.active_workers + pending, "checking_workers": checking, "status": status,
 				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
@@ -698,6 +701,11 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 func journey_addressed(route: TrailRouteState) -> bool:
 	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
 	return outcome.get("outcome","") == "secured" and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
+
+
+func daughter_worker_reinforcement(recall: bool) -> Dictionary:
+	var accepted: bool=simulation.recall_daughter_workers() if recall else simulation.send_daughter_workers()
+	return {"accepted":accepted,"reason":simulation.reinforcement.last_error}
 
 
 func set_daughter_supply(enabled: bool) -> Dictionary:

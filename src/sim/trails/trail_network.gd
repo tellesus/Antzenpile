@@ -65,7 +65,7 @@ func to_dict() -> Dictionary:
 		"routes": route_records, "segments": segment_records, "cohorts": cohort_records}
 
 
-func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float, founding: FoundingState = null, supply: InterpileSupplyState = null) -> bool:
+func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float, founding: FoundingState = null, supply: InterpileSupplyState = null, reinforcement: WorkerReinforcementState = null) -> bool:
 	if not data.has_all(["next_route_id", "next_cohort_id", "routes", "segments", "cohorts"]) or not WorkerLedger.valid_count(data.next_route_id) or data.next_route_id < 1 or not WorkerLedger.valid_count(data.next_cohort_id) or data.next_cohort_id < 1 or not data.routes is Array or not data.segments is Array or not data.cohorts is Array:
 		return false
 	var restored_routes: Dictionary[String, TrailRouteState] = {}
@@ -78,7 +78,11 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 			return false
 		if route.purpose in ["founding","interpile"]:
 			if founding==null or knowledge.nodes[route.destination_knowledge_id].definition_id!="nest_site" or not founding.valid_route(route): return false
-			if route.purpose=="interpile" and (supply==null or not supply.valid_route(route)): return false
+			if route.purpose=="interpile":
+				if supply==null: return false
+				if reinforcement!=null and reinforcement.active():
+					if not reinforcement.valid_route(route,supply): return false
+				elif not supply.valid_route(route): return false
 		elif knowledge.nodes[route.destination_knowledge_id].definition_id not in PileState.RESOURCE_IDS: return false
 		if not route.receipt.is_empty() and route.receipt.last_at > time: return false
 		var suffix: String = route.id.trim_prefix("route_")

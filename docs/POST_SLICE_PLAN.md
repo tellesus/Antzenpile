@@ -23,9 +23,11 @@ The first supported satellite milestone is complete. Keep implementing one bound
 
 | [114 daughter independence review](tasks/114_daughter_independence_review.md) | Four exact sustained dual-pile scout/local intake/care/growth continuations after paid defense and stopped parent supplies. | [Independence review](DAUGHTER_INDEPENDENCE_EVALUATION.md) |
 
-Latest local-independence gate: 6,925 checks, four ordinary paid daughters with exact dual-pile standing exploration continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain explicitly permitted; local defense is verified, full independent reproductive biology is not claimed.
+| [115 daughter worker reinforcement](tasks/115_daughter_worker_reinforcement.md) | Paid nine-worker Home departure, eight real arriving settlers and returned messenger confirmation/recall; exclusive connection reuse with supplies. | [Worker support](WORKER_REINFORCEMENT_EVALUATION.md) |
 
-Next bounded section: paid worker reinforcement of the existing daughter. Audit original Part 3 support, current physical connection/captured phenotype bundles, migration ledgers and fixed founding conservation; define a small paid transfer with real travel before coding. Do not create workers or change ownership at dispatch. Preserve single-party bounds and real travel; do not treat shared reports as a free/instant response. Reinforcement, full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
+Latest worker-support gate: 6,970 checks, four ordinary paid daughters with exact mixed-trait migration/recall continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain permitted; local defense/support are verified, full independent reproductive biology is not claimed.
+
+Next bounded section: sustained reinforced daughter review. Exercise new workers in local exploration, care/growth and existing support-route reuse; preserve exact migrations/phenotypes and original queen inheritance. Then audit the next original network/reproductive player outcome against current dependencies. Full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
 
 ## Current priority — internal health and weather (2026-10-03)
 
