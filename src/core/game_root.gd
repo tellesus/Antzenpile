@@ -316,7 +316,7 @@ func outward_status(pile_id: String) -> Dictionary:
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
 		"scout_missions": scout_mission_summaries(pile_id),
 		"honeydew": honeydew_summary(pile_id),
-		"journey_response": simulation.journey_response.summary() if pile_id == "home" else {},
+		"journey_response": simulation.journey_response.summary(pile_id),
 		"internal_attention": Pressure.attention(inward_status(pile_id)),
 		"daughter_attention": pile_internal_attention("satellite_1" if pile_id == "home" else "home")}
 	status["exploration"] = exploration_summary(pile_id)
@@ -782,7 +782,8 @@ func recheck_trail(route_id: String) -> Dictionary:
 
 
 func respond_to_journey(action: String, route_id: String) -> Dictionary:
-	if inward_pile_id != "home": return _home_order()
+	if not _owns_food_route(route_id): return {"accepted":false,"reason":"Journey belongs to another pile or job"}
+	if inward_pile_id != "home" and action in ["defend","reinforce"]: return _home_order()
 	var system: JourneyResponseSystem = simulation.journey_response
 	var accepted: bool = false
 	match action:

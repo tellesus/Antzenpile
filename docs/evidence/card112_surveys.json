@@ -1,0 +1,85 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"cost": 0.36892,
+			"duration": 82.0,
+			"local_workers_released": true,
+			"losses": 2,
+			"no_parent_party": true,
+			"parent_dispatch_unchanged": true,
+			"passed": true,
+			"private_ticks": 208,
+			"report": {
+				"finding": "mixed",
+				"fraction": 0.75,
+				"observed_at": 5731.5,
+				"received_at": 5782.25
+			},
+			"route_id": "route_9",
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"cost": 0.370539999999998,
+			"duration": 82.5,
+			"local_workers_released": true,
+			"losses": 2,
+			"no_parent_party": true,
+			"parent_dispatch_unchanged": true,
+			"passed": true,
+			"private_ticks": 211,
+			"report": {
+				"finding": "mixed",
+				"fraction": 0.7,
+				"observed_at": 6820.75,
+				"received_at": 6872.75
+			},
+			"route_id": "route_9",
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591
+		},
+		{
+			"cost": 0.369859999999999,
+			"duration": 82.5,
+			"local_workers_released": true,
+			"losses": 2,
+			"no_parent_party": true,
+			"parent_dispatch_unchanged": true,
+			"passed": true,
+			"private_ticks": 210,
+			"report": {
+				"finding": "mixed",
+				"fraction": 0.7,
+				"observed_at": 6166.5,
+				"received_at": 6217.75
+			},
+			"route_id": "route_9",
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		},
+		{
+			"cost": 0.361260000000001,
+			"duration": 80.5,
+			"local_workers_released": true,
+			"losses": 2,
+			"no_parent_party": true,
+			"parent_dispatch_unchanged": true,
+			"passed": true,
+			"private_ticks": 205,
+			"report": {
+				"finding": "mixed",
+				"fraction": 0.7,
+				"observed_at": 5926.0,
+				"received_at": 5975.75
+			},
+			"route_id": "route_9",
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591
+		}
+	]
+}

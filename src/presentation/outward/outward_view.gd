@@ -439,7 +439,7 @@ func _button_at(at: Vector2) -> String:
 				if own_party and state.get("reinforcement_available",false): return "journey_reinforce"
 				if not own_party and _can_mobilize(chosen_route): return "journey_defend"
 			if Rect2(get_viewport_rect().size.x - 316,144,292,448).has_point(at): return "journey_panel"
-		elif not _daughter() and chosen_route.get("reported_losses",0) > 0 and _journey_rect("journey_open").has_point(at): return "journey_open"
+		elif chosen_route.get("reported_losses",0) > 0 and _journey_rect("journey_open").has_point(at): return "journey_open"
 		if _journey_attention():
 			for command: String in ["scout","pause","speed_1","speed_4","speed_16","speed_64","inward","save","load","sources"]:
 				if _button_rect(command).has_point(at): return command
@@ -1079,13 +1079,13 @@ func _daughter() -> bool:
 
 
 func _journey_attention() -> bool:
-	return not _daughter() and (journey_open or _selected_signal().get("category") == "threat")
+	return journey_open or _selected_signal().get("category") == "threat"
 
 func _journey_rect(command: String) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300,548 if command in ["journey_open","journey_close"] else 494 if command in ["journey_defend","journey_reinforce"] else 446,260,44)
 
 func _draw_journey_link() -> void:
-	if _daughter() or _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
+	if _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
 	var box: Rect2 = _journey_rect("journey_open")
 	UIStyle.surface(self, box,Color("39302b"))
 	_label(box.get_center() + Vector2(0,5),"JOURNEY REPORTS AND RESPONSE",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
@@ -1112,8 +1112,8 @@ func _draw_journey_context(_size: Vector2) -> void:
 	var witnesses: Array[String] = LossEvidence.lines(route, _status.get("time", 0.0))
 	_detail_journey(box, 211, witnesses[0] if not witnesses.is_empty() else "No harvest losses reported", 12)
 	_detail_journey(box, 233, "%d losses · report %s ago" % [route.get("reported_losses", 0), Copy.duration(_status.time - route.get("last_loss_time", 0))])
-	_detail_journey(box, 257, "%d %s sent · away %s" % [state.workers, "defenders" if state.get("mode") == "defend" else "survey workers", Copy.duration(state.age)] if own_party else "Home carbs: %.1f · %d available" % [_status.get("resources", {}).get("carbohydrate", 0), _status.get("available_workers", 0)], 12)
-	_detail_journey(box, 279, "Reports arrive with returning ants", 12)
+	_detail_journey(box, 257, "%d %s sent · away %s" % [state.workers, "defenders" if state.get("mode") == "defend" else "survey workers", Copy.duration(state.age)] if own_party else "%s carbs: %.1f · %d available" % [_status.get("pile_name","Home"),_status.get("resources", {}).get("carbohydrate", 0), _status.get("available_workers", 0)], 12)
+	_detail_journey(box, 279, state.other_party + " party away · one at a time" if state.get("other_party","") != "" else "Reports arrive with returning ants", 12)
 	var action: Rect2 = _journey_rect("journey_investigate")
 	_draw_journey_action(action, ("RECALL DEFENDERS" if state.get("mode") == "defend" else "RECALL SURVEY PARTY") if own_party else "SURVEY JOURNEY FOR DANGER", "Workers return through travel" if own_party else _party_requirement(3))
 	if own_party and state.get("reinforcement_available", false) or not own_party and _can_mobilize(route):
@@ -1143,4 +1143,4 @@ func _threat_caption(signal_data: Dictionary) -> String:
 
 func _can_mobilize(route: Dictionary) -> bool:
 	var state: Dictionary = _status.get("journey_response",{})
-	return state.get("reports",{}).get(route.get("id"),{}).get("finding","") in ["ambush","mixed"] and state.get("outcomes",{}).get(route.get("id"),{}).get("outcome","") != "secured"
+	return not _daughter() and state.get("reports",{}).get(route.get("id"),{}).get("finding","") in ["ambush","mixed"] and state.get("outcomes",{}).get(route.get("id"),{}).get("outcome","") != "secured"

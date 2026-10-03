@@ -13,7 +13,7 @@ func run(test: Object) -> bool:
  var before: Dictionary=game.run.to_dict()
  test.check(colony.set_mode("outward") and colony.inward_pile_id=="satellite_1","Daughter INWARD to OUTWARD preserves selected pile")
  view._process(0)
- test.check(view._status.pile_name=="Daughter" and view._status.honeydew.is_empty() and view._status.journey_response.is_empty(),"Daughter projection omits Home tending/defense")
+ test.check(view._status.pile_name=="Daughter" and view._status.honeydew.is_empty() and view._status.journey_response.reports.is_empty() and not view._status.journey_response.away,"Daughter projection omits Home tending/defense")
  var signal_data: Dictionary=colony.focused_outward_signals().filter(func(a:Dictionary)->bool:return a.source_knowledge_id==SOURCE)[0]
  var home_signal: Dictionary=colony.sensory_snapshot("home").filter(func(a:Dictionary)->bool:return a.source_knowledge_id==SOURCE)[0]
  test.check(signal_data.bearing!=home_signal.bearing and signal_data.estimated_distance!=home_signal.estimated_distance,"Shared memory bearing/distance is relative to actual selected entrance")
@@ -46,7 +46,7 @@ func run(test: Object) -> bool:
  var recheck: String="scout_%d" % (game.run.next_scout_id-1)
  test.check(colony.recall_scout(recheck).accepted and Exact.new().exact(game,120),"Known local recheck retains physical return/saved continuation")
  view._process(0);view.selected_id=signal_data.id
- test.check(view._investigation_title(signal_data).contains("PRIORITIZE") and view._button_at(view._journey_rect("journey_open").get_center())!="journey_open","Daughter offers deliberate recheck with no Home paid journey control")
+ test.check(view._investigation_title(signal_data).contains("PRIORITIZE") and view._button_at(view._journey_rect("journey_open").get_center())!="journey_open","Daughter offers deliberate recheck with no journey control before a returned loss")
  colony.set_mode("inward");test.check(colony.inward_pile_id==daughter.id,"OUTWARD to INWARD retains daughter context")
  colony._refresh_loaded_views();test.check(colony.inward_pile_id=="home" and view._status.pile_name=="Home","Load/new-run reset baselines Home before rebinding projection")
  colony._outward_view=null;view.queue_free();colony.free();return true
