@@ -21,9 +21,11 @@ The first supported satellite milestone is complete. Keep implementing one bound
 
 | [113 daughter defensive response](tasks/113_daughter_defensive_response.md) | Locally paid defenders/reinforcements/recall, conserved private casualties and delivered intervention. | [Defense](DAUGHTER_DEFENSE_EVALUATION.md) |
 
+| [114 daughter independence review](tasks/114_daughter_independence_review.md) | Four exact sustained dual-pile scout/local intake/care/growth continuations after paid defense and stopped parent supplies. | [Independence review](DAUGHTER_INDEPENDENCE_EVALUATION.md) |
+
 Latest local-independence gate: 6,925 checks, four ordinary paid daughters with exact dual-pile standing exploration continuations, standard/compact actual mouse/touch and inspected graphics. Initial colony-wide knowledge and simplified first interior remain explicitly permitted; local defense is verified, full independent reproductive biology is not claimed.
 
-Next bounded section: combined daughter independence review. Exercise both standing scout policies, own gathering/care/brood and delivered paid response together in ordinary saved colonies; keep physical ownership, exact continuation and meaningful strain evidence. Preserve single-party bounds and real travel; do not treat shared reports as a free/instant response. Reinforcement, full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
+Next bounded section: paid worker reinforcement of the existing daughter. Audit original Part 3 support, current physical connection/captured phenotype bundles, migration ledgers and fixed founding conservation; define a small paid transfer with real travel before coding. Do not create workers or change ownership at dispatch. Preserve single-party bounds and real travel; do not treat shared reports as a free/instant response. Reinforcement, full mating biology, latent lineage selection/drift, daughter reproductive generations, multiple sites, abandonment and transport threats remain later milestones. Preserve the accepted Home worker-brood adaptation proxy. Mobile and session targets remain tabled.
 
 ## Current priority — internal health and weather (2026-10-03)
 
