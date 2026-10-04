@@ -1,0 +1,1785 @@
+{
+  "baseline": "036ab0b",
+  "combat": [
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "clear12",
+      "dispatched": true,
+      "duration": 55.75,
+      "outcome": {
+        "lost": 6,
+        "observed_at": 469.25,
+        "outcome": "withdrew",
+        "received_at": 479.0,
+        "sent": 12
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "resisted"
+        }
+      ],
+      "seed": 3043,
+      "travel_carbs_spent": 0.7297199999999999
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "clear24",
+      "dispatched": true,
+      "duration": 59.75,
+      "outcome": {
+        "lost": 4,
+        "observed_at": 473.25,
+        "outcome": "secured",
+        "received_at": 483.0,
+        "sent": 24
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "resisted"
+        }
+      ],
+      "seed": 3043,
+      "travel_carbs_spent": 1.45943
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "hunt12",
+      "dispatched": true,
+      "duration": 55.75,
+      "outcome": {
+        "goal": "hunt",
+        "lost": 6,
+        "observed_at": 469.25,
+        "outcome": "withdrew",
+        "received_at": 479.0,
+        "sent": 12
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "resisted"
+        }
+      ],
+      "seed": 3043,
+      "travel_carbs_spent": 0.7297199999999999
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "hunt24",
+      "dispatched": true,
+      "duration": 83.75,
+      "outcome": {
+        "goal": "hunt",
+        "lost": 7,
+        "observed_at": 497.25,
+        "outcome": "secured",
+        "received_at": 507.0,
+        "sent": 24
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "resisted"
+        }
+      ],
+      "seed": 3043,
+      "travel_carbs_spent": 1.45943
+    },
+    {
+      "accepted": true,
+      "approach": {
+        "length": 28.21,
+        "outcome": "found",
+        "received_at": 479.75
+      },
+      "choice": "bypass",
+      "dispatched": true,
+      "duration": 56.5,
+      "outcome": {},
+      "reports": [],
+      "seed": 3043,
+      "travel_carbs_spent": 0.2538499999999999
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "clear12",
+      "dispatched": true,
+      "duration": 55.75,
+      "outcome": {
+        "lost": 3,
+        "observed_at": 461.75,
+        "outcome": "secured",
+        "received_at": 471.5,
+        "sent": 12
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "resisted"
+        }
+      ],
+      "seed": 3030,
+      "travel_carbs_spent": 0.6875800000000001
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "clear24",
+      "dispatched": true,
+      "duration": 55.75,
+      "outcome": {
+        "lost": 3,
+        "observed_at": 461.75,
+        "outcome": "secured",
+        "received_at": 471.5,
+        "sent": 24
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "resisted"
+        }
+      ],
+      "seed": 3030,
+      "travel_carbs_spent": 1.37517
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "hunt12",
+      "dispatched": true,
+      "duration": 75.75,
+      "outcome": {
+        "goal": "hunt",
+        "lost": 5,
+        "observed_at": 481.75,
+        "outcome": "secured",
+        "received_at": 491.5,
+        "sent": 12
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "resisted"
+        }
+      ],
+      "seed": 3030,
+      "travel_carbs_spent": 0.6875800000000001
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "hunt24",
+      "dispatched": true,
+      "duration": 71.75,
+      "outcome": {
+        "goal": "hunt",
+        "lost": 4,
+        "observed_at": 477.75,
+        "outcome": "secured",
+        "received_at": 487.5,
+        "sent": 24
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "resisted"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "resisted"
+        }
+      ],
+      "seed": 3030,
+      "travel_carbs_spent": 1.37517
+    },
+    {
+      "accepted": true,
+      "approach": {
+        "length": 27.32,
+        "outcome": "found",
+        "received_at": 470.75
+      },
+      "choice": "bypass",
+      "dispatched": true,
+      "duration": 55.0,
+      "outcome": {},
+      "reports": [],
+      "seed": 3030,
+      "travel_carbs_spent": 0.2458800000000001
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "clear12",
+      "dispatched": true,
+      "duration": 43.75,
+      "outcome": {
+        "lost": 0,
+        "observed_at": 850.25,
+        "outcome": "secured",
+        "received_at": 860.0,
+        "sent": 12
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "holding"
+        }
+      ],
+      "seed": 482817,
+      "travel_carbs_spent": 0.72085
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "clear24",
+      "dispatched": true,
+      "duration": 43.75,
+      "outcome": {
+        "lost": 0,
+        "observed_at": 850.25,
+        "outcome": "secured",
+        "received_at": 860.0,
+        "sent": 24
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "holding"
+        }
+      ],
+      "seed": 482817,
+      "travel_carbs_spent": 1.4417
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "hunt12",
+      "dispatched": true,
+      "duration": 59.75,
+      "outcome": {
+        "goal": "hunt",
+        "lost": 1,
+        "observed_at": 866.25,
+        "outcome": "secured",
+        "received_at": 876.0,
+        "sent": 12
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "holding"
+        }
+      ],
+      "seed": 482817,
+      "travel_carbs_spent": 0.72085
+    },
+    {
+      "accepted": true,
+      "approach": {},
+      "choice": "hunt24",
+      "dispatched": true,
+      "duration": 55.75,
+      "outcome": {
+        "goal": "hunt",
+        "lost": 0,
+        "observed_at": 862.25,
+        "outcome": "secured",
+        "received_at": 872.0,
+        "sent": 24
+      },
+      "reports": [
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 23.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 35.75,
+          "pressure": "holding"
+        },
+        {
+          "age_on_arrival": 9.75,
+          "arrived_after": 47.75,
+          "pressure": "holding"
+        }
+      ],
+      "seed": 482817,
+      "travel_carbs_spent": 1.4417
+    },
+    {
+      "accepted": true,
+      "approach": {
+        "length": 28.02,
+        "outcome": "danger",
+        "received_at": 872.75
+      },
+      "choice": "bypass",
+      "dispatched": true,
+      "duration": 56.5,
+      "outcome": {},
+      "reports": [],
+      "seed": 482817,
+      "travel_carbs_spent": 0.25215999999999994
+    }
+  ],
+  "economic_policy": "Nine ordinary 1200-second runs, five standing scouts, auto brood, five gatherers per basic resource; choose freshest nonempty safe returned source; withdraw on known alarm; watch empty routes; fund Food Exchange then Nursery, respond to known refuse/climate/guest strain. Every 5 simulated seconds; no hidden-policy reads or injected resources. The fixed window is measurement only, not a session target. Combat branches reuse existing ordinary paid scout/loss/survey preparation, then choose clear/hunt 12/24 or bypass and wait without follow-up. Travel-carbs delta can include ongoing brood/other consumption.",
+  "economy": [
+    {
+      "actions": [
+        {
+          "action": "gather carbohydrate",
+          "time": 20.0
+        },
+        {
+          "action": "gather protein",
+          "time": 40.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 45.0
+        },
+        {
+          "action": "gather water",
+          "time": 55.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 130.0
+        },
+        {
+          "action": "watch route_1",
+          "time": 465.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 465.0
+        },
+        {
+          "action": "watch route_2",
+          "time": 505.0
+        },
+        {
+          "action": "recall alarm route_4",
+          "time": 505.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 505.0
+        },
+        {
+          "action": "gather protein",
+          "time": 545.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 620.0
+        },
+        {
+          "action": "climate 1",
+          "time": 620.0
+        },
+        {
+          "action": "watch route_6",
+          "time": 640.0
+        },
+        {
+          "action": "retry route_3",
+          "time": 800.0
+        },
+        {
+          "action": "retry route_6",
+          "time": 845.0
+        },
+        {
+          "action": "watch route_5",
+          "time": 1040.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 1060.0
+        }
+      ],
+      "avoided": [
+        "route_4"
+      ],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "space"
+        },
+        "emerged": 40,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 146.66009,
+          "protein": 122.91169,
+          "water": 109.14781
+        },
+        "time": 1200.0,
+        "workers": 77
+      },
+      "first_delivery": {
+        "carbohydrate": 45.0,
+        "protein": 65.0,
+        "water": 80.0
+      },
+      "first_emergence": 360.0,
+      "first_report": {
+        "carbohydrate": 20.0,
+        "nest_site": 245.0,
+        "protein": 40.0,
+        "water": 55.0
+      },
+      "food_short_samples": 0,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "backyard_slice",
+      "seed": 482817,
+      "watch_attempted": [
+        "route_1",
+        "route_2",
+        "route_3",
+        "route_6",
+        "route_5"
+      ]
+    },
+    {
+      "actions": [
+        {
+          "action": "gather carbohydrate",
+          "time": 40.0
+        },
+        {
+          "action": "gather water",
+          "time": 40.0
+        },
+        {
+          "action": "gather protein",
+          "time": 45.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 60.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 140.0
+        },
+        {
+          "action": "watch route_1",
+          "time": 500.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 500.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 510.0
+        },
+        {
+          "action": "gather protein",
+          "time": 540.0
+        },
+        {
+          "action": "watch route_5",
+          "time": 610.0
+        },
+        {
+          "action": "watch route_2",
+          "time": 620.0
+        },
+        {
+          "action": "climate 1",
+          "time": 630.0
+        },
+        {
+          "action": "recall alarm route_4",
+          "time": 730.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 730.0
+        },
+        {
+          "action": "recall alarm route_6",
+          "time": 775.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 915.0
+        }
+      ],
+      "avoided": [
+        "route_4",
+        "route_6"
+      ],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "space"
+        },
+        "emerged": 40,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 125.56396,
+          "protein": 98.91169,
+          "water": 110.89781
+        },
+        "time": 1200.0,
+        "workers": 76
+      },
+      "first_delivery": {
+        "carbohydrate": 60.0,
+        "protein": 70.0,
+        "water": 65.0
+      },
+      "first_emergence": 360.0,
+      "first_report": {
+        "carbohydrate": 40.0,
+        "nest_site": 245.0,
+        "protein": 45.0,
+        "water": 40.0
+      },
+      "food_short_samples": 0,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "backyard_slice",
+      "seed": 71,
+      "watch_attempted": [
+        "route_1",
+        "route_3",
+        "route_5",
+        "route_2"
+      ]
+    },
+    {
+      "actions": [
+        {
+          "action": "gather carbohydrate",
+          "time": 25.0
+        },
+        {
+          "action": "gather water",
+          "time": 35.0
+        },
+        {
+          "action": "gather protein",
+          "time": 50.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 50.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 135.0
+        },
+        {
+          "action": "watch route_1",
+          "time": 480.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 480.0
+        },
+        {
+          "action": "recall alarm route_4",
+          "time": 520.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 520.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 535.0
+        },
+        {
+          "action": "gather protein",
+          "time": 535.0
+        },
+        {
+          "action": "watch route_6",
+          "time": 605.0
+        },
+        {
+          "action": "retry route_3",
+          "time": 605.0
+        },
+        {
+          "action": "climate 1",
+          "time": 625.0
+        },
+        {
+          "action": "watch route_2",
+          "time": 640.0
+        },
+        {
+          "action": "retry route_2",
+          "time": 650.0
+        },
+        {
+          "action": "watch route_5",
+          "time": 1055.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 1055.0
+        },
+        {
+          "action": "retry route_6",
+          "time": 1100.0
+        }
+      ],
+      "avoided": [
+        "route_4"
+      ],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "space"
+        },
+        "emerged": 40,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 146.78164,
+          "protein": 123.04669,
+          "water": 116.09781
+        },
+        "time": 1200.0,
+        "workers": 77
+      },
+      "first_delivery": {
+        "carbohydrate": 50.0,
+        "protein": 75.0,
+        "water": 60.0
+      },
+      "first_emergence": 360.0,
+      "first_report": {
+        "carbohydrate": 25.0,
+        "nest_site": 275.0,
+        "protein": 50.0,
+        "water": 35.0
+      },
+      "food_short_samples": 0,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "backyard_slice",
+      "seed": 3030,
+      "watch_attempted": [
+        "route_1",
+        "route_3",
+        "route_6",
+        "route_2",
+        "route_5"
+      ]
+    },
+    {
+      "actions": [
+        {
+          "action": "gather carbohydrate",
+          "time": 30.0
+        },
+        {
+          "action": "gather water",
+          "time": 35.0
+        },
+        {
+          "action": "gather protein",
+          "time": 45.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 55.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 140.0
+        },
+        {
+          "action": "watch route_1",
+          "time": 485.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 485.0
+        },
+        {
+          "action": "watch route_2",
+          "time": 490.0
+        },
+        {
+          "action": "climate 1",
+          "time": 630.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 665.0
+        },
+        {
+          "action": "gather protein",
+          "time": 665.0
+        },
+        {
+          "action": "watch route_5",
+          "time": 680.0
+        },
+        {
+          "action": "retry route_5",
+          "time": 680.0
+        }
+      ],
+      "avoided": [],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "space"
+        },
+        "emerged": 40,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 76.30816,
+          "protein": 80.31669,
+          "water": 116.57281
+        },
+        "time": 1200.0,
+        "workers": 78
+      },
+      "first_delivery": {
+        "carbohydrate": 55.0,
+        "protein": 75.0,
+        "water": 55.0
+      },
+      "first_emergence": 360.0,
+      "first_report": {
+        "carbohydrate": 30.0,
+        "nest_site": 255.0,
+        "protein": 45.0,
+        "water": 35.0
+      },
+      "food_short_samples": 0,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "garden_edge",
+      "seed": 482817,
+      "watch_attempted": [
+        "route_1",
+        "route_2",
+        "route_3",
+        "route_5"
+      ]
+    },
+    {
+      "actions": [
+        {
+          "action": "gather water",
+          "time": 30.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 45.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 80.0
+        },
+        {
+          "action": "watch route_1",
+          "time": 410.0
+        },
+        {
+          "action": "gather protein",
+          "time": 555.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 590.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 650.0
+        },
+        {
+          "action": "gather protein",
+          "time": 790.0
+        },
+        {
+          "action": "retry route_1",
+          "time": 965.0
+        },
+        {
+          "action": "climate 1",
+          "time": 1080.0
+        }
+      ],
+      "avoided": [],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "carbohydrate"
+        },
+        "emerged": 24,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 13.29094,
+          "protein": 101.27494,
+          "water": 109.59156
+        },
+        "time": 1200.0,
+        "workers": 63
+      },
+      "first_delivery": {
+        "carbohydrate": 80.0,
+        "protein": 575.0,
+        "water": 50.0
+      },
+      "first_emergence": 715.0,
+      "first_report": {
+        "carbohydrate": 45.0,
+        "nest_site": 345.0,
+        "protein": 555.0,
+        "water": 30.0
+      },
+      "food_short_samples": 71,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "garden_edge",
+      "seed": 71,
+      "watch_attempted": [
+        "route_1",
+        "route_3"
+      ]
+    },
+    {
+      "actions": [
+        {
+          "action": "gather water",
+          "time": 265.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 275.0
+        },
+        {
+          "action": "gather protein",
+          "time": 295.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 380.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 485.0
+        },
+        {
+          "action": "watch route_1",
+          "time": 690.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 870.0
+        },
+        {
+          "action": "gather protein",
+          "time": 870.0
+        },
+        {
+          "action": "watch route_4",
+          "time": 885.0
+        },
+        {
+          "action": "climate 1",
+          "time": 975.0
+        },
+        {
+          "action": "watch route_2",
+          "time": 1005.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 1005.0
+        }
+      ],
+      "avoided": [],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "space"
+        },
+        "emerged": 32,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 73.66514,
+          "protein": 77.69775,
+          "water": 72.24625
+        },
+        "time": 1200.0,
+        "workers": 70
+      },
+      "first_delivery": {
+        "carbohydrate": 305.0,
+        "protein": 330.0,
+        "water": 320.0
+      },
+      "first_emergence": 400.0,
+      "first_report": {
+        "carbohydrate": 275.0,
+        "nest_site": 330.0,
+        "protein": 295.0,
+        "water": 265.0
+      },
+      "food_short_samples": 8,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "garden_edge",
+      "seed": 3030,
+      "watch_attempted": [
+        "route_1",
+        "route_3",
+        "route_4",
+        "route_2"
+      ]
+    },
+    {
+      "actions": [
+        {
+          "action": "gather carbohydrate",
+          "time": 20.0
+        },
+        {
+          "action": "gather protein",
+          "time": 40.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 45.0
+        },
+        {
+          "action": "gather water",
+          "time": 70.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 130.0
+        },
+        {
+          "action": "recall alarm route_1",
+          "time": 210.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 210.0
+        },
+        {
+          "action": "recall alarm route_4",
+          "time": 335.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 335.0
+        },
+        {
+          "action": "watch route_2",
+          "time": 545.0
+        },
+        {
+          "action": "climate 1",
+          "time": 620.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 625.0
+        },
+        {
+          "action": "retry route_3",
+          "time": 740.0
+        }
+      ],
+      "avoided": [
+        "route_1",
+        "route_4"
+      ],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "space"
+        },
+        "emerged": 40,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 166.59299,
+          "protein": 74.91169,
+          "water": 105.84781
+        },
+        "time": 1200.0,
+        "workers": 72
+      },
+      "first_delivery": {
+        "carbohydrate": 45.0,
+        "protein": 65.0,
+        "threat": 210.0,
+        "water": 95.0
+      },
+      "first_emergence": 360.0,
+      "first_report": {
+        "carbohydrate": 20.0,
+        "nest_site": 290.0,
+        "protein": 40.0,
+        "threat": 210.0,
+        "water": 70.0
+      },
+      "food_short_samples": 0,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "roadside",
+      "seed": 482817,
+      "watch_attempted": [
+        "route_2",
+        "route_3"
+      ]
+    },
+    {
+      "actions": [
+        {
+          "action": "gather carbohydrate",
+          "time": 35.0
+        },
+        {
+          "action": "gather water",
+          "time": 40.0
+        },
+        {
+          "action": "gather protein",
+          "time": 45.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 60.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 140.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 550.0
+        },
+        {
+          "action": "gather protein",
+          "time": 550.0
+        },
+        {
+          "action": "recall alarm route_4",
+          "time": 565.0
+        },
+        {
+          "action": "watch route_2",
+          "time": 570.0
+        },
+        {
+          "action": "climate 1",
+          "time": 630.0
+        },
+        {
+          "action": "retry route_2",
+          "time": 670.0
+        }
+      ],
+      "avoided": [
+        "route_4"
+      ],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "space"
+        },
+        "emerged": 40,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 192.47939,
+          "protein": 82.04669,
+          "water": 114.12281
+        },
+        "time": 1200.0,
+        "workers": 67
+      },
+      "first_delivery": {
+        "carbohydrate": 60.0,
+        "protein": 70.0,
+        "threat": 565.0,
+        "water": 65.0
+      },
+      "first_emergence": 360.0,
+      "first_report": {
+        "carbohydrate": 35.0,
+        "nest_site": 275.0,
+        "protein": 45.0,
+        "threat": 565.0,
+        "water": 40.0
+      },
+      "food_short_samples": 0,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "roadside",
+      "seed": 71,
+      "watch_attempted": [
+        "route_3",
+        "route_2"
+      ]
+    },
+    {
+      "actions": [
+        {
+          "action": "gather carbohydrate",
+          "time": 25.0
+        },
+        {
+          "action": "gather water",
+          "time": 35.0
+        },
+        {
+          "action": "gather protein",
+          "time": 50.0
+        },
+        {
+          "action": "develop exchange",
+          "time": 50.0
+        },
+        {
+          "action": "develop nursery",
+          "time": 135.0
+        },
+        {
+          "action": "recall alarm route_1",
+          "time": 195.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 195.0
+        },
+        {
+          "action": "watch route_3",
+          "time": 535.0
+        },
+        {
+          "action": "retry route_3",
+          "time": 545.0
+        },
+        {
+          "action": "retry route_3",
+          "time": 575.0
+        },
+        {
+          "action": "gather protein",
+          "time": 600.0
+        },
+        {
+          "action": "climate 1",
+          "time": 625.0
+        },
+        {
+          "action": "watch route_2",
+          "time": 640.0
+        },
+        {
+          "action": "watch route_5",
+          "time": 670.0
+        },
+        {
+          "action": "watch route_4",
+          "time": 705.0
+        },
+        {
+          "action": "gather carbohydrate",
+          "time": 705.0
+        },
+        {
+          "action": "retry route_2",
+          "time": 725.0
+        }
+      ],
+      "avoided": [
+        "route_1"
+      ],
+      "final": {
+        "brood_losses": 0,
+        "brood_waiting": {
+          "intent": "grow",
+          "waiting": "space"
+        },
+        "emerged": 40,
+        "food_exchange": "developed",
+        "nursery": "developed",
+        "stores": {
+          "carbohydrate": 197.72354,
+          "protein": 98.76994,
+          "water": 115.63656
+        },
+        "time": 1200.0,
+        "workers": 77
+      },
+      "first_delivery": {
+        "carbohydrate": 50.0,
+        "protein": 75.0,
+        "threat": 195.0,
+        "water": 60.0
+      },
+      "first_emergence": 360.0,
+      "first_report": {
+        "carbohydrate": 25.0,
+        "nest_site": 270.0,
+        "protein": 50.0,
+        "threat": 195.0,
+        "water": 35.0
+      },
+      "food_short_samples": 0,
+      "ledger_valid": true,
+      "save_exact": true,
+      "save_restored": true,
+      "scenario": "roadside",
+      "seed": 3030,
+      "watch_attempted": [
+        "route_3",
+        "route_2",
+        "route_5",
+        "route_4"
+      ]
+    }
+  ],
+  "engine": "4.7.2-stable (official)",
+  "failures": [],
+  "rival": {
+    "failures": 0,
+    "trials": [
+      {
+        "action": "avoid",
+        "alarm": false,
+        "allocated": 0,
+        "delivered": 0.0,
+        "desired": 0,
+        "duration": 500,
+        "encounters": 0,
+        "followup_issued": false,
+        "latest": "withdrew",
+        "reports": [],
+        "returned_losses": 0,
+        "rival_mobilizations": 0,
+        "seed": 3048
+      },
+      {
+        "action": "retry",
+        "alarm": false,
+        "allocated": 5,
+        "delivered": 89.0,
+        "desired": 13,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": false,
+        "latest": "secured",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 55.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 67.25,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 79.25,
+            "report": "reinforced"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 12.0,
+            "received_after": 127.0,
+            "report": "secured"
+          }
+        ],
+        "returned_losses": 8,
+        "rival_mobilizations": 1,
+        "seed": 3048
+      },
+      {
+        "action": "reinforce_after_pressure",
+        "alarm": false,
+        "allocated": 9,
+        "delivered": 89.0,
+        "desired": 17,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": true,
+        "latest": "secured",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 55.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 67.25,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 79.25,
+            "report": "reinforced"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 12.0,
+            "received_after": 127.0,
+            "report": "secured"
+          }
+        ],
+        "returned_losses": 8,
+        "rival_mobilizations": 1,
+        "seed": 3048
+      },
+      {
+        "action": "withdraw_after_pressure",
+        "alarm": false,
+        "allocated": 0,
+        "delivered": 27.0,
+        "desired": 0,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": true,
+        "latest": "withdrew",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 55.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 67.25,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 75.75,
+            "report": "withdrew"
+          }
+        ],
+        "returned_losses": 2,
+        "rival_mobilizations": 1,
+        "seed": 3048
+      },
+      {
+        "action": "avoid",
+        "alarm": false,
+        "allocated": 0,
+        "delivered": 0.0,
+        "desired": 0,
+        "duration": 500,
+        "encounters": 0,
+        "followup_issued": false,
+        "latest": "withdrew",
+        "reports": [],
+        "returned_losses": 0,
+        "rival_mobilizations": 0,
+        "seed": 3030
+      },
+      {
+        "action": "retry",
+        "alarm": false,
+        "allocated": 5,
+        "delivered": 89.0,
+        "desired": 13,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": false,
+        "latest": "secured",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 54.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 68.5,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 80.5,
+            "report": "reinforced"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 11.5,
+            "received_after": 127.75,
+            "report": "secured"
+          }
+        ],
+        "returned_losses": 8,
+        "rival_mobilizations": 1,
+        "seed": 3030
+      },
+      {
+        "action": "reinforce_after_pressure",
+        "alarm": false,
+        "allocated": 14,
+        "delivered": 89.0,
+        "desired": 17,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": true,
+        "latest": "secured",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 54.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 68.5,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 80.5,
+            "report": "reinforced"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 11.5,
+            "received_after": 107.75,
+            "report": "secured"
+          }
+        ],
+        "returned_losses": 3,
+        "rival_mobilizations": 1,
+        "seed": 3030
+      },
+      {
+        "action": "withdraw_after_pressure",
+        "alarm": false,
+        "allocated": 0,
+        "delivered": 27.0,
+        "desired": 0,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": true,
+        "latest": "withdrew",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 54.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 68.5,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 77.0,
+            "report": "withdrew"
+          }
+        ],
+        "returned_losses": 2,
+        "rival_mobilizations": 1,
+        "seed": 3030
+      },
+      {
+        "action": "avoid",
+        "alarm": false,
+        "allocated": 0,
+        "delivered": 0.0,
+        "desired": 0,
+        "duration": 500,
+        "encounters": 0,
+        "followup_issued": false,
+        "latest": "withdrew",
+        "reports": [],
+        "returned_losses": 0,
+        "rival_mobilizations": 0,
+        "seed": 482817
+      },
+      {
+        "action": "retry",
+        "alarm": false,
+        "allocated": 3,
+        "delivered": 80.0,
+        "desired": 13,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": false,
+        "latest": "secured",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 57.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 65.25,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 77.25,
+            "report": "reinforced"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 13.0,
+            "received_after": 134.0,
+            "report": "secured"
+          }
+        ],
+        "returned_losses": 10,
+        "rival_mobilizations": 1,
+        "seed": 482817
+      },
+      {
+        "action": "reinforce_after_pressure",
+        "alarm": false,
+        "allocated": 8,
+        "delivered": 89.0,
+        "desired": 17,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": true,
+        "latest": "secured",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 57.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 65.25,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 77.25,
+            "report": "reinforced"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 13.0,
+            "received_after": 130.0,
+            "report": "secured"
+          }
+        ],
+        "returned_losses": 9,
+        "rival_mobilizations": 1,
+        "seed": 482817
+      },
+      {
+        "action": "withdraw_after_pressure",
+        "alarm": false,
+        "allocated": 0,
+        "delivered": 27.0,
+        "desired": 0,
+        "duration": 500,
+        "encounters": 1,
+        "followup_issued": true,
+        "latest": "withdrew",
+        "reports": [
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 57.25,
+            "report": "contested"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 65.25,
+            "report": "holding"
+          },
+          {
+            "encounter": 2,
+            "observation_age": 8.25,
+            "received_after": 73.75,
+            "report": "withdrew"
+          }
+        ],
+        "returned_losses": 2,
+        "rival_mobilizations": 1,
+        "seed": 482817
+      }
+    ]
+  }
+}

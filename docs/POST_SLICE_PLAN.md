@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Consultancy review — 134 complete; recommendations pending acceptance
+
+The player's 2026-10-04 gameplay/communication review is recorded in [findings and staged improvement plan](GAMEPLAY_REVIEW_2026_10_04.md) and [card 134](tasks/134_gameplay_consultancy_review.md). New background evidence covers nine ordinary economic runs, fifteen ambusher branches and twelve rival branches; the full suite recorded 8,405 passing checks. Recommended priorities are honest order/recovery wording, persistent returned reports and readable decision time, then scouting/source/growth/trait/network clarity before measured tuning. This review changes no gameplay or locked decision. Its proposed short clarity milestone is not yet accepted as a replacement for the current completion order below.
+
 ## Current priority — desktop completion path (132–133)
 
 [133 post-run history/review](tasks/133_post_run_history_review.md) implements the next source-backed outcome: voluntary end, private bounded physical recording and release-available sampled truth review. Existing saves remain available for explicit load, and normal play cannot resume after reveal. The first map is deliberately simple; automatic outcomes, richer storytelling/campaign transition and current release performance remain open.

@@ -1,0 +1,103 @@
+extends SceneTree
+const Root = preload("res://src/core/game_root.gd")
+const Controller = preload("res://src/core/simulation_controller.gd")
+const Memories = preload("res://src/presentation/outward/source_memory.gd")
+const Defense = preload("res://tests/test_ambusher_defense.gd")
+var rows: Array = []
+var failures: Array = []
+
+func _initialize() -> void: go.call_deferred()
+
+func go() -> void:
+	for scenario: String in ["backyard_slice", "garden_edge", "roadside"]:
+		for seed_value: int in [482817, 71, 3030]:
+			var root = Root.new()
+			root.simulation = Controller.new(seed_value, scenario)
+			var row: Dictionary = {"scenario":scenario,"seed":seed_value,"first_report":{},"first_delivery":{},"first_emergence":-1,"food_short_samples":0,"actions":[],"avoided":[],"watch_attempted":[]}
+			root.set_exploration(5)
+			root.set_brood_intent("grow")
+			for sample: int in 240:
+				observe_and_act(root,row)
+				root.simulation.advance(5.0)
+			var inside: Dictionary = root.inward_status("home")
+			row.final = {"time":inside.time,"workers":inside.workers_total,"emerged":inside.brood_matured_total,"brood_losses":inside.brood_losses,"stores":inside.resources,"nursery":inside.nursery_state,"food_exchange":inside.food_exchange_state,"brood_waiting":inside.brood_production}
+			var saved: Dictionary = JSON.parse_string(JSON.stringify(root.simulation.run.to_dict(),"",true,true))
+			var twin = Controller.new()
+			row.save_restored = twin.restore_snapshot(saved)
+			root.simulation.advance(30); twin.advance(30)
+			row.save_exact = root.simulation.run.to_dict() == twin.run.to_dict()
+			row.ledger_valid = root.simulation.run.colony.piles.home.workers.invariant_holds()
+			if not row.save_restored or not row.save_exact or not row.ledger_valid: failures.append([scenario,seed_value])
+			rows.append(row)
+			print("[REVIEW ECONOMY] ",scenario," ",seed_value," emerged=",row.final.emerged," short_samples=",row.food_short_samples," first=",row.first_report," exact=",row.save_exact)
+			root.free()
+	var combats: Array = []
+	for seed_value: int in [3043,3030,482817]:
+		var initial = Defense.new().ready_game(seed_value)
+		var saved: Dictionary = Defense.new().snapshot(initial)
+		for choice: String in ["clear12","clear24","hunt12","hunt24","bypass"]:
+			var root = Root.new(); root.simulation = Controller.new()
+			if not root.simulation.restore_snapshot(saved): failures.append("combat restore")
+			var before: Dictionary = root.inward_status("home")
+			var game: SimulationController = root.simulation
+			var accepted: bool
+			if choice == "bypass": accepted = game.journey_response.investigate_approach("route_1")
+			else:
+				game.journey_response.set_goal("route_1","hunt" if choice.begins_with("hunt") else "clear")
+				accepted = game.journey_response.set_force("route_1",24 if choice.ends_with("24") else 12)
+			var initial_away: bool = root.outward_status("home").journey_response.away
+			var reports: Array = []
+			var last_report: float = -1
+			for tick: int in 1600:
+				if not root.outward_status("home").journey_response.away: break
+				game.advance(0.25)
+				var report: Dictionary = root.outward_status("home").journey_response.pressure_reports.get("route_1",{})
+				if not report.is_empty() and report.received_at > last_report:
+					last_report=report.received_at;reports.append({"arrived_after":report.received_at-before.time,"age_on_arrival":report.received_at-report.observed_at,"pressure":report.pressure})
+			var state: Dictionary = root.outward_status("home").journey_response
+			combats.append({"seed":seed_value,"choice":choice,"accepted":accepted,"dispatched":initial_away,"duration":game.run.simulation_time-before.time,"travel_carbs_spent":before.resources.carbohydrate-root.inward_status("home").resources.carbohydrate,"reports":reports,"outcome":state.outcomes.get("route_1",{}),"approach":state.approach_reports.get("route_1",{})})
+			if not accepted or not initial_away or state.away: failures.append(["combat",seed_value,choice])
+			root.free()
+	var output = {"baseline":"036ab0b","engine":Engine.get_version_info().string,"economic_policy":"Nine ordinary 1200-second runs, five standing scouts, auto brood, five gatherers per basic resource; choose freshest nonempty safe returned source; withdraw on known alarm; watch empty routes; fund Food Exchange then Nursery, respond to known refuse/climate/guest strain. Every 5 simulated seconds; no hidden-policy reads or injected resources. The fixed window is measurement only, not a session target. Combat branches reuse existing ordinary paid scout/loss/survey preparation, then choose clear/hunt 12/24 or bypass and wait without follow-up. Travel-carbs delta can include ongoing brood/other consumption.","economy":rows,"combat":combats,"failures":failures}
+	FileAccess.open("res://.godot/gameplay_review_measure.json",FileAccess.WRITE).store_string(JSON.stringify(output,"\t",true,true))
+	print("[REVIEW COMPLETE] economy=",rows.size()," combat=",combats.size()," failures=",failures)
+	quit(0 if failures.is_empty() else 1)
+
+func record(row: Dictionary, time: float, label: String, result: Dictionary) -> void:
+	if result.get("accepted",false): row.actions.append({"time":time,"action":label})
+
+func observe_and_act(root: Node, row: Dictionary) -> void:
+	var inside: Dictionary = root.inward_status("home")
+	var outside: Dictionary = root.outward_status("home")
+	var signals: Array[Dictionary] = root.sensory_snapshot("home")
+	if inside.brood_matured_total > 0 and row.first_emergence < 0: row.first_emergence=inside.time
+	if not ColonyPressure.food_shortages(inside).is_empty(): row.food_short_samples += 1
+	for signal_data: Dictionary in signals:
+		if not row.first_report.has(signal_data.category): row.first_report[signal_data.category]=inside.time
+	for route: Dictionary in outside.trails:
+		if route.delivered_total > 0:
+			for signal_data: Dictionary in signals:
+				if signal_data.source_knowledge_id==route.destination_knowledge_id and not row.first_delivery.has(signal_data.category): row.first_delivery[signal_data.category]=inside.time
+		if route.journey_alarm and route.id not in row.avoided:
+			row.avoided.append(route.id);record(row,inside.time,"recall alarm "+route.id,root.set_trail_target(route.id,0))
+		elif route.status == "depleted" and not route.resume_on_report and route.id not in row.watch_attempted:
+			row.watch_attempted.append(route.id);record(row,inside.time,"watch "+route.id,root.toggle_investigation_priority(route.destination_knowledge_id))
+	for category: String in ["carbohydrate","protein","water"]:
+		var entries: Array[Dictionary] = Memories.entries(signals,outside,category)
+		var active: bool = false
+		for entry: Dictionary in entries:
+			if entry.desired_workers > 0 and entry.route_status == "active" and not entry.danger: active=true
+		if active: continue
+		entries.sort_custom(func(a: Dictionary,b: Dictionary)->bool:return a.age<b.age)
+		for entry: Dictionary in entries:
+			if entry.danger or entry.route_id in row.avoided or entry.state == "Reported empty": continue
+			if entry.route_status == "depleted":
+				record(row,inside.time,"retry "+entry.route_id,root.recheck_trail(entry.route_id))
+			elif entry.route_status in ["none","inactive"]:
+				record(row,inside.time,"gather "+category,root.create_trail_for(entry.knowledge_id))
+			break
+	if inside.food_exchange_state == "primitive": record(row,inside.time,"develop exchange",root.start_food_exchange())
+	if inside.food_exchange_state == "developed" and inside.nursery_state == "primitive": record(row,inside.time,"develop nursery",root.start_nursery_development())
+	if inside.midden.revealed and inside.midden.larval_rate < 1.0 and inside.midden.cleaners == 0: record(row,inside.time,"clean 2",root.set_sanitation_workers(2))
+	if inside.nursery_state == "developed" and inside.humidity.larval_rate < 1.0 and inside.humidity.carers == 0: record(row,inside.time,"climate 1",root.set_humidity_workers(1))
+	if inside.guest.get("reported_losses",0)>0 and inside.guest.observation != "purged" and not inside.guest.rejection_active: record(row,inside.time,"reject guest",root.set_guest_rejection(true))
