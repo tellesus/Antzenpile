@@ -18,7 +18,7 @@ func blocker() -> String:
  if _run.supply.phase!="none":return "Stop supplies; await their return"
  var h: PileState=_run.colony.piles.home;var d: PileState=_run.colony.piles.satellite_1
  var required: int=CONFIG.reinforcement_workers+CONFIG.reinforcement_messengers
- if h.workers_available<required:return "Need %d available Home workers" % required
+ if h.workers_assignable<required:return "Need %d available Home workers" % required
  if h.resources.carbohydrate<_cost():return "Need %.2f Home travel carbs" % _cost()
  if _run.reinforcement.trips_started>=WorkerLedger.MAX_COUNT or h.workers.transferred_out>WorkerLedger.MAX_COUNT-CONFIG.reinforcement_workers or d.workers_total>WorkerLedger.MAX_COUNT-CONFIG.reinforcement_workers or d.workers.transferred_in>WorkerLedger.MAX_COUNT-CONFIG.reinforcement_workers:return "Worker transfer history or capacity is full"
  var traits: Array[String]=d.genetics.established.duplicate()
@@ -33,7 +33,7 @@ func start() -> bool:
  var h: PileState=_run.colony.piles.home;var route: TrailRouteState=_run.trails.routes[_run.founding.route_id]
  var count: int=CONFIG.reinforcement_workers+CONFIG.reinforcement_messengers
  if not h.workers.create_commitment("trail:"+route.id,"trail",route.id):return _reject("Connection commitment unavailable")
- var allocated: bool=h.workers.allocate("trail:"+route.id,count);var paid: bool=h.consume_resources({"carbohydrate":_cost()});assert(allocated and paid)
+ var allocated: bool=h.allocate_workers("trail:"+route.id,count);var paid: bool=h.consume_resources({"carbohydrate":_cost()});assert(allocated and paid)
  var state: WorkerReinforcementState=_run.reinforcement
  state.phase="outbound";state.elapsed_ticks=0;state.departed_tick=_run.clock.tick_count;state.trips_started+=1;state.settled=false
  _sync(route);last_error="";return true

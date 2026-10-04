@@ -81,9 +81,9 @@ func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "journey:" + pile.id
 	var cost: float = _cost(route_id,count)
-	if pile.workers_available < count or pile.resources.carbohydrate < cost: return _reject("Needs %d available workers and travel food" % count)
+	if pile.workers_assignable < count or pile.resources.carbohydrate < cost: return _reject("Needs %d available workers and travel food" % count)
 	if not pile.workers.create_commitment(commitment,"other",route_id): return _reject("Party commitment unavailable")
-	var allocated: bool = pile.workers.allocate(commitment,count)
+	var allocated: bool = pile.allocate_workers(commitment,count)
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
 	assert(allocated and paid)
 	state.route_id = route_id; state.phase = "outbound"; state.workers = count; state.departed_at = _run.simulation_time
@@ -102,8 +102,8 @@ func reinforce(route_id: String) -> bool:
 	if _reinforcement_pending(): return _reject("Reinforcements already sent; await a returning messenger")
 	var pile: PileState = _run.colony.piles[state.origin_id(_run.trails)]
 	var cost: float = _cost(route_id,CONFIG.reinforcement_workers)
-	if pile.workers_available < CONFIG.reinforcement_workers or pile.resources.carbohydrate < cost: return _reject("Reinforcement needs four workers and travel food")
-	var allocated: bool = pile.workers.allocate("journey:"+pile.id,CONFIG.reinforcement_workers)
+	if pile.workers_assignable < CONFIG.reinforcement_workers or pile.resources.carbohydrate < cost: return _reject("Reinforcement needs four workers and travel food")
+	var allocated: bool = pile.allocate_workers("journey:"+pile.id,CONFIG.reinforcement_workers)
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
 	assert(allocated and paid)
 	defense.extra_workers = CONFIG.reinforcement_workers; defense.extra_ticks = 0; defense.sent += CONFIG.reinforcement_workers

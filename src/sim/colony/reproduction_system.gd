@@ -17,7 +17,7 @@ func blocker(pile: PileState) -> String:
 	if pile.nursery_state!="developed" or pile.food_exchange_state!="developed": return "Develop Nursery and Food Exchange first"
 	if not pile.queued_adaptation.is_empty(): return "Queued adaptation owns the next brood slot"
 	if pile.nursery_brood_capacity()-pile.nursery_occupied_space()<CONFIG.space: return "Need %d free Nursery spaces" % CONFIG.space
-	if pile.workers_available<CONFIG.nurses: return "Need %d available reproductive nurses" % CONFIG.nurses
+	if pile.workers_assignable<CONFIG.nurses: return "Need %d available reproductive nurses" % CONFIG.nurses
 	for id: String in PileState.RESOURCE_IDS:
 		if pile.resources[id]<CONFIG.costs()[id]: return "Need %.0f %s for reproductive laying" % [CONFIG.costs()[id],id]
 	return ""
@@ -29,7 +29,7 @@ func start(pile_id: String) -> bool:
 	if not last_error.is_empty(): return false
 	var commitment: String = "reproduction:"+pile_id
 	if not pile.workers.create_commitment(commitment,"internal",pile_id): last_error="Reproductive nurse assignment unavailable"; return false
-	var allocated: bool = pile.workers.allocate(commitment,CONFIG.nurses)
+	var allocated: bool = pile.allocate_workers(commitment,CONFIG.nurses)
 	if not allocated:
 		pile.workers.retire_commitment(commitment); last_error="Could not reserve reproductive nurses"; return false
 	var paid: bool = pile.consume_resources(CONFIG.costs())

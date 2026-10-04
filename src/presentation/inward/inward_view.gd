@@ -31,6 +31,7 @@ var midden_develop_command: Callable
 var sanitation_command: Callable
 var humidity_command: Callable
 var brood_command: Callable
+var brood_care_command: Callable
 var brood_intent_command: Callable
 var reproduction_command: Callable
 var queen_tab: String = "workers"
@@ -83,6 +84,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if selected_id == "nursery" and _status.get("brood_care", {}).get("missing", 0) > 0 and Rect2(get_viewport_rect().size.x-316,144,292,388).has_point(at):
+		var relief: Dictionary = _status.brood_care.relief
+		if not relief.is_empty() and relief.get("kind") != "returning" and _brood_care_rect().has_point(at) and brood_care_command.is_valid():
+			var result: Dictionary = brood_care_command.call(relief.duplicate(true))
+			show_feedback(result.get("reason", "Care reassignment unavailable"))
+		return true
 	if selected_id=="entrance" and not _status.get("reinforcement",{}).is_empty() and _reinforcement_rect().has_point(at):
 		if reinforcement_command.is_valid():
 			var recall: bool=_status.reinforcement.away
@@ -369,6 +376,10 @@ func _humidity_rect(target: int) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0 + [0, 1, 2, 4].find(target) * 66.0, 384, 62, 44)
 
 
+func _brood_care_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x-304, 353, 268, 60)
+
+
 func _nursery_develop_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 494.0, 260.0, 44.0)
 
@@ -578,7 +589,7 @@ func _draw_hud(size: Vector2) -> void:
 	if not _status.is_empty():
 		var stores: Dictionary = _status.get("resources", {})
 		_label(Vector2(24, 96), "STORES   Carbs %.1f   ·   Protein %.1f   ·   Water %.1f" % [stores.get("carbohydrate", 0.0), stores.get("protein", 0.0), stores.get("water", 0.0)], Color("a9b9bc"), 13)
-		_label(Vector2(size.x - 24, 36), "%d available" % _status.workers_available, Color("c9d1c5"), 15, HORIZONTAL_ALIGNMENT_RIGHT)
+		_label(Vector2(size.x - 24, 36), "%d available" % _status.get("workers_assignable", _status.workers_available), Color("c9d1c5"), 15, HORIZONTAL_ALIGNMENT_RIGHT)
 		var pause_word: String = "PAUSED" if _status.paused else "%dx" % _status.time_scale
 		_label(Vector2(size.x - 24, 61), "%s  ·  %s" % [pause_word, Copy.duration(_status.time)], Color("83969d"), 13, HORIZONTAL_ALIGNMENT_RIGHT)
 
@@ -637,7 +648,7 @@ func _draw_context(size: Vector2) -> void:
 				_draw_reproduction_context(box)
 				return
 			_detail_line(box, 111, "Queens: %d · Local workers: %d" % [_status.queens,_status.workers_total])
-			_detail_line(box, 137, "Available workers: %d" % _status.workers_available)
+			_detail_line(box, 137, "%d free · %d held for brood care" % [_status.get("workers_assignable",_status.workers_available),_status.get("brood_care",{}).get("held",0)])
 			_detail_line(box, 157, "Nursery: %d / %d brood space" % [_status.nursery_occupied_space, _status.nursery_brood_capacity])
 			var production: Dictionary = _status.get("brood_production", {"intent":"manual", "waiting":"manual"})
 			_label(box.position + Vector2(16, 195), "Brood laying", Color("a9b9bc"), 15)
@@ -685,6 +696,22 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box,117,"Reproductive brood · inspect Queen")
 				_detail_line(box,143,"Last short: "+Pressure.food_names(_status) if not Pressure.food_shortages(_status).is_empty() else "Four reproductive nurses committed")
 			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)] if _status.get("brood_health", {}).get("losses", 0) == 0 else "%d lost · %d during health strain" % [_status.get("brood_losses", 0), _status.brood_health.losses])
+			var care: Dictionary = _status.get("brood_care", {})
+			if care.get("missing", 0) > 0:
+				_detail_line(box, 162, "Care paused · need %d workers home" % care.missing)
+				var relief: Dictionary = care.get("relief", {})
+				if relief.get("kind") == "returning":
+					_detail_line(box, 235, "Recall requested · await workers home")
+				elif not relief.is_empty():
+					var labels: Dictionary = {"climate":"RELEASE CLIMATE WORKERS", "cleanup":"RELEASE CLEANUP WORKERS", "aphids":"WITHDRAW APHID ATTENDANTS", "gatherers":"RECALL GATHERERS", "scouts":"RECALL SCOUTS · EXPLORATION OFF", "response":"RECALL RESPONSE PARTY", "supplies":"STOP DAUGHTER SUPPLIES", "rejection":"STOP NURSERY REJECTION"}
+					_draw_action(_brood_care_rect(), labels.get(relief.kind, "MAKE ROOM FOR CARE"), "%d workers · other job reduced" % relief.workers if relief.kind in ["climate","cleanup"] else "Whole attendant group released" if relief.kind == "aphids" else "%d workers · gathering target reduced" % relief.workers if relief.kind == "gatherers" else "Workers must return through travel" if relief.kind in ["scouts","response","supplies"] else "Clearing stops; workers released")
+					if relief.kind == "gatherers": _detail_line(box, 284, "From " + care.get("source_name", "remembered source"))
+				else:
+					_detail_line(box, 235, "Await workers or ongoing jobs ending")
+				_detail_line(box, 309, "Returned carers stay with brood.")
+				_detail_line(box, 325, "Growth still needs food and care.")
+				return
+			if care.get("held", 0) > 0: _detail_line(box, 162, "%d workers held for brood care" % care.held)
 			var dirty: bool = _status.get("midden", {}).get("larval_rate", 1.0) < 1.0
 			var climate: bool = _status.get("humidity", {}).get("larval_rate", 1.0) < 1.0
 			var health: Dictionary = _status.get("brood_health", {})
@@ -763,7 +790,7 @@ func _draw_context(size: Vector2) -> void:
 			elif food_losses.get("losses",0) > 0:
 				_label(box.position + Vector2(16, 213), "Local losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 15)
 		"entrance":
-			_detail_line(box, 65, "Available workers: %d" % _status.workers_available)
+			_detail_line(box, 65, "%d free · %d held for brood care" % [_status.get("workers_assignable",_status.workers_available),_status.get("brood_care",{}).get("held",0)])
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
 			_detail_line(box, 117, "Trail workers: %d" % _status.trail_workers)
 			if not _status.get("supply",{}).is_empty(): _draw_supply_context(box)

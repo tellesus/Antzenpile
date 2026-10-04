@@ -29,7 +29,7 @@ static func fit_line(value: String, font: Font, size: int, width: float) -> Stri
 
 
 static func local_shortage(status: Dictionary, costs: Dictionary, workers: int) -> String:
-	var available: int = status.get("workers_available", status.get("available_workers", 0))
+	var available: int = status.get("workers_assignable", status.get("workers_available", status.get("available_workers", 0)))
 	if available < workers: return "Need %d more available workers" % (workers - available)
 	for id: String in ["carbohydrate", "protein", "water"]:
 		var shortage: float = float(costs.get(id, 0.0)) - float(status.get("resources", {}).get(id, 0.0))

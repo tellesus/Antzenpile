@@ -24,7 +24,7 @@ func dispatch(origin_id: String, bearing: Variant = null, standing: bool = false
 	if bearing != null and (not typeof(bearing) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(bearing))):
 		return _reject("Bearing must be finite or null")
 	var origin: PileState = _run.colony.piles[origin_id]
-	if origin.workers_available < 1:
+	if origin.workers_assignable < 1:
 		return _reject("No available worker")
 	var id: String = "scout_%d" % _run.next_scout_id
 	if origin.workers.count(id) >= 0 or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
@@ -54,12 +54,12 @@ func dispatch(origin_id: String, bearing: Variant = null, standing: bool = false
 
 
 func _dispatch_route(origin: PileState, route: Array[Vector2], standing: bool, bearing: float, source_id: String = "", trunk_id: String = "") -> bool:
-	if origin.workers_available < 1 or _run.active_scout_count() >= config.active_cap or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
+	if origin.workers_assignable < 1 or _run.active_scout_count() >= config.active_cap or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
 		return _reject("Scout labor or capacity unavailable")
 	var id: String = "scout_%d" % _run.next_scout_id
 	if origin.workers.count(id) >= 0 or not origin.workers.create_commitment(id, "scout", id):
 		return _reject("Scout commitment unavailable")
-	var allocated: bool = origin.workers.allocate(id, 1)
+	var allocated: bool = origin.allocate_workers(id, 1)
 	assert(allocated)
 	var agent := Agent.new()
 	agent.id = id
@@ -176,7 +176,7 @@ func maintain_effort() -> void:
 func _maintain_pile_effort(origin_id: String) -> void:
 	var policy: ExplorationState = _run.exploration_for(origin_id)
 	policy.cooldown_ticks = maxi(0, policy.cooldown_ticks - 1)
-	if policy.cooldown_ticks > 0 or standing_count(origin_id) >= policy.target or _run.active_scout_count() >= config.active_cap or _run.colony.piles[origin_id].workers_available < 1:
+	if policy.cooldown_ticks > 0 or standing_count(origin_id) >= policy.target or _run.active_scout_count() >= config.active_cap or _run.colony.piles[origin_id].workers_assignable < 1:
 		return
 	var saved_rng: int = _run.rng.state
 	var bearing: Variant = policy.bias if policy.bias != null and _run.rng.randf() < config.directional_share else null
@@ -249,7 +249,7 @@ func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 	if _run.active_scout_count() >= config.active_cap or _run.next_scout_id >= WorkerLedger.MAX_COUNT:
 		return _reject("Scout cap reached")
 	var pile: PileState = _run.colony.piles[origin_id]
-	if pile.workers_available < 1:
+	if pile.workers_assignable < 1:
 		return _reject("No available worker")
 	var known: KnownNode = _run.knowledge.nodes[knowledge_id]
 	var target: Vector2 = known.estimated_position.round()

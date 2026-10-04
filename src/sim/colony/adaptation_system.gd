@@ -43,7 +43,7 @@ func laying_blocker(pile: PileState, trait_id: String) -> String:
 	if not AdaptationRules.can_select(pile, trait_id): return "trial" if pile.trial_cohort() != null else "unavailable"
 	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty() or pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / BROOD.starting_count or pile.nursery_brood_capacity() - pile.nursery_occupied_space() < BROOD.starting_count:
 		return "space"
-	if pile.workers_available < AdaptationRules.NURSES: return "nurses"
+	if pile.workers_assignable < AdaptationRules.NURSES: return "nurses"
 	var pending: int = pile.nursery_occupied_space() + BROOD.starting_count
 	if pile.brood_started_total >= WorkerLedger.MAX_COUNT or pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending or pile.workers_total > WorkerLedger.MAX_COUNT - pending:
 		return "population"
@@ -77,7 +77,7 @@ func start(pile_id: String, trait_id: String) -> bool:
 	var commitment: String = "adaptation:" + pile.id
 	if not pile.workers.create_commitment(commitment, "internal", pile.id):
 		return _reject("Nurse commitment unavailable")
-	if not pile.workers.allocate(commitment, AdaptationRules.NURSES):
+	if not pile.allocate_workers(commitment, AdaptationRules.NURSES):
 		pile.workers.retire_commitment(commitment)
 		return _reject("Two available nurses required")
 	if not pile.consume_resources(costs):

@@ -13,6 +13,7 @@
 - Simulation is headless, uses only run-owned seeded randomness, and advances through fixed ticks. No UI text, camera, particle, audio, or input-key dependencies in simulation state/systems.
 - Views consume knowledge-derived sensory data or approved colony summaries; send semantic commands back. Simulation owns validation and mutation. Debug access is an explicit exception, never a normal presentation shortcut.
 - Every worker commitment/release/population change uses the ledger. Do not repair a failed invariant by silently editing totals. Route/cohort counts are reconciled views of commitments, not additional workers.
+- Player-colony jobs check `PileState.workers_assignable` and allocate through `PileState.allocate_workers` so existing brood keeps its carers. Raw ledger availability includes those carers; direct allocation remains for isolated ledger tests, legacy fixtures and the separate rival ledger.
 - Authored Resources are immutable definitions. Mutable runtime arrays/dictionaries are per-run. Use stable IDs and explicit versioned serialization; no opaque scene save as authoritative state.
 - Keep simulation/visual RNG streams separate. Stable processing order is required for repeatable seeds; do not rely on incidental scene order.
 

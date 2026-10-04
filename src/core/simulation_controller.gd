@@ -28,6 +28,7 @@ var humidity: RefCounted
 var adaptation: RefCounted
 var rain: RainSystem
 var ecology: EcologySystem
+var brood_care: BroodCareRelief
 var swarm: SwarmSystem
 var guest: GuestSystem
 var rival: RivalSystem
@@ -88,6 +89,7 @@ func _attach_run(next_run: RunState) -> void:
 	humidity = Humidity.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
+	brood_care = BroodCareRelief.new(run, {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"response":journey_response,"supplies":supply,"rejection":guest})
 	run.clock.tick.connect(_tick)
 
 

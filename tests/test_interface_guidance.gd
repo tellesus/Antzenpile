@@ -15,9 +15,11 @@ func run(test: Object) -> bool:
 	test.check(root.simulation.run.to_dict() == before, "Reserve summary is detached and read-only attention")
 	status = root.inward_status("home")
 	status.workers_available = 1
+	status.workers_assignable = 1
 	status.resources.carbohydrate = 0
 	test.check(Copy.local_shortage(status, {"carbohydrate": 10}, 4) == "Need 3 more available workers", "Labor advisory uses home availability rather than total colony count")
 	status.workers_available = 4
+	status.workers_assignable = 4
 	test.check(Copy.local_shortage(status, {"carbohydrate": 10}, 4) == "Need 10.0 more carbs", "Food advisory names the missing local quantity")
 	var view := Inward.new()
 	test.get_root().add_child(view)

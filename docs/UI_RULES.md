@@ -1,5 +1,7 @@
 # UI and visual rules
 
+128: “available” counters and labor advisories mean workers free for another job; Queen/Entrance separately name held brood carers. Nursery shows held care or an explicit care pause with the missing home-worker count. Its touch-sized release/recall action names the affected job, quantity and remembered gathering source when relevant; it reduces that assignment only on activation, validates stale plans and waits for real traveler return. A pending recall replaces the action with waiting text. Care recovery temporarily replaces chamber/climate controls; invisible controls cannot receive clicks. Help explains that food/care still gate hatching. No automatic staffing or free emergency workers.
+
 Card 126 adds a persistent Approach tab beside Source/Conflict. Withdraw gatherers, wait for actual return, then Test Alternate Approach with three paid workers. Away facts identify the commanded job without previewing progress/course/safety. A returned outcome enables deliberate gathering resumption; a longer established course costs more travel/food and does not guarantee future safety. Source bearings remain a sensory panorama, not a route map.
 
 Card 125 places Clear Journey/Hunt for Protein before force selection, locks the dispatched goal, explains added hunt risk and provides an explicit returned-remains inspection link. Protein remains become normal gatherable sensory memories only after evidence returns. Success language distinguishes displacement from confirmed kill; neither exposes live health or instantly adds stores.

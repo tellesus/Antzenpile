@@ -44,6 +44,21 @@ var workers_total: int:
 	get: return workers.total
 var workers_available: int:
 	get: return workers.available
+var workers_assignable: int:
+	get: return maxi(0, workers_available - brood_care_workers_required())
+
+
+func brood_care_workers_required(extra_brood: int = 0) -> int:
+	var occupied: int = nursery_occupied_space() - reproduction.occupied_space() + extra_brood
+	var required: int = ceili(float(occupied * BROOD_CONFIG.available_carers_required) / BROOD_CONFIG.primitive_nursery_care_capacity)
+	return maxi(0, required - (AdaptationRules.NURSES if trial_cohort() != null else 0))
+
+
+func allocate_workers(commitment: String, amount: Variant) -> bool:
+	if not Ledger.valid_count(amount) or amount > workers_assignable:
+		workers.last_error = "Workers held for brood care" if Ledger.valid_count(amount) and amount <= workers_available else "Insufficient workers"
+		return false
+	return workers.allocate(commitment, amount)
 
 
 func to_dict() -> Dictionary:

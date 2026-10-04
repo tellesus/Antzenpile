@@ -14,9 +14,9 @@ func set_enabled(value: Variant) -> bool:
  var route: TrailRouteState=_run.trails.routes[_run.founding.route_id]
  var home: PileState=_run.colony.piles.home
  if value and state.phase=="none":
-  if home.workers_available<CONFIG.workers: return _reject("Need %d available Home supply workers" % CONFIG.workers)
+  if home.workers_assignable<CONFIG.workers: return _reject("Need %d available Home supply workers" % CONFIG.workers)
   if not home.workers.create_commitment("trail:"+route.id,"trail",route.id): return _reject("Supply commitment unavailable")
-  var allocated: bool=home.workers.allocate("trail:"+route.id,CONFIG.workers); assert(allocated)
+  var allocated: bool=home.allocate_workers("trail:"+route.id,CONFIG.workers); assert(allocated)
   route.allocated_workers=CONFIG.workers;state.phase="waiting"
  state.enabled=value;route.desired_workers=CONFIG.workers if value else 0
  route.status="active" if value else "recalling"
@@ -88,7 +88,7 @@ func summary() -> Dictionary:
  if state.travelling():
   result.age=(_run.clock.tick_count-state.departed_tick)*SimulationClock.TICK_INTERVAL
  elif state.phase=="waiting": result.blocker=_food_blocker(_plan())
- else: result.blocker="Need %d available Home workers" % CONFIG.workers if _run.colony.piles.home.workers_available<CONFIG.workers else ""
+ else: result.blocker="Need %d available Home workers" % CONFIG.workers if _run.colony.piles.home.workers_assignable<CONFIG.workers else ""
  if state.trips_reported>0: result.report_age=(_run.clock.tick_count-state.last_reported_tick)*SimulationClock.TICK_INTERVAL
  if _run.reinforcement.active():result.blocker="Worker party away; await return"
  return result

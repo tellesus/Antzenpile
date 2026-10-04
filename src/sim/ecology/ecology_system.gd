@@ -29,12 +29,12 @@ func start_tending(pile_id: String) -> bool:
 	var pile: PileState = _run.colony.piles[pile_id]
 	var share: float = _run.recognition_share(pile_id)
 	var required: int = AdaptationRules.protection_workers(HONEYDEW.protection_workers, share)
-	if pile.workers_available < required:
+	if pile.workers_assignable < required:
 		return _reject("Not enough workers to protect the producers")
 	var commitment: String = "honeydew:" + pile_id
 	if not pile.workers.create_commitment(commitment, "other", HONEYDEW.source_id):
 		return _reject("Protection commitment unavailable")
-	if not pile.workers.allocate(commitment, required):
+	if not pile.allocate_workers(commitment, required):
 		assert(pile.workers.retire_commitment(commitment))
 		return _reject("Could not commit protection workers")
 	_run.honeydew.relationship = "tended"

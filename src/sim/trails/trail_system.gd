@@ -38,13 +38,13 @@ func create_route(origin_id: String, knowledge_id: String) -> bool:
 		return _reject("Destination has no usable direction")
 	if _run.trails.next_route_id >= WorkerLedger.MAX_COUNT:
 		return _reject("Route ID unavailable")
-	if pile.workers_available < CONFIG.initial_workers:
+	if pile.workers_assignable < CONFIG.initial_workers:
 		return _reject("Not enough available workers")
 	var id: String = "route_%d" % _run.trails.next_route_id
 	var commitment: String = "trail:" + id
 	if pile.workers.count(commitment) >= 0 or not pile.workers.create_commitment(commitment, "trail", id):
 		return _reject("Trail commitment unavailable")
-	if not pile.workers.allocate(commitment, CONFIG.initial_workers):
+	if not pile.allocate_workers(commitment, CONFIG.initial_workers):
 		pile.workers.retire_commitment(commitment)
 		return _reject("Not enough available workers")
 	var route := Route.new()
@@ -84,11 +84,11 @@ func set_workers(route_id: String, target: Variant) -> bool:
 		return true
 	if requested > expected:
 		var needed: int = requested - expected
-		if pile.workers_available < needed:
+		if pile.workers_assignable < needed:
 			return _reject("Not enough available workers")
 		if route.status == "inactive" and not pile.workers.create_commitment(commitment, "trail", route.id):
 			return _reject("Trail commitment unavailable")
-		if not pile.workers.allocate(commitment, needed):
+		if not pile.allocate_workers(commitment, needed):
 			if route.status == "inactive":
 				pile.workers.retire_commitment(commitment)
 			return _reject("Could not allocate workers")

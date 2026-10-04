@@ -36,6 +36,9 @@ func start(pile_id: String) -> bool:
 	if pile.brood_started_total >= WorkerLedger.MAX_COUNT or pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending_brood or pile.workers_total > WorkerLedger.MAX_COUNT - pending_brood:
 		last_error = "Population limit reached"
 		return false
+	if pile.workers_available < pile.brood_care_workers_required(CONFIG.starting_count):
+		last_error = "More workers at home required for brood care"
+		return false
 	var cohort := BroodCohort.new()
 	pile.brood_started_total += 1
 	cohort.id = "brood_%d" % pile.brood_started_total

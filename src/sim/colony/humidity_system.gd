@@ -13,13 +13,13 @@ func set_workers(pile_id: String, target: Variant) -> bool:
 	if pile.nursery_state != "developed":
 		return _reject("Develop the Nursery before assigning climate carers")
 	var current: int = pile.humidity.carers
-	if target > current and pile.workers_available < target - current:
+	if target > current and pile.workers_assignable < target - current:
 		return _reject("More available climate carers required")
 	var id: String = "humidity:" + pile_id
 	if target > current:
 		if current == 0 and not pile.workers.create_commitment(id, "internal", pile_id):
 			return _reject("Climate commitment unavailable")
-		var allocated: bool = pile.workers.allocate(id, target - current)
+		var allocated: bool = pile.allocate_workers(id, target - current)
 		assert(allocated)
 	elif target < current:
 		var released: bool = pile.workers.release(id, current - target)

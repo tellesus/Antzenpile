@@ -79,6 +79,7 @@ func _ready() -> void:
 		inward.sanitation_command = set_sanitation_workers
 		inward.humidity_command = set_humidity_workers
 		inward.brood_command = start_brood
+		inward.brood_care_command = relieve_brood_care
 		inward.brood_intent_command = set_brood_intent
 		inward.reproduction_command = start_reproduction
 		inward.guest_rejection_command = set_guest_rejection
@@ -311,7 +312,7 @@ func outward_status(pile_id: String) -> Dictionary:
 	var status: Dictionary = {"pile_id":pile_id, "pile_name":"Home" if pile_id == "home" else "Daughter",
 		"other_pile":"satellite_1" if pile_id == "home" and simulation.run.colony.piles.has("satellite_1") else "home" if pile_id != "home" else "",
 		"founding":camps if pile_id == "home" else {},"home_air": simulation.heat.home_air(),
-		"available_workers": simulation.run.colony.piles[pile_id].workers_available,
+		"available_workers": simulation.run.colony.piles[pile_id].workers_assignable,
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
@@ -413,6 +414,12 @@ func inward_status(pile_id: String) -> Dictionary:
 		return {}
 	var pile: PileState = simulation.run.colony.piles[pile_id]
 	var brood: Array[Dictionary] = []
+	var care_plan: Dictionary = simulation.brood_care.plan(pile_id)
+	var care_source_name: String = ""
+	if care_plan.get("kind") == "gatherers":
+		var source_id: String = simulation.run.trails.routes[care_plan.route_id].destination_knowledge_id
+		for signal_data: PerceivedSignal in perception.project([simulation.run.knowledge.nodes[source_id]], pile.position, simulation.run.simulation_time):
+			care_source_name = SourceMemory.display_name({"knowledge_id":source_id, "category":signal_data.category, "honeydew":source_id == "known:aphid_01"})
 	for cohort: BroodCohort in pile.brood_cohorts:
 		brood.append(cohort.to_dict())
 	var trail_workers: int = 0
@@ -464,6 +471,8 @@ func inward_status(pile_id: String) -> Dictionary:
 		"brood_batch_count": BROOD_CONFIG.starting_count,
 		"brood_production": simulation.brood.production_status(pile_id),
 		"brood_reserve": simulation.brood.remaining_food_reserve(pile).duplicate(),
+		"workers_assignable":pile.workers_assignable,
+		"brood_care": {"required":pile.brood_care_workers_required(), "held":mini(pile.workers_available,pile.brood_care_workers_required()), "missing":maxi(0,pile.brood_care_workers_required()-pile.workers_available), "relief":care_plan.duplicate(true), "source_name":care_source_name},
 		"nursery_state": pile.nursery_state, "nursery_brood_capacity": pile.nursery_brood_capacity(),
 		"nursery_occupied_space": pile.nursery_occupied_space(),
 		"nursery_care_capacity": pile.nursery_care_capacity(),
@@ -602,6 +611,11 @@ func set_guest_rejection(enabled: bool) -> Dictionary:
 func start_brood() -> Dictionary:
 	var accepted: bool = simulation.start_brood(inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.brood.last_error}
+
+
+func relieve_brood_care(plan: Dictionary) -> Dictionary:
+	var accepted: bool = simulation.brood_care.apply(inward_pile_id, plan)
+	return {"accepted":accepted, "reason":"Assignments changed; inspect care again" if not accepted else "Worker reassignment requested; care resumes when they are home"}
 
 
 func start_reproduction() -> Dictionary:

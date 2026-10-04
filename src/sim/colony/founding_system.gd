@@ -17,7 +17,7 @@ func blocker(knowledge_id: String) -> String:
 	if _run.founding.phase=="failed" and _run.trails.routes[_run.founding.route_id].destination_knowledge_id!=knowledge_id: return "Recheck the prior shelter before retrying"
 	if prior==null and pile.workers.count("trail:route_%d" % _run.trails.next_route_id)!=-1: return "Founding commitment unavailable"
 	if _run.trails.next_route_id>=WorkerLedger.MAX_COUNT: return "Route ID unavailable"
-	if pile.workers_available<CONFIG.workers: return "Need %d available founding workers" % CONFIG.workers
+	if pile.workers_assignable<CONFIG.workers: return "Need %d available founding workers" % CONFIG.workers
 	var costs: Dictionary=_costs(endpoint)
 	for id: String in PileState.RESOURCE_IDS:
 		if pile.resources[id]<costs[id]: return "Need %.2f %s for founding" % [costs[id],id]
@@ -44,7 +44,7 @@ func start(knowledge_id: String) -> bool:
 	infrastructure.end=endpoint; infrastructure.exposure=TrailSegmentState.exposure_for(_run.world,infrastructure.start,endpoint)
 	var commitment: String="trail:"+route.id
 	var created: bool=pile.workers.create_commitment(commitment,"trail",route.id); assert(created)
-	var allocated: bool=pile.workers.allocate(commitment,CONFIG.workers); assert(allocated)
+	var allocated: bool=pile.allocate_workers(commitment,CONFIG.workers); assert(allocated)
 	var state:=FoundingState.new(); state.phase="outbound"; state.route_id=route.id
 	state.leg_ticks=TRAILS.leg_ticks(pile.position.distance_to(endpoint)); state.departed_tick=_run.clock.tick_count
 	state.reproductive_group=pile.reproduction.to_dict()

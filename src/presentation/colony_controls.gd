@@ -22,7 +22,8 @@ const GUIDE: Array = [
 	{"title":"Support the inside", "lines":["INWARD shows functions, not a tunnel map.","Expand Nursery for up to four cohorts.","Queen's Auto Brood repeats supported groups.","Climate care: water when dry, air when damp.","Midden cleaners isolate accumulating refuse.","Queued traits lock when their brood is laid."]},
 	{"title":"Build a second pile", "lines":["Shelter memories are not safety guarantees.","Queen → Reproduction raises a young queen.","Send Founding Party uses workers and stores.","Its returning messenger reports the camp.","Establish Daughter Pile starts its local jobs.","Inspect or Look From either named pile."]},
 	{"title":"Support your network", "lines":["Entrance supplies move food over real trips.","Send 8 Worker Settlers uses 9 Home workers.","Eight stay; one messenger returns a report.","Supplies and settlers share one connection.","Stop supplies; await return to send workers.","Extra workers still need food and brood care."]},
-	{"title":"Keep your colony", "lines":["Pause and speed control simulation time.","Sound keeps music and cues independent.","Save keeps one colony; Load restores it.","A new colony retains that saved slot.","Repeat uses the selected setting and seed.","Fresh seed changes behavior, not layout."]}
+	{"title":"Keep your colony", "lines":["Pause and speed control simulation time.","Sound keeps music and cues independent.","Save keeps one colony; Load restores it.","A new colony retains that saved slot.","Repeat uses the selected setting and seed.","Fresh seed changes behavior, not layout."]},
+	{"title":"Keep brood care available", "lines":["Available means free to take another job.","Existing brood keeps its carers at home.","Queen and Entrance show held care workers.","If an older colony stalls, inspect Nursery.","Its named release or recall restores care.","Traveling workers must reach home first."]}
 ]
 
 func _process(_delta: float) -> void: queue_redraw()

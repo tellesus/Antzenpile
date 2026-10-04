@@ -1,5 +1,7 @@
 # Post-slice development plan
 
+128 resolves the reported brood assignment soft lock before further features: reserve existing care against new jobs and offer voluntary release/physical recall for already-stalled saves. [Card/evidence](tasks/128_brood_care_safeguard.md): 8,285 checks, clean import/Main, eight standard/compact input captures. No extinction rule or rate rebalance. Resume the accepted threat expansion below.
+
 ## Current priority — playable threat management (accepted 2026-10-03)
 
 The core milestone is complete: [124](tasks/124_persistent_conflict_management.md) adds persistent force orders and aphid/evidence clarity; [125](tasks/125_edible_threat_recovery.md) distinguishes clear-versus-hunt and finite carcass recovery; [126](tasks/126_investigated_alternate_approaches.md) adds paid physically reported alternate approaches; [127](tasks/127_honeydew_danger_variety.md) varies honeydew threat placement. Final suite: 8,251 checks, zero failures; import/Main and standard/compact graphical inputs passed. See [threat-management evaluation](THREAT_MANAGEMENT_EVALUATION.md).
