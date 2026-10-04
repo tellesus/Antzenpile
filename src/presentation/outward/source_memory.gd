@@ -23,7 +23,7 @@ static func entries(signals: Array[Dictionary], status: Dictionary, category: St
 			"route_id": route.get("id", ""), "route_status": route.get("status", "none"), "desired_workers": route.get("desired_workers", 0),
 			"receipt": route.get("receipt", {}).duplicate(true),
 			"delivered_total": route.get("delivered_total", 0.0),
-			"danger": route.get("reported_losses", 0) > 0 and not route.get("ambusher_addressed",false) or route.get("foreign_reports", 0) > 0,
+			"danger": route.get("journey_alarm",route.get("reported_losses", 0) > 0 and not route.get("ambusher_addressed",false) or route.get("foreign_reports", 0) > 0),
 			"honeydew": status.get("honeydew", {}).get("knowledge_id", "") == signal_data.source_knowledge_id})
 	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.knowledge_id < b.knowledge_id)
 	return result

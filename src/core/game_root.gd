@@ -281,7 +281,7 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		record["foreign_contact"] = route != null and route.foreign_reports > 0
 		record["conflict_report"] = route.conflict_report if route != null else ""
 		if route != null and route.reported_losses > 0:
-			record.risk = "past_loss" if journey_addressed(route) else "reported_loss"
+			record.risk = "reported_loss" if journey_alarm(route) else "past_loss"
 		result.append(record)
 	for id: String in simulation.run.journey_response.reports:
 		var report: Dictionary = simulation.run.journey_response.reports[id]
@@ -686,6 +686,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
 				"ambusher_addressed": journey_addressed(route),
+				"journey_alarm":journey_alarm(route),"conflict_serial":route.conflict_serial,
 				"attack_reports": route.attack_reports, "fighting_reports": route.fighting_reports,
 				"missing_workers": route.missing_workers, "last_witness_time": route.last_witness_time,
 				"energy_limited": route.energy_limited,
@@ -701,6 +702,13 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 func journey_addressed(route: TrailRouteState) -> bool:
 	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
 	return outcome.get("outcome","") == "secured" and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
+
+func journey_alarm(route: TrailRouteState) -> bool:
+	if route.conflict_report in ["contested","holding","resisted","reinforced"]: return true
+	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
+	var settled_at: float = float(outcome.get("received_at",0.0))
+	if route.conflict_report in ["secured","withdrew","dispersed"]: settled_at = maxf(settled_at,route.conflict_received_at)
+	return route.reported_losses > 0 and route.last_loss_time > settled_at
 
 
 func daughter_worker_reinforcement(recall: bool) -> Dictionary:

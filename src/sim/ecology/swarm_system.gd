@@ -17,6 +17,8 @@ func _init(run_state: RunState, loss_command: Callable) -> void:
 
 func consider(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var state: SwarmState = _run.swarm
+	# A routed foraging remnant is not a new attacking force.
+	if not state.active() and _run.rival.workers.count("rival:trail") <= CONFIG.rival_retreat_count: return
 	if cohort.worker_count <= 0 or not cohort.reports_source_outcome or route.desired_workers == 0 or _run.rival.workers.count("rival:trail") <= 0:
 		return
 	if state.active() and state.route_id != route.id:
@@ -45,6 +47,9 @@ func consider(cohort: TransitCohort, route: TrailRouteState) -> void:
 		state.rounds = 0; state.pressure_reports_sent = 1
 		state.formation_ticks = TRAILS.leg_ticks(RIVAL.pile_position.distance_to(_run.world.nodes[RIVAL.food_id].position)) * 2 + 1
 		if not _messenger(cohort, route):
+			# The whole group returns when it cannot detach a courier/hold a front.
+			_finish("withdrew")
+			cohort.conflict_report = "withdrew"
 			return
 	cohort.swarm_engaged = true
 
@@ -63,6 +68,7 @@ func _messenger(cohort: TransitCohort, route: TrailRouteState, report: String = 
 		cohort.reports_source_outcome = false
 		cohort.conflict_report = report
 		cohort.conflict_observed_at = _run.simulation_time
+		cohort.conflict_serial = state.serial
 		return false
 	var messenger := Cohort.new()
 	messenger.id = "cohort_%d" % _run.trails.next_cohort_id
@@ -90,6 +96,7 @@ func _messenger(cohort: TransitCohort, route: TrailRouteState, report: String = 
 	messenger.reports_source_outcome = false
 	messenger.conflict_report = report
 	messenger.conflict_observed_at = _run.simulation_time
+	messenger.conflict_serial = state.serial
 	cohort.worker_count -= 1
 	_run.trails.cohorts[messenger.id] = messenger
 	_run.trails.next_cohort_id += 1
@@ -205,6 +212,7 @@ func _finish(outcome: String) -> void:
 			if cohort.worker_count > 0:
 				cohort.conflict_report = outcome
 				cohort.conflict_observed_at = _run.simulation_time
+				cohort.conflict_serial = state.serial
 				if outcome == "withdrew":
 					var segment: TrailSegmentState = _run.trails.segments[_run.trails.routes[cohort.route_id].segment_id]
 					cohort.direction = "inbound"

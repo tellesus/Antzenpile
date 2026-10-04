@@ -243,6 +243,7 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 		cohort.detour_report = null
 		cohort.swarm_engaged = false
 		cohort.conflict_report = ""
+		cohort.conflict_serial = 0
 		cohort.conflict_observed_at = 0.0
 	if route.allocated_workers == 0:
 		var retired: bool = pile.workers.retire_commitment("trail:" + route.id)
@@ -378,6 +379,12 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		route.conflict_report = cohort.conflict_report
 		route.conflict_observed_at = cohort.conflict_observed_at
 		route.conflict_received_at = _run.simulation_time
+		route.conflict_serial = cohort.conflict_serial
+		if cohort.conflict_report in ["secured","withdrew","dispersed"] and cohort.conflict_serial > route.settled_conflict_serial:
+			route.settled_conflict_serial = cohort.conflict_serial
+			if cohort.conflict_report in ["withdrew","dispersed"]:
+				var paused: bool = set_workers(route.id,0)
+				assert(paused)
 	if cohort.lost_workers > 0:
 		route.reported_losses += cohort.lost_workers
 		route.reported_rival_losses += cohort.rival_losses

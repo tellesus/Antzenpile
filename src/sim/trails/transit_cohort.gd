@@ -28,6 +28,7 @@ var swarm_engaged: bool = false
 var rival_losses: int = 0
 var conflict_report: String = ""
 var conflict_observed_at: float = 0.0
+var conflict_serial: int = 0
 var predator_encountered: bool = false
 var witnessed_attack: bool = false
 var witnessed_fighting: bool = false
@@ -48,7 +49,7 @@ func to_dict() -> Dictionary:
 		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
 		"foreign_sampled": foreign_sampled, "reports_source_outcome": reports_source_outcome,
 		"swarm_engaged": swarm_engaged, "rival_losses": rival_losses,
-		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
+		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "conflict_serial":conflict_serial, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
 		"detour_report": detour_report.to_dict() if detour_report != null else null}
 
@@ -129,6 +130,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 			return false
 	var report: Variant = data.get("conflict_report", "")
 	var report_time: Variant = data.get("conflict_observed_at", 0.0)
+	if not WorkerLedger.valid_count(data.get("conflict_serial",0)): return false
 	if not report in ["", "contested", "holding", "resisted", "reinforced", "secured", "withdrew", "dispersed"] or not typeof(report_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(report_time)) or report_time < 0.0 or report_time > time or ((report == "") != (report_time == 0.0)):
 		return false
 	if not data.get("reports_source_outcome", true) and (data.direction != "inbound" or (data.worker_count > 0 and report == "")):
@@ -162,6 +164,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	rival_losses = int(rival_deaths)
 	conflict_report = report
 	conflict_observed_at = float(report_time)
+	conflict_serial = int(data.get("conflict_serial",0))
 	detour_attempted = data.get("detour_attempted", false)
 	detour = restored_detour
 	detour_report = restored_report

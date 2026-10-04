@@ -1,5 +1,7 @@
 # Combat/conflict review — 118
 
+Follow-up: the player accepted these recommendations; cards 120–123 now implement the bounded warning, physical pressure, finite rival response and settlement/recovery milestone. [Implementation evidence](COMBAT_COUNTERPLAY_EVALUATION.md). The assessment and original measurements below describe the pre-implementation build.
+
 **Verdict, expanded after the player's clarification:** the ambusher loop is mechanically complete, with meaningful investment and outcomes, but play during the conflict is thin. Rival conflict adds physical reinforcement/withdrawal yet lacks responsive enemy recruitment and clear settlement. Guest rejection has a useful labor-versus-harm tradeoff, but warning/navigation is weak. Interface repairs alone will not deliver the original combat/counterplay loop. This review changes no gameplay or rates.
 
 Windows, pinned Godot 4.7.2 Compatibility/Radeon RX 6650 XT, 2026-10-03. These are command-driven comparisons and inspected renders, not a human enjoyment test or a broad balance verdict.

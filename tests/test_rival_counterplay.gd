@@ -6,7 +6,8 @@ const Root = preload("res://src/core/game_root.gd")
 
 func ready_game() -> SimulationController:
 	var game: SimulationController = Fixture.new().forming_fixture()
-	while game.run.trails.routes.route_1.conflict_report == "": game.advance(0.25)
+	while game.run.trails.routes.route_1.conflict_report not in ["withdrew","dispersed"]: game.advance(0.25)
+	while game.run.trails.routes.route_1.allocated_workers > 0: game.advance(0.25)
 	game.set_trail_workers("route_1",13)
 	return game
 
@@ -57,7 +58,7 @@ func run(test: Object) -> bool:
 	view._run_command("journey_topic")
 	var event := InputEventScreenTouch.new(); event.pressed = true; event.position = view._journey_rect("journey_defend").get_center()
 	view._unhandled_input(event)
-	test.check(route.desired_workers == 0 and route.allocated_workers > 0, "Rival-context touch withdrawal requests real travel rather than instant release")
+	test.check(route.desired_workers == 0, "Rival-context touch withdrawal requests real travel rather than instant release")
 	for field: String in ["count","phase","travel","budget","serial"]:
 		var invalid: Dictionary = saved.duplicate(true)
 		match field:

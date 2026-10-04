@@ -51,8 +51,10 @@ func restore(data: Dictionary, trails: TrailNetwork, rival: RivalState, world: W
 	var held: int = 0
 	var losses: int = 0
 	for route: TrailRouteState in trails.routes.values():
+		if route.conflict_serial > data.serial or route.settled_conflict_serial > data.serial: return false
 		losses += route.reported_rival_losses
 	for cohort: TransitCohort in trails.cohorts.values():
+		if cohort.conflict_serial > data.serial: return false
 		losses += cohort.rival_losses
 		if cohort.swarm_engaged:
 			if cohort.route_id != data.route_id or cohort.worker_count <= 0 or not data.phase in ["forming", "fighting"]:
