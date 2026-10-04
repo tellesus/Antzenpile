@@ -2,7 +2,8 @@ class_name AdaptationRules
 extends RefCounted
 ## Authored first-web choice; aggregate effects apply only to newly emerged workers.
 
-const TRAITS: Array[String] = ["lean", "load", "persistent", "security", "tolerance"]
+const TRAITS: Array[String] = ["lean", "load", "persistent", "security", "tolerance", "fighter"]
+const FIGHTING = preload("res://data/adaptation/strong_mandibles.tres")
 const CHEMISTRY = preload("res://data/adaptation/persistent_chemistry.tres")
 const RECOGNITION = preload("res://data/adaptation/recognition.tres")
 const COSTS: Dictionary = {"carbohydrate": 12.0, "protein": 12.0, "water": 6.0}
@@ -14,7 +15,7 @@ static func valid_trait(id: String) -> bool:
 
 
 static func costs(id: String) -> Dictionary:
-	return RECOGNITION.costs() if id in ["security", "tolerance"] else CHEMISTRY.costs() if id == "persistent" else COSTS.duplicate()
+	return FIGHTING.costs() if id == "fighter" else RECOGNITION.costs() if id in ["security", "tolerance"] else CHEMISTRY.costs() if id == "persistent" else COSTS.duplicate()
 
 
 static func compatible(traits: Array[String]) -> bool:

@@ -11,12 +11,15 @@ static func positions(size: Vector2) -> Dictionary:
 	return {"foraging": origin + Vector2(width * 0.50, height * 0.25),
 		"lean": origin + Vector2(width * 0.27, height * 0.50),
 		"load": origin + Vector2(width * 0.73, height * 0.50),
+		"fighter": origin + Vector2(width * 0.50, height * 0.65),
 		"security": origin + Vector2(width * 0.27, height * 0.50),
 		"tolerance": origin + Vector2(width * 0.73, height * 0.50),
 		"persistent": origin + Vector2(width * 0.27, height * 0.84),
 		"honeydew": origin + Vector2(width * 0.73, height * 0.84)}
 
 static func visible_nodes(status: Dictionary, family: String = "foraging") -> Array[String]:
+	if family == "combat" and status.get("adaptation_options", {}).has("fighter"):
+		return ["foraging", "fighter"]
 	if family == "recognition" and status.get("adaptation_options", {}).has("security"):
 		return ["foraging", "security", "tolerance"]
 	var result: Array[String] = ["foraging", "lean", "load"]
@@ -38,7 +41,7 @@ static func trait_state(status: Dictionary, id: String) -> String:
 		return "Queued · next brood"
 	if status.get("adaptation_trial", {}).get("adaptation_id", "") == id:
 		return "Growing trial brood"
-	if id in ["persistent", "security", "tolerance"]:
+	if id in ["persistent", "security", "tolerance", "fighter"]:
 		var option: Dictionary = status.get("adaptation_options", {}).get(id, {})
 		if option.get("inherited", false):
 			return "Inherited · %d adult carriers" % option.get("expressed", 0)
@@ -54,14 +57,14 @@ static func trait_state(status: Dictionary, id: String) -> String:
 		return "Other branch chosen"
 	if status.get("adaptation_options", {}).get(id, {}).get("available", false):
 		return "Available · queue next brood"
-	if status.get("adaptation_trial", {}).get("adaptation_id", "") in ["persistent", "security", "tolerance"]:
+	if status.get("adaptation_trial", {}).get("adaptation_id", "") in ["persistent", "security", "tolerance", "fighter"]:
 		return "Another trial is growing"
 	if status.get("adaptation_repertoire", "") != "" or not status.get("adaptation_trial", {}).is_empty():
 		return "Other branch chosen"
 	return "Brood trial available"
 
 static func title(id: String) -> String:
-	return {"foraging": "Colony repertoire", "lean": "Lean Foragers", "load": "Load Bearers", "persistent": "Persistent chemistry", "security": "Foreign Chemical Sensitivity", "tolerance": "Flexible Recognition Envelope", "honeydew": "Honeydew relationship"}.get(id, "Trait")
+	return {"fighter":"Strong Mandibles", "foraging": "Colony repertoire", "lean": "Lean Foragers", "load": "Load Bearers", "persistent": "Persistent chemistry", "security": "Foreign Chemical Sensitivity", "tolerance": "Flexible Recognition Envelope", "honeydew": "Honeydew relationship"}.get(id, "Trait")
 
 
 static func short_title(id: String) -> String:

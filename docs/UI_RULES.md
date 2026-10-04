@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 130 adds a focused Combat family containing Strong Mandibles. The family navigation cycles available recognition/combat/foraging views, with no purchase on the graph. The one selected-trait panel explains increased combat contribution, recurring larval food, trial costs and the existing queue/laid lock/inheritance. Adult expression counts include pending unknown casualties. No live enemy power or automatic combat action is added.
+
 Card 129 presents returned heavy surface disturbance as dated witness history and a selectable coarse memory. Threat Management explicitly says it cannot be fought, offers Survey and Withdraw/Keep Avoided plus existing Approach controls, and never predicts another impact. New Roadside runs have the first bounded surface hazard. Every hint stays historical; quiet later pulses cannot refresh it.
 
 128: “available” counters and labor advisories mean workers free for another job; Queen/Entrance separately name held brood carers. Nursery shows held care or an explicit care pause with the missing home-worker count. Its touch-sized release/recall action names the affected job, quantity and remembered gathering source when relevant; it reduces that assignment only on activation, validates stale plans and waits for real traveler return. A pending recall replaces the action with waiting text. Care recovery temporarily replaces chamber/climate controls; invisible controls cannot receive clicks. Help explains that food/care still gate hatching. No automatic staffing or free emergency workers.

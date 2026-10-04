@@ -119,6 +119,11 @@ func adaptation_fraction() -> float:
 	return float(adapted_workers_total) / workers_total if workers_total > 0 else 0.0
 
 
+func combat_multiplier() -> float:
+	var share: float = float(genetics.count_trait("fighter")) / workers_total if workers_total > 0 else 0.0
+	return snappedf(1.0 + AdaptationRules.FIGHTING.extra_combat_weight * share, 0.00001)
+
+
 func chemistry_fraction() -> float:
 	return float(genetics.count_trait("persistent")) / workers_total if workers_total > 0 else 0.0
 

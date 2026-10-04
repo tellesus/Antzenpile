@@ -90,6 +90,7 @@ func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
 	assert(allocated and paid)
 	state.route_id = route_id; state.phase = "outbound"; state.workers = count; state.departed_at = _run.simulation_time
+	state.defense.combat_multiplier = pile.combat_multiplier() if mode == "defend" else 1.0
 	state.defense.mode = mode; state.defense.sent = count; state.defense.initial_sent = count
 	state.defense.goal = state.orders.goals.get(route_id, "clear") if mode == "defend" else "clear"
 	last_error = ""; return true
@@ -109,6 +110,7 @@ func reinforce(route_id: String) -> bool:
 	var allocated: bool = pile.allocate_workers("journey:"+pile.id,CONFIG.reinforcement_workers)
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
 	assert(allocated and paid)
+	defense.extra_combat_multiplier = pile.combat_multiplier()
 	defense.extra_workers = CONFIG.reinforcement_workers; defense.extra_ticks = 0; defense.sent += CONFIG.reinforcement_workers
 	last_error = ""; return true
 
@@ -158,6 +160,8 @@ func _meet_reinforcement() -> void:
 	defense.extra_ticks += 1
 	var cursor: int = _leg() - state.elapsed_ticks if state.phase == "inbound" else state.elapsed_ticks
 	if defense.extra_ticks >= cursor:
+		defense.combat_multiplier = snappedf((state.workers * defense.combat_multiplier + defense.extra_workers * defense.extra_combat_multiplier) / (state.workers + defense.extra_workers), 0.00001)
+		defense.extra_combat_multiplier = 1.0
 		state.workers += defense.extra_workers; defense.extra_workers = 0; defense.extra_ticks = 0
 
 func _find_ambusher() -> bool:
@@ -176,7 +180,8 @@ func _combat() -> void:
 	defense.rounds += 1
 	var front: int = state.workers - state.pressure.messengers
 	var resistance: int = maxi(_run.predator.resistance, CONFIG.hunt_resistance if defense.goal == "hunt" else 0)
-	if _run.rng.randf() < float(front) / (front + resistance):
+	var power: float = front * defense.combat_multiplier
+	if _run.rng.randf() < power / (power + resistance):
 		if _run.predator.resistance > 0: _run.predator.resistance -= 1
 		elif defense.goal == "hunt": _run.predator.health -= 1
 	else:
@@ -205,7 +210,7 @@ func _send_messenger() -> void:
 	pressure.remaining_ticks = maxi(1, state.elapsed_ticks)
 	pressure.travel_ticks = pressure.remaining_ticks
 	var front: int = state.workers - pressure.messengers
-	pressure.pending = {"pressure": "resisted" if state.defense.lost >= 2 or front < _run.predator.resistance * 2 else "holding", "observed_at": _run.simulation_time, "acknowledged_sent": state.defense.sent - state.defense.extra_workers}
+	pressure.pending = {"pressure": "resisted" if state.defense.lost >= 2 or front * state.defense.combat_multiplier < _run.predator.resistance * 2 else "holding", "observed_at": _run.simulation_time, "acknowledged_sent": state.defense.sent - state.defense.extra_workers}
 
 func _tick_messenger() -> void:
 	var state: JourneyResponseState = _run.journey_response

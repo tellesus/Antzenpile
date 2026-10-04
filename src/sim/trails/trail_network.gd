@@ -134,6 +134,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if foraging_losses != cohort.adapted_lost_workers:
 			return false
 		var fraction: float = 0.0
+		if cohort.combat_multiplier > 1 and "fighter" not in pile.genetics.established: return false
 		if pile.adaptation_repertoire == "lean":
 			fraction = (1.0 - cohort.energy_multiplier) / 0.3
 		elif pile.adaptation_repertoire == "load":

@@ -95,6 +95,7 @@ func _messenger(cohort: TransitCohort, route: TrailRouteState, report: String = 
 	messenger.reports_source_outcome = false
 	messenger.conflict_report = report
 	messenger.conflict_observed_at = _run.simulation_time
+	messenger.combat_multiplier = cohort.combat_multiplier
 	messenger.conflict_serial = state.serial
 	cohort.worker_count -= 1
 	_run.trails.cohorts[messenger.id] = messenger
@@ -143,7 +144,9 @@ func tick() -> void:
 	if state.round_ticks > 0:
 		return
 	state.rounds += 1
-	if _run.rng.randf() < float(player_count) / (player_count + rival_count):
+	var power: float = 0.0
+	for cohort: TransitCohort in participants: power += cohort.worker_count * cohort.combat_multiplier
+	if _run.rng.randf() < power / (power + rival_count):
 		var regulars: int = maxi(0,_run.rival.workers.count("rival:trail"))
 		var commitment: String = "rival:trail" if regulars == rival_count or _run.rng.randi_range(0,rival_count-1) < regulars else "rival:reinforcement"
 		var removed: bool = _run.rival.workers.remove_living_workers(commitment, 1, "Junction conflict")

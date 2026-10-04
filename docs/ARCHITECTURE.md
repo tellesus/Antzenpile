@@ -1,5 +1,7 @@
 # Architecture
 
+Card 130 integrates the independent fighter gene into existing cohort genetics and queued Home trials. Only emerged carriers contribute to a captured departure combat multiplier. Aggregate food cohorts and defensive/reinforcement batches carry their own weights; real joining combines them, couriers preserve them, and casualties still debit ordinary disjoint worker phenotypes. Larval feeding and Auto Brood reserves share the authored increased demand. No soldier nodes or army ledger.
+
 Card 129 adds run-owned SurfaceImpactState/System. Seed-derived Roadside pulses operate physical food-route travelers and crossing scent fields through the existing ledger loss owner. Route witnesses and paid physical survey samples are separate returned knowledge; normal UI receives only dated records. No human actor, enemy health bar or live event feed. Older absent-state saves retain disabled disturbances.
 
 128 derives a caregiver reserve on PileState from existing worker brood and the authored care ratio, subtracting dedicated trial nurses. Job systems check `workers_assignable` and commit through `PileState.allocate_workers`, which validates that reserve before the authoritative ledger transfer. Raw available workers still include caregivers; no duplicate saved pool. BroodCareRelief offers one voluntary assignment reduction through the existing job owner, revalidates on activation and retains physical travel. Normal presentation receives detached free/held/missing care, a semantic recovery plan and a source name derived only from returned memory.

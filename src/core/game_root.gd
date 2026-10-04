@@ -471,6 +471,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"chemistry_persistence": AdaptationRules.CHEMISTRY.persistence_multiplier,
 		"chemistry_extra_energy": AdaptationRules.CHEMISTRY.extra_travel_energy,
 		"recognition_experience": pile.recognition_experience,
+		"fighter_combat_weight":1.0 + AdaptationRules.FIGHTING.extra_combat_weight, "fighter_extra_food":AdaptationRules.FIGHTING.extra_larval_food,
 		"recognition_clearing_change": AdaptationRules.RECOGNITION.clearing_change,
 		"recognition_labor_change": AdaptationRules.RECOGNITION.protection_worker_change,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},

@@ -9,6 +9,8 @@ var goal: String = "clear"
 var lost: int = 0
 var adapted_lost: int = 0
 var lost_profiles: Dictionary[String,int] = {}
+var combat_multiplier: float = 1.0
+var extra_combat_multiplier: float = 1.0
 var extra_workers: int = 0
 var extra_ticks: int = 0
 var round_ticks: int = 0
@@ -24,6 +26,7 @@ func reported_for_pile(pile_id: String) -> int:
 
 func to_dict() -> Dictionary:
 	return {"mode":mode,"sent":sent,"initial_sent":initial_sent,"goal":goal,"lost":lost,"adapted_lost":adapted_lost,"lost_profiles":lost_profiles.duplicate(),
+		"combat_multiplier":combat_multiplier,"extra_combat_multiplier":extra_combat_multiplier,
 		"extra_workers":extra_workers,"extra_ticks":extra_ticks,"round_ticks":round_ticks,"rounds":rounds,
 		"outcome":outcome,"observed_at":observed_at,"reported_losses":reported_losses,"outcomes":outcomes.duplicate(true),"reported_by_pile":reported_by_pile.duplicate()}
 
@@ -35,11 +38,18 @@ func pending_trait(trait_id: String) -> int:
 
 func reset_party() -> void:
 	mode = "investigate"; sent = 0; initial_sent = 0; goal = "clear"; lost = 0; adapted_lost = 0; lost_profiles.clear()
+	combat_multiplier = 1.0; extra_combat_multiplier = 1.0
 	extra_workers = 0; extra_ticks = 0; round_ticks = 0; rounds = 0; outcome = ""; observed_at = 0
 
 func restore(data: Dictionary, party: Dictionary, colony: ColonyState, trails: TrailNetwork, time: float) -> bool:
-	var required: Array = to_dict().keys(); required.erase("reported_by_pile"); required.erase("initial_sent"); required.erase("goal")
-	if data.size() < 13 or data.size() > 16 or not data.has_all(required) or data.mode not in ["investigate","defend"] or not data.lost_profiles is Dictionary or not data.outcomes is Dictionary: return false
+	var required: Array = to_dict().keys(); required.erase("reported_by_pile"); required.erase("initial_sent"); required.erase("goal"); required.erase("combat_multiplier"); required.erase("extra_combat_multiplier")
+	if data.size() < 13 or data.size() > 18 or not data.has_all(required) or data.mode not in ["investigate","defend"] or not data.lost_profiles is Dictionary or not data.outcomes is Dictionary: return false
+	var combat: Variant = data.get("combat_multiplier",1.0)
+	var extra_combat: Variant = data.get("extra_combat_multiplier",1.0)
+	for value: Variant in [combat,extra_combat]:
+		if not typeof(value) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(value)) or value < 1 or value > 1 + AdaptationRules.FIGHTING.extra_combat_weight: return false
+	if (party.phase == "idle" or data.mode == "investigate") and (combat != 1 or extra_combat != 1): return false
+	if data.extra_workers == 0 and extra_combat != 1: return false
 	var restored_goal: Variant = data.get("goal", "clear")
 	if restored_goal not in ["clear", "hunt"] or data.mode == "investigate" and restored_goal != "clear": return false
 	var initial: Variant = data.get("initial_sent", 0 if party.phase == "idle" else CONFIG.investigation_workers if data.mode == "investigate" else CONFIG.defense_workers)
@@ -55,6 +65,7 @@ func restore(data: Dictionary, party: Dictionary, colony: ColonyState, trails: T
 	var adapted_total: int = 0
 	var origin: String = trails.routes[party.route_id].origin_pile if trails.routes.has(party.route_id) else "home"
 	var pile: PileState = colony.piles[origin]
+	if (combat > 1 or extra_combat > 1) and "fighter" not in pile.genetics.established: return false
 	for key: Variant in data.lost_profiles:
 		if not key is String or not WorkerLedger.valid_count(data.lost_profiles[key]) or data.lost_profiles[key] <= 0 or data.lost_profiles[key] > pile.genetics.lost.get(key,0): return false
 		profiles[key] = int(data.lost_profiles[key]); profile_total += profiles[key]
@@ -91,6 +102,7 @@ func restore(data: Dictionary, party: Dictionary, colony: ColonyState, trails: T
 		if data.sent < CONFIG.defense_workers or (int(data.sent) - CONFIG.defense_workers) % CONFIG.reinforcement_workers != 0 or party.workers < 1 or party.workers + data.extra_workers + data.lost != data.sent: return false
 		if data.observed_at > 0 and data.observed_at < party.departed_at: return false
 		if (party.phase == "inbound") != (data.outcome != "") or (party.phase == "fighting") != (data.round_ticks > 0): return false
+	combat_multiplier = float(combat); extra_combat_multiplier = float(extra_combat)
 	mode = data.mode; sent = int(data.sent); initial_sent = int(initial); goal = restored_goal; lost = int(data.lost); adapted_lost = int(data.adapted_lost); lost_profiles = profiles
 	extra_workers = int(data.extra_workers); extra_ticks = int(data.extra_ticks); round_ticks = int(data.round_ticks); rounds = int(data.rounds)
 	outcome = data.outcome; observed_at = float(data.observed_at); reported_losses = int(data.reported_losses); outcomes = restored_outcomes; reported_by_pile = restored_history

@@ -343,6 +343,7 @@ func _depart(route: TrailRouteState) -> void:
 	cohort.unpaid_energy_cost = unpaid_energy_cost
 	cohort.energy_multiplier = energy_multiplier
 	cohort.carry_multiplier = carry_multiplier
+	cohort.combat_multiplier = pile.combat_multiplier()
 	cohort.chemistry_fraction = chemistry
 	cohort.remaining_ticks = _leg_ticks(route)
 	_run.trails.cohorts[cohort.id] = cohort

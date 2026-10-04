@@ -82,10 +82,11 @@ func production_status(pile_id: String) -> Dictionary:
 
 func remaining_food_reserve(pile: PileState) -> Dictionary:
 	# Intrinsic remaining larval demand, not a forecast of routes/weather/deliveries.
-	var ant_seconds: float = CONFIG.starting_count * CONFIG.larva_seconds
+	var ant_seconds: float = CONFIG.starting_count * CONFIG.larva_seconds * (1.0 + AdaptationRules.FIGHTING.extra_larval_food if "fighter" in pile.offspring_traits() else 1.0)
 	for cohort: BroodCohort in pile.brood_cohorts:
-		if cohort.stage == "egg": ant_seconds += cohort.count * CONFIG.larva_seconds
-		elif cohort.stage == "larva": ant_seconds += cohort.count * (CONFIG.larva_seconds - cohort.progress_seconds)
+		var feeding: float = 1.0 + AdaptationRules.FIGHTING.extra_larval_food if "fighter" in cohort.inherited_traits else 1.0
+		if cohort.stage == "egg": ant_seconds += cohort.count * CONFIG.larva_seconds * feeding
+		elif cohort.stage == "larva": ant_seconds += cohort.count * (CONFIG.larva_seconds - cohort.progress_seconds) * feeding
 	var reproductive: ReproductionState = pile.reproduction
 	if reproductive.phase=="egg": ant_seconds+=reproductive.CONFIG.space*reproductive.CONFIG.larva_ticks*SimulationClock.TICK_INTERVAL
 	elif reproductive.phase=="larva": ant_seconds+=reproductive.CONFIG.space*(reproductive.CONFIG.larva_ticks*SimulationClock.TICK_INTERVAL-reproductive.progress_quarters*SimulationClock.TICK_INTERVAL/4.0)
@@ -147,6 +148,7 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 	var effective_delta: float = delta * (environment_rate if cohort.stage == "larva" else 1.0)
 	if cohort.stage == "larva":
 		var food_multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0
+		if "fighter" in cohort.inherited_traits: food_multiplier *= 1.0 + AdaptationRules.FIGHTING.extra_larval_food
 		var costs: Dictionary = {"carbohydrate": cohort.count * CONFIG.carbohydrate_per_larva_second * effective_delta * food_multiplier,
 			"protein": cohort.count * CONFIG.protein_per_larva_second * effective_delta * food_multiplier,
 			"water": cohort.count * CONFIG.water_per_larva_second * effective_delta * food_multiplier}

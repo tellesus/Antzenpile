@@ -17,6 +17,7 @@ var remaining_ticks: int = 1
 var unpaid_energy_cost: float = 0.0
 var energy_multiplier: float = 1.0
 var carry_multiplier: float = 1.0
+var combat_multiplier: float = 1.0
 var chemistry_fraction: float = 0.0
 var lost_workers: int = 0
 var adapted_lost_workers: int = 0
@@ -46,7 +47,7 @@ func to_dict() -> Dictionary:
 		"payload": payload, "remaining_ticks": remaining_ticks, "contaminant_mass": contaminant_mass,
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
-		"chemistry_fraction": chemistry_fraction,
+		"combat_multiplier":combat_multiplier, "chemistry_fraction": chemistry_fraction,
 		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
 		"lost_profiles": lost_profiles.duplicate(),
 		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
@@ -76,6 +77,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	var energy: Variant = data.get("energy_multiplier", 1.0)
 	var carry: Variant = data.get("carry_multiplier", 1.0)
+	var combat: Variant = data.get("combat_multiplier", 1.0)
+	if not typeof(combat) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(combat)) or combat < 1 or combat > 1 + AdaptationRules.FIGHTING.extra_combat_weight: return false
 	var chemistry: Variant = data.get("chemistry_fraction", 0.0)
 	if not typeof(chemistry) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(chemistry)) or chemistry < 0.0 or chemistry > 1.0:
 		return false
@@ -160,6 +163,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	unpaid_energy_cost = float(data.get("unpaid_energy_cost", 0.0))
 	energy_multiplier = float(energy)
 	carry_multiplier = float(carry)
+	combat_multiplier = float(combat)
 	chemistry_fraction = snappedf(float(chemistry), 0.00001)
 	lost_workers = int(losses)
 	adapted_lost_workers = int(adapted_losses)
