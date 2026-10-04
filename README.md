@@ -1,5 +1,7 @@
 # Antzenpile
 
+**Colony Menu → End Run and Review** now closes the run and opens a sampled physical history: sources, Home/Daughter, real trail courses, scout positions, weather and cause-specific event notes. Scrub, step or play the timeline; inspect sources to compare physical availability with returned-memory presence. This cannot resume revealed play. The existing saved colony remains intact; **Load Saved** restores it or **New Colony** starts separately. Older saves record from load, and long histories disclose thinning. Automatic endings and elaborate replay art remain future work.
+
 Later warm fronts can heat a developed Nursery. Existing climate workers cool brood with stored water as well as maintaining humidity; rain reduces the local heat. Current warm/hot conditions appear in Nursery and voluntary attention, without a weather forecast. OUTWARD also senses current air at Home. Hot, dry air mildly evaporates exposed water and reduces new nectar/honeydew output; actual rain and cooler conditions restore ordinary behavior, with remote changes learned on return. [Nursery heat evidence](docs/NURSERY_HEAT_EVALUATION.md).
 
 Prolonged heavy refuse can now strain larval health and eventually cause brood losses. Nursery shows local symptoms and points to Midden cleanup; recovery takes time after isolation. Developed damp conditions accelerate exposure. Guest losses and adult food-sharing failures remain separate. [Local brood-health evidence](docs/BROOD_HEALTH_EVALUATION.md).

@@ -21,6 +21,7 @@ const Predator = preload("res://src/sim/ecology/predator_state.gd")
 const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 const Exploration = preload("res://src/sim/scouting/exploration_state.gd")
+var history := RunHistory.new()
 var supply := InterpileSupplyState.new()
 var daughter_supply := InterpileSupplyState.new()
 var supply_origin: String = "home"
@@ -74,6 +75,7 @@ func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> voi
 	world = Loader.new().load_scenario(Scenarios.path_for(scenario))
 	assert(world != null, "Run construction requires a registered authored scenario")
 	colony.initialize_home(world.home_position)
+	history.record(self,true)
 
 
 func to_dict() -> Dictionary:
@@ -93,7 +95,7 @@ func to_dict() -> Dictionary:
 	for id: String in ids:
 		delivered.append(delivered_observations[id].to_dict())
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
-	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
+	return {"history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"daughter_supply":daughter_supply.to_dict(), "supply_origin":supply_origin,
@@ -162,6 +164,8 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if not data.world is Dictionary or not restored_world.restore(data.world, Loader.definition_ids()):
 		return false
+	var restored_history := RunHistory.new()
+	if data.has("history") and not restored_history.restore(data.history,restored_clock.tick_count,restored_world.bounds,restored_clock.paused): return false
 	var restored_colony := Colony.new()
 	if not data.colony is Dictionary or not restored_colony.restore(data.colony, restored_world.bounds, restored_world.home_position):
 		return false
@@ -495,6 +499,7 @@ func restore(data: Dictionary) -> bool:
 	rng.seed = _seed
 	rng.state = data.rng_state.to_int()
 	genetic_rng = restored_genetic_rng
+	history = restored_history
 	world = restored_world
 	colony = restored_colony
 	scouts = restored_scouts

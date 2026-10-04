@@ -96,135 +96,169 @@ func _attach_run(next_run: RunState) -> void:
 	ecology = Ecology.new(run)
 	brood_care = BroodCareRelief.new(run, {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"response":journey_response,"supplies":supply,"daughter_supplies":daughter_supply,"rejection":guest})
 	run.clock.tick.connect(_tick)
+	if run.history.frames.is_empty(): run.history.record(run,true)
 
 
 func dispatch_scout(origin_id: String, bearing: Variant = null) -> bool:
+	if run.history.ended: return false
 	return scouting.dispatch(origin_id, bearing)
 
 
 func recall_scout(id: String) -> bool:
+	if run.history.ended: return false
 	return scouting.recall(id)
 
 
 func set_exploration(target: Variant, origin_id: String = "home") -> bool:
+	if run.history.ended: return false
 	return scouting.set_effort(target, origin_id)
 
 
 func set_exploration_bias(bearing: Variant, origin_id: String = "home") -> bool:
+	if run.history.ended: return false
 	return scouting.set_bias(bearing, origin_id)
 
 
 func set_investigation_priority(knowledge_id: String, enabled: bool, origin_id: String = "home") -> bool:
+	if run.history.ended: return false
 	return scouting.set_priority(knowledge_id, enabled, origin_id)
 
 
 func investigate_known_source(origin_id: String, knowledge_id: String) -> bool:
+	if run.history.ended: return false
 	return scouting.dispatch_investigation(origin_id, knowledge_id)
 
 
 func advance(real_delta: float) -> bool:
+	if run.history.ended: return false
 	return run.clock.advance(real_delta)
 
 
 func toggle_pause() -> void:
+	if run.history.ended: return
 	run.clock.paused = not run.clock.paused
 
 
 func set_time_scale(value: int) -> bool:
+	if run.history.ended: return false
 	return run.clock.set_time_scale(value)
 
 
 func create_trail(origin_id: String, knowledge_id: String) -> bool:
+	if run.history.ended: return false
 	return trails.create_route(origin_id, knowledge_id)
 
 
 func set_trail_workers(route_id: String, target: Variant) -> bool:
+	if run.history.ended: return false
 	return trails.set_workers(route_id, target)
 
 
 func recheck_trail(route_id: String) -> bool:
+	if run.history.ended: return false
 	return trails.recheck(route_id)
 
 
 func start_food_exchange(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return food_exchange.start(pile_id)
 
 
 func start_brood(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return brood.start(pile_id)
 
 
 func set_brood_intent(pile_id: String, intent: Variant) -> bool:
+	if run.history.ended: return false
 	return brood.set_intent(pile_id, intent)
 
 
 func start_nursery_development(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return nursery.start(pile_id)
 
 
 func start_nursery_expansion(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return nursery.start_expansion(pile_id)
 
 
 func set_sanitation_workers(pile_id: String, target: Variant) -> bool:
+	if run.history.ended: return false
 	return sanitation.set_workers(pile_id, target)
 
 
 func start_midden(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return sanitation.start(pile_id)
 
 
 func set_humidity_workers(pile_id: String, target: Variant) -> bool:
+	if run.history.ended: return false
 	return humidity.set_workers(pile_id, target)
 
 
 func start_adaptation(pile_id: String, trait_id: String) -> bool:
+	if run.history.ended: return false
 	return adaptation.start(pile_id, trait_id)
 
 
 func queue_adaptation(pile_id: String, trait_id: Variant) -> bool:
+	if run.history.ended: return false
 	return adaptation.queue_choice(pile_id, trait_id)
 
 
 func start_honeydew_tending(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return ecology.start_tending(pile_id)
 
 
 func stop_honeydew_tending(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return ecology.stop_tending(pile_id)
 
 
 func start_guest_rejection() -> bool:
+	if run.history.ended: return false
 	return guest.start_rejection()
 
 
 func send_daughter_workers() -> bool:
+	if run.history.ended: return false
 	return reinforcement.start()
 
 func recall_daughter_workers() -> bool:
+	if run.history.ended: return false
 	return reinforcement.recall()
 
 func set_daughter_supply(enabled: Variant, source_id: String = "home") -> bool:
+	if run.history.ended: return false
 	return (supply if source_id == "home" else daughter_supply).set_enabled(enabled) if source_id in ["home","satellite_1"] else false
 
 
 func establish_daughter(knowledge_id: String) -> bool:
+	if run.history.ended: return false
 	return founding.establish(knowledge_id)
 
 
 func start_founding(knowledge_id: String) -> bool:
+	if run.history.ended: return false
 	return founding.start(knowledge_id)
 
 
 func start_reproduction(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return reproduction.start(pile_id)
 
 
 func stop_guest_rejection() -> bool:
+	if run.history.ended: return false
 	return guest.stop_rejection()
 
 
 func _tick(delta: float) -> void:
+	if run.history.ended: return
 	surface_impact.tick()
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():
@@ -251,3 +285,17 @@ func _tick(delta: float) -> void:
 	daughter_supply.tick()
 	reinforcement.tick()
 	food_toxicity.tick(delta)
+	run.history.record(run)
+
+
+func end_run() -> bool:
+	if run.history.ended: return false
+	run.history.record(run,true)
+	run.history.ended=true
+	run.clock.paused=true
+	return true
+
+
+func review_snapshot() -> Dictionary:
+	if not run.history.ended: return {}
+	return {"history":run.history.review_dict(),"bounds":[run.world.bounds.position.x,run.world.bounds.position.y,run.world.bounds.size.x,run.world.bounds.size.y],"terrain":run.world.terrain.duplicate(true),"scenario":run.scenario_id,"seed":str(run.run_seed)}

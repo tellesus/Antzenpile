@@ -7,6 +7,8 @@ const UIStyle = preload("res://src/presentation/organic_ui.gd")
 var seed_provider: Callable
 var scenario_provider: Callable
 var start_command: Callable
+var end_command: Callable
+var confirm_end: bool = false
 var blocked: Callable
 var interaction_started: Callable
 var opened: bool = false
@@ -35,10 +37,10 @@ func help_button_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 544, 78, 100, 64)
 
 func panel_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 432,156,408,390)
+	return Rect2(get_viewport_rect().size.x - 432,156,408,430)
 
 func choice_rect(choice: String) -> Rect2:
-	return Rect2(panel_rect().position + Vector2(24,148 if choice == "repeat" else 206 if choice == "fresh" else 322 if choice == "guide" else 264),Vector2(360,44))
+	return Rect2(panel_rect().position + Vector2(24,148 if choice == "repeat" else 200 if choice == "fresh" else 356 if choice == "guide" else 304 if choice == "end" else 252),Vector2(360,44))
 
 
 func guide_rect(command: String) -> Rect2:
@@ -57,10 +59,16 @@ func activate_at(at: Vector2) -> bool:
 		return true
 	if button_rect().has_point(at):
 		opened = not opened
+		confirm_end = false
 		guide_open = false
 		if opened and scenario_provider.is_valid(): selected_scenario = scenario_provider.call()
 		return true
 	if not opened: return false
+	if confirm_end:
+		if choice_rect("repeat").has_point(at) and end_command.is_valid():
+			if end_command.call(): opened=false; confirm_end=false
+		elif choice_rect("cancel").has_point(at): confirm_end=false
+		return true
 	if guide_open:
 		if guide_rect("back").has_point(at):
 			guide_open = false
@@ -68,6 +76,7 @@ func activate_at(at: Vector2) -> bool:
 		elif guide_rect("previous").has_point(at): guide_page = maxi(0,guide_page - 1)
 		elif guide_rect("next").has_point(at): guide_page = (guide_page + 1) % GUIDE.size()
 		return true
+	if choice_rect("end").has_point(at): confirm_end=true; return true
 	if choice_rect("guide").has_point(at):
 		guide_open = true
 		guide_page = 0
@@ -111,17 +120,25 @@ func _draw() -> void:
 	var panel: Rect2 = panel_rect()
 	UIStyle.surface(self, panel,Color("111921"))
 	UIStyle.surface(self, panel,Color("41535a"),true)
+	if confirm_end:
+		_label(panel.position+Vector2(24,32),"End this run and reveal its world?",20,Color("e4d4b8"))
+		_label(panel.position+Vector2(24,69),"This colony cannot resume after the reveal.",15,Color("dbb19a"))
+		_label(panel.position+Vector2(24,96),"Your existing saved slot will be kept.",15,Color("b4c3bd"))
+		for choice: String in ["repeat","cancel"]:
+			UIStyle.surface(self,choice_rect(choice),Color("35483c"))
+			_label(choice_rect(choice).position+Vector2(24,28),"END RUN AND REVIEW" if choice=="repeat" else "KEEP PLAYING",14,Color("e1d7bf"))
+		return
 	if guide_open:
 		_draw_guide(panel)
 		return
-	_label(panel.position+Vector2(24,32),"Start a new colony",22,Color("d9d3be"))
-	_label(panel.position+Vector2(24,64),"Unsaved progress will be replaced.",15,Color("ccac91"))
+	_label(panel.position+Vector2(24,32),"Colony menu",22,Color("d9d3be"))
+	_label(panel.position+Vector2(24,64),"New colonies replace unsaved progress.",15,Color("ccac91"))
 	_label(panel.position+Vector2(24,86),"Saved colony and sound settings stay.",14,Color("a9b9bc"))
 	UIStyle.surface(self, scenario_rect(),Color("263038"))
 	_label(scenario_rect().position+Vector2(16,28),"SETTING: %s  ·  CHANGE" % ScenarioCatalog.label_for(selected_scenario),14,Color("a9b9bc"))
-	for choice: String in ["repeat","fresh","cancel","guide"]:
+	for choice: String in ["repeat","fresh","cancel","end","guide"]:
 		UIStyle.surface(self, choice_rect(choice),Color("35483c") if choice in ["repeat","fresh"] else Color("263038"))
-		_label(choice_rect(choice).position+Vector2(32,28),"REPEAT THIS SEED" if choice == "repeat" else "START WITH A FRESH SEED" if choice == "fresh" else "HOW TO PLAY" if choice == "guide" else "CANCEL",14,Color("dce5d9"))
+		_label(choice_rect(choice).position+Vector2(32,28),"REPEAT THIS SEED" if choice == "repeat" else "START WITH A FRESH SEED" if choice == "fresh" else "HOW TO PLAY" if choice == "guide" else "END RUN AND REVIEW" if choice == "end" else "CANCEL",14,Color("dce5d9"))
 
 
 func _draw_guide(panel: Rect2) -> void:

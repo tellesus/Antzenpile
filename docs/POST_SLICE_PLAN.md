@@ -1,8 +1,10 @@
 # Post-slice development plan
 
-## Current priority — desktop completion path (132)
+## Current priority — desktop completion path (132–133)
 
-Cards 129–131 complete the accepted disturbance/fighting/return-supply section. [Release-gap review](tasks/132_desktop_release_gap_review.md) and [next order](DESKTOP_RELEASE_PATH.md) identify the missing completed-run/reality-replay experience, reproducible Windows package and current integrated performance evidence. Next expand a bounded physical-history plus voluntary post-run reveal card from original Part 6 §§115–118/159/162/167. Keep it unavailable during ordinary play, avoid arbitrary session/win thresholds and preserve all remaining original feature milestones. Do not declare the present sandbox a release candidate.
+[133 post-run history/review](tasks/133_post_run_history_review.md) implements the next source-backed outcome: voluntary end, private bounded physical recording and release-available sampled truth review. Existing saves remain available for explicit load, and normal play cannot resume after reveal. The first map is deliberately simple; automatic outcomes, richer storytelling/campaign transition and current release performance remain open.
+
+Next expand run continuity and endings from original Part 6 §§68–73/97–99 against actual queen/brood/recall/network state. Distinguish viable stalled colonies from genuinely unrecoverable ones without arbitrary session thresholds or free recovery. Keep the wider original-design completion list, Windows package and measured current-build gates in [desktop release path](DESKTOP_RELEASE_PATH.md). Do not call the present prototype a release candidate.
 
 128 resolves the reported brood assignment soft lock before further features: reserve existing care against new jobs and offer voluntary release/physical recall for already-stalled saves. [Card/evidence](tasks/128_brood_care_safeguard.md): 8,285 checks, clean import/Main, eight standard/compact input captures. No extinction rule or rate rebalance. Resume the accepted threat expansion below.
 

@@ -23,6 +23,7 @@ var save_service: SaveService = Save.new()
 var mode: String = "outward"
 var audio_preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
 var _audio_settings: AudioSettings
+var _review: RunReview
 var _colony_controls: ColonyControls
 var _discovery_notice: ReturnedDiscovery = preload("res://src/presentation/returned_discovery.gd").new()
 var _discovery_reports: int = 0
@@ -109,10 +110,16 @@ func _ready() -> void:
 		_colony_controls.seed_provider = current_seed
 		_colony_controls.scenario_provider = current_scenario
 		_colony_controls.start_command = start_new_colony
+		_colony_controls.end_command = end_run_review
 		_colony_controls.blocked = colony_controls_blocked
 		_colony_controls.interaction_started = cancel_field_gesture
 		_colony_controls.z_index = 101
 		add_child(_colony_controls)
+		_review = preload("res://src/presentation/run_review.gd").new()
+		_review.new_command = review_new_colony
+		_review.load_command = quick_load
+		_review.z_index = 200
+		add_child(_review)
 	# Lazy load keeps truth-view code out of the headless runtime and release input path.
 	if OS.is_debug_build() and DisplayServer.get_name() != "headless":
 		_debug_view = load("res://src/debug/debug_world_view.gd").new()
@@ -156,6 +163,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func set_mode(next_mode: String) -> bool:
+	if simulation.run.history.ended: return false
 	if not next_mode in ["outward", "inward"]:
 		return false
 	cancel_field_gesture()
@@ -176,15 +184,15 @@ func cancel_field_gesture() -> void:
 
 
 func interaction_blocked() -> bool:
-	return debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened
+	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened
 
 
 func sound_controls_blocked() -> bool:
-	return debug_is_open() or _colony_controls != null and _colony_controls.opened
+	return simulation.run.history.ended or debug_is_open() or _colony_controls != null and _colony_controls.opened
 
 
 func colony_controls_blocked() -> bool:
-	return debug_is_open() or _audio_settings != null and _audio_settings.opened
+	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened
 
 
 func current_seed() -> int:
@@ -273,6 +281,7 @@ func _owns_food_route(route_id: String) -> bool:
 
 
 func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
+	if simulation.run.history.ended: return []
 	var result: Array[Dictionary] = []
 	if not simulation.run.colony.piles.has(pile_id):
 		return result
@@ -525,6 +534,7 @@ func music_state(pile_id: String) -> MusicState:
 
 
 func quick_save() -> Dictionary:
+	if simulation.run.history.ended: return {"accepted":false,"reason":"Run ended; existing saved colony was kept"}
 	var accepted: bool = save_service.save(simulation.run)
 	return {"accepted": accepted, "reason": save_service.last_error}
 
@@ -537,6 +547,8 @@ func quick_load() -> Dictionary:
 
 
 func _refresh_loaded_views() -> void:
+	if _review != null: _review.open({})
+	set_mode("outward" if mode == "review" else mode)
 	inward_pile_id = "home"
 	_discovery_notice.baseline(sensory_snapshot("home"))
 	_discovery_reports = 0
@@ -561,10 +573,12 @@ func _refresh_loaded_views() -> void:
 		_inward_view._feedback = ""
 		_inward_view._process(0)
 	if _debug_view != null:
+		_debug_view.set_process_input(true)
 		_debug_view.snapshot_provider = simulation.run.to_dict
 		_debug_view.model.selected_id = "home"
 	if _audio_controller != null:
 		_audio_controller.restart_after_load()
+	if simulation.run.history.ended: _show_review()
 
 
 func _show_save_feedback(result: Dictionary, success: String) -> void:
@@ -626,6 +640,7 @@ func start_brood() -> Dictionary:
 
 
 func relieve_brood_care(plan: Dictionary) -> Dictionary:
+	if simulation.run.history.ended: return {"accepted":false,"reason":"This run has ended"}
 	var accepted: bool = simulation.brood_care.apply(inward_pile_id, plan)
 	return {"accepted":accepted, "reason":"Assignments changed; inspect care again" if not accepted else "Worker reassignment requested; care resumes when they are home"}
 
@@ -832,6 +847,7 @@ func recheck_trail(route_id: String) -> Dictionary:
 
 
 func respond_to_journey(action: String, route_id: String) -> Dictionary:
+	if simulation.run.history.ended: return {"accepted":false,"reason":"This run has ended"}
 	if not _owns_food_route(route_id): return {"accepted":false,"reason":"Journey belongs to another pile or job"}
 	var system: JourneyResponseSystem = simulation.journey_response
 	var accepted: bool = false
@@ -867,3 +883,26 @@ func investigate_known_source(knowledge_id: String) -> Dictionary:
 
 func debug_is_open() -> bool:
 	return _debug_view != null and _debug_view.visible
+
+
+func end_run_review() -> bool:
+	if not simulation.end_run(): return false
+	_show_review()
+	return true
+
+
+func _show_review() -> void:
+	mode="review"
+	if _colony_controls != null: _colony_controls.opened=false
+	if _audio_settings != null: _audio_settings.opened=false
+	for view in [_outward_view,_inward_view]:
+		if view != null:
+			view.visible=false; view.set_process(false); view.set_process_unhandled_input(false)
+	if _debug_view != null:
+		_debug_view.visible=false; _debug_view.model.shown=false; _debug_view.set_process_input(false)
+	if _review != null: _review.open(simulation.review_snapshot())
+
+
+func review_new_colony() -> void:
+	var seed_value: int = int(Time.get_ticks_usec()%2147483646)+1
+	start_new_colony(seed_value,current_scenario())
