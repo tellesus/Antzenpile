@@ -496,7 +496,7 @@ func _button_at(at: Vector2) -> String:
 				var state: Dictionary = _status.get("journey_response",{})
 				if own_party and state.get("reinforcement_available",false): return "journey_reinforce"
 				if not own_party and _can_mobilize(chosen_route): return "journey_defend"
-				if not own_party and _journey_recovery(chosen_route): return "journey_avoid"
+				if not own_party and (_journey_recovery(chosen_route) or chosen_route.get("surface_warning", false)): return "journey_avoid"
 			if Rect2(get_viewport_rect().size.x - 316,144,292,448).has_point(at): return "journey_panel"
 		elif (chosen_route.get("reported_losses",0) > 0 or chosen_route.get("conflict_report", "") != "") and _journey_rect("journey_open").has_point(at): return "journey_open"
 		if _journey_attention():
@@ -1161,10 +1161,11 @@ func _draw_journey_context(_size: Vector2) -> void:
 	var report: Dictionary = state.get("reports", {}).get(route.get("id"), {})
 	var outcome: Dictionary = state.get("outcomes", {}).get(route.get("id"), {})
 	var own_party: bool = state.get("away", false) and state.get("route_id", "") == route.get("id")
+	var surface: bool = route.get("surface_warning", false)
 	_detail_journey(box, 31, "Threat management", 20)
-	_detail_journey(box, 62, "LAST DEFENSIVE RETURN", 12)
-	_detail_journey(box, 85, Memories.defense_label(outcome), 14)
-	if not outcome.is_empty():
+	_detail_journey(box, 62, "RETURNED DISTURBANCE" if surface else "LAST DEFENSIVE RETURN", 12)
+	_detail_journey(box, 85, "Surface impact / avoid this corridor" if surface else Memories.defense_label(outcome), 14)
+	if not surface and not outcome.is_empty():
 		_detail_journey(box, 107, "%d returned / %d sent · %s ago" % [outcome.sent - outcome.lost, outcome.sent, Copy.duration(_status.time - outcome.received_at)])
 	var pressure: Dictionary = state.get("pressure_reports", {}).get(route.get("id"), {})
 	if own_party and not pressure.is_empty():
@@ -1172,9 +1173,11 @@ func _draw_journey_context(_size: Vector2) -> void:
 		_detail_journey(box, 145, "Holding against resistance" if pressure.pressure == "holding" else "Resistance remains strong")
 		_detail_journey(box, 165, "Observed %s ago · arrived %s ago" % [Copy.duration(_status.time-pressure.observed_at),Copy.duration(_status.time-pressure.received_at)], 12)
 	else:
-		_detail_journey(box, 125, "SURVEY HISTORY", 12)
+		_detail_journey(box, 125, "WITNESS HISTORY" if surface else "SURVEY HISTORY", 12)
 		var finding: String = report.get("finding", "")
-		var labels: Dictionary = {"ambush":"Predatory arthropod witnessed", "foreign":"Foreign ants encountered", "mixed":"Predator and foreign ants witnessed", "inconclusive":"Attacker remains unidentified"}
+		if route.get("surface_warning", false) and not route.get("impact_report", {}).is_empty():
+			finding = "surface"; report = route.impact_report
+		var labels: Dictionary = {"ambush":"Predatory arthropod witnessed", "foreign":"Foreign ants encountered", "mixed":"Predator and foreign ants witnessed", "surface":"Heavy surface disturbance witnessed", "inconclusive":"Attacker remains unidentified"}
 		_detail_journey(box, 145, labels.get(finding, "Cause remains uncertain"))
 		if not report.is_empty(): _detail_journey(box, 165, "Reported " + Copy.duration(_status.time - report.received_at) + " ago")
 	var goal: String = state.get("goal", "clear") if own_party else state.get("goals", {}).get(route.get("id"), "clear")
@@ -1183,15 +1186,15 @@ func _draw_journey_context(_size: Vector2) -> void:
 			var goal_box: Rect2 = _goal_rect(option)
 			UIStyle.surface(self, goal_box, Color("594737") if goal == option else Color("263038"))
 			_label(goal_box.get_center() + Vector2(0, 5), "CLEAR JOURNEY" if option == "clear" else "HUNT FOR PROTEIN", Color("e0c5b7"), 11, HORIZONTAL_ALIGNMENT_CENTER)
-	else: _detail_journey(box, 207, "Goal: kill for protein" if goal == "hunt" else "Goal: drive attacker away", 13)
+	else: _detail_journey(box, 207, "Withdraw or use another approach" if surface else "Goal: kill for protein" if goal == "hunt" else "Goal: drive attacker away", 13)
 	var target: int = int(state.get("force_orders", {}).get(route.get("id"), 0))
 	if _can_mobilize(route):
 		for count: int in [12, 16, 20, 24]:
 			var rect: Rect2 = _force_rect(count)
 			UIStyle.surface(self, rect, Color("594737") if target == count else Color("263038"))
 			_label(rect.get_center() + Vector2(0, 5), str(count), Color("e0c5b7"), 16, HORIZONTAL_ALIGNMENT_CENTER)
-	_detail_journey(box, 278, "%d sent · budget %d" % [state.workers, target] if own_party else "Budget %d · waiting for workers/food" % target if target > 0 else "Attempt ended · no new force ordered" if not outcome.is_empty() else "%d workers available · choose force" % _status.get("available_workers", 0), 12)
-	_detail_journey(box, 298, "Recall returns all · goal locked until return" if own_party else "Reported remains need collecting" if _carcass_returned(route) else "Hunt adds risk; food still needs gathering" if goal == "hunt" else "Force buttons order one paid attempt", 10)
+	_detail_journey(box, 278, "%d sent · budget %d" % [state.workers, target] if own_party else "Budget %d · waiting for workers/food" % target if target > 0 else "Attempt ended · no new force ordered" if not outcome.is_empty() else "This disturbance cannot be fought" if surface else "%d workers available · choose force" % _status.get("available_workers", 0), 12)
+	_detail_journey(box, 298, "Recall returns all · goal locked until return" if own_party else "Reported remains need collecting" if _carcass_returned(route) else "Hunt adds risk; food still needs gathering" if goal == "hunt" else "A survey cannot predict the next impact" if surface else "Force buttons order one paid attempt", 10)
 	var action: Rect2 = _journey_rect("journey_investigate")
 	_draw_journey_action(action, ("RECALL DEFENDERS" if state.get("mode") == "defend" else "RECALL SURVEY PARTY") if own_party else "CANCEL FORCE ORDER" if target > 0 else "RESUME GATHERING · TARGET 5" if _journey_recovery(route) else "SURVEY JOURNEY FOR DANGER", "Workers return through travel" if own_party else "Waiting order spends nothing" if target > 0 else "Danger may remain; workers travel" if _journey_recovery(route) else _party_requirement(3))
 	if own_party and state.get("reinforcement_available", false) or not own_party and _can_mobilize(route):
@@ -1200,8 +1203,8 @@ func _draw_journey_context(_size: Vector2) -> void:
 		_draw_journey_action(_journey_rect("journey_defend"), "REINFORCEMENTS ALREADY SENT", "Await returning messenger confirmation")
 	elif not own_party and _carcass_returned(route):
 		_draw_journey_action(_journey_rect("journey_defend"), "INSPECT PROTEIN REMAINS", "Assign gatherers to carry it home")
-	elif not own_party and _journey_recovery(route) and not _can_mobilize(route):
-		_draw_journey_action(_journey_rect("journey_defend"),"KEEP ROUTE AVOIDED","No new gathering departures")
+	elif not own_party and (_journey_recovery(route) or surface) and not _can_mobilize(route):
+		_draw_journey_action(_journey_rect("journey_defend"),"WITHDRAW GATHERERS" if route.get("desired_workers", 0) > 0 else "KEEP ROUTE AVOIDED","Travelers return physically" if route.get("desired_workers", 0) > 0 else "No new gathering departures")
 	var back: Rect2 = _journey_rect("journey_close")
 	if not own_party and route.get("conflict_report", "") != "": back.size.x = 125
 	UIStyle.surface(self, back, Color("263038"))
@@ -1301,11 +1304,12 @@ func _detail_journey(box: Rect2, y: float, text: String, font_size: int = 14) ->
 func _threat_caption(signal_data: Dictionary) -> String:
 	var route: Dictionary = _selected_route(signal_data)
 	var record: Dictionary = _status.get("journey_response",{}).get("outcomes",{}).get(route.get("id"),{})
+	if signal_data.get("threat_kind", "") == "surface": return "Surface disturbance memory"
 	return "Ambush memory" if record.get("outcome","") == "secured" else "Ambush trace"
 
 func _can_mobilize(route: Dictionary) -> bool:
 	var state: Dictionary = _status.get("journey_response",{})
-	return state.get("reports",{}).get(route.get("id"),{}).get("finding","") in ["ambush","mixed"] and state.get("outcomes",{}).get(route.get("id"),{}).get("outcome","") != "secured"
+	return not route.get("surface_warning", false) and state.get("reports",{}).get(route.get("id"),{}).get("finding","") in ["ambush","mixed"] and state.get("outcomes",{}).get(route.get("id"),{}).get("outcome","") != "secured"
 
 func _force_rect(target: int) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300 + (target - 12) / 4 * 66, 369, 62, 44)

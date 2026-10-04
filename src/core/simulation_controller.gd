@@ -32,6 +32,7 @@ var brood_care: BroodCareRelief
 var swarm: SwarmSystem
 var guest: GuestSystem
 var rival: RivalSystem
+var surface_impact: SurfaceImpactSystem
 var predator: PredatorSystem
 var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
@@ -71,6 +72,8 @@ func _attach_run(next_run: RunState) -> void:
 	predator = Predator.new(run)
 	journey_response = JourneyResponseSystem.new(run)
 	trails = Trails.new(run, predator, rival)
+	surface_impact = SurfaceImpactSystem.new(run, trails.apply_loss)
+	trails.surface_impact = surface_impact
 	swarm = Swarm.new(run, trails.apply_loss)
 	trails.swarm = swarm
 	adaptation = Adaptation.new(run)
@@ -220,6 +223,7 @@ func stop_guest_rejection() -> bool:
 
 
 func _tick(delta: float) -> void:
+	surface_impact.tick()
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():
 		if not run.knowledge.consume(run.delivered_observations, run.simulation_time):

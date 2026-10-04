@@ -25,6 +25,9 @@ var foreign_contact: bool = false
 var foreign_sampled: bool = false
 var reports_source_outcome: bool = true
 var swarm_engaged: bool = false
+var impact_losses: int = 0
+var impact_serial: int = 0
+var impact_witness_at: float = 0.0
 var rival_losses: int = 0
 var conflict_report: String = ""
 var conflict_observed_at: float = 0.0
@@ -48,6 +51,7 @@ func to_dict() -> Dictionary:
 		"lost_profiles": lost_profiles.duplicate(),
 		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
 		"foreign_sampled": foreign_sampled, "reports_source_outcome": reports_source_outcome,
+		"impact_losses": impact_losses, "impact_serial": impact_serial, "impact_witness_at": impact_witness_at,
 		"swarm_engaged": swarm_engaged, "rival_losses": rival_losses,
 		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "conflict_serial":conflict_serial, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
@@ -99,11 +103,17 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	var losses: Variant = data.get("lost_workers", 0)
 	var adapted_losses: Variant = data.get("adapted_lost_workers", 0)
+	var impact_deaths: Variant = data.get("impact_losses", 0)
+	var impact_id: Variant = data.get("impact_serial", 0)
+	var impact_time: Variant = data.get("impact_witness_at", 0.0)
+	if not WorkerLedger.valid_count(impact_deaths) or not WorkerLedger.valid_count(impact_id): return false
+	if not typeof(impact_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(impact_time)) or impact_time < 0 or impact_time > time: return false
+	if impact_deaths > losses or ((impact_deaths == 0) != (impact_id == 0)) or impact_time > 0 and (impact_deaths == 0 or data.worker_count == 0): return false
 	var rival_deaths: Variant = data.get("rival_losses", 0)
-	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths > losses:
+	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths + impact_deaths > losses:
 		return false
 	var encountered: Variant = data.get("predator_encountered", false)
-	if not WorkerLedger.valid_count(losses) or losses > CONFIG.workers_per_cohort or losses - rival_deaths > 1 or not WorkerLedger.valid_count(adapted_losses) or adapted_losses > losses or typeof(encountered) != TYPE_BOOL or (losses > rival_deaths and not encountered):
+	if not WorkerLedger.valid_count(losses) or losses > CONFIG.workers_per_cohort or losses - rival_deaths - impact_deaths > 1 or not WorkerLedger.valid_count(adapted_losses) or adapted_losses > losses or typeof(encountered) != TYPE_BOOL or (losses > rival_deaths + impact_deaths and not encountered):
 		return false
 	if data.worker_count == 0 and (losses == 0 or data.payload != 0.0 or restored_detour != null or restored_report != null):
 		return false
@@ -123,7 +133,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	var fighting_witness: Variant = data.get("witnessed_fighting", false)
 	if typeof(attack_witness) != TYPE_BOOL or typeof(fighting_witness) != TYPE_BOOL:
 		return false
-	if (attack_witness and (data.worker_count == 0 or losses <= rival_deaths)) or (fighting_witness and (data.worker_count == 0 or rival_deaths == 0)):
+	if (attack_witness and (data.worker_count == 0 or losses <= rival_deaths + impact_deaths)) or (fighting_witness and (data.worker_count == 0 or rival_deaths == 0)):
 		return false
 	for key: String in ["foreign_sampled", "reports_source_outcome", "swarm_engaged"]:
 		if typeof(data.get(key, key == "reports_source_outcome")) != TYPE_BOOL:
@@ -161,6 +171,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	foreign_sampled = data.get("foreign_sampled", foreign_contact)
 	reports_source_outcome = data.get("reports_source_outcome", true)
 	swarm_engaged = data.get("swarm_engaged", false)
+	impact_losses = int(impact_deaths); impact_serial = int(impact_id); impact_witness_at = float(impact_time)
 	rival_losses = int(rival_deaths)
 	conflict_report = report
 	conflict_observed_at = float(report_time)

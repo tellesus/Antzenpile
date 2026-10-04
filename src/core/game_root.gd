@@ -285,9 +285,20 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		if route != null and route.reported_losses > 0:
 			record.risk = "reported_loss" if journey_alarm(route) else "past_loss"
 		result.append(record)
+	for route: TrailRouteState in simulation.run.trails.routes.values():
+		if route.origin_pile != pile_id or route.impact_report.is_empty(): continue
+		var report: Dictionary = simulation.run.journey_response.reports.get(route.id, {})
+		if report.get("received_at", 0.0) > route.impact_report.received_at: continue
+		var offset: Vector2 = Vector2(route.impact_report.estimated_position[0], route.impact_report.estimated_position[1]) - origin
+		result.append({"id":"threat:" + route.id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat",
+			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":5.0,
+			"confidence":0.75,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time - route.impact_report.observed_at,
+			"risk":"reported_attack","threat_kind":"surface","traffic":null,"foreign_contact":false,"conflict_report":""})
 	for id: String in simulation.run.journey_response.reports:
 		var report: Dictionary = simulation.run.journey_response.reports[id]
-		if report.finding not in ["ambush","mixed"]: continue
+		var impact: Dictionary = simulation.run.trails.routes[id].impact_report
+		if not impact.is_empty() and report.received_at <= impact.received_at: continue
+		if report.finding not in ["ambush","mixed","surface"]: continue
 		var route: TrailRouteState = simulation.run.trails.routes[id]
 		if route.origin_pile != pile_id: continue
 		var segment: TrailSegmentState = simulation.run.trails.segments[route.segment_id]
@@ -296,7 +307,7 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		result.append({"id":"threat:" + id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat",
 			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":3.0,
 			"confidence":0.75,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time - report.observed_at,
-			"risk":"reported_attack","traffic":null,"foreign_contact":false,"conflict_report":""})
+			"risk":"reported_attack","threat_kind":report.finding,"traffic":null,"foreign_contact":false,"conflict_report":""})
 	return result
 
 
@@ -701,6 +712,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"purpose":route.purpose, "founding_intent":route.purpose in ["founding","interpile"] and simulation.run.founding.phase!="failed", "active_workers":sent if settlers_away else 0 if route.purpose=="founding" and simulation.run.founding.phase=="ready" else route.active_workers + pending, "checking_workers": checking, "status": status,
 				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at, "conflict_received_at":route.conflict_received_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
+				"impact_report":route.impact_report.duplicate(true), "surface_warning":simulation.journey_response._surface_warning(route.id),
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
 				"ambusher_addressed": journey_addressed(route),
 				"journey_alarm":journey_alarm(route),"conflict_serial":route.conflict_serial,

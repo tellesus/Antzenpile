@@ -13,6 +13,7 @@ var last_error: String = ""
 var _run: RunState
 var _predator: PredatorSystem
 var _rival: RivalSystem
+var surface_impact: SurfaceImpactSystem
 var swarm: SwarmSystem
 
 
@@ -164,6 +165,7 @@ func tick(delta: float) -> void:
 	for id: String in ids:
 		var cohort: TransitCohort = _run.trails.cohorts[id]
 		var route: TrailRouteState = _run.trails.routes[cohort.route_id]
+		if surface_impact != null: surface_impact.encounter(cohort)
 		if cohort.detour != null:
 			if cohort.detour.tick(_run.world, _run.rng, _run.simulation_time):
 				cohort.detour_report = cohort.detour.observation.detached_copy()
@@ -219,7 +221,7 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
 	var phenotype: String = pile.genetics.loss_profile(adapted == 1, pile.adaptation_repertoire, pile.workers_total, _run.rng)
-	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "ambush" if cause == "predator" else "foreign conflict", phenotype)
+	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "surface impact" if cause == "impact" else "ambush" if cause == "predator" else "foreign conflict", phenotype)
 	assert(removed)
 	route.allocated_workers -= 1
 	route.active_workers -= 1
@@ -231,6 +233,8 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 	if cause == "rival":
 		cohort.rival_losses += 1
 		cohort.witnessed_fighting = cohort.worker_count > 0
+	elif cause == "impact":
+		cohort.impact_losses += 1
 	else:
 		cohort.witnessed_attack = cohort.worker_count > 0
 	var payload_before: float = cohort.payload
@@ -239,6 +243,7 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 	if cohort.payload == 0.0:
 		cohort.resource_id = ""
 	if cohort.worker_count == 0:
+		cohort.impact_witness_at = 0.0
 		cohort.witnessed_attack = false
 		cohort.witnessed_fighting = false
 		cohort.detour_report = null
@@ -388,6 +393,11 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 				assert(paused)
 	if cohort.lost_workers > 0:
 		route.reported_losses += cohort.lost_workers
+		route.reported_impact_losses += cohort.impact_losses
+		if cohort.worker_count > 0 and cohort.impact_witness_at > 0:
+			var estimate: Vector2 = _run.trails.segments[route.segment_id].point_at(0.5).round()
+			route.impact_report = {"observed_at":cohort.impact_witness_at,"received_at":_run.simulation_time,"estimated_position":[estimate.x,estimate.y]}
+			_run.journey_response.orders.targets[route.id] = 0
 		route.reported_rival_losses += cohort.rival_losses
 		route.last_loss_time = _run.simulation_time
 		if cohort.worker_count == 0:

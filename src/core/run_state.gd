@@ -39,6 +39,7 @@ var honeydew: HoneydewState = Honeydew.new()
 var swarm: SwarmState = Swarm.new()
 var guest: GuestState = Guest.new()
 var rival: RivalState = Rival.new()
+var surface_impact := SurfaceImpactState.new()
 var predator: PredatorState = Predator.new()
 var journey_response: JourneyResponseState = JourneyResponseState.new()
 var delivered_observations: Dictionary[String, Observation] = {}
@@ -63,6 +64,7 @@ func exploration_for(pile_id: String) -> ExplorationState:
 
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
+	surface_impact.enabled = scenario == "roadside"
 	_seed = seed_value
 	_scenario_id = scenario
 	rng.seed = _seed
@@ -93,7 +95,7 @@ func to_dict() -> Dictionary:
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"reinforcement": reinforcement.to_dict(), "supply": supply.to_dict(), "founding": founding.to_dict(), "knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(), "daughter_exploration": daughter_exploration.to_dict(),
-		"honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
+		"surface_impact":surface_impact.to_dict(), "honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
 
 
 func active_scout_count() -> int:
@@ -368,22 +370,37 @@ func restore(data: Dictionary) -> bool:
 	var restored_predator := Predator.new()
 	if data.has("predator") and (not data.predator is Dictionary or not restored_predator.restore(data.predator, restored_clock.tick_count)):
 		return false
+	var restored_impact := SurfaceImpactState.new()
+	if not restored_impact.restore(data.get("surface_impact", restored_impact.to_dict()), restored_clock.tick_count, data.seed.to_int(), data.scenario_id): return false
+	var impact_casualties: int = 0
 	var casualties: int = 0
 	var predator_casualties: int = 0
 	var losses_by_pile: Dictionary[String, int] = {}
 	for route: TrailRouteState in restored_trails.routes.values():
 		var losses: int = route.reported_losses + restored_trails.pending_losses(route.id)
 		var pile_losses: int = losses_by_pile.get(route.origin_pile, 0)
-		if losses > restored_colony.piles[route.origin_pile].workers.lost_total - pile_losses or losses > restored_predator.kills_total + restored_swarm.player_losses - casualties:
+		if losses > restored_colony.piles[route.origin_pile].workers.lost_total - pile_losses or losses > restored_predator.kills_total + restored_swarm.player_losses + restored_impact.kills_total - casualties:
 			return false
-		if route.reported_losses > 0 and route.last_loss_time < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL:
+		if route.reported_losses - route.reported_impact_losses > 0 and route.last_loss_time < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL:
 			return false
 		losses_by_pile[route.origin_pile] = pile_losses + losses
 		casualties += losses
-		predator_casualties += route.reported_losses - route.reported_rival_losses
+		impact_casualties += route.reported_impact_losses
+		if not route.impact_report.is_empty() and (not restored_impact.enabled or route.impact_report.observed_at < SurfaceImpactState.first_tick(data.seed.to_int()) * Clock.TICK_INTERVAL): return false
+		predator_casualties += route.reported_losses - route.reported_rival_losses - route.reported_impact_losses
 		for cohort: TransitCohort in restored_trails.cohorts.values():
 			if cohort.route_id == route.id:
-				predator_casualties += cohort.lost_workers - cohort.rival_losses
+				impact_casualties += cohort.impact_losses
+				if cohort.impact_serial > restored_impact.serial or cohort.impact_losses > cohort.impact_serial or cohort.impact_witness_at > 0 and cohort.impact_witness_at < SurfaceImpactState.first_tick(data.seed.to_int()) * Clock.TICK_INTERVAL: return false
+				predator_casualties += cohort.lost_workers - cohort.rival_losses - cohort.impact_losses
+	if restored_response.impact_fraction >= 0 and not restored_impact.enabled: return false
+	for id: String in restored_response.reports:
+		var report: Dictionary = restored_response.reports[id]
+		if report.finding == "surface" and (not restored_impact.enabled or report.observed_at < SurfaceImpactState.first_tick(data.seed.to_int()) * Clock.TICK_INTERVAL): return false
+	for id: String in restored_response.orders.targets:
+		var impact: Dictionary = restored_trails.routes[id].impact_report
+		if restored_response.orders.targets[id] > 0 and not impact.is_empty() and impact.received_at >= restored_response.reports.get(id, {}).get("received_at", 0.0): return false
+	if impact_casualties != restored_impact.kills_total: return false
 	if predator_casualties + all_scout_losses != restored_predator.kills_total:
 		return false
 	for pile_id: String in restored_scout_losses:
@@ -480,6 +497,7 @@ func restore(data: Dictionary) -> bool:
 	trails = restored_trails
 	rain = restored_rain
 	honeydew = restored_honeydew
+	surface_impact = restored_impact
 	predator = restored_predator
 	journey_response = restored_response
 	rival = restored_rival
