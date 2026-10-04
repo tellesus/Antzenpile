@@ -11,11 +11,34 @@ func _init(run_state: RunState): _run = run_state
 func investigate(route_id: String) -> bool:
 	return _dispatch(route_id,"investigate",CONFIG.investigation_workers)
 
-func defend(route_id: String) -> bool:
+func defend(route_id: String, count: int = CONFIG.defense_workers) -> bool:
+	if not JourneyOrders.valid_target(count) or count == 0: return _reject("Choose 12–24 workers in groups of four")
 	var report: Dictionary = _run.journey_response.reports.get(route_id,{})
 	if report.get("finding","") not in ["ambush","mixed"]: return _reject("A returned ambusher survey is required")
 	if _run.journey_response.defense.outcomes.get(route_id,{}).get("outcome","") == "secured": return _reject("Ambusher addressed; survey again if journey losses continue")
-	return _dispatch(route_id,"defend",CONFIG.defense_workers)
+	return _dispatch(route_id,"defend",count)
+
+func set_force(route_id: String, target: int) -> bool:
+	if not _run.trails.routes.has(route_id) or not JourneyOrders.valid_target(target): return _reject("Unknown journey or invalid force budget")
+	var state: JourneyResponseState = _run.journey_response
+	if target > 0:
+		if state.reports.get(route_id, {}).get("finding", "") not in ["ambush", "mixed"]: return _reject("Return a predator survey first")
+		if state.defense.outcomes.get(route_id, {}).get("outcome", "") == "secured": return _reject("This predator was already addressed")
+	state.orders.targets[route_id] = target
+	if target == 0 and state.active() and state.route_id == route_id: recall()
+	else: _fund_orders()
+	last_error = ""
+	return true
+
+func _fund_orders() -> void:
+	var state: JourneyResponseState = _run.journey_response
+	if state.active():
+		var target: int = state.orders.targets.get(state.route_id, 0)
+		if state.defense.mode == "defend" and target > state.defense.sent and not _reinforcement_pending(): reinforce(state.route_id)
+		return
+	var ids: Array = state.orders.targets.keys(); ids.sort()
+	for id: String in ids:
+		if state.orders.targets[id] > 0 and defend(id, state.orders.targets[id]): return
 
 func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	var state: JourneyResponseState = _run.journey_response
@@ -31,7 +54,7 @@ func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
 	assert(allocated and paid)
 	state.route_id = route_id; state.phase = "outbound"; state.workers = count; state.departed_at = _run.simulation_time
-	state.defense.mode = mode; state.defense.sent = count
+	state.defense.mode = mode; state.defense.sent = count; state.defense.initial_sent = count
 	last_error = ""; return true
 
 func _cost(route_id: String, count: int) -> float:
@@ -55,6 +78,7 @@ func reinforce(route_id: String) -> bool:
 func recall() -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	if not state.active(): return _reject("No party is away")
+	state.orders.targets[state.route_id] = 0
 	if state.phase in ["outbound","fighting"]:
 		if state.defense.mode == "defend":
 			_return("withdrew")
@@ -66,6 +90,7 @@ func recall() -> bool:
 	last_error = ""; return true
 
 func tick() -> void:
+	_fund_orders()
 	var state: JourneyResponseState = _run.journey_response
 	if not state.active(): return
 	_tick_messenger()
@@ -147,7 +172,7 @@ func _tick_messenger() -> void:
 func _reinforcement_pending() -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	var reported: Dictionary = state.pressure.reports.get(state.route_id, {})
-	var acknowledged: int = int(reported.acknowledged_sent) if reported.get("observed_at", 0.0) >= state.departed_at else CONFIG.defense_workers
+	var acknowledged: int = int(reported.acknowledged_sent) if reported.get("observed_at", 0.0) >= state.departed_at else state.defense.initial_sent
 	return state.defense.sent > acknowledged
 
 func _return(outcome: String) -> void:
@@ -175,6 +200,7 @@ func _sample() -> void:
 
 func _arrive() -> void:
 	var state: JourneyResponseState = _run.journey_response
+	state.orders.targets[state.route_id] = 0
 	var finding: String = "mixed" if state.ambush_fraction >= 0 and state.foreign_seen else "ambush" if state.ambush_fraction >= 0 else "foreign" if state.foreign_seen else "inconclusive"
 	if state.defense.mode == "defend":
 		state.defense.outcomes[state.route_id] = {"outcome":state.defense.outcome,"lost":state.defense.lost,"sent":state.defense.sent,"observed_at":state.defense.observed_at,"received_at":_run.simulation_time}
@@ -198,7 +224,9 @@ func _arrive() -> void:
 func summary(origin_id: String = "home") -> Dictionary:
 	var state: JourneyResponseState = _run.journey_response
 	var own_party: bool = state.active() and _run.trails.routes[state.route_id].origin_pile == origin_id
-	var reports: Dictionary = {}; var outcomes: Dictionary = {}; var pressure_reports: Dictionary = {}
+	var reports: Dictionary = {}; var outcomes: Dictionary = {}; var pressure_reports: Dictionary = {}; var orders: Dictionary = {}
+	for id: String in state.orders.targets:
+		if _run.trails.routes[id].origin_pile == origin_id: orders[id] = state.orders.targets[id]
 	for id: String in state.reports:
 		if _run.trails.routes[id].origin_pile == origin_id: reports[id] = state.reports[id].duplicate(true)
 	for id: String in state.defense.outcomes:
@@ -208,7 +236,7 @@ func summary(origin_id: String = "home") -> Dictionary:
 	var other: String = _run.trails.routes[state.route_id].origin_pile if state.active() and not own_party else ""
 	return {"away":own_party,"route_id":state.route_id if own_party else "","mode":state.defense.mode if own_party else "investigate",
 		"workers":state.workers + state.defense.extra_workers + state.defense.lost if own_party else 0,
-		"age":_run.simulation_time - state.departed_at if own_party else 0.0,"reports":reports,"outcomes":outcomes,
+		"age":_run.simulation_time - state.departed_at if own_party else 0.0,"reports":reports,"outcomes":outcomes,"force_orders":orders,
 		"reported_losses":state.defense.reported_for_pile(origin_id),
 		"other_party":"Home" if other == "home" else "Daughter" if other != "" else "",
 		"pressure_reports": pressure_reports, "reinforcement_pending": own_party and state.defense.mode == "defend" and _reinforcement_pending(),

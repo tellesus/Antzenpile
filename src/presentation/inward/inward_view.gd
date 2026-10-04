@@ -939,9 +939,9 @@ func _draw_relationship_context(box: Rect2) -> void:
 	else:
 		_detail_line(box, 125, "Workers tend producers" if state == "tended" else "Honeydew successfully harvested")
 		_detail_line(box, 151, "%d workers committed" % relationship.protection_workers if state == "tended" else "Needs %d available workers" % relationship.required_workers)
-		_detail_line(box, 185, "Tending supports production")
+		_detail_line(box, 185, "Improves output; does not guard trail")
 		_detail_line(box, 211, "Journey defense is a separate job")
-		_draw_action(_honeydew_rect(), "WITHDRAW TENDERS" if state == "tended" else "TEND PRODUCERS", "" if state == "tended" else Copy.local_shortage(_status, {}, relationship.required_workers))
+		_draw_action(_honeydew_rect(), "WITHDRAW ATTENDANTS" if state == "tended" else "ASSIGN APHID ATTENDANTS", "" if state == "tended" else Copy.local_shortage(_status, {}, relationship.required_workers))
 
 
 func _detail_line(box: Rect2, y: float, value: String) -> void:

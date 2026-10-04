@@ -14,13 +14,14 @@ var sampled_at: float = 0
 var reports: Dictionary = {}
 var defense: JourneyDefenseState = JourneyDefenseState.new()
 var pressure: JourneyPressureState = JourneyPressureState.new()
+var orders: JourneyOrders = JourneyOrders.new()
 
 func active() -> bool: return phase != "idle"
 func origin_id(trails: TrailNetwork) -> String:
 	return trails.routes[route_id].origin_pile if active() and trails.routes.has(route_id) else ""
 func to_dict() -> Dictionary:
 	return {"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
-		"ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict()}
+		"ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict(),"orders":orders.targets.duplicate()}
 
 func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: float) -> bool:
 	if not data.has_all(["route_id","phase","workers","elapsed_ticks","departed_at","ambush_fraction","foreign_seen","sampled_at","reports"]): return false
@@ -41,7 +42,7 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 			if report.fraction < 0 or report.fraction > 1 or report.observed_at == 0: return false
 		elif report.fraction != -1: return false
 	var restored_defense := JourneyDefenseState.new()
-	var legacy: Dictionary = restored_defense.to_dict(); legacy.sent = int(data.workers)
+	var legacy: Dictionary = restored_defense.to_dict(); legacy.sent = int(data.workers); legacy.initial_sent = int(data.workers)
 	var defense_data: Variant = data.get("defense",legacy)
 	if not defense_data is Dictionary or not restored_defense.restore(defense_data,data,colony,trails,time): return false
 	var restored_pressure := JourneyPressureState.new()
@@ -67,6 +68,11 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 		if data.elapsed_ticks * SimulationClock.TICK_INTERVAL > time - data.departed_at + TRAILS.leg_ticks(segment.start.distance_to(segment.end)) * SimulationClock.TICK_INTERVAL: return false
 	route_id = data.route_id; phase = data.phase; workers = int(data.workers); elapsed_ticks = int(data.elapsed_ticks)
 	departed_at = float(data.departed_at); ambush_fraction = float(data.ambush_fraction); foreign_seen = data.foreign_seen; sampled_at = float(data.sampled_at); reports = data.reports.duplicate(true)
+	var restored_orders := JourneyOrders.new()
+	if not restored_orders.restore(data.get("orders", {}), trails): return false
+	for id: String in restored_orders.targets:
+		if restored_orders.targets[id] > 0 and (not reports.has(id) or reports[id].finding not in ["ambush", "mixed"] or restored_defense.outcomes.get(id, {}).get("outcome", "") == "secured"): return false
+	orders = restored_orders
 	defense = restored_defense
 	pressure = restored_pressure
 	return true

@@ -1,5 +1,7 @@
 # Data model
 
+Card 124 adds optional JourneyOrders targets by food-route ID: zero or 12/16/20/24. Local intent waits for workers/food/shared slot, funds one party and acknowledged four-worker reinforcements, and clears on recall/returned ending. No repeat attacks. JourneyDefenseState captures initial_sent independently of later sent totals; legacy saves infer the original twelve. Orders expose no private phase/loss and remain filtered by pile ownership.
+
 Card 113 adds optional JourneyDefenseState.reported_by_pile, a positive-count origin→delivered lifetime defensive deaths map whose sum equals reported_losses. Legacy missing map infers the previously Home-only total. Restore validates known origins, local ledger bounds, latest per-route loss history and active private phenotype ownership against the route origin; RunState combines owned delivered/pending deaths with scout/trail histories. Latest outcome sent/lost counts restore as canonical integers (JSON otherwise retained floating types and broke exact immediate state equality). No snapshot version change or live-loss disclosure.
 
 Card 112 needs no new saved fields/version: active JourneyResponse route_id determines the survey owner and exact journey:<origin> ledger commitment. Returned survey records may refer to either pile’s owned food route with actual reported losses. Restore checks single-party ownership across all ledgers, route purpose and matching count; defensive parties/history still require Home. Legacy empty/Home states remain valid.

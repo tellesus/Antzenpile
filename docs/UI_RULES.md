@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 124 keeps threat selection in persistent Threat Management, names witnessed predatory arthropod/foreign ants and provides 44-pixel force-budget buttons. Waiting orders can be replaced/canceled; sent counts remain expected until return. Lowering budget stops extra dispatch; Recall returns the whole party physically. Aphid attendants improve honeydew production; gatherers and travel defense remain explicitly separate jobs.
+
 Card 113 enables local Send 12 Defenders, Request 4 Defenders and Recall on the daughter’s own returned ambusher survey. Payment/labor wording uses the selected pile’s stores; command validation rejects foreign routes and insufficient local food/workers. Away counts retain all sent workers, including private casualties; physical return alone delivers survivors/losses/outcome and turns its threat into Ambush Memory. Current one-party bounds, 44-pixel targets and no position/combat/survivor preview remain.
 
 Card 112 makes Journey Reports and Response available on daughter routes with returned losses, with local three-worker survey cost, Daughter carbohydrate/available labor, real Recall and dated returned evidence. Away information includes commanded workers and elapsed time only. Another pile’s shared response slot is explicitly named; Home routes cannot be commanded from Daughter. Defense/reinforcement controls remain Home-only until 113.

@@ -802,6 +802,7 @@ func respond_to_journey(action: String, route_id: String) -> Dictionary:
 	var system: JourneyResponseSystem = simulation.journey_response
 	var accepted: bool = false
 	match action:
+		"force_0", "force_12", "force_16", "force_20", "force_24": accepted = system.set_force(route_id, int(action.trim_prefix("force_")))
 		"investigate": accepted = system.investigate(route_id)
 		"defend": accepted = system.defend(route_id)
 		"reinforce": accepted = system.reinforce(route_id)

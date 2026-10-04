@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Current priority — playable threat management (accepted 2026-10-03)
+
+Implement bounded player-visible sections: 124 persistent force orders and aphid/evidence clarity; 125 clear-versus-hunt and finite carcass recovery; 126 paid physically reported alternate approaches; 127 varied honeydew threat placement. Then larger disturbance/catastrophe responses and brood-derived fighter adaptations as separate cards. Preserve return-before-information, real travel/labor and tabled mobile/session balance. Daughter-to-Home supplies follow this accepted combat work.
+
 ## Current priority — combat response and counterplay (authorized 2026-10-03)
 
 The accepted combat milestone is complete: [120 harm navigation](tasks/120_nursery_harm_response.md), [121 defensive pressure](tasks/121_returned_defensive_pressure.md), [122 rival counterplay](tasks/122_rival_counterplay.md) and [123 settlement/recovery](tasks/123_conflict_settlement_recovery.md). Local warnings lead to existing response controls; physical messengers inform later decisions; finite paid rival reserves travel and return; dated endings offer retry/reopening/avoidance. Twelve ordinary branches and Home/Daughter regressions are documented in [counterplay evidence](COMBAT_COUNTERPLAY_EVALUATION.md). Return-before-information, mobile deferral and tabled broad balance/session targets remain. Next previously planned feature: daughter-to-Home physical resource supplies below.
