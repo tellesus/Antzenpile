@@ -161,6 +161,10 @@ func activate_at(at: Vector2) -> bool:
 		_run_command("honeydew")
 		return true
 	var guest: Dictionary = _status.get("guest", {})
+	if selected_id == "nursery" and _guest_attention() and _guest_link_rect().has_point(at):
+		selected_id = "guest"
+		queue_redraw()
+		return true
 	if selected_id == "guest" and guest.get("reported_losses", 0) > 0 and guest.get("observation", "") != "purged" and _guest_rect().has_point(at):
 		_run_command("guest_rejection")
 		return true
@@ -385,6 +389,14 @@ func _guest_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
 
 
+func _guest_attention() -> bool:
+	return _status.get("guest", {}).get("observation", "") in ["loss", "foreign"]
+
+
+func _guest_link_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300.0, 610.0, 260.0, 44.0)
+
+
 func _web_back_rect() -> Rect2:
 	return Rect2(24, 116, 196, 44)
 
@@ -583,6 +595,7 @@ func _draw_context(size: Vector2) -> void:
 	var recent_food_losses: bool = food_losses.get("recent",false)
 	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292,466 if selected_id=="entrance" and not _status.get("reinforcement",{}).is_empty() else  (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses and _status.food_exchange_state != "developed" else 388 if food_attention or selected_id == "queen" or selected_id=="food_exchange" and _status.get("daughter",false) or selected_id=="entrance" and not _status.get("supply",{}).is_empty() else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	if selected_id == "food_exchange" and _status.get("daughter",false): box.size.y = 444 if food_attention else 388
+	if selected_id == "nursery" and _guest_attention(): box.size.y = 526
 	var web: bool = selected_id == "adaptation"
 	UIStyle.surface(self, box, Color("17141f") if web else Color("111921"))
 	UIStyle.surface(self, box, Color("786683") if web else Color("41535a"), true)
@@ -710,6 +723,8 @@ func _draw_context(size: Vector2) -> void:
 					_detail_line(box, 306, "Climate workers humidify / cool")
 					_detail_line(box, 330, "%.1f water used · damp brood aired" % humidity.water_used)
 			_draw_brood_button()
+			if _guest_attention():
+				_draw_action(_guest_link_rect(), "INSPECT NURSERY HARM", "Clearing underway" if _status.guest.get("rejection_active", false) else "Cause uncertain" if _status.guest.observation == "loss" else "Internal foreignness", Color("39323e"))
 		"food_exchange":
 			if _status.get("daughter",false): _draw_action(_gather_link_rect(),"LOCAL GATHERING")
 			if _status.food_exchange_state == "primitive":
@@ -759,12 +774,13 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 99, "%d brood lost this encounter" % guest.get("reported_losses", 0) if observation != "tolerated" else "No harmful effect observed")
 			if guest.get("rejection_active", false):
 				_detail_line(box, 137, "%d workers on rejection effort" % guest.workers_committed)
-				_detail_line(box, 163, "Recognition and clearing take time")
+				_detail_line(box, 163, "Harm may continue while clearing")
 			elif observation in ["loss", "foreign"]:
 				_detail_line(box, 137, "Commit %d available workers" % guest.workers_required)
 				_detail_line(box, 163, "Effort competes with colony care")
 			elif observation == "purged":
 				_detail_line(box, 137, "Rejection workers released")
+				_detail_line(box, 163, "Encounter ended · losses are history")
 			if observation in ["loss", "foreign"]:
 				_draw_action(_guest_rect(), "STOP REJECTION" if guest.get("rejection_active", false) else "ASSIGN %d TO REJECTION" % guest.workers_required, "" if guest.get("rejection_active", false) else Copy.local_shortage(_status, {}, guest.workers_required), Color("39323e"))
 		"adaptation":

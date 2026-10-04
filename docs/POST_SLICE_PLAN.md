@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Current priority — combat response and counterplay (authorized 2026-10-03)
+
+The player accepted the expanded review. Implement bounded sections for local warning/action clarity, returned physical pressure reports, finite rival counter-reinforcement and clear settlement/recovery before resuming daughter-to-Home supplies. Preserve return-before-information and existing aggregate combat; no population rescaling or broad balance pass.
+
 ## Combat/conflict review — complete (118)
 
 The player's follow-up explicitly includes play/counterplay after dispatch through momentary settlement. [119 review extension](tasks/119_conflict_counterplay_review.md) finds that the active portion remains thin: ambusher choices lack fresh intermediate evidence, rivals do not counter-recruit from reserves, and settlement can trigger repeated recruitment alarms. The [expanded review](COMBAT_CONFLICT_REVIEW.md) proposes warning/action repairs followed by a bounded physical pressure-report, second-decision, rival-response and settlement milestone. No such gameplay is implemented or locked by this review.

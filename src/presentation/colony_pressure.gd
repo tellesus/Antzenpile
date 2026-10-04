@@ -45,6 +45,10 @@ static func food_sources_needed(status: Dictionary) -> Array[String]:
 
 static func attention(status: Dictionary) -> Dictionary:
 	var causes: Array[String] = nursery_causes(status)
+	var guest: Dictionary = status.get("guest", {})
+	if guest.get("observation", "") in ["loss", "foreign"]:
+		var symptom: String = "CLEARING EFFORT" if guest.get("rejection_active", false) else "INTERNAL FOREIGNNESS" if guest.observation == "foreign" else "NURSERY LOSSES · CAUSE UNCERTAIN"
+		return {"organ": "guest", "causes": [symptom], "title": "CHECK NURSERY HARM"}
 	if status.get("food_sharing",{}).get("recent",false):
 		return {"organ":"food_exchange","causes":[("DAUGHTER" if status.get("daughter",false) else "HOME") + " LOSSES · CAUSE UNCERTAIN"],"title":"CHECK FOOD EXCHANGE"}
 	if causes.is_empty():
