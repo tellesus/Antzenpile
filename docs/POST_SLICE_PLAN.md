@@ -1,5 +1,9 @@
 # Post-slice development plan
 
+## Current priority — desktop completion path (132)
+
+Cards 129–131 complete the accepted disturbance/fighting/return-supply section. [Release-gap review](tasks/132_desktop_release_gap_review.md) and [next order](DESKTOP_RELEASE_PATH.md) identify the missing completed-run/reality-replay experience, reproducible Windows package and current integrated performance evidence. Next expand a bounded physical-history plus voluntary post-run reveal card from original Part 6 §§115–118/159/162/167. Keep it unavailable during ordinary play, avoid arbitrary session/win thresholds and preserve all remaining original feature milestones. Do not declare the present sandbox a release candidate.
+
 128 resolves the reported brood assignment soft lock before further features: reserve existing care against new jobs and offer voluntary release/physical recall for already-stalled saves. [Card/evidence](tasks/128_brood_care_safeguard.md): 8,285 checks, clean import/Main, eight standard/compact input captures. No extinction rule or rate rebalance. Resume the accepted threat expansion below.
 
 ## Current priority — playable threat management (accepted 2026-10-03)
