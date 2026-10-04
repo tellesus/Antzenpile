@@ -10,7 +10,7 @@ func run(test: Object) -> bool:
 	var twin := Controller.new(71,"garden_edge")
 	test.check(garden.run.scenario_id == "garden_edge" and garden.run.to_dict() == twin.run.to_dict(), "Requested authored setting starts reproducibly")
 	test.check(garden.run.world.to_dict() != backyard.run.world.to_dict() and garden.run.knowledge.nodes.is_empty(), "Different hidden geography supplies no founding knowledge")
-	test.check(garden.run.world.nodes.water_01.position != backyard.run.world.nodes.water_01.position and garden.run.world.nodes.aphid_01.position == backyard.run.world.nodes.aphid_01.position, "Initial resources vary while established producer ecology positions remain compatible")
+	test.check(garden.run.world.nodes.water_01.position != backyard.run.world.nodes.water_01.position and garden.run.world.nodes.aphid_01.position != backyard.run.world.nodes.aphid_01.position and garden.run.world.nodes.aphid_01.definition_id == backyard.run.world.nodes.aphid_01.definition_id, "Resource positions vary while stable aphid identity retains compatible producer ecology")
 	var quantity: float = twin.run.world.nodes.water_01.quantity
 	garden.run.world.nodes.water_01.quantity = 0
 	test.check(twin.run.world.nodes.water_01.quantity == quantity, "Authored definitions produce isolated mutable worlds")

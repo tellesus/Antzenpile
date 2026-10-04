@@ -43,7 +43,7 @@ position = Vector2(14, 13)
 script = ExtResource("node")
 id = "aphid_01"
 definition = ExtResource("carb")
-position = Vector2(35, 33)
+position = Vector2(12, 33)
 initial_quantity = 20.0
 [sub_resource type="Resource" id="rival_food"]
 script = ExtResource("node")

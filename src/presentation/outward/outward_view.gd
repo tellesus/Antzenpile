@@ -211,6 +211,7 @@ func _pointer_release(at: Vector2, kind: String) -> void:
 					break
 		selected_id = picked if not picked.is_empty() else ScoutTrace.pick(_mission_traces, at, selected_id)
 		journey_open = false
+		approach_focus = false; rival_focus = false
 	_pointer_kind = ""
 
 
@@ -257,7 +258,7 @@ func _run_command(command: String) -> void:
 	if command == "journey_carcass":
 		for signal_data: Dictionary in _signals:
 			if signal_data.source_knowledge_id == "known:ambusher_carcass":
-				selected_id = signal_data.id; journey_open = false; rival_focus = false
+				selected_id = signal_data.id; journey_open = false; rival_focus = false; approach_focus = false
 				if signal_data.bearing != null: facing = signal_data.bearing
 		return
 	if command.begins_with("journey_goal_"):
@@ -304,6 +305,7 @@ func _run_command(command: String) -> void:
 		return
 	if command.begins_with("source_entry_"):
 		journey_open = false
+		approach_focus = false; rival_focus = false
 		var entries: Array[Dictionary] = _source_entries()
 		var index: int = source_page * 3 + int(command.trim_prefix("source_entry_"))
 		if index < entries.size():

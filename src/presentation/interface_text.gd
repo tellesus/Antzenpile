@@ -4,10 +4,10 @@ extends RefCounted
 
 static func reason(value: String) -> String:
 	return {
-		"Honeydew producers have not been exploited": "Harvest honeydew before assigning tenders",
-		"Not enough workers to protect the producers": "Not enough available workers to tend producers",
+		"Honeydew producers have not been exploited": "Harvest honeydew before assigning aphid attendants",
+		"Not enough workers to protect the producers": "Not enough available workers for aphid attendants",
 		"Protection commitment unavailable": "Tending assignment unavailable",
-		"Could not commit protection workers": "Could not assign tending workers"
+		"Could not commit protection workers": "Could not assign aphid attendants"
 	}.get(value, value)
 
 

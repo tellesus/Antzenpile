@@ -240,6 +240,7 @@ func _reset_outward_attention() -> void:
 	_outward_view.source_page = 0
 	_outward_view.exploration_open = false
 	_outward_view.journey_open = false
+	_outward_view.approach_focus = false; _outward_view.rival_focus = false
 	_outward_view._feedback = ""
 	_outward_view._request_rejected = false
 	_outward_view.reset_mission_visuals()
@@ -522,6 +523,7 @@ func _refresh_loaded_views() -> void:
 		_outward_view.facing = 0.0
 		_outward_view.selected_id = ""
 		_outward_view.journey_open = false
+		_outward_view.approach_focus = false; _outward_view.rival_focus = false
 		_outward_view.sources_open = false
 		_outward_view.source_page = 0
 		_outward_view._pointer_kind = ""

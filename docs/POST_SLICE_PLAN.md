@@ -2,7 +2,9 @@
 
 ## Current priority — playable threat management (accepted 2026-10-03)
 
-Implement bounded player-visible sections: 124 persistent force orders and aphid/evidence clarity; 125 clear-versus-hunt and finite carcass recovery; 126 paid physically reported alternate approaches; 127 varied honeydew threat placement. Then larger disturbance/catastrophe responses and brood-derived fighter adaptations as separate cards. Preserve return-before-information, real travel/labor and tabled mobile/session balance. Daughter-to-Home supplies follow this accepted combat work.
+The core milestone is complete: [124](tasks/124_persistent_conflict_management.md) adds persistent force orders and aphid/evidence clarity; [125](tasks/125_edible_threat_recovery.md) distinguishes clear-versus-hunt and finite carcass recovery; [126](tasks/126_investigated_alternate_approaches.md) adds paid physically reported alternate approaches; [127](tasks/127_honeydew_danger_variety.md) varies honeydew threat placement. Final suite: 8,251 checks, zero failures; import/Main and standard/compact graphical inputs passed. See [threat-management evaluation](THREAT_MANAGEMENT_EVALUATION.md).
+
+Next: larger disturbance/catastrophe responses and brood-derived fighter adaptations, expanded into separate bounded cards before implementation. These must offer useful avoidance/recovery for unassailable threats and real brood/tradeoff costs for fighters. Preserve return-before-information, real travel/labor and tabled mobile/session balance. Daughter-to-Home supplies follow this accepted combat work.
 
 ## Current priority — combat response and counterplay (authorized 2026-10-03)
 
