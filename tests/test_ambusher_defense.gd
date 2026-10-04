@@ -110,7 +110,7 @@ func _test_retreat_and_genetics(test: Object) -> void:
 		var result: Dictionary = candidate.run.journey_response.defense.outcomes.route_1
 		if result.outcome == "withdrew":
 			var copy := Controller.new()
-			test.check(result.sent - result.lost == 3 and candidate.run.predator.defeated_at == 0 and copy.restore_snapshot(snapshot(candidate)),"Weak aggregate swarm retreats with surviving labor and persistent manageable threat")
+			test.check(result.sent - result.lost >= 3 and result.sent - result.lost <= 3 + candidate.journey_response.CONFIG.max_messengers and candidate.run.predator.defeated_at == 0 and copy.restore_snapshot(snapshot(candidate)),"Weak aggregate swarm retreats with surviving labor and persistent manageable threat")
 			withdrew = true; break
 	test.check(withdrew,"Bounded combat seed coverage exercises actual automatic retreat")
 	# Obtain expressed adults through the ordinary paid brood trial.

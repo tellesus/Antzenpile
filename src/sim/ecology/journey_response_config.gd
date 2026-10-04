@@ -9,3 +9,5 @@ extends Resource
 @export var round_ticks: int = 16
 @export var retreat_workers: int = 3
 @export var max_rounds: int = 48
+@export var pressure_every_rounds: int = 3
+@export var max_messengers: int = 3

@@ -1103,21 +1103,29 @@ func _draw_journey_context(_size: Vector2) -> void:
 	_detail_journey(box, 85, Memories.defense_label(outcome), 14)
 	if not outcome.is_empty():
 		_detail_journey(box, 107, "%d returned / %d sent · %s ago" % [outcome.sent - outcome.lost, outcome.sent, Copy.duration(_status.time - outcome.received_at)])
-	_detail_journey(box, 125, "SURVEY HISTORY", 12)
-	var finding: String = report.get("finding", "")
-	var labels: Dictionary = {"": "No danger survey returned", "ambush": "Localized ambusher reported", "foreign": "Foreign traffic reported", "mixed": "Ambusher and foreign traffic", "inconclusive": "No clear threat found"}
-	_detail_journey(box, 145, labels.get(finding, "Cause remains uncertain"))
-	if not report.is_empty(): _detail_journey(box, 165, "Reported " + Copy.duration(_status.time - report.received_at) + " ago")
+	var pressure: Dictionary = state.get("pressure_reports", {}).get(route.get("id"), {})
+	if own_party and not pressure.is_empty():
+		_detail_journey(box, 125, "RETURNED PRESSURE · SNAPSHOT", 12)
+		_detail_journey(box, 145, "Holding against resistance" if pressure.pressure == "holding" else "Resistance remains strong")
+		_detail_journey(box, 165, "Observed %s ago · arrived %s ago" % [Copy.duration(_status.time-pressure.observed_at),Copy.duration(_status.time-pressure.received_at)], 12)
+	else:
+		_detail_journey(box, 125, "SURVEY HISTORY", 12)
+		var finding: String = report.get("finding", "")
+		var labels: Dictionary = {"ambush":"Ambusher trace along journey", "foreign":"Foreign traffic along journey", "mixed":"Ambusher + foreign traffic", "inconclusive":"No clear danger found"}
+		_detail_journey(box, 145, labels.get(finding, "Cause remains uncertain"))
+		if not report.is_empty(): _detail_journey(box, 165, "Reported " + Copy.duration(_status.time - report.received_at) + " ago")
 	_detail_journey(box, 191, "HARVEST HISTORY", 12)
 	var witnesses: Array[String] = LossEvidence.lines(route, _status.get("time", 0.0))
 	_detail_journey(box, 211, witnesses[0] if not witnesses.is_empty() else "No harvest losses reported", 12)
 	_detail_journey(box, 233, "%d losses · report %s ago" % [route.get("reported_losses", 0), Copy.duration(_status.time - route.get("last_loss_time", 0))])
-	_detail_journey(box, 257, "%d %s sent · away %s" % [state.workers, "defenders" if state.get("mode") == "defend" else "survey workers", Copy.duration(state.age)] if own_party else "%s carbs: %.1f · %d available" % [_status.get("pile_name","Home"),_status.get("resources", {}).get("carbohydrate", 0), _status.get("available_workers", 0)], 12)
-	_detail_journey(box, 279, state.other_party + " party away · one at a time" if state.get("other_party","") != "" else "Reports arrive with returning ants", 12)
+	_detail_journey(box, 257, "%d %s assigned · away %s" % [state.workers, "defenders" if state.get("mode") == "defend" else "survey workers", Copy.duration(state.age)] if own_party else "%s carbs: %.1f · %d available" % [_status.get("pile_name","Home"),_status.get("resources", {}).get("carbohydrate", 0), _status.get("available_workers", 0)], 12)
+	_detail_journey(box, 279, state.other_party + " party away · one at a time" if state.get("other_party","") != "" else "Messenger returned · still assigned" if own_party and pressure.get("observed_at",0) >= _status.time-state.age else "Reports arrive with returning ants", 12)
 	var action: Rect2 = _journey_rect("journey_investigate")
 	_draw_journey_action(action, ("RECALL DEFENDERS" if state.get("mode") == "defend" else "RECALL SURVEY PARTY") if own_party else "SURVEY JOURNEY FOR DANGER", "Workers return through travel" if own_party else _party_requirement(3))
 	if own_party and state.get("reinforcement_available", false) or not own_party and _can_mobilize(route):
 		_draw_journey_action(_journey_rect("journey_defend"), "REQUEST 4 DEFENDERS" if own_party else "SEND 12 DEFENDERS", _party_requirement(4 if own_party else 12))
+	if own_party and state.get("reinforcement_pending", false):
+		_draw_journey_action(_journey_rect("journey_defend"), "REINFORCEMENTS ALREADY SENT", "Await returning messenger confirmation")
 	var back: Rect2 = _journey_rect("journey_close")
 	UIStyle.surface(self, back, Color("263038"))
 	_label(back.get_center() + Vector2(0, 5), "BACK TO SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)

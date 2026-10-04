@@ -42,6 +42,7 @@ func reinforce(route_id: String) -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	var defense: JourneyDefenseState = state.defense
 	if not state.active() or state.route_id != route_id or defense.mode != "defend" or defense.extra_workers > 0 or defense.sent + CONFIG.reinforcement_workers > CONFIG.dispatched_cap: return _reject("No further reinforcement can be dispatched")
+	if _reinforcement_pending(): return _reject("Reinforcements already sent; await a returning messenger")
 	var pile: PileState = _run.colony.piles[state.origin_id(_run.trails)]
 	var cost: float = _cost(route_id,CONFIG.reinforcement_workers)
 	if pile.workers_available < CONFIG.reinforcement_workers or pile.resources.carbohydrate < cost: return _reject("Reinforcement needs four workers and travel food")
@@ -67,6 +68,7 @@ func recall() -> bool:
 func tick() -> void:
 	var state: JourneyResponseState = _run.journey_response
 	if not state.active(): return
+	_tick_messenger()
 	_meet_reinforcement()
 	if state.defense.mode == "defend":
 		if state.phase == "fighting": _combat(); return
@@ -103,7 +105,8 @@ func _combat() -> void:
 	defense.round_ticks -= 1
 	if defense.round_ticks > 0: return
 	defense.rounds += 1
-	if _run.rng.randf() < float(state.workers) / (state.workers + _run.predator.resistance):
+	var front: int = state.workers - state.pressure.messengers
+	if _run.rng.randf() < float(front) / (front + _run.predator.resistance):
 		_run.predator.resistance -= 1
 	else:
 		var pile: PileState = _run.colony.piles[state.origin_id(_run.trails)]
@@ -115,8 +118,37 @@ func _combat() -> void:
 		if profile != "": defense.lost_profiles[profile] = defense.lost_profiles.get(profile,0) + 1
 	if _run.predator.resistance == 0:
 		_run.predator.defeated_at = _run.simulation_time; _return("secured")
-	elif state.workers <= CONFIG.retreat_workers or defense.rounds >= CONFIG.max_rounds: _return("withdrew")
-	else: defense.round_ticks = CONFIG.round_ticks
+	elif state.workers - state.pressure.messengers <= CONFIG.retreat_workers or defense.rounds >= CONFIG.max_rounds: _return("withdrew")
+	else:
+		defense.round_ticks = CONFIG.round_ticks
+		if defense.rounds % CONFIG.pressure_every_rounds == 1: _send_messenger()
+
+func _send_messenger() -> void:
+	var state: JourneyResponseState = _run.journey_response
+	var pressure: JourneyPressureState = state.pressure
+	if pressure.remaining_ticks > 0 or pressure.messengers >= CONFIG.max_messengers or state.workers - pressure.messengers <= CONFIG.retreat_workers + 1: return
+	pressure.messengers += 1
+	pressure.remaining_ticks = maxi(1, state.elapsed_ticks)
+	pressure.travel_ticks = pressure.remaining_ticks
+	var front: int = state.workers - pressure.messengers
+	pressure.pending = {"pressure": "resisted" if state.defense.lost >= 2 or front < _run.predator.resistance * 2 else "holding", "observed_at": _run.simulation_time, "acknowledged_sent": state.defense.sent - state.defense.extra_workers}
+
+func _tick_messenger() -> void:
+	var state: JourneyResponseState = _run.journey_response
+	if state.pressure.remaining_ticks == 0: return
+	state.pressure.remaining_ticks -= 1
+	if state.pressure.remaining_ticks > 0: return
+	var report: Dictionary = state.pressure.pending.duplicate(true)
+	report.received_at = _run.simulation_time
+	state.pressure.reports[state.route_id] = report
+	state.pressure.pending.clear()
+	state.pressure.travel_ticks = 0
+
+func _reinforcement_pending() -> bool:
+	var state: JourneyResponseState = _run.journey_response
+	var reported: Dictionary = state.pressure.reports.get(state.route_id, {})
+	var acknowledged: int = int(reported.acknowledged_sent) if reported.get("observed_at", 0.0) >= state.departed_at else CONFIG.defense_workers
+	return state.defense.sent > acknowledged
 
 func _return(outcome: String) -> void:
 	var state: JourneyResponseState = _run.journey_response
@@ -161,21 +193,25 @@ func _arrive() -> void:
 	assert(released and retired)
 	state.route_id = ""; state.phase = "idle"; state.workers = 0; state.elapsed_ticks = 0; state.departed_at = 0; state.ambush_fraction = -1; state.foreign_seen = false; state.sampled_at = 0
 	state.defense.reset_party()
+	state.pressure.reset_party()
 
 func summary(origin_id: String = "home") -> Dictionary:
 	var state: JourneyResponseState = _run.journey_response
 	var own_party: bool = state.active() and _run.trails.routes[state.route_id].origin_pile == origin_id
-	var reports: Dictionary = {}; var outcomes: Dictionary = {}
+	var reports: Dictionary = {}; var outcomes: Dictionary = {}; var pressure_reports: Dictionary = {}
 	for id: String in state.reports:
 		if _run.trails.routes[id].origin_pile == origin_id: reports[id] = state.reports[id].duplicate(true)
 	for id: String in state.defense.outcomes:
 		if _run.trails.routes[id].origin_pile == origin_id: outcomes[id] = state.defense.outcomes[id].duplicate(true)
+	for id: String in state.pressure.reports:
+		if _run.trails.routes[id].origin_pile == origin_id: pressure_reports[id] = state.pressure.reports[id].duplicate(true)
 	var other: String = _run.trails.routes[state.route_id].origin_pile if state.active() and not own_party else ""
 	return {"away":own_party,"route_id":state.route_id if own_party else "","mode":state.defense.mode if own_party else "investigate",
 		"workers":state.workers + state.defense.extra_workers + state.defense.lost if own_party else 0,
 		"age":_run.simulation_time - state.departed_at if own_party else 0.0,"reports":reports,"outcomes":outcomes,
 		"reported_losses":state.defense.reported_for_pile(origin_id),
 		"other_party":"Home" if other == "home" else "Daughter" if other != "" else "",
-		"reinforcement_available":own_party and state.defense.mode == "defend" and state.defense.sent + CONFIG.reinforcement_workers <= CONFIG.dispatched_cap}
+		"pressure_reports": pressure_reports, "reinforcement_pending": own_party and state.defense.mode == "defend" and _reinforcement_pending(),
+		"reinforcement_available":own_party and state.defense.mode == "defend" and not _reinforcement_pending() and state.defense.sent + CONFIG.reinforcement_workers <= CONFIG.dispatched_cap}
 
 func _reject(reason: String) -> bool: last_error = reason; return false

@@ -85,7 +85,7 @@ func _test_defense(test: Object) -> void:
 	var game: SimulationController = load("res://tests/test_ambusher_defense.gd").new().ready_game()
 	var route: TrailRouteState = game.run.trails.routes.route_1
 	test.check(Caution.routes(game.run, "home") == [route.id], "Reported ambusher remains a learned concern before intervention")
-	test.check(game.journey_response.defend(route.id), "Ordinary funded defense can address learned danger")
+	test.check(game.journey_response.defend(route.id) and game.journey_response.reinforce(route.id), "Ordinary funded defense and physical support can address learned danger")
 	for tick: int in 1200:
 		game.advance(0.25)
 		if game.run.predator.defeated_at > 0:

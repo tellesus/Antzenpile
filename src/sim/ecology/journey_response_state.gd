@@ -13,13 +13,14 @@ var foreign_seen: bool = false
 var sampled_at: float = 0
 var reports: Dictionary = {}
 var defense: JourneyDefenseState = JourneyDefenseState.new()
+var pressure: JourneyPressureState = JourneyPressureState.new()
 
 func active() -> bool: return phase != "idle"
 func origin_id(trails: TrailNetwork) -> String:
 	return trails.routes[route_id].origin_pile if active() and trails.routes.has(route_id) else ""
 func to_dict() -> Dictionary:
 	return {"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
-		"ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict()}
+		"ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict()}
 
 func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: float) -> bool:
 	if not data.has_all(["route_id","phase","workers","elapsed_ticks","departed_at","ambush_fraction","foreign_seen","sampled_at","reports"]): return false
@@ -43,6 +44,9 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	var legacy: Dictionary = restored_defense.to_dict(); legacy.sent = int(data.workers)
 	var defense_data: Variant = data.get("defense",legacy)
 	if not defense_data is Dictionary or not restored_defense.restore(defense_data,data,colony,trails,time): return false
+	var restored_pressure := JourneyPressureState.new()
+	var pressure_data: Variant = data.get("pressure", restored_pressure.to_dict())
+	if not pressure_data is Dictionary or not restored_pressure.restore(pressure_data,data,defense_data,trails,time): return false
 	var origin: String = trails.routes[data.route_id].origin_pile if trails.routes.has(data.route_id) else ""
 	var commitment: Dictionary = colony.piles[origin].workers.to_dict().commitments.get("journey:"+origin,{}) if origin != "" else {}
 	for pile: PileState in colony.piles.values():
@@ -64,4 +68,5 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	route_id = data.route_id; phase = data.phase; workers = int(data.workers); elapsed_ticks = int(data.elapsed_ticks)
 	departed_at = float(data.departed_at); ambush_fraction = float(data.ambush_fraction); foreign_seen = data.foreign_seen; sampled_at = float(data.sampled_at); reports = data.reports.duplicate(true)
 	defense = restored_defense
+	pressure = restored_pressure
 	return true
