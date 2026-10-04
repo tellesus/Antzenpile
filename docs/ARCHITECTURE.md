@@ -1,5 +1,7 @@
 # Architecture
 
+Card 131 parameterizes InterpileSupplySystem by payer and composes Home and Daughter owners. One shared connection selects a payer, while each owner retains independent returned history. Only that payer's ledger/store funds the eight-worker trip; destination stores receive on arrival and the party/report return to its payer. Supply directions and settlers are exclusive until physical return. Home shortage support and Daughter homebound transport have distinct named controls; care relief calls the appropriate job owner.
+
 Card 130 integrates the independent fighter gene into existing cohort genetics and queued Home trials. Only emerged carriers contribute to a captured departure combat multiplier. Aggregate food cohorts and defensive/reinforcement batches carry their own weights; real joining combines them, couriers preserve them, and casualties still debit ordinary disjoint worker phenotypes. Larval feeding and Auto Brood reserves share the authored increased demand. No soldier nodes or army ledger.
 
 Card 129 adds run-owned SurfaceImpactState/System. Seed-derived Roadside pulses operate physical food-route travelers and crossing scent fields through the existing ledger loss owner. Route witnesses and paid physical survey samples are separate returned knowledge; normal UI receives only dated records. No human actor, enemy health bar or live event feed. Older absent-state saves retain disabled disturbances.

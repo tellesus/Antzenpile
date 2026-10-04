@@ -32,6 +32,8 @@ func plan(pile_id: String) -> Dictionary:
 	var response: JourneyResponseState = _run.journey_response
 	if response.active() and _run.trails.routes[response.route_id].origin_pile == pile_id:
 		return {"kind":"response"}
+	if pile_id == "satellite_1" and _run.daughter_supply.enabled:
+		return {"kind":"daughter_supplies"}
 	if pile_id == "home" and _run.supply.enabled:
 		return {"kind":"supplies"}
 	if pile_id == "home" and _run.guest.phase == "rejecting":
@@ -52,5 +54,6 @@ func apply(pile_id: String, expected: Dictionary) -> bool:
 			return true
 		"response": return _jobs.response.recall()
 		"supplies": return _jobs.supplies.set_enabled(false)
+		"daughter_supplies": return _jobs.daughter_supplies.set_enabled(false)
 		"rejection": return _jobs.rejection.stop_rejection()
 	return false

@@ -38,6 +38,7 @@ var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
 var brood_health: BroodHealthSystem
 var heat: HeatSystem
+var daughter_supply: InterpileSupplySystem
 var supply: InterpileSupplySystem
 var reinforcement: WorkerReinforcementSystem
 var founding: FoundingSystem
@@ -82,6 +83,7 @@ func _attach_run(next_run: RunState) -> void:
 	brood_health = BroodHealthSystem.new(run, brood.lose_one)
 	heat = HeatSystem.new(run)
 	supply = InterpileSupplySystem.new(run)
+	daughter_supply = InterpileSupplySystem.new(run,"satellite_1")
 	reinforcement = WorkerReinforcementSystem.new(run)
 	founding = FoundingSystem.new(run)
 	reproduction = ReproductionSystem.new(run)
@@ -92,7 +94,7 @@ func _attach_run(next_run: RunState) -> void:
 	humidity = Humidity.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
-	brood_care = BroodCareRelief.new(run, {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"response":journey_response,"supplies":supply,"rejection":guest})
+	brood_care = BroodCareRelief.new(run, {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"response":journey_response,"supplies":supply,"daughter_supplies":daughter_supply,"rejection":guest})
 	run.clock.tick.connect(_tick)
 
 
@@ -202,8 +204,8 @@ func send_daughter_workers() -> bool:
 func recall_daughter_workers() -> bool:
 	return reinforcement.recall()
 
-func set_daughter_supply(enabled: Variant) -> bool:
-	return supply.set_enabled(enabled)
+func set_daughter_supply(enabled: Variant, source_id: String = "home") -> bool:
+	return (supply if source_id == "home" else daughter_supply).set_enabled(enabled) if source_id in ["home","satellite_1"] else false
 
 
 func establish_daughter(knowledge_id: String) -> bool:
@@ -246,5 +248,6 @@ func _tick(delta: float) -> void:
 	reproduction.tick()
 	founding.tick()
 	supply.tick()
+	daughter_supply.tick()
 	reinforcement.tick()
 	food_toxicity.tick(delta)

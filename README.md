@@ -10,6 +10,8 @@ A colony-scale strategy game about interpreting and shaping a living ant trail n
 
 ## Current state
 
+Each pile's Entrance now assigns its own outbound supply workers: Home → Daughter or Daughter → Home. Local workers/stores fund physical cargo; the payer learns delivery when its party returns. Directional histories stay separate, and the shared connection must be free before switching supplies or sending settlers. Daughter shortage guidance opens Home support. [Two-way supply evidence](docs/tasks/131_daughter_return_supplies.md).
+
 New Roadside runs include recurring surface impacts on one gathering corridor. Survivors return a dated disturbance clue; withdraw or pay to test another approach, since this hazard cannot be fought or harvested. Old saves retain their previous environment. The Adaptation Web now has a separate Combat family: Strong Mandibles strengthens emerged carriers, costs more to develop and makes inheriting larvae need more food. Queuing and laying locks remain unchanged. [Disturbance/fighting evidence](docs/DISTURBANCE_FIGHTING_EVALUATION.md).
 
 Existing brood now holds its caregivers at home; “available” means free to take another job. Queen/Entrance name held care workers. Already-stalled colonies can use the Nursery's named release/recall to restore care, with real traveler return before progress resumes. Manual laying waits for enough carers for the additional cohort; food costs still apply. [Care safeguard evidence](docs/tasks/128_brood_care_safeguard.md).

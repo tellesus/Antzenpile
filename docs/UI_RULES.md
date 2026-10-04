@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 131 Entrance names Home → Daughter or Daughter → Home supplies using the inspected payer's workers, shortage and returned history. The other direction must be stopped and physically returned before assignment. Home settlers remain a separately named Home-funded action. Daughter Food Exchange's actual shortage link reads Inspect Home Support and switches to Home Entrance. Local cargo is paid at departure; destination stores become available at arrival, while payer delivery history waits for its party return.
+
 Card 130 adds a focused Combat family containing Strong Mandibles. The family navigation cycles available recognition/combat/foraging views, with no purchase on the graph. The one selected-trait panel explains increased combat contribution, recurring larval food, trial costs and the existing queue/laid lock/inheritance. Adult expression counts include pending unknown casualties. No live enemy power or automatic combat action is added.
 
 Card 129 presents returned heavy surface disturbance as dated witness history and a selectable coarse memory. Threat Management explicitly says it cannot be fought, offers Survey and Withdraw/Keep Avoided plus existing Approach controls, and never predicts another impact. New Roadside runs have the first bounded surface hazard. Every hint stays historical; quiet later pulses cannot refresh it.

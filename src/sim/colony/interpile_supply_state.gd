@@ -1,6 +1,6 @@
 class_name InterpileSupplyState
 extends RefCounted
-## One aggregate Home party. Cargo and private travel are separate from returned reports.
+## One aggregate payer-owned party. Cargo and private travel are separate from returned reports.
 const CONFIG=preload("res://data/resources/default_interpile_supply.tres")
 const TRAILS=preload("res://data/trails/default_trails.tres")
 var enabled: bool=false
@@ -27,7 +27,7 @@ func receipt() -> Dictionary:
  return {"first_at":first_reported_tick*SimulationClock.TICK_INTERVAL,"last_at":last_reported_tick*SimulationClock.TICK_INTERVAL,"last_amount":last_payload.carbohydrate+last_payload.protein+last_payload.water,"earlier_unrecorded":false}
 func to_dict() -> Dictionary:
  return {"enabled":enabled,"phase":phase,"elapsed_ticks":elapsed_ticks,"departed_tick":departed_tick,"trips_started":trips_started,"trips_reported":trips_reported,"first_reported_tick":first_reported_tick,"last_reported_tick":last_reported_tick,"cargo":cargo.duplicate(),"last_payload":last_payload.duplicate(),"delivered_units":delivered_units.duplicate(),"energy_multiplier":energy_multiplier,"carry_multiplier":carry_multiplier,"chemistry_fraction":chemistry_fraction,"contaminant_mass":contaminant_mass}
-func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tick: int) -> bool:
+func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tick: int, source_id: String = "home") -> bool:
  if data.size()!=15 or not data.has_all(to_dict().keys()): return false
  if not data.enabled is bool or not data.phase is String or data.phase not in ["none","waiting","outbound","returning"]: return false
  for key: String in ["elapsed_ticks","departed_tick","trips_started","trips_reported","first_reported_tick","last_reported_tick"]:
@@ -73,8 +73,8 @@ func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tic
  if data.trips_started==0 and data.departed_tick!=0: return false
  if data.phase!="none" or data.trips_started>0:
   if founding.phase!="established" or not colony.piles.has("satellite_1"): return false
-  var parent: PileState=colony.piles.home; var daughter: PileState=colony.piles.satellite_1
-  var leg: int=TRAILS.leg_ticks(parent.position.distance_to(daughter.position))
+  var parent: PileState=colony.piles[source_id]; var daughter: PileState=colony.piles.satellite_1
+  var leg: int=TRAILS.leg_ticks(colony.piles.home.position.distance_to(daughter.position))
   if data.trips_reported>floori(float(tick-daughter.foundation.founded_tick)/(2*leg)) or data.trips_started>1+floori(float(tick-daughter.foundation.founded_tick)/(2*leg)): return false
   if data.trips_started>0 and data.departed_tick<daughter.foundation.founded_tick+2*leg*(data.trips_started-1): return false
   if away:

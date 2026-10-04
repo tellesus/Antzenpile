@@ -65,7 +65,7 @@ func to_dict() -> Dictionary:
 		"routes": route_records, "segments": segment_records, "cohorts": cohort_records}
 
 
-func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float, founding: FoundingState = null, supply: InterpileSupplyState = null, reinforcement: WorkerReinforcementState = null) -> bool:
+func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float, founding: FoundingState = null, supply: InterpileSupplyState = null, reinforcement: WorkerReinforcementState = null, supply_origin: String = "home") -> bool:
 	if not data.has_all(["next_route_id", "next_cohort_id", "routes", "segments", "cohorts"]) or not WorkerLedger.valid_count(data.next_route_id) or data.next_route_id < 1 or not WorkerLedger.valid_count(data.next_cohort_id) or data.next_cohort_id < 1 or not data.routes is Array or not data.segments is Array or not data.cohorts is Array:
 		return false
 	var restored_routes: Dictionary[String, TrailRouteState] = {}
@@ -176,7 +176,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if route.desired_workers > route.allocated_workers + pending + route.reported_losses or route.allocated_workers > WorkerLedger.MAX_COUNT - pending:
 			return false
 		var commitment: String = "trail:" + route.id
-		var ledger: WorkerLedger = colony.piles[route.origin_pile].workers
+		var payer: String = supply_origin if route.purpose == "interpile" else route.origin_pile
+		var ledger: WorkerLedger = colony.piles[payer].workers
 		if route.status != "inactive":
 			var record: Dictionary = ledger.to_dict().commitments.get(commitment, {})
 			if record.get("kind") != "trail" or record.get("owner_id") != route.id or record.get("count") != route.allocated_workers:
@@ -196,7 +197,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 			var entry: Dictionary = pile.workers.to_dict().commitments[id]
 			if entry.kind == "trail" or id.begins_with("trail:"):
 				var route_id: String = id.trim_prefix("trail:")
-				if id != "trail:" + route_id or not restored_routes.has(route_id) or restored_routes[route_id].origin_pile != pile.id or restored_routes[route_id].status == "inactive" or entry.kind != "trail" or entry.owner_id != route_id:
+				if id != "trail:" + route_id or not restored_routes.has(route_id) or (supply_origin if restored_routes[route_id].purpose == "interpile" else restored_routes[route_id].origin_pile) != pile.id or restored_routes[route_id].status == "inactive" or entry.kind != "trail" or entry.owner_id != route_id:
 					return false
 	if founding!=null and founding.phase!="none":
 		if not restored_routes.has(founding.route_id): return false

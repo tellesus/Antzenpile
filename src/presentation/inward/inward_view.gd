@@ -106,6 +106,7 @@ func activate_at(at: Vector2) -> bool:
 			show_feedback(("Supply workers assigned" if enable else "Stop after current trip requested" if _status.supply.status=="away" else "Idle supply workers released") if result.get("accepted",false) else result.get("reason","Supply unavailable"))
 		return true
 	if selected_id=="food_exchange" and _status.get("daughter",false) and not Pressure.food_sources_needed(_status).is_empty() and _supply_link_rect().has_point(at):
+		if pile_command.is_valid(): pile_command.call("home")
 		selected_id="entrance"; queue_redraw(); return true
 	if _status.get("daughter_available",false) and _pile_rect().has_point(at):
 		var target: String = "home" if _status.get("daughter",false) else "satellite_1"
@@ -703,8 +704,8 @@ func _draw_context(size: Vector2) -> void:
 				if relief.get("kind") == "returning":
 					_detail_line(box, 235, "Recall requested · await workers home")
 				elif not relief.is_empty():
-					var labels: Dictionary = {"climate":"RELEASE CLIMATE WORKERS", "cleanup":"RELEASE CLEANUP WORKERS", "aphids":"WITHDRAW APHID ATTENDANTS", "gatherers":"RECALL GATHERERS", "scouts":"RECALL SCOUTS · EXPLORATION OFF", "response":"RECALL RESPONSE PARTY", "supplies":"STOP DAUGHTER SUPPLIES", "rejection":"STOP NURSERY REJECTION"}
-					_draw_action(_brood_care_rect(), labels.get(relief.kind, "MAKE ROOM FOR CARE"), "%d workers · other job reduced" % relief.workers if relief.kind in ["climate","cleanup"] else "Whole attendant group released" if relief.kind == "aphids" else "%d workers · gathering target reduced" % relief.workers if relief.kind == "gatherers" else "Workers must return through travel" if relief.kind in ["scouts","response","supplies"] else "Clearing stops; workers released")
+					var labels: Dictionary = {"climate":"RELEASE CLIMATE WORKERS", "cleanup":"RELEASE CLEANUP WORKERS", "aphids":"WITHDRAW APHID ATTENDANTS", "gatherers":"RECALL GATHERERS", "scouts":"RECALL SCOUTS · EXPLORATION OFF", "response":"RECALL RESPONSE PARTY", "supplies":"STOP DAUGHTER SUPPLIES", "daughter_supplies":"STOP HOMEBOUND SUPPLIES", "rejection":"STOP NURSERY REJECTION"}
+					_draw_action(_brood_care_rect(), labels.get(relief.kind, "MAKE ROOM FOR CARE"), "%d workers · other job reduced" % relief.workers if relief.kind in ["climate","cleanup"] else "Whole attendant group released" if relief.kind == "aphids" else "%d workers · gathering target reduced" % relief.workers if relief.kind == "gatherers" else "Workers must return through travel" if relief.kind in ["scouts","response","supplies","daughter_supplies"] else "Clearing stops; workers released")
 					if relief.kind == "gatherers": _detail_line(box, 284, "From " + care.get("source_name", "remembered source"))
 				else:
 					_detail_line(box, 235, "Await workers or ongoing jobs ending")
@@ -782,7 +783,7 @@ func _draw_context(size: Vector2) -> void:
 					_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 15)
 					_label(box.position + Vector2(16, 316), "Needs supplies from Home" if _status.get("daughter",false) else "Browse returned sources", Color("8fa1a8"), 15)
 				if _status.get("daughter",false):
-					_draw_action(_supply_link_rect(),"SUPPLY CONNECTION")
+					_draw_action(_supply_link_rect(),"INSPECT HOME SUPPORT")
 				for resource_id: String in ([] if _status.get("daughter",false) else Pressure.food_sources_needed(_status)):
 					var button: Rect2 = _food_source_rect(resource_id)
 					UIStyle.surface(self, button, Color("263038"))
@@ -840,9 +841,9 @@ func _draw_context(size: Vector2) -> void:
 
 func _draw_supply_context(box: Rect2) -> void:
 	var supply: Dictionary=_status.supply
-	_detail_line(box,145,"Home → Daughter supplies")
-	_detail_line(box,173,"%d Home workers assigned" % supply.workers if supply.workers>0 else "Assign %d Home workers" % supply.workers_required)
-	var message: String="Deliveries are off" if supply.status=="none" else "Waiting at Home" if supply.status=="waiting" else "Party away · "+Copy.duration(supply.age)
+	_detail_line(box,145,"%s → %s supplies" % [supply.get("source_name","Home"),supply.get("destination_name","Daughter")])
+	_detail_line(box,173,"%d %s workers assigned" % [supply.workers,supply.get("source_name","Home")] if supply.workers>0 else "Assign %d %s workers" % [supply.workers_required,supply.get("source_name","Home")])
+	var message: String="Deliveries are off" if supply.status=="none" else "Waiting at " + supply.get("source_name","Home") if supply.status=="waiting" else "Party away · "+Copy.duration(supply.age)
 	_detail_line(box,197,message)
 	_label(box.position+Vector2(16,219),"Current trip finishes before release" if not supply.enabled and supply.status=="away" else supply.get("blocker","") if not supply.get("blocker","").is_empty() else "Pack: 4 carbs / 2 protein / 2 water + traits",Color("8fa1a8"),12)
 	_label(box.position+Vector2(16,249),"Reports: %d · last %s ago" % [supply.trips_reported,Copy.duration(supply.report_age)] if supply.trips_reported>0 else "No delivery report yet",Color("a9b9bc"),14)

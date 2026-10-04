@@ -22,6 +22,8 @@ const Evidence = preload("res://src/sim/scouting/observation.gd")
 const SCOUT_CONFIG = preload("res://data/scouting/default_scouts.tres")
 const Exploration = preload("res://src/sim/scouting/exploration_state.gd")
 var supply := InterpileSupplyState.new()
+var daughter_supply := InterpileSupplyState.new()
+var supply_origin: String = "home"
 var reinforcement := WorkerReinforcementState.new()
 var founding := FoundingState.new()
 var exploration: ExplorationState = Exploration.new()
@@ -94,6 +96,7 @@ func to_dict() -> Dictionary:
 	return {"version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
+		"daughter_supply":daughter_supply.to_dict(), "supply_origin":supply_origin,
 		"reinforcement": reinforcement.to_dict(), "supply": supply.to_dict(), "founding": founding.to_dict(), "knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(), "daughter_exploration": daughter_exploration.to_dict(),
 		"surface_impact":surface_impact.to_dict(), "honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
 
@@ -278,11 +281,20 @@ func restore(data: Dictionary) -> bool:
 	var restored_supply:=InterpileSupplyState.new()
 	var supply_data: Variant=data.get("supply",restored_supply.to_dict())
 	if not supply_data is Dictionary or not restored_supply.restore(supply_data,restored_colony,restored_founding,restored_clock.tick_count): return false
+	var restored_daughter_supply := InterpileSupplyState.new()
+	var daughter_supply_data: Variant = data.get("daughter_supply",restored_daughter_supply.to_dict())
+	if not daughter_supply_data is Dictionary or not restored_daughter_supply.restore(daughter_supply_data,restored_colony,restored_founding,restored_clock.tick_count,"satellite_1"): return false
+	var restored_supply_origin: Variant = data.get("supply_origin","home")
+	if restored_supply_origin not in ["home","satellite_1"] or restored_supply_origin == "satellite_1" and not restored_colony.piles.has("satellite_1"): return false
+	if restored_supply.phase != "none" and (restored_daughter_supply.phase != "none" or restored_supply_origin != "home"): return false
+	if restored_daughter_supply.phase != "none" and restored_supply_origin != "satellite_1": return false
+	var active_supply: InterpileSupplyState = restored_supply if restored_supply_origin == "home" else restored_daughter_supply
 	var restored_reinforcement:=WorkerReinforcementState.new()
 	var reinforcement_data: Variant=data.get("reinforcement",restored_reinforcement.to_dict())
 	if not reinforcement_data is Dictionary or not restored_reinforcement.restore(reinforcement_data,restored_colony,restored_founding,restored_supply,restored_clock.tick_count): return false
+	if restored_reinforcement.active() and (restored_daughter_supply.phase != "none" or restored_supply_origin != "home"): return false
 	var restored_trails := Trails.new()
-	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, restored_supply, restored_reinforcement):
+	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, active_supply, restored_reinforcement, restored_supply_origin):
 		return false
 	# One paid, physically reported foundation owns the only current daughter.
 	var daughter: PileState=restored_colony.piles.get("satellite_1")
@@ -493,6 +505,8 @@ func restore(data: Dictionary) -> bool:
 	knowledge = restored_knowledge
 	reinforcement = restored_reinforcement
 	supply = restored_supply
+	daughter_supply = restored_daughter_supply
+	supply_origin = restored_supply_origin
 	founding = restored_founding
 	trails = restored_trails
 	rain = restored_rain

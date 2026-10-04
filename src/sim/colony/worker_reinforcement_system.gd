@@ -15,7 +15,7 @@ func _cost() -> float:
 func blocker() -> String:
  if _run.founding.phase!="established" or not _run.colony.piles.has("satellite_1"):return "Establish Daughter first"
  if _run.reinforcement.active():return "A worker reinforcement party is already away"
- if _run.supply.phase!="none":return "Stop supplies; await their return"
+ if _run.supply.phase!="none" or _run.daughter_supply.phase!="none":return "Stop supplies; await their return"
  var h: PileState=_run.colony.piles.home;var d: PileState=_run.colony.piles.satellite_1
  var required: int=CONFIG.reinforcement_workers+CONFIG.reinforcement_messengers
  if h.workers_assignable<required:return "Need %d available Home workers" % required
@@ -30,6 +30,9 @@ func blocker() -> String:
 func start() -> bool:
  last_error=blocker()
  if not last_error.is_empty():return false
+ _run.supply_origin="home"
+ var connection: TrailRouteState=_run.trails.routes[_run.founding.route_id]
+ connection.delivered_total=_run.supply.delivered_total();connection.receipt=_run.supply.receipt()
  var h: PileState=_run.colony.piles.home;var route: TrailRouteState=_run.trails.routes[_run.founding.route_id]
  var count: int=CONFIG.reinforcement_workers+CONFIG.reinforcement_messengers
  if not h.workers.create_commitment("trail:"+route.id,"trail",route.id):return _reject("Connection commitment unavailable")

@@ -435,7 +435,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		brood.append(cohort.to_dict())
 	var trail_workers: int = 0
 	for route: TrailRouteState in simulation.run.trails.routes.values():
-		if route.origin_pile == pile_id:
+		if (simulation.run.supply_origin if route.purpose == "interpile" and not simulation.run.reinforcement.active() else route.origin_pile) == pile_id:
 			trail_workers += route.allocated_workers + simulation.run.trails.pending_losses(route.id)
 	var expected_total: int = pile.workers_total + simulation.run.pending_for_pile(pile_id)
 	var expected_adapted: int = pile.adapted_workers_total + simulation.run.pending_for_pile(pile_id, true)
@@ -453,7 +453,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
-	return {"reinforcement":simulation.reinforcement.summary(), "supply":simulation.supply.summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
+	return {"reinforcement":simulation.reinforcement.summary(), "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
 		"reproduction": simulation.reproduction.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
 			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
@@ -751,8 +751,8 @@ func daughter_worker_reinforcement(recall: bool) -> Dictionary:
 
 
 func set_daughter_supply(enabled: bool) -> Dictionary:
-	var accepted: bool=simulation.set_daughter_supply(enabled)
-	return {"accepted":accepted,"reason":simulation.supply.last_error}
+	var accepted: bool=simulation.set_daughter_supply(enabled,inward_pile_id)
+	return {"accepted":accepted,"reason":(simulation.supply if inward_pile_id == "home" else simulation.daughter_supply).last_error}
 
 
 func daughter_gathering_summary() -> Dictionary:
