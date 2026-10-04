@@ -3,6 +3,7 @@ extends RefCounted
 ## Colony-known budgets for one attempt, not remote force estimates.
 const CONFIG = preload("res://data/ecology/default_journey_response.tres")
 var targets: Dictionary[String, int] = {}
+var goals: Dictionary[String, String] = {}
 
 static func valid_target(value: Variant) -> bool:
 	return typeof(value) == TYPE_INT and (value == 0 or value >= CONFIG.defense_workers and value <= CONFIG.dispatched_cap and (value - CONFIG.defense_workers) % CONFIG.reinforcement_workers == 0)

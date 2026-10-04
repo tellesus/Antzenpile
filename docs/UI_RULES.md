@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 125 places Clear Journey/Hunt for Protein before force selection, locks the dispatched goal, explains added hunt risk and provides an explicit returned-remains inspection link. Protein remains become normal gatherable sensory memories only after evidence returns. Success language distinguishes displacement from confirmed kill; neither exposes live health or instantly adds stores.
+
 Card 124 keeps threat selection in persistent Threat Management, names witnessed predatory arthropod/foreign ants and provides 44-pixel force-budget buttons. Waiting orders can be replaced/canceled; sent counts remain expected until return. Lowering budget stops extra dispatch; Recall returns the whole party physically. Aphid attendants improve honeydew production; gatherers and travel defense remain explicitly separate jobs.
 
 Card 113 enables local Send 12 Defenders, Request 4 Defenders and Recall on the daughter’s own returned ambusher survey. Payment/labor wording uses the selected pile’s stores; command validation rejects foreign routes and insufficient local food/workers. Away counts retain all sent workers, including private casualties; physical return alone delivers survivors/losses/outcome and turns its threat into Ambush Memory. Current one-party bounds, 44-pixel targets and no position/combat/survivor preview remain.

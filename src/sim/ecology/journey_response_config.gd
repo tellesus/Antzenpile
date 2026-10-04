@@ -11,3 +11,6 @@ extends Resource
 @export var max_rounds: int = 48
 @export var pressure_every_rounds: int = 3
 @export var max_messengers: int = 3
+@export var hunt_resistance: int = 6
+@export var hunt_health: int = 3
+@export var carcass_protein: float = 24.0

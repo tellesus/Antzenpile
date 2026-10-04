@@ -21,7 +21,7 @@ func origin_id(trails: TrailNetwork) -> String:
 	return trails.routes[route_id].origin_pile if active() and trails.routes.has(route_id) else ""
 func to_dict() -> Dictionary:
 	return {"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
-		"ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict(),"orders":orders.targets.duplicate()}
+		"ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict(),"orders":orders.targets.duplicate(),"goals":orders.goals.duplicate()}
 
 func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: float) -> bool:
 	if not data.has_all(["route_id","phase","workers","elapsed_ticks","departed_at","ambush_fraction","foreign_seen","sampled_at","reports"]): return false
@@ -70,6 +70,11 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	departed_at = float(data.departed_at); ambush_fraction = float(data.ambush_fraction); foreign_seen = data.foreign_seen; sampled_at = float(data.sampled_at); reports = data.reports.duplicate(true)
 	var restored_orders := JourneyOrders.new()
 	if not restored_orders.restore(data.get("orders", {}), trails): return false
+	var goals: Variant = data.get("goals", {})
+	if not goals is Dictionary: return false
+	for id: Variant in goals:
+		if not id is String or not trails.routes.has(id) or trails.routes[id].purpose != "food" or goals[id] not in ["clear", "hunt"]: return false
+		restored_orders.goals[id] = goals[id]
 	for id: String in restored_orders.targets:
 		if restored_orders.targets[id] > 0 and (not reports.has(id) or reports[id].finding not in ["ambush", "mixed"] or restored_defense.outcomes.get(id, {}).get("outcome", "") == "secured"): return false
 	orders = restored_orders

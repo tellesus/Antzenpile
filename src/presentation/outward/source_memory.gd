@@ -50,6 +50,7 @@ static func first_receipt_label(entry: Dictionary, time: float) -> String:
 
 
 static func defense_label(outcome: Dictionary) -> String:
+	if outcome.get("goal", "clear") == "hunt" and outcome.get("outcome", "") == "secured": return "Predator killed · protein reported"
 	return {"secured": "Ambusher driven off", "withdrew": "Defenders withdrew", "not_found": "No ambusher found"}.get(outcome.get("outcome", ""), "No defensive return yet")
 
 

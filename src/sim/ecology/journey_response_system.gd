@@ -30,6 +30,12 @@ func set_force(route_id: String, target: int) -> bool:
 	last_error = ""
 	return true
 
+func set_goal(route_id: String, goal: String) -> bool:
+	var state: JourneyResponseState = _run.journey_response
+	if goal not in ["clear", "hunt"] or not _run.trails.routes.has(route_id) or state.reports.get(route_id, {}).get("finding", "") not in ["ambush", "mixed"]: return _reject("A returned predator survey is required")
+	if state.active() and state.route_id == route_id: return _reject("Goal locked for the dispatched party; recall before changing it")
+	state.orders.goals[route_id] = goal; last_error = ""; return true
+
 func _fund_orders() -> void:
 	var state: JourneyResponseState = _run.journey_response
 	if state.active():
@@ -55,6 +61,7 @@ func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	assert(allocated and paid)
 	state.route_id = route_id; state.phase = "outbound"; state.workers = count; state.departed_at = _run.simulation_time
 	state.defense.mode = mode; state.defense.sent = count; state.defense.initial_sent = count
+	state.defense.goal = state.orders.goals.get(route_id, "clear") if mode == "defend" else "clear"
 	last_error = ""; return true
 
 func _cost(route_id: String, count: int) -> float:
@@ -131,8 +138,10 @@ func _combat() -> void:
 	if defense.round_ticks > 0: return
 	defense.rounds += 1
 	var front: int = state.workers - state.pressure.messengers
-	if _run.rng.randf() < float(front) / (front + _run.predator.resistance):
-		_run.predator.resistance -= 1
+	var resistance: int = maxi(_run.predator.resistance, CONFIG.hunt_resistance if defense.goal == "hunt" else 0)
+	if _run.rng.randf() < float(front) / (front + resistance):
+		if _run.predator.resistance > 0: _run.predator.resistance -= 1
+		elif defense.goal == "hunt": _run.predator.health -= 1
 	else:
 		var pile: PileState = _run.colony.piles[state.origin_id(_run.trails)]
 		var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
@@ -141,7 +150,10 @@ func _combat() -> void:
 		assert(removed)
 		state.workers -= 1; defense.lost += 1; defense.adapted_lost += adapted; _run.predator.defense_losses += 1
 		if profile != "": defense.lost_profiles[profile] = defense.lost_profiles.get(profile,0) + 1
-	if _run.predator.resistance == 0:
+	if _run.predator.resistance == 0 and (defense.goal == "clear" or _run.predator.health == 0):
+		if defense.goal == "hunt":
+			_run.predator.killed = true
+			PredatorCarcass.create(_run)
 		_run.predator.defeated_at = _run.simulation_time; _return("secured")
 	elif state.workers - state.pressure.messengers <= CONFIG.retreat_workers or defense.rounds >= CONFIG.max_rounds: _return("withdrew")
 	else:
@@ -204,6 +216,9 @@ func _arrive() -> void:
 	var finding: String = "mixed" if state.ambush_fraction >= 0 and state.foreign_seen else "ambush" if state.ambush_fraction >= 0 else "foreign" if state.foreign_seen else "inconclusive"
 	if state.defense.mode == "defend":
 		state.defense.outcomes[state.route_id] = {"outcome":state.defense.outcome,"lost":state.defense.lost,"sent":state.defense.sent,"observed_at":state.defense.observed_at,"received_at":_run.simulation_time}
+		if state.defense.goal == "hunt":
+			state.defense.outcomes[state.route_id].goal = "hunt"
+			if state.defense.outcome == "secured": PredatorCarcass.report(_run, state.origin_id(_run.trails), state.defense.observed_at)
 		state.defense.reported_losses += state.defense.lost
 		var owner: String = state.origin_id(_run.trails)
 		if state.defense.lost > 0: state.defense.reported_by_pile[owner] = state.defense.reported_for_pile(owner) + state.defense.lost
@@ -224,7 +239,9 @@ func _arrive() -> void:
 func summary(origin_id: String = "home") -> Dictionary:
 	var state: JourneyResponseState = _run.journey_response
 	var own_party: bool = state.active() and _run.trails.routes[state.route_id].origin_pile == origin_id
-	var reports: Dictionary = {}; var outcomes: Dictionary = {}; var pressure_reports: Dictionary = {}; var orders: Dictionary = {}
+	var reports: Dictionary = {}; var outcomes: Dictionary = {}; var pressure_reports: Dictionary = {}; var orders: Dictionary = {}; var goals: Dictionary = {}
+	for id: String in state.orders.goals:
+		if _run.trails.routes[id].origin_pile == origin_id: goals[id] = state.orders.goals[id]
 	for id: String in state.orders.targets:
 		if _run.trails.routes[id].origin_pile == origin_id: orders[id] = state.orders.targets[id]
 	for id: String in state.reports:
@@ -236,7 +253,7 @@ func summary(origin_id: String = "home") -> Dictionary:
 	var other: String = _run.trails.routes[state.route_id].origin_pile if state.active() and not own_party else ""
 	return {"away":own_party,"route_id":state.route_id if own_party else "","mode":state.defense.mode if own_party else "investigate",
 		"workers":state.workers + state.defense.extra_workers + state.defense.lost if own_party else 0,
-		"age":_run.simulation_time - state.departed_at if own_party else 0.0,"reports":reports,"outcomes":outcomes,"force_orders":orders,
+		"age":_run.simulation_time - state.departed_at if own_party else 0.0,"reports":reports,"outcomes":outcomes,"force_orders":orders,"goals":goals,"goal":state.defense.goal if own_party else "",
 		"reported_losses":state.defense.reported_for_pile(origin_id),
 		"other_party":"Home" if other == "home" else "Daughter" if other != "" else "",
 		"pressure_reports": pressure_reports, "reinforcement_pending": own_party and state.defense.mode == "defend" and _reinforcement_pending(),

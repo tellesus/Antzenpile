@@ -249,6 +249,18 @@ func _run_command(command: String) -> void:
 	if command == "journey_open":
 		journey_open = true; rival_focus = _selected_route(_selected_signal()).get("conflict_report", "") != ""; return
 	if command == "journey_topic": rival_focus = not rival_focus; return
+	if command == "journey_carcass":
+		for signal_data: Dictionary in _signals:
+			if signal_data.source_knowledge_id == "known:ambusher_carcass":
+				selected_id = signal_data.id; journey_open = false; rival_focus = false
+				if signal_data.bearing != null: facing = signal_data.bearing
+		return
+	if command.begins_with("journey_goal_"):
+		var route: Dictionary = _selected_route(_selected_signal())
+		if not route.is_empty() and journey_command.is_valid():
+			var result: Dictionary = journey_command.call(command.trim_prefix("journey_"), route.id)
+			show_feedback("Goal selected · choose force to dispatch" if result.get("accepted", false) else result.get("reason", "Unavailable"), not result.get("accepted", false))
+		return
 	if command.begins_with("journey_force_"):
 		var route: Dictionary = _selected_route(_selected_signal())
 		if not route.is_empty() and journey_command.is_valid():
@@ -459,9 +471,13 @@ func _button_at(at: Vector2) -> String:
 			if _journey_rect("journey_close").has_point(at): return "journey_close"
 			if _journey_rect("journey_investigate").has_point(at): return "journey_recall" if own_party else "journey_force_0" if _status.get("journey_response", {}).get("force_orders", {}).get(chosen_route.get("id"), 0) > 0 else "journey_gather" if _journey_recovery(chosen_route) else "journey_investigate"
 			if _can_mobilize(chosen_route):
+				if not own_party:
+					for goal: String in ["clear", "hunt"]:
+						if _goal_rect(goal).has_point(at): return "journey_goal_" + goal
 				for target: int in [12, 16, 20, 24]:
 					if _force_rect(target).has_point(at): return "journey_force_%d" % target
 			if _journey_rect("journey_defend").has_point(at):
+				if not own_party and _carcass_returned(chosen_route): return "journey_carcass"
 				var state: Dictionary = _status.get("journey_response",{})
 				if own_party and state.get("reinforcement_available",false): return "journey_reinforce"
 				if not own_party and _can_mobilize(chosen_route): return "journey_defend"
@@ -966,6 +982,7 @@ func _evidence_offset() -> float:
 
 func _signal_title_for(signal_data: Dictionary) -> String:
 	if signal_data.category == "threat": return _threat_caption(signal_data)
+	if signal_data.source_knowledge_id == "known:ambusher_carcass": return "Protein remains"
 	return "Honeydew trace" if _is_honeydew(signal_data) else _signal_title(signal_data.category)
 
 
@@ -1144,23 +1161,29 @@ func _draw_journey_context(_size: Vector2) -> void:
 		var labels: Dictionary = {"ambush":"Predatory arthropod witnessed", "foreign":"Foreign ants encountered", "mixed":"Predator and foreign ants witnessed", "inconclusive":"Attacker remains unidentified"}
 		_detail_journey(box, 145, labels.get(finding, "Cause remains uncertain"))
 		if not report.is_empty(): _detail_journey(box, 165, "Reported " + Copy.duration(_status.time - report.received_at) + " ago")
-	_detail_journey(box, 191, "REPORTS AND OUR ORDERS", 12)
-	var witnesses: Array[String] = LossEvidence.lines(route, _status.get("time", 0.0))
-	_detail_journey(box, 211, witnesses[0] if not witnesses.is_empty() else "No harvest losses reported", 12)
+	var goal: String = state.get("goal", "clear") if own_party else state.get("goals", {}).get(route.get("id"), "clear")
+	if _can_mobilize(route) and not own_party:
+		for option: String in ["clear", "hunt"]:
+			var goal_box: Rect2 = _goal_rect(option)
+			UIStyle.surface(self, goal_box, Color("594737") if goal == option else Color("263038"))
+			_label(goal_box.get_center() + Vector2(0, 5), "CLEAR JOURNEY" if option == "clear" else "HUNT FOR PROTEIN", Color("e0c5b7"), 11, HORIZONTAL_ALIGNMENT_CENTER)
+	else: _detail_journey(box, 207, "Goal: kill for protein" if goal == "hunt" else "Goal: drive attacker away", 13)
 	var target: int = int(state.get("force_orders", {}).get(route.get("id"), 0))
 	if _can_mobilize(route):
 		for count: int in [12, 16, 20, 24]:
 			var rect: Rect2 = _force_rect(count)
 			UIStyle.surface(self, rect, Color("594737") if target == count else Color("263038"))
 			_label(rect.get_center() + Vector2(0, 5), str(count), Color("e0c5b7"), 16, HORIZONTAL_ALIGNMENT_CENTER)
-	_detail_journey(box, 278, "%d sent · budget %d" % [state.workers, target] if own_party else "Budget %d · waiting for workers/food" % target if target > 0 else "%d workers available · choose force" % _status.get("available_workers", 0), 12)
-	_detail_journey(box, 298, "Lower budget stops extra dispatch; recall returns all" if own_party else "Force buttons order one paid attempt", 10)
+	_detail_journey(box, 278, "%d sent · budget %d" % [state.workers, target] if own_party else "Budget %d · waiting for workers/food" % target if target > 0 else "Attempt ended · no new force ordered" if not outcome.is_empty() else "%d workers available · choose force" % _status.get("available_workers", 0), 12)
+	_detail_journey(box, 298, "Recall returns all · goal locked until return" if own_party else "Reported remains need collecting" if _carcass_returned(route) else "Hunt adds risk; food still needs gathering" if goal == "hunt" else "Force buttons order one paid attempt", 10)
 	var action: Rect2 = _journey_rect("journey_investigate")
 	_draw_journey_action(action, ("RECALL DEFENDERS" if state.get("mode") == "defend" else "RECALL SURVEY PARTY") if own_party else "CANCEL FORCE ORDER" if target > 0 else "RESUME GATHERING · TARGET 5" if _journey_recovery(route) else "SURVEY JOURNEY FOR DANGER", "Workers return through travel" if own_party else "Waiting order spends nothing" if target > 0 else "Danger may remain; workers travel" if _journey_recovery(route) else _party_requirement(3))
 	if own_party and state.get("reinforcement_available", false) or not own_party and _can_mobilize(route):
 		_draw_journey_action(_journey_rect("journey_defend"), "REQUEST 4 DEFENDERS" if own_party else "SEND 12 DEFENDERS", _party_requirement(4 if own_party else 12))
 	if own_party and state.get("reinforcement_pending", false):
 		_draw_journey_action(_journey_rect("journey_defend"), "REINFORCEMENTS ALREADY SENT", "Await returning messenger confirmation")
+	elif not own_party and _carcass_returned(route):
+		_draw_journey_action(_journey_rect("journey_defend"), "INSPECT PROTEIN REMAINS", "Assign gatherers to carry it home")
 	elif not own_party and _journey_recovery(route) and not _can_mobilize(route):
 		_draw_journey_action(_journey_rect("journey_defend"),"KEEP ROUTE AVOIDED","No new gathering departures")
 	var back: Rect2 = _journey_rect("journey_close")
@@ -1235,3 +1258,10 @@ func _can_mobilize(route: Dictionary) -> bool:
 
 func _force_rect(target: int) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300 + (target - 12) / 4 * 66, 369, 62, 44)
+
+func _goal_rect(goal: String) -> Rect2:
+	return Rect2(get_viewport_rect().size.x - 300 + (134 if goal == "hunt" else 0), 315, 126, 44)
+
+func _carcass_returned(route: Dictionary) -> bool:
+	var outcome: Dictionary = _status.get("journey_response", {}).get("outcomes", {}).get(route.get("id"), {})
+	return outcome.get("goal", "clear") == "hunt" and outcome.get("outcome", "") == "secured"

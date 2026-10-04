@@ -392,6 +392,7 @@ func restore(data: Dictionary) -> bool:
 			return false
 		losses_by_pile[pile_id] = recorded
 	var defense: JourneyDefenseState = restored_response.defense
+	if not PredatorCarcass.valid(restored_world, restored_predator): return false
 	if defense.reported_losses + defense.lost != restored_predator.defense_losses: return false
 	var defense_origin: String = restored_response.origin_id(restored_trails)
 	for pile: PileState in restored_colony.piles.values():
@@ -399,8 +400,10 @@ func restore(data: Dictionary) -> bool:
 		if owned_losses > pile.workers.lost_total - losses_by_pile.get(pile.id,0): return false
 		losses_by_pile[pile.id] = losses_by_pile.get(pile.id,0) + owned_losses
 	if defense.outcome == "secured" and defense.observed_at != restored_predator.defeated_at: return false
+	if defense.outcome == "secured" and defense.goal == "hunt" and not restored_predator.killed: return false
 	for record: Dictionary in defense.outcomes.values():
 		if record.outcome == "secured" and record.observed_at != restored_predator.defeated_at: return false
+		if record.outcome == "secured" and record.get("goal", "clear") == "hunt" and not restored_predator.killed: return false
 	if restored_response.phase == "fighting":
 		var segment: TrailSegmentState = restored_trails.segments[restored_trails.routes[restored_response.route_id].segment_id]
 		var point: Vector2 = segment.start.lerp(segment.end,float(restored_response.elapsed_ticks) / JourneyResponseState.TRAILS.leg_ticks(segment.start.distance_to(segment.end)))
