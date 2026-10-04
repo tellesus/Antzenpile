@@ -74,7 +74,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 	var pairs: Dictionary[String, bool] = {}
 	for record: Variant in data.routes:
 		var route := Route.new()
-		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id) or route.last_loss_time > time or route.last_foreign_time > time or route.conflict_observed_at > time or route.last_empty_report_at > time:
+		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id) or route.last_loss_time > time or route.last_foreign_time > time or route.conflict_observed_at > time or route.conflict_received_at > time or route.last_empty_report_at > time:
 			return false
 		if route.purpose in ["founding","interpile"]:
 			if founding==null or knowledge.nodes[route.destination_knowledge_id].definition_id!="nest_site" or not founding.valid_route(route): return false

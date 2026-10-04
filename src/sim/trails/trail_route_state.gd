@@ -26,6 +26,7 @@ var last_foreign_time: float = 0.0
 var reported_rival_losses: int = 0
 var conflict_report: String = ""
 var conflict_observed_at: float = 0.0
+var conflict_received_at: float = 0.0
 var reported_losses: int = 0
 var last_loss_time: float = 0.0
 var attack_reports: int = 0
@@ -44,7 +45,7 @@ func to_dict() -> Dictionary:
 		"resume_on_report": resume_on_report, "last_empty_report_at": last_empty_report_at,
 		"reported_depleted": reported_depleted, "delivered_total": delivered_total, "receipt": receipt.duplicate(true),
 		"reported_rival_losses": reported_rival_losses, "conflict_report": conflict_report,
-		"conflict_observed_at": conflict_observed_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
+		"conflict_observed_at": conflict_observed_at, "conflict_received_at": conflict_received_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
 		"attack_reports": attack_reports, "fighting_reports": fighting_reports,
 		"missing_workers": missing_workers, "last_witness_time": last_witness_time}
 	if purpose != "food": record.purpose=purpose
@@ -100,7 +101,9 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	var rival_deaths: Variant = data.get("reported_rival_losses", 0)
 	var conflict: Variant = data.get("conflict_report", "")
 	var conflict_time: Variant = data.get("conflict_observed_at", 0.0)
-	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths > losses or not conflict in ["", "contested", "secured", "withdrew", "dispersed"] or not typeof(conflict_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(conflict_time)) or conflict_time < 0.0 or ((conflict == "") != (conflict_time == 0.0)):
+	var conflict_receipt: Variant = data.get("conflict_received_at", 0.0)
+	if not typeof(conflict_receipt) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(conflict_receipt)) or conflict_receipt < 0 or conflict_receipt > 0 and (conflict == "" or conflict_receipt < conflict_time): return false
+	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths > losses or not conflict in ["", "contested", "holding", "resisted", "reinforced", "secured", "withdrew", "dispersed"] or not typeof(conflict_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(conflict_time)) or conflict_time < 0.0 or ((conflict == "") != (conflict_time == 0.0)):
 		return false
 	var attacks: Variant = data.get("attack_reports", 0)
 	var fights: Variant = data.get("fighting_reports", 0)
@@ -141,6 +144,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	reported_rival_losses = int(rival_deaths)
 	conflict_report = conflict
 	conflict_observed_at = float(conflict_time)
+	conflict_received_at = float(conflict_receipt)
 	reported_losses = int(losses)
 	last_loss_time = float(loss_time)
 	attack_reports = int(attacks)

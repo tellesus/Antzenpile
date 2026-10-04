@@ -14,6 +14,8 @@ var rival_engaged: bool = false
 var player_losses: int = 0
 var rival_losses: int = 0
 var last_finish_tick: int = -1
+var rounds: int = 0
+var pressure_reports_sent: int = 0
 
 
 func active() -> bool:
@@ -24,12 +26,14 @@ func to_dict() -> Dictionary:
 	return {"serial": serial, "route_id": route_id, "position": [position.x, position.y],
 		"phase": phase, "round_ticks": round_ticks, "formation_ticks": formation_ticks,
 		"rival_engaged": rival_engaged, "player_losses": player_losses, "rival_losses": rival_losses,
-		"last_finish_tick": str(last_finish_tick)}
+		"last_finish_tick": str(last_finish_tick), "rounds":rounds,"pressure_reports_sent":pressure_reports_sent}
 
 
 func restore(data: Dictionary, trails: TrailNetwork, rival: RivalState, world: WorldState, tick: int) -> bool:
 	if not data.has_all(["serial", "route_id", "position", "phase", "round_ticks", "formation_ticks", "rival_engaged", "player_losses", "rival_losses", "last_finish_tick"]):
 		return false
+	if not WorkerLedger.valid_count(data.get("rounds",0)) or not WorkerLedger.valid_count(data.get("pressure_reports_sent",0)) or data.get("pressure_reports_sent",0) > CONFIG.max_pressure_reports: return false
+	if rival.reinforcement.swarm_serial > data.serial or rival.reinforcement.phase == "engaged" and (data.phase != "fighting" or rival.reinforcement.swarm_serial != data.serial or not data.rival_engaged): return false
 	for key: String in ["serial", "round_ticks", "formation_ticks", "player_losses", "rival_losses"]:
 		if not WorkerLedger.valid_count(data[key]):
 			return false
@@ -74,7 +78,7 @@ func restore(data: Dictionary, trails: TrailNetwork, rival: RivalState, world: W
 			return false
 		if data.phase == "forming" and (data.formation_ticks < 1 or data.round_ticks != 0):
 			return false
-		if data.phase == "fighting" and (not data.rival_engaged or held == 0 or rival.workers.count("rival:trail") <= 0 or data.round_ticks < 1 or data.formation_ticks != 0):
+		if data.phase == "fighting" and (not data.rival_engaged or held == 0 or maxi(0,rival.workers.count("rival:trail")) + (maxi(0,rival.workers.count("rival:reinforcement")) if rival.reinforcement.phase == "engaged" else 0) <= 0 or data.round_ticks < 1 or data.formation_ticks != 0):
 			return false
 	serial = int(data.serial)
 	route_id = data.route_id
@@ -86,4 +90,5 @@ func restore(data: Dictionary, trails: TrailNetwork, rival: RivalState, world: W
 	player_losses = int(data.player_losses)
 	rival_losses = int(data.rival_losses)
 	last_finish_tick = last
+	rounds = int(data.get("rounds",0)); pressure_reports_sent = int(data.get("pressure_reports_sent",0))
 	return true

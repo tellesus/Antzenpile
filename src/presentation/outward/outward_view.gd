@@ -42,6 +42,7 @@ var load_command: Callable
 var facing: float = 0.0
 var selected_id: String = ""
 var journey_open: bool = false
+var rival_focus: bool = false
 var journey_command: Callable
 
 var _animation_time: float = 0.0
@@ -245,7 +246,15 @@ func _run_command(command: String) -> void:
 			var result: Dictionary = scout_recall_command.call(mission.id)
 			show_feedback("Return requested · await arrival" if result.get("accepted", false) else result.get("reason", "Recall unavailable"), not result.get("accepted", false))
 		return
-	if command == "journey_open": journey_open = true; return
+	if command == "journey_open":
+		journey_open = true; rival_focus = _selected_route(_selected_signal()).get("conflict_report", "") != ""; return
+	if command == "journey_topic": rival_focus = not rival_focus; return
+	if command in ["rival_reinforce", "rival_withdraw"]:
+		var route: Dictionary = _selected_route(_selected_signal())
+		if not route.is_empty() and trail_set_command.is_valid():
+			var result: Dictionary = trail_set_command.call(route.id, route.desired_workers+SWARM_CONFIG.reinforcement_step if command == "rival_reinforce" else 0)
+			show_feedback(("Gathering target raised by 4; workers travel" if command == "rival_reinforce" else "Withdrawal requested; await returning ants") if result.get("accepted",false) else result.get("reason","Order unavailable"),not result.get("accepted",false))
+		return
 	if command == "journey_close":
 		journey_open = false
 		var selected: Dictionary = _selected_signal()
@@ -432,6 +441,13 @@ func _button_at(at: Vector2) -> String:
 			if _context_panel_rect().has_point(at): return ""
 		if _journey_attention():
 			var own_party: bool = _status.get("journey_response",{}).get("away",false) and _status.get("journey_response",{}).get("route_id","") == chosen_route.get("id")
+			if not own_party and chosen_route.get("conflict_report", "") != "" and _journey_topic_rect().has_point(at): return "journey_topic"
+			if _rival_attention():
+				if _journey_rect("journey_close").has_point(at): return "journey_close"
+				if _journey_rect("journey_investigate").has_point(at): return "rival_reinforce"
+				if _journey_rect("journey_defend").has_point(at): return "rival_withdraw"
+				if Rect2(get_viewport_rect().size.x-316,144,292,448).has_point(at): return "journey_panel"
+				return ""
 			if _journey_rect("journey_close").has_point(at): return "journey_close"
 			if _journey_rect("journey_investigate").has_point(at): return "journey_recall" if own_party else "journey_investigate"
 			if _journey_rect("journey_defend").has_point(at):
@@ -439,7 +455,7 @@ func _button_at(at: Vector2) -> String:
 				if own_party and state.get("reinforcement_available",false): return "journey_reinforce"
 				if not own_party and _can_mobilize(chosen_route): return "journey_defend"
 			if Rect2(get_viewport_rect().size.x - 316,144,292,448).has_point(at): return "journey_panel"
-		elif chosen_route.get("reported_losses",0) > 0 and _journey_rect("journey_open").has_point(at): return "journey_open"
+		elif (chosen_route.get("reported_losses",0) > 0 or chosen_route.get("conflict_report", "") != "") and _journey_rect("journey_open").has_point(at): return "journey_open"
 		if _journey_attention():
 			for command: String in ["scout","pause","speed_1","speed_4","speed_16","speed_64","inward","save","load","sources"]:
 				if _button_rect(command).has_point(at): return command
@@ -1085,12 +1101,14 @@ func _journey_rect(command: String) -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300,548 if command in ["journey_open","journey_close"] else 494 if command in ["journey_defend","journey_reinforce"] else 446,260,44)
 
 func _draw_journey_link() -> void:
-	if _selected_route(_selected_signal()).get("reported_losses",0) <= 0: return
+	var route: Dictionary = _selected_route(_selected_signal())
+	if route.get("reported_losses",0) <= 0 and route.get("conflict_report","") == "": return
 	var box: Rect2 = _journey_rect("journey_open")
 	UIStyle.surface(self, box,Color("39302b"))
 	_label(box.get_center() + Vector2(0,5),"JOURNEY REPORTS AND RESPONSE",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
 
 func _draw_journey_context(_size: Vector2) -> void:
+	if _rival_attention(): _draw_rival_context(); return
 	var box: Rect2 = _context_panel_rect()
 	UIStyle.surface(self, box, Color("17171b")); UIStyle.surface(self, box, Color("665047"), true)
 	var route: Dictionary = _selected_route(_selected_signal())
@@ -1127,8 +1145,47 @@ func _draw_journey_context(_size: Vector2) -> void:
 	if own_party and state.get("reinforcement_pending", false):
 		_draw_journey_action(_journey_rect("journey_defend"), "REINFORCEMENTS ALREADY SENT", "Await returning messenger confirmation")
 	var back: Rect2 = _journey_rect("journey_close")
+	if not own_party and route.get("conflict_report", "") != "": back.size.x = 125
 	UIStyle.surface(self, back, Color("263038"))
-	_label(back.get_center() + Vector2(0, 5), "BACK TO SOURCE", Color("d5ded8"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(back.get_center() + Vector2(0, 5), "BACK TO SOURCE", Color("d5ded8"), 12, HORIZONTAL_ALIGNMENT_CENTER)
+	if not own_party and route.get("conflict_report", "") != "": _draw_journey_topic("RIVAL RESPONSE")
+
+func _rival_attention() -> bool:
+	var route: Dictionary = _selected_route(_selected_signal())
+	var state: Dictionary = _status.get("journey_response", {})
+	return rival_focus and route.get("conflict_report", "") != "" and not (state.get("away",false) and state.get("route_id","") == route.get("id"))
+
+func _journey_topic_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x-169,548,129,44)
+
+func _draw_journey_topic(title: String) -> void:
+	var rect: Rect2 = _journey_topic_rect()
+	UIStyle.surface(self,rect,Color("39302b"))
+	_label(rect.get_center()+Vector2(0,5),title,Color("e0c5b7"),12,HORIZONTAL_ALIGNMENT_CENTER)
+
+func _draw_rival_context() -> void:
+	var box: Rect2 = _context_panel_rect()
+	UIStyle.surface(self,box,Color("17171b")); UIStyle.surface(self,box,Color("665047"),true)
+	var route: Dictionary = _selected_route(_selected_signal())
+	var labels: Dictionary = {"contested":"Junction contested", "holding":"Workers holding the junction", "resisted":"Strong foreign resistance", "reinforced":"Foreign reinforcements encountered", "secured":"Foreign force withdrew", "withdrew":"Our attempt ended in withdrawal", "dispersed":"Encounter dispersed"}
+	_detail_journey(box,31,"Rival response",20)
+	_detail_journey(box,62,"LATEST RETURNED SNAPSHOT",12)
+	_detail_journey(box,85,labels.get(route.get("conflict_report",""),"Foreign traffic reported"),13)
+	_detail_journey(box,107,"Observed %s ago" % Copy.duration(_status.time-route.get("conflict_observed_at",0)),12)
+	_detail_journey(box,129,"Arrived %s ago" % Copy.duration(_status.time-route.conflict_received_at) if route.get("conflict_received_at",0)>0 else "Return date unrecorded",12)
+	_detail_journey(box,159,"GATHERING AND REINFORCEMENT",12)
+	_detail_journey(box,181,"Target %d · %d assigned" % [route.desired_workers,route.allocated_workers])
+	_detail_journey(box,203,"Target also replaces reported losses",12)
+	_detail_journey(box,225,"New workers pay food and travel",12)
+	_detail_journey(box,251,"%d lifetime journey losses" % route.get("reported_losses",0),12)
+	_detail_journey(box,273,"Continue, raise target or withdraw",12)
+	_detail_journey(box,291,"Snapshot is not a live battle view",12)
+	_draw_journey_action(_journey_rect("journey_investigate"),"RAISE GATHERING TARGET BY 4","Uses available workers + travel carbs")
+	_draw_journey_action(_journey_rect("journey_defend"),"WITHDRAW GATHERERS","Return through travel; danger may remain")
+	var back: Rect2 = Rect2(get_viewport_rect().size.x-300,548,125,44)
+	UIStyle.surface(self,back,Color("263038"))
+	_label(back.get_center()+Vector2(0,5),"BACK TO SOURCE",Color("d5ded8"),12,HORIZONTAL_ALIGNMENT_CENTER)
+	_draw_journey_topic("SURVEY / AMBUSH")
 
 
 func _party_requirement(workers: int) -> String:

@@ -29,6 +29,7 @@ func tick(delta: float) -> void:
 		state.remaining_ticks = leg
 		return
 	state.pheromone = snappedf(state.pheromone * pow(0.5, delta / TRAILS.pheromone_half_life_seconds), 0.0000000001)
+	_tick_reinforcement()
 	if _run.swarm.active() and _run.swarm.rival_engaged:
 		return
 	state.remaining_ticks -= 1
@@ -46,6 +47,20 @@ func tick(delta: float) -> void:
 		state.cargo = 0.0
 		state.direction = "outbound"
 	state.remaining_ticks = leg
+
+func _tick_reinforcement() -> void:
+	var rival: RivalState = _run.rival
+	var group: RivalReinforcementState = rival.reinforcement
+	if group.phase in ["idle", "engaged"]: return
+	group.remaining_ticks -= 1
+	if group.remaining_ticks > 0: return
+	if group.phase == "outbound" and _run.swarm.active() and group.swarm_serial == _run.swarm.serial:
+		group.phase = "engaged"
+		return
+	var released: bool = rival.workers.release("rival:reinforcement",rival.workers.count("rival:reinforcement"))
+	var retired: bool = rival.workers.retire_commitment("rival:reinforcement")
+	assert(released and retired)
+	group.phase = "idle"; group.remaining_ticks = 0; group.travel_ticks = 0
 
 
 func sample_contact(cohort: TransitCohort, route: TrailRouteState) -> void:

@@ -682,7 +682,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
 				"desired_workers": sent if settlers_away else route.desired_workers, "allocated_workers": sent if settlers_away else route.allocated_workers + pending,
 				"purpose":route.purpose, "founding_intent":route.purpose in ["founding","interpile"] and simulation.run.founding.phase!="failed", "active_workers":sent if settlers_away else 0 if route.purpose=="founding" and simulation.run.founding.phase=="ready" else route.active_workers + pending, "checking_workers": checking, "status": status,
-				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at,
+				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at, "conflict_received_at":route.conflict_received_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
 				"ambusher_addressed": journey_addressed(route),

@@ -129,7 +129,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 			return false
 	var report: Variant = data.get("conflict_report", "")
 	var report_time: Variant = data.get("conflict_observed_at", 0.0)
-	if not report in ["", "contested", "secured", "withdrew", "dispersed"] or not typeof(report_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(report_time)) or report_time < 0.0 or report_time > time or ((report == "") != (report_time == 0.0)):
+	if not report in ["", "contested", "holding", "resisted", "reinforced", "secured", "withdrew", "dispersed"] or not typeof(report_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(report_time)) or report_time < 0.0 or report_time > time or ((report == "") != (report_time == 0.0)):
 		return false
 	if not data.get("reports_source_outcome", true) and (data.direction != "inbound" or (data.worker_count > 0 and report == "")):
 		return false

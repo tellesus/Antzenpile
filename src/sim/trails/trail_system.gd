@@ -377,6 +377,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if cohort.worker_count > 0 and cohort.conflict_report != "" and cohort.conflict_observed_at >= route.conflict_observed_at:
 		route.conflict_report = cohort.conflict_report
 		route.conflict_observed_at = cohort.conflict_observed_at
+		route.conflict_received_at = _run.simulation_time
 	if cohort.lost_workers > 0:
 		route.reported_losses += cohort.lost_workers
 		route.reported_rival_losses += cohort.rival_losses
