@@ -95,7 +95,7 @@ func _dispatch_general(origin_id: String, bearing: Variant) -> bool:
 	var candidates: Array[TrailRouteState] = []
 	for route: TrailRouteState in _run.trails.routes.values():
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-		if route.origin_pile != origin_id or route.delivered_total <= 0 or segment.route_familiarity < config.established_trail_familiarity or route.reported_losses > 0 and not Caution.addressed(route, _run.journey_response.defense.outcomes) or route.conflict_report not in ["", "secured", "dispersed"] or route.foreign_reports > 0:
+		if route.origin_pile != origin_id or route.delivered_total <= 0 or segment.route_familiarity < config.established_trail_familiarity or route.reported_losses > 0 and not Caution.addressed(route, _run.journey_response.defense.outcomes, _run.journey_response.approach.reports) or route.conflict_report not in ["", "secured", "dispersed"] or route.foreign_reports > 0:
 			continue
 		var direction: float = (route.estimated_destination - _run.colony.piles[origin_id].position).angle()
 		if bearing != null and absf(wrapf(direction - float(bearing), -PI, PI)) > config.cone_radians:
@@ -106,6 +106,15 @@ func _dispatch_general(origin_id: String, bearing: Variant) -> bool:
 		var selected: TrailRouteState = candidates[_run.rng.randi_range(0, candidates.size() - 1)]
 		var origin: PileState = _run.colony.piles[origin_id]
 		var path: Array[Vector2] = Pathfinder.new(_run.world).path_from_origin(origin.position, selected.estimated_destination.round(), _run.world)
+		var infrastructure: TrailSegmentState = _run.trails.segments[selected.segment_id]
+		if not infrastructure.waypoints.is_empty():
+			path = []; var cursor: Vector2 = origin.position
+			var destinations: Array[Vector2] = infrastructure.waypoints.duplicate(); destinations.append(selected.estimated_destination)
+			for destination: Vector2 in destinations:
+				var leg: Array[Vector2] = Pathfinder.new(_run.world).path_from_origin(cursor, destination.round(), _run.world)
+				if leg.size() < 2: path.clear(); break
+				if not path.is_empty(): leg.pop_front()
+				path.append_array(leg); cursor = destination.round()
 		if path.size() > 1 and Caution.path_risk(path, Caution.routes(_run, origin_id), _run.trails, origin.position) == 0.0:
 			return _dispatch_route(origin, path, true, (path.back() - origin.position).angle(), "", selected.id)
 	return dispatch(origin_id, bearing, true)

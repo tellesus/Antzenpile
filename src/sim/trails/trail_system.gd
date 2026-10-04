@@ -73,6 +73,7 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	if not _run.trails.routes.has(route_id) or typeof(target) != TYPE_INT or not WorkerLedger.valid_count(target):
 		return _reject("Unknown route or invalid worker target")
 	var route: TrailRouteState = _run.trails.routes[route_id]
+	if target > 0 and _run.journey_response.active() and _run.journey_response.route_id == route_id and _run.journey_response.approach.candidate != null: return _reject("Wait for the alternate-approach party to return")
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "trail:" + route.id
 	if route.purpose!="food": return _reject("Founding workers belong to their expedition")
@@ -204,7 +205,7 @@ func _encounter(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var progress: float = 1.0 - float(cohort.remaining_ticks) / _leg_ticks(route)
 	if cohort.direction == "inbound":
 		progress = 1.0 - progress
-	var point: Vector2 = segment.start.lerp(segment.end, progress)
+	var point: Vector2 = segment.point_at( progress)
 	if point.distance_to(PREDATOR_CONFIG.position) > PREDATOR_CONFIG.radius:
 		return
 	# Saturated encounters still consume this journey's one opportunity.
@@ -258,7 +259,7 @@ func _maybe_detour(cohort: TransitCohort, route: TrailRouteState) -> bool:
 		return false
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	var progress: float = 1.0 - float(cohort.remaining_ticks) / float(_leg_ticks(route))
-	var join: Vector2 = segment.start.lerp(segment.end, progress).round()
+	var join: Vector2 = segment.point_at( progress).round()
 	if not _run.world.bounds.has_point(join) or not is_finite(Pathfinder.travel_cost(_run.world, join)):
 		return false
 	var ids: Array = _run.world.nodes.keys()
@@ -308,8 +309,8 @@ func _depart(route: TrailRouteState) -> void:
 		return
 	var worker_count: int = mini(idle, CONFIG.workers_per_cohort)
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-	var length: float = segment.start.distance_to(segment.end)
-	var terrain_cost: float = Segment.terrain_cost_for(_run.world, segment.start, segment.end)
+	var length: float = segment.length()
+	var terrain_cost: float = segment.terrain_cost(_run.world)
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var fraction: float = pile.adaptation_fraction()
 	# Quantize captured phenotype to the same stable decimal precision used for resource debits.
@@ -440,7 +441,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 
 func _leg_ticks(route: TrailRouteState) -> int:
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-	return CONFIG.leg_ticks(segment.start.distance_to(segment.end))
+	return CONFIG.leg_ticks(segment.length())
 
 
 static func reliability(segment: TrailSegmentState) -> float:

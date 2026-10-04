@@ -70,9 +70,10 @@ func restore(data: Dictionary, trails: TrailNetwork, rival: RivalState, world: W
 			return false
 		var route: TrailRouteState = trails.routes[data.route_id]
 		var segment: TrailSegmentState = trails.segments[route.segment_id]
-		var intersection: Variant = Geometry2D.segment_intersects_segment(segment.start, segment.end, RIVAL.pile_position, world.nodes[RIVAL.food_id].position)
-		if intersection == null or not point.is_equal_approx(intersection):
-			return false
+		var matched: bool = false
+		for intersection: Vector2 in segment.intersections(RIVAL.pile_position, world.nodes[RIVAL.food_id].position):
+			if point.is_equal_approx(intersection): matched = true
+		if data.phase != "finished" and not matched: return false
 		var max_wait: int = TRAILS.leg_ticks(RIVAL.pile_position.distance_to(world.nodes[RIVAL.food_id].position)) * 2 + 1
 		if data.formation_ticks > max_wait:
 			return false

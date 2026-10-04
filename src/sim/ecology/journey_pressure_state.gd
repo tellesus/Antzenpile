@@ -20,7 +20,7 @@ func restore(data: Dictionary, party: Dictionary, defense: Dictionary, trails: T
 	if party.phase != "idle":
 		if not trails.routes.has(party.route_id): return false
 		var segment: TrailSegmentState = trails.segments[trails.routes[party.route_id].segment_id]
-		if data.travel_ticks > TRAIL_CONFIG.leg_ticks(segment.start.distance_to(segment.end)): return false
+		if data.travel_ticks > TRAIL_CONFIG.leg_ticks(segment.length()): return false
 	if not data.pending.is_empty():
 		if not valid_report(data.pending, time, false) or data.pending.observed_at < party.departed_at or data.pending.acknowledged_sent > defense.sent or data.messengers == 0: return false
 		if data.remaining_ticks + int(round((time - data.pending.observed_at) / SimulationClock.TICK_INTERVAL)) != data.travel_ticks: return false

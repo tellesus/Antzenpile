@@ -26,15 +26,14 @@ func consider(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if not state.active() and (route.foreign_reports < CONFIG.reports_to_escalate or _run.rival.pheromone < 0.1 or (state.last_finish_tick >= 0 and _run.clock.tick_count - state.last_finish_tick < CONFIG.cooldown_ticks)):
 		return
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-	var intersection: Variant = Geometry2D.segment_intersects_segment(segment.start, segment.end, RIVAL.pile_position, _run.world.nodes[RIVAL.food_id].position)
-	if intersection == null:
-		return
-	var leg: int = TRAILS.leg_ticks(segment.start.distance_to(segment.end))
+	var leg: int = TRAILS.leg_ticks(segment.length())
 	var t: float = 1.0 - float(cohort.remaining_ticks) / leg
 	if cohort.direction == "inbound":
 		t = 1.0 - t
-	if segment.start.lerp(segment.end, t).distance_to(intersection) > RIVAL.contact_radius:
-		return
+	var intersection: Variant = null
+	for crossing: Vector2 in segment.intersections(RIVAL.pile_position, _run.world.nodes[RIVAL.food_id].position):
+		if segment.point_at(t).distance_to(crossing) <= RIVAL.contact_radius: intersection = crossing; break
+	if intersection == null: return
 	if not state.active():
 		if state.serial >= WorkerLedger.MAX_COUNT:
 			return
@@ -64,7 +63,7 @@ func _messenger(cohort: TransitCohort, route: TrailRouteState, report: String = 
 	if cohort.worker_count < 2 or count >= TRAILS.max_cohorts_per_route or _run.trails.next_cohort_id >= WorkerLedger.MAX_COUNT:
 		# At capacity, the whole arriving group reports instead of creating a ninth batch.
 		cohort.direction = "inbound"
-		cohort.remaining_ticks = TRAILS.leg_ticks(segment.start.distance_to(state.position))
+		cohort.remaining_ticks = TRAILS.leg_ticks(segment.distance_from_start(state.position))
 		cohort.reports_source_outcome = false
 		cohort.conflict_report = report
 		cohort.conflict_observed_at = _run.simulation_time
@@ -75,7 +74,7 @@ func _messenger(cohort: TransitCohort, route: TrailRouteState, report: String = 
 	messenger.route_id = route.id
 	messenger.worker_count = 1
 	messenger.direction = "inbound"
-	messenger.remaining_ticks = TRAILS.leg_ticks(segment.start.distance_to(state.position))
+	messenger.remaining_ticks = TRAILS.leg_ticks(segment.distance_from_start(state.position))
 	messenger.energy_multiplier = cohort.energy_multiplier
 	messenger.carry_multiplier = cohort.carry_multiplier
 	messenger.chemistry_fraction = cohort.chemistry_fraction
@@ -216,7 +215,7 @@ func _finish(outcome: String) -> void:
 				if outcome == "withdrew":
 					var segment: TrailSegmentState = _run.trails.segments[_run.trails.routes[cohort.route_id].segment_id]
 					cohort.direction = "inbound"
-					cohort.remaining_ticks = TRAILS.leg_ticks(segment.start.distance_to(state.position))
+					cohort.remaining_ticks = TRAILS.leg_ticks(segment.distance_from_start(state.position))
 					cohort.reports_source_outcome = false
 	state.phase = "finished"
 	state.round_ticks = 0

@@ -1,5 +1,7 @@
 # UI and visual rules
 
+Card 126 adds a persistent Approach tab beside Source/Conflict. Withdraw gatherers, wait for actual return, then Test Alternate Approach with three paid workers. Away facts identify the commanded job without previewing progress/course/safety. A returned outcome enables deliberate gathering resumption; a longer established course costs more travel/food and does not guarantee future safety. Source bearings remain a sensory panorama, not a route map.
+
 Card 125 places Clear Journey/Hunt for Protein before force selection, locks the dispatched goal, explains added hunt risk and provides an explicit returned-remains inspection link. Protein remains become normal gatherable sensory memories only after evidence returns. Success language distinguishes displacement from confirmed kill; neither exposes live health or instantly adds stores.
 
 Card 124 keeps threat selection in persistent Threat Management, names witnessed predatory arthropod/foreign ants and provides 44-pixel force-budget buttons. Waiting orders can be replaced/canceled; sent counts remain expected until return. Lowering budget stops extra dispatch; Recall returns the whole party physically. Aphid attendants improve honeydew production; gatherers and travel defense remain explicitly separate jobs.

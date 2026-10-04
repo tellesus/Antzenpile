@@ -112,11 +112,11 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if not restored_segments.has(route.segment_id) or cohort.worker_count + cohort.lost_workers > CONFIG.workers_per_cohort:
 			return false
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
-		if cohort.remaining_ticks > CONFIG.leg_ticks(segment.start.distance_to(segment.end)):
+		if cohort.remaining_ticks > CONFIG.leg_ticks(segment.length()):
 			return false
 		if cohort.detour != null:
 			var join: Vector2 = cohort.detour.path[0] if cohort.detour.phase == "outbound" else cohort.detour.path.back()
-			if cohort.detour.origin_pile != route.origin_pile or cohort.detour.source_id == knowledge.nodes[route.destination_knowledge_id].source_node_id or _distance_to_segment(join, segment.start, segment.end) > 1.5:
+			if cohort.detour.origin_pile != route.origin_pile or cohort.detour.source_id == knowledge.nodes[route.destination_knowledge_id].source_node_id or segment.distance_to_path(join) > 1.5:
 				return false
 		if cohort.detour_report != null and (cohort.detour_report.origin_pile != route.origin_pile or cohort.detour_report.source_node_id == knowledge.nodes[route.destination_knowledge_id].source_node_id):
 			return false
@@ -143,7 +143,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		# A journey keeps its departure phenotype even if adapted adults die meanwhile.
 		if fraction < -0.00002 or fraction > 1.0 + 0.00002 or absf(cohort.carry_multiplier - AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction)) > 0.00002:
 			return false
-		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count + cohort.lost_workers, segment.start.distance_to(segment.end), Segment.terrain_cost_for(world, segment.start, segment.end)) * cohort.energy_multiplier * (1.0 + AdaptationRules.CHEMISTRY.extra_travel_energy * cohort.chemistry_fraction)
+		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count + cohort.lost_workers, segment.length(), segment.terrain_cost(world)) * cohort.energy_multiplier * (1.0 + AdaptationRules.CHEMISTRY.extra_travel_energy * cohort.chemistry_fraction)
 		if cohort.unpaid_energy_cost > maximum_energy_cost + 0.00001 or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):
 			return false
 		var source_id: String = knowledge.nodes[route.destination_knowledge_id].source_node_id
@@ -164,7 +164,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 			return false
 		used_segments[route.segment_id] = true
 		var segment: TrailSegmentState = restored_segments[route.segment_id]
-		if segment.route_id != route.id or segment.start != colony.piles[route.origin_pile].position or segment.end != route.estimated_destination or not is_equal_approx(segment.exposure, Segment.exposure_for(world, segment.start, segment.end)):
+		if segment.route_id != route.id or segment.start != colony.piles[route.origin_pile].position or segment.end != route.estimated_destination or not is_equal_approx(segment.exposure, segment.path_exposure(world)):
 			return false
 		if segment.persistent_chemistry > 0 and "persistent" not in colony.piles[route.origin_pile].genetics.established:
 			return false

@@ -290,6 +290,7 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		if route.origin_pile != pile_id: continue
 		var segment: TrailSegmentState = simulation.run.trails.segments[route.segment_id]
 		var offset: Vector2 = segment.start.lerp(segment.end,report.fraction) - origin
+		if report.has("estimated_position"): offset = Vector2(report.estimated_position[0],report.estimated_position[1]) - origin
 		result.append({"id":"threat:" + id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat",
 			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":3.0,
 			"confidence":0.75,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time - report.observed_at,
@@ -700,13 +701,17 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 	return summaries
 
 func journey_addressed(route: TrailRouteState) -> bool:
+	var approach: Dictionary = simulation.run.journey_response.approach.reports.get(route.id,{})
+	if approach.get("outcome", "") == "found" and route.last_loss_time <= approach.get("received_at", 0.0): return true
 	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
 	return outcome.get("outcome","") == "secured" and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
 
 func journey_alarm(route: TrailRouteState) -> bool:
-	if route.conflict_report in ["contested","holding","resisted","reinforced"]: return true
+	var approach: Dictionary = simulation.run.journey_response.approach.reports.get(route.id,{})
+	var approached_at: float = float(approach.get("received_at",0.0)) if approach.get("outcome", "") == "found" else 0.0
+	if route.conflict_report in ["contested","holding","resisted","reinforced"] and route.conflict_received_at >= approached_at: return true
 	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
-	var settled_at: float = float(outcome.get("received_at",0.0))
+	var settled_at: float = maxf(float(outcome.get("received_at",0.0)),approached_at)
 	if route.conflict_report in ["secured","withdrew","dispersed"]: settled_at = maxf(settled_at,route.conflict_received_at)
 	return route.reported_losses > 0 and route.last_loss_time > settled_at
 
@@ -804,6 +809,7 @@ func respond_to_journey(action: String, route_id: String) -> Dictionary:
 	match action:
 		"force_0", "force_12", "force_16", "force_20", "force_24": accepted = system.set_force(route_id, int(action.trim_prefix("force_")))
 		"goal_clear", "goal_hunt": accepted = system.set_goal(route_id, action.trim_prefix("goal_"))
+		"approach": accepted = system.investigate_approach(route_id)
 		"investigate": accepted = system.investigate(route_id)
 		"defend": accepted = system.defend(route_id)
 		"reinforce": accepted = system.reinforce(route_id)

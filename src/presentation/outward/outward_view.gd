@@ -43,6 +43,7 @@ var facing: float = 0.0
 var selected_id: String = ""
 var journey_open: bool = false
 var rival_focus: bool = false
+var approach_focus: bool = false
 var journey_command: Callable
 
 var _animation_time: float = 0.0
@@ -247,8 +248,12 @@ func _run_command(command: String) -> void:
 			show_feedback("Return requested · await arrival" if result.get("accepted", false) else result.get("reason", "Recall unavailable"), not result.get("accepted", false))
 		return
 	if command == "journey_open":
-		journey_open = true; rival_focus = _selected_route(_selected_signal()).get("conflict_report", "") != ""; return
-	if command == "journey_topic": rival_focus = not rival_focus; return
+		journey_open = true; approach_focus = false; rival_focus = _selected_route(_selected_signal()).get("conflict_report", "") != ""; return
+	if command == "journey_approach_tab": approach_focus = not approach_focus; return
+	if command == "journey_topic":
+		if approach_focus: approach_focus = false
+		else: rival_focus = not rival_focus
+		return
 	if command == "journey_carcass":
 		for signal_data: Dictionary in _signals:
 			if signal_data.source_knowledge_id == "known:ambusher_carcass":
@@ -277,16 +282,17 @@ func _run_command(command: String) -> void:
 		return
 	if command == "journey_close":
 		journey_open = false
+		approach_focus = false
 		var selected: Dictionary = _selected_signal()
 		if selected.get("category") == "threat":
 			for signal_data: Dictionary in _signals:
 				if signal_data.category != "threat" and signal_data.source_knowledge_id == selected.source_knowledge_id: selected_id = signal_data.id; break
 		return
-	if command in ["journey_investigate","journey_recall","journey_defend","journey_reinforce"]:
+	if command in ["journey_investigate","journey_recall","journey_defend","journey_reinforce","journey_approach"]:
 		var route: Dictionary = _selected_route(_selected_signal())
 		if not route.is_empty() and journey_command.is_valid():
 			var result: Dictionary = journey_command.call(command.trim_prefix("journey_"),route.id)
-			var message: Dictionary = {"journey_investigate":"Survey dispatched","journey_defend":"Defenders dispatched","journey_reinforce":"Reinforcements dispatched","journey_recall":"Party recalled"}
+			var message: Dictionary = {"journey_investigate":"Survey dispatched","journey_defend":"Defenders dispatched","journey_reinforce":"Reinforcements dispatched","journey_recall":"Party recalled","journey_approach":"Approach party sent · await return"}
 			show_feedback(message[command] if result.get("accepted",false) else result.get("reason","Response unavailable"), not result.get("accepted", false))
 		return
 	if command.begins_with("source_filter_"):
@@ -461,6 +467,13 @@ func _button_at(at: Vector2) -> String:
 			if _context_panel_rect().has_point(at): return ""
 		if _journey_attention():
 			var own_party: bool = _status.get("journey_response",{}).get("away",false) and _status.get("journey_response",{}).get("route_id","") == chosen_route.get("id")
+			if _approach_tab_rect().has_point(at): return "journey_approach_tab"
+			if approach_focus:
+				if _journey_topic_rect().has_point(at): return "journey_topic"
+				if _journey_rect("journey_investigate").has_point(at): return "journey_recall" if own_party else "rival_withdraw" if chosen_route.get("desired_workers",0) > 0 else "journey_gather" if _status.get("journey_response",{}).get("approach_reports",{}).get(chosen_route.get("id"),{}).get("outcome","") == "found" else "journey_avoid"
+				if _journey_rect("journey_defend").has_point(at) and not own_party: return "journey_approach"
+				if _journey_rect("journey_close").has_point(at): return "journey_close"
+				return "journey_panel" if _context_panel_rect().has_point(at) else ""
 			if not own_party and chosen_route.get("conflict_report", "") != "" and _journey_topic_rect().has_point(at): return "journey_topic"
 			if _rival_attention():
 				if _journey_rect("journey_close").has_point(at): return "journey_close"
@@ -1137,6 +1150,7 @@ func _draw_journey_link() -> void:
 	_label(box.get_center() + Vector2(0,5),"JOURNEY REPORTS AND RESPONSE",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
 
 func _draw_journey_context(_size: Vector2) -> void:
+	if approach_focus: _draw_approach_context(); return
 	if _rival_attention(): _draw_rival_context(); return
 	var box: Rect2 = _context_panel_rect()
 	UIStyle.surface(self, box, Color("17171b")); UIStyle.surface(self, box, Color("665047"), true)
@@ -1191,6 +1205,7 @@ func _draw_journey_context(_size: Vector2) -> void:
 	UIStyle.surface(self, back, Color("263038"))
 	_label(back.get_center() + Vector2(0, 5), "BACK TO SOURCE", Color("d5ded8"), 12, HORIZONTAL_ALIGNMENT_CENTER)
 	if not own_party and route.get("conflict_report", "") != "": _draw_journey_topic("RIVAL RESPONSE")
+	_draw_approach_tab()
 
 func _rival_attention() -> bool:
 	var route: Dictionary = _selected_route(_selected_signal())
@@ -1198,7 +1213,7 @@ func _rival_attention() -> bool:
 	return rival_focus and route.get("conflict_report", "") != "" and not (state.get("away",false) and state.get("route_id","") == route.get("id"))
 
 func _journey_topic_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x-169,548,129,44)
+	return Rect2(get_viewport_rect().size.x-213,548,85,44)
 
 func _draw_journey_topic(title: String) -> void:
 	var rect: Rect2 = _journey_topic_rect()
@@ -1229,6 +1244,40 @@ func _draw_rival_context() -> void:
 	UIStyle.surface(self,back,Color("263038"))
 	_label(back.get_center()+Vector2(0,5),"BACK TO SOURCE",Color("d5ded8"),12,HORIZONTAL_ALIGNMENT_CENTER)
 	_draw_journey_topic("SURVEY / AMBUSH")
+	_draw_approach_tab()
+
+func _approach_tab_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x-123,548,83,44)
+
+func _draw_approach_tab() -> void:
+	UIStyle.surface(self,_journey_rect("journey_close"),Color("17171b"))
+	var back: Rect2 = Rect2(get_viewport_rect().size.x-300,548,82,44)
+	UIStyle.surface(self,back,Color("263038")); _label(back.get_center()+Vector2(0,5),"SOURCE",Color("d5ded8"),11,HORIZONTAL_ALIGNMENT_CENTER)
+	var rect: Rect2 = _approach_tab_rect()
+	UIStyle.surface(self,rect,Color("594737") if approach_focus else Color("263038"))
+	_label(rect.get_center()+Vector2(0,5),"APPROACH",Color("e0c5b7"),11,HORIZONTAL_ALIGNMENT_CENTER)
+	var route: Dictionary = _selected_route(_selected_signal())
+	if approach_focus or route.get("conflict_report","") != "": _draw_journey_topic("CONFLICT" if approach_focus else "RESPONSE" if _rival_attention() else "RIVAL")
+
+func _draw_approach_context() -> void:
+	var box: Rect2 = _context_panel_rect(); UIStyle.surface(self,box,Color("17171b")); UIStyle.surface(self,box,Color("665047"),true)
+	var route: Dictionary = _selected_route(_selected_signal()); var state: Dictionary = _status.get("journey_response",{})
+	var own_party: bool = state.get("away",false) and state.get("route_id","") == route.get("id")
+	var report: Dictionary = state.get("approach_reports",{}).get(route.get("id"),{})
+	_detail_journey(box,31,"Alternate approach",20)
+	_detail_journey(box,66,"Test a longer way around this corridor")
+	_detail_journey(box,91,"Three workers + travel food",13)
+	_detail_journey(box,117,"Recall gatherers before testing",13)
+	_detail_journey(box,160,"LAST RETURNED SURVEY",12)
+	_detail_journey(box,183,{"found":"Longer approach established","danger":"Danger encountered; course unchanged","unconfirmed":"No alternative confirmed"}.get(report.get("outcome",""),"No alternate approach reported"),13)
+	if not report.is_empty(): _detail_journey(box,206,"Returned " + Copy.duration(_status.time-report.received_at) + " ago",12)
+	_detail_journey(box,238,"%d investigators assigned · %s away" % [state.workers,Copy.duration(state.age)] if own_party and state.get("testing_approach",false) else "Another response party is away" if own_party else "%d gatherers still committed" % route.get("allocated_workers",0),12)
+	_detail_journey(box,277,"New course increases travel and food",12)
+	_detail_journey(box,299,"Reported clear then; future safety unknown",11)
+	_draw_journey_action(_journey_rect("journey_investigate"),"RECALL PARTY" if own_party else "WITHDRAW GATHERERS" if route.get("desired_workers",0)>0 else "RESUME GATHERING · TARGET 5" if report.get("outcome","") == "found" else "KEEP GATHERING PAUSED","Physical return still takes time" if own_party else "Resume only when you choose")
+	if not own_party: _draw_journey_action(_journey_rect("journey_defend"),"TEST ALTERNATE APPROACH","Recall first · 3 workers + food")
+	_draw_journey_topic("CONFLICT")
+	_draw_approach_tab()
 
 func _journey_recovery(route: Dictionary) -> bool:
 	return route.get("desired_workers",0) == 0 and not _status.get("journey_response",{}).get("away",false) and not _status.get("journey_response",{}).get("outcomes",{}).get(route.get("id"),{}).is_empty()

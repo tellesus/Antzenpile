@@ -342,7 +342,7 @@ func restore(data: Dictionary) -> bool:
 		return false
 	var restored_response := JourneyResponseState.new()
 	var response_data: Variant = data.get("journey_response",restored_response.to_dict())
-	if not response_data is Dictionary or not restored_response.restore(response_data,restored_colony,restored_trails,restored_clock.simulation_time): return false
+	if not response_data is Dictionary or not restored_response.restore(response_data,restored_colony,restored_trails,restored_clock.simulation_time,restored_world): return false
 	var contacts: int = restored_rival.unreturned_contacts + (1 if restored_response.foreign_seen else 0)
 	for route: TrailRouteState in restored_trails.routes.values():
 		if (route.conflict_report != "" and route.conflict_observed_at < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL) or route.foreign_reports > restored_rival.contacts_total - contacts or (route.foreign_reports > 0 and route.last_foreign_time < Rival.CONFIG.first_tick * Clock.TICK_INTERVAL):
@@ -406,7 +406,7 @@ func restore(data: Dictionary) -> bool:
 		if record.outcome == "secured" and record.get("goal", "clear") == "hunt" and not restored_predator.killed: return false
 	if restored_response.phase == "fighting":
 		var segment: TrailSegmentState = restored_trails.segments[restored_trails.routes[restored_response.route_id].segment_id]
-		var point: Vector2 = segment.start.lerp(segment.end,float(restored_response.elapsed_ticks) / JourneyResponseState.TRAILS.leg_ticks(segment.start.distance_to(segment.end)))
+		var point: Vector2 = segment.point_at(float(restored_response.elapsed_ticks) / JourneyResponseState.TRAILS.leg_ticks(segment.length()))
 		if restored_predator.defeated_at > 0 or restored_clock.tick_count < Predator.CONFIG.first_tick or point.distance_to(Predator.CONFIG.position) > Predator.CONFIG.radius: return false
 	for pile: PileState in restored_colony.piles.values():
 		var pending: int = restored_trails.pending_for_pile(pile.id) + (defense.lost if pile.id == defense_origin else 0)

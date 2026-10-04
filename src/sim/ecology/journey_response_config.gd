@@ -14,3 +14,4 @@ extends Resource
 @export var hunt_resistance: int = 6
 @export var hunt_health: int = 3
 @export var carcass_protein: float = 24.0
+@export var bypass_offset: float = 8.0
