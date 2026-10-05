@@ -1,0 +1,15 @@
+> **ARCHIVE ONLY — frozen 2026-10-04.** Historical record; not an active plan, current contract or implementation instruction. Use the [current documentation](../../../README.md). Original path: `docs/DAUGHTER_INDEPENDENCE_EVALUATION.md`. Historical status and recommendations below apply only to their recorded build.
+
+# First daughter independence review
+
+Card 114 combines the completed ownership mechanisms; it adds no gameplay or rate change. Four ordinary paid daughters from card113 returned victories ran another 1,200 simulated seconds with Home/Daughter standing effort two each, daughter water/protein priorities, own resumed honeydew/water/protein gathering, one local climate carer, one sanitation worker and Grow intent. Parent supplies stayed stopped; no Home response labor was borrowed.
+
+All 19,200 quarter-second comparisons matched their JSON-restored twins. Living + cumulative dead − local emergence remained conserved colony-wide. Both policies retained target two, with six/seven maximum detailed agents under the shared eight cap. Local returned coverage grew to 57/68/66/70 cells. Continued real local intake was 69.91078/34.55402/51.82494/48.52337 resources; local brood emergence added 16/8/16/16 workers. Existing delivered defensive outcomes/lifetime losses remained valid across weather, scouts and gathering. [Recorded results](../../../evidence/card114_independence.json).
+
+Final daughter adult populations were 128/117/111/142. Ending stores were 3.77–14.83 carbohydrate, 11.41–23.22 protein and 24.66–68.03 water. Three daughters exposed known Queen carbohydrate reserve waiting while one was quiet. These are observed resource competition and attention, not an assertion of tuned session length or finished balance. Current local gathering/priority controls provide a response; no food injection/rate adjustment was made.
+
+Windows Godot 4.7.2: final suite remains 6,925 checks, zero failures/script errors. New evaluation script import passed. Existing 112/113 Main smoke, actual mouse/touch and inspected standard/compact graphics cover unchanged presentation; this evidence-only card does not repeat their graphical probes. Mobile/target session work remains tabled.
+
+Reproduce the ordinary setup through 108, 112 and 113 evaluators, then tests/evaluate_daughter_independence.gd. Unit/full-suite tests remain independent of ignored saves. The first daughter has paid founding/supplies, distinct local stores/care/brood/development, scouts/coverage, gathering and defensive response; knowledge initially stays shared and one response party is shared colony-wide.
+
+Next bounded feature: actual worker reinforcement of the existing daughter. Audit original Part 3 support, current physical supply route/captured phenotype bundles, migration ledgers and fixed founding conservation before specifying a small paid transfer. Do not create workers or transfer ownership at dispatch. Full mating/latent lineage selection and drift, daughter reproductive generations, multiple sites/abandonment/transport threats remain later; accepted Home brood adaptation remains.

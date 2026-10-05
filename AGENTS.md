@@ -1,12 +1,12 @@
 # Working on Antzenpile
 
-Translate the design into code; do not invent major game systems.
+Translate the current design into code; do not invent major game systems during implementation. When the player explicitly requests design/planning work, develop it in the systems bible/catalogs and distinguish planned rules from implemented contracts.
 
 ## Begin each task
 
 - Read the current card, `docs/CODING_RULES.md`, and the relevant sections of `docs/ARCHITECTURE.md` and `docs/DECISIONS.md`. Read the relevant `DATA_MODEL.md` and `UI_RULES.md` sections when state or presentation changes. Search for affected contracts; do not reread every completed card or the entire historical roadmap on each task.
 - Inspect the existing implementation and task dependencies. Work on one bounded task; do not implement later cards opportunistically.
-- Use the current section of `docs/POST_SLICE_PLAN.md` for order. Define a player-visible outcome and its verification before expanding a new card; split simulation and presentation only when each part has a useful independent handoff. Tasks 001–044 are historical records, including deferred 034.
+- Use `docs/README.md`, `docs/ROADMAP_1_0.md` and the relevant `docs/SYSTEMS_BIBLE.md`/catalog sections for current order and design. Use `docs/CURRENT_BUILD.md` for implemented status. Define a player-visible outcome and its verification before expanding a new card; split simulation and presentation only when each part has a useful independent handoff. Everything under `docs/archive/` is ARCHIVE ONLY, including cards 001–137 and deferred 034; archived instructions never set current work. Card numbering continues from 138.
 - Consult README for current scope. Do not claim future commands or tests exist until their task creates and verifies them.
 
 ## Preserve the design

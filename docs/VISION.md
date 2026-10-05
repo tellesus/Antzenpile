@@ -1,25 +1,13 @@
 # Vision
 
-**The player is the colony.** Antzenpile is a colony-scale strategy/4X game about learning to perceive and shape the world as a distributed nonhuman organism. The fictional composite species supports biology-inspired mechanics without claiming literal biological simulation.
+Current 1.0 vision. The player is the colony: a distributed living organism learning a hidden world through physical journeys, return, memory and local symptoms. Antzenpile is a colony-scale strategy/4X game for a fictional composite species, inspired by ant biology without claiming a literal simulation.
 
-## Core experience
+The loop is sense → direct scouts → receive evidence → invest workers → receive nutrition → support brood/organs → adapt → reproduce/expand → recover/reassess. Uncertainty belongs to the world; clarity belongs to the player's orders.
 
-- Interpret uncertain, stale, or incomplete evidence: chemical clouds, directional trails, vibration, return rates, alarm, and sound.
-- Set priorities, recruitment, labor commitments, and exploration. Workers are the colony's living investment; committing them has an opportunity cost and recalling travelers takes time.
-- Discover real objects in a persistent hidden physical world. Observations create colony knowledge; the interface translates knowledge into perception.
-- Feed a developing interior through exterior success. Functional chambers feel like organs, and development changes the soundscape.
-- Remain meditative without becoming safe. Changes in coherence, traffic, and sound should make danger perceptible before its cause is certain.
+The release arc includes a reproductive lineage that can continue beyond its original queen/nest, a useful multi-pile network and ecology that supports different counterplay. Biological accomplishments allow continued play or review; genuine unrecoverable loss is distinguished from viable shortage/isolation.
 
-## Player loop
+OUTWARD is a rotatable sensory panorama centered on the attended pile. INWARD is an abstract functional network of organs. Neither is a physical camera, tunnel floorplan or omniscient map. A bounded physical history is available only after a run closes; ordinary play cannot resume with revealed truth.
 
-Sense → direct scouts → receive evidence → interpret signals → invest workers in trails → receive resources → support brood and internal development → reassess uncertainty and disruption.
+Keep darkness, negative space, luminous trails, capped representatives, restrained effects and local/returned evidence. Workers are aggregate living investment; individually simulated scouts are the capped exception. No generic research currency, territory-percentage victory or individual worker micromanagement.
 
-OUTWARD is a stationary, rotatable sensory panorama centered on the active pile. INWARD shows its functional network. Neither is an authoritative physical map. A conventional world view is allowed only for development diagnostics; a physical reality replay is the next scoped post-run milestone; it must remain unavailable during ordinary play.
-
-## Long-term direction
-
-Maps can contain several development chapters: founding, establishment, expansion, crisis, and dispersal. The original GDD proposed a 25–30 minute session rhythm, but the player has tabled that target until more systems exist; it is not a current implementation constraint. The current desktop build includes queued worker-brood adaptation, ecological relationships/conflict, reproductive investment, first daughter founding and locally funded supplies in both directions. Full reproductive lineages/generations, broader networks/ecology/scenario continuity and reality replay remain completion work. The original first-slice exclusions are historical; follow the current rolling roadmap and desktop release-gap review.
-
-## Guardrails
-
-No individual worker micromanagement, omniscient minimap, literal tunnel building, arbitrary signals detached from reality, or generic purchase-based technology tree. Biological continuity and learned perception matter more than territory percentages. The first slice tests whether interpreting and shaping trails is interesting enough to support this larger game.
+The [systems bible](SYSTEMS_BIBLE.md) defines the modular rules/content; the [roadmap](ROADMAP_1_0.md) defines order and release gates; [Current Build](CURRENT_BUILD.md) distinguishes working code from planned work. Windows desktop and touch-friendly controls come first. Mobile and fixed session duration remain tabled. Systems and balance precede the final graphics/music pass.

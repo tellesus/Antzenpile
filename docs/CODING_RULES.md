@@ -2,6 +2,8 @@
 
 ## Scope and style
 
+- Current design/order lives in `SYSTEMS_BIBLE.md`, `ROADMAP_1_0.md` and their catalogs; `CURRENT_BUILD.md` records implemented status. Archived documents are historical evidence only. Do not treat a catalog entry or future schema as an existing API.
+- A modular content card names its system/catalog IDs and implements one complete useful entry before adding more. Reuse typed family owners/definitions; do not build a universal effect interpreter or speculative future scaffolding.
 - Implement one bounded task card in a small logical commit. A card should usually end in a player-visible behavior with its simulation, presentation, and evidence together; split it when the pieces need separate verification or a useful independent handoff. Avoid unrelated cleanup and unused future-system folders/classes. Expand roadmap cards against actual code before implementation.
 - Prefer typed GDScript, explicit fields and ownership, short focused functions, and descriptive names. Use snake_case files/methods/fields and PascalCase class names. Comments explain invariants and non-obvious choices.
 - Data and balance live in authored definitions/configuration. Keep provisional values visibly tunable. Favor simple, inspectable algorithms over speculative optimization or framework building.
