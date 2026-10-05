@@ -28,10 +28,10 @@ func run(test: Object) -> bool:
 	view._status.nursery_occupied_space = view._status.nursery_brood_capacity
 	test.check(not view._can_lay_brood() and not view._brood_block_reason().is_empty(), "Full Nursery retains an explanation for unavailable laying")
 	test.check(view.activate_at(view._brood_rect().get_center()) and not view._feedback.is_empty() and root.simulation.run.to_dict() == before, "Blocked brood target absorbs input without a hidden mutation")
-	var entry: Dictionary = {"knowledge_id": "known:water_01", "category": "water", "delivered_total": 5}
+	var entry: Dictionary = {"knowledge_id": "known:water_01", "category": "water", "memory_label":"C", "delivered_total": 5}
 	var name: String = Memory.display_name(entry)
 	entry.workers = 9; entry.age = 9999
-	test.check(Memory.display_name(entry) == name and name.begins_with("Water #"), "Stable colony memory name does not depend on age, labor or browser position")
+	test.check(Memory.display_name(entry) == name and name=="Water trace C", "Stable colony memory name does not depend on age, labor or browser position")
 	test.check(Memory.receipt_label({"category": "water"}, 100) == "No delivery home yet", "Water without delivery is not called food")
 	entry.receipt = {"last_at": 50, "first_at": 10, "last_amount": 5, "earlier_unrecorded": false}
 	test.check(Memory.receipt_label(entry, 100).contains("5.0 water") and Memory.first_receipt_label(entry, 100).begins_with("First delivery"), "Receipt names resource and separates first/latest intake")

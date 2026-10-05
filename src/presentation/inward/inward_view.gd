@@ -35,6 +35,7 @@ var brood_care_command: Callable
 var brood_intent_command: Callable
 var reproduction_command: Callable
 var queen_tab: String = "workers"
+var activation := preload("res://src/presentation/activation_feedback.gd").new()
 var adaptation_command: Callable
 var guest_rejection_command: Callable
 var honeydew_command: Callable
@@ -80,6 +81,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	else:
 		return
 	if activate_at(at):
+		activation.tap(at)
 		get_viewport().set_input_as_handled()
 
 
@@ -447,6 +449,7 @@ func _draw() -> void:
 		_draw_hud(size)
 		_draw_context(size)
 		_draw_controls(size)
+		activation.draw(self)
 		return
 	var centers: Dictionary = positions(size)
 	# One dark continuous material field, with no baked organs or inhabitants.
@@ -478,6 +481,7 @@ func _draw() -> void:
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
+	activation.draw(self)
 
 
 func _draw_flow(start: Vector2, finish: Vector2, representative: bool, tint: Color = Color("dcb477")) -> void:

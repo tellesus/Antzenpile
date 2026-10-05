@@ -5,6 +5,8 @@ extends RefCounted
 var id: String
 var source_knowledge_id: String
 var category: String
+var source_type: String = ""
+var memory_label: String = ""
 var bearing: Variant = null # Radians clockwise from east; null at the origin.
 var estimated_distance: float
 var uncertainty_radius: float
@@ -18,6 +20,7 @@ var traffic: Variant = null # Unknown until trail information exists.
 
 func to_dict() -> Dictionary:
 	return {"id": id, "source_knowledge_id": source_knowledge_id, "category": category,
+		"source_type":source_type,"memory_label":memory_label,
 		"bearing": bearing, "estimated_distance": estimated_distance,
 		"uncertainty_radius": uncertainty_radius, "strength": strength,
 		"confidence": confidence, "confidence_label": confidence_label,

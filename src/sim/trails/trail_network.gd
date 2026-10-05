@@ -150,6 +150,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		var source_id: String = knowledge.nodes[route.destination_knowledge_id].source_node_id
 		if not world.nodes.has(source_id):
 			return false
+		if cohort.harvest_report != null and (cohort.harvest_report.source_node_id != source_id or cohort.harvest_report.origin_pile != route.origin_pile): return false
 		if cohort.payload > float(cohort.worker_count) * CONFIG.carry_per_worker * cohort.carry_multiplier + 0.00001 or (not cohort.resource_id.is_empty() and cohort.resource_id != world.nodes[source_id].definition_id):
 			return false
 		active_counts[route.id] = active_counts.get(route.id, 0) + cohort.worker_count

@@ -333,18 +333,17 @@ func restore(data: Dictionary) -> bool:
 		used_scout_ids[evidence.scout_id] = true
 	var active_detours: int = 0
 	for cohort: TransitCohort in restored_trails.cohorts.values():
-		var scout_id: String = ""
+		var sample_ids: Array[String] = []
 		if cohort.detour != null:
 			active_detours += 1
-			scout_id = cohort.detour.id
+			sample_ids.append(cohort.detour.id)
 		elif cohort.detour_report != null:
-			scout_id = cohort.detour_report.scout_id
-		if scout_id.is_empty():
-			continue
-		var suffix: String = scout_id.trim_prefix("scout_")
-		if scout_id != "scout_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_scout_id or used_scout_ids.has(scout_id):
-			return false
-		used_scout_ids[scout_id] = true
+			sample_ids.append(cohort.detour_report.scout_id)
+		if cohort.harvest_report != null: sample_ids.append(cohort.harvest_report.scout_id)
+		for scout_id: String in sample_ids:
+			var suffix: String = scout_id.trim_prefix("scout_")
+			if scout_id != "scout_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_scout_id or used_scout_ids.has(scout_id): return false
+			used_scout_ids[scout_id] = true
 	if restored_scouts.size() + active_detours > SCOUT_CONFIG.active_cap:
 		return false
 	var restored_rain := Rain.new()

@@ -37,6 +37,7 @@ static func sample(agent: ScoutAgent, world: WorldState, config: ScoutConfig, rn
 			var error: Vector2 = Vector2.from_angle(rng.randf_range(-PI, PI)) * evidence.uncertainty_radius
 			evidence.estimated_position = (node.position + error).clamp(world.bounds.position, world.bounds.end - Vector2(0.001, 0.001))
 			evidence.proximity_confirmed = distance <= config.confirmation_radius
+			if evidence.proximity_confirmed: evidence.source_type = node.source_type
 		if not evidence.proximity_confirmed and distance < nearest:
 			nearest = distance
 			strongest = id

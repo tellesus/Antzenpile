@@ -2,6 +2,8 @@
 
 Current 1.0 design. Shared rules: [SYS-03](../SYSTEMS_BIBLE.md#sys-03-resource-sources-and-nutrition), [SYS-04](../SYSTEMS_BIBLE.md#sys-04-trails-travel-and-cargo). Delivery: [M1/M2/M6](../ROADMAP_1_0.md). [Current build](../CURRENT_BUILD.md) distinguishes physical foundations from planned type support.
 
+Identity foundation [139](../tasks/139_returned_resource_identity.md) is implemented for `flower_nectar`, `aphid_honeydew`, `insect_remains`, `hunted_arthropod` and `rain_puddle`: saved physical/evidence IDs, close/harvest return and stable labels. Their existing single-nutrient production/collection behavior is unchanged. Mixed yields and the other five profiles remain planned; the ratios below are not current conversion amounts.
+
 ## Rules family
 
 A **source type** describes an actual object or producer. A **source instance** is one physical patch/object with position, remaining portions and activity. A **memory** is dated evidence about that instance. A **trail** is a labor/travel commitment to it. These are four different things.

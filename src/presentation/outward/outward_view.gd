@@ -13,6 +13,7 @@ const Copy = preload("res://src/presentation/interface_text.gd")
 const Memories = preload("res://src/presentation/outward/source_memory.gd")
 const Conflict = preload("res://src/presentation/outward/conflict_popover.gd")
 var conflict: ConflictPopover = Conflict.new()
+var activation := preload("res://src/presentation/activation_feedback.gd").new()
 const MEMORY_CATEGORIES: Array[String] = ["carbohydrate", "protein", "water", "nest_site"]
 var sources_open: bool = false
 var source_category: String = "carbohydrate"
@@ -155,6 +156,7 @@ func _pointer_press(at: Vector2, kind: String) -> void:
 	var command: String = _button_at(at)
 	if not command.is_empty():
 		_run_command(command)
+		if not command.ends_with("_panel"): activation.tap(at)
 		return
 	if _panel_at(at):
 		return
@@ -428,6 +430,7 @@ func _conflict_route() -> Dictionary:
 	for signal_data: Dictionary in _signals:
 		if signal_data.source_knowledge_id == route.get("destination_knowledge_id", "") and signal_data.category in MEMORY_CATEGORIES:
 			route.category = signal_data.category
+			route.source_type = signal_data.get("source_type", ""); route.memory_label = signal_data.get("memory_label", "")
 			break
 	return route
 
@@ -592,6 +595,7 @@ func _draw() -> void:
 	if sources_open:
 		_draw_sources()
 	_draw_controls(size)
+	activation.draw(self)
 
 
 func _draw_pressure_attention() -> void:
@@ -788,8 +792,8 @@ func _draw_context(size: Vector2) -> void:
 	var box: Rect2 = _context_panel_rect()
 	UIStyle.surface(self, box, Color("111921"))
 	UIStyle.surface(self, box, Color("41535a"), true)
-	_label(box.position + Vector2(16, 31), Memories.display_name({"knowledge_id": selected.source_knowledge_id, "category": selected.category, "honeydew": _is_honeydew(selected)}), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
-	_label(box.position + Vector2(16, 58), "A %s trace" % selected.confidence_label, Color("d4d8d1"), 15)
+	_label(box.position + Vector2(16, 31), Copy.fit_line(Memories.display_name(selected),_font,20,260), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
+	_label(box.position + Vector2(16, 58), Copy.fit_line(Memories.description(selected) if not selected.get("source_type","").is_empty() else "A %s trace · identity unconfirmed" % selected.confidence_label,_font,12,260), Color("d4d8d1"), 12)
 	var distance_word: String = "nearby" if selected.estimated_distance < 6.0 else "within reach" if selected.estimated_distance < 14.0 else "distant"
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 15)
 	_label(box.position + Vector2(16, 109), "Last sensed " + Copy.duration(selected.age) + " ago", Color("8fa1a8"), 15)
@@ -1055,8 +1059,7 @@ func _evidence_offset() -> float:
 
 func _signal_title_for(signal_data: Dictionary) -> String:
 	if signal_data.category == "threat": return _threat_caption(signal_data)
-	if signal_data.source_knowledge_id == "known:ambusher_carcass": return "Protein remains"
-	return "Aphid honeydew" if _is_honeydew(signal_data) else _signal_title(signal_data.category)
+	return Memories.display_name(signal_data)
 
 
 func _draw_trail_button(command: String, title: String) -> void:

@@ -28,6 +28,7 @@ func load_scenario(path: String = "res://data/scenarios/backyard_slice.tres") ->
 			last_error = "Invalid authored contaminant fraction"
 			return null
 		records.append({"id": definition.id, "definition_id": definition.definition.id,
+			"source_type":definition.source_profile.id if definition.source_profile != null else "",
 			"position": [definition.position.x, definition.position.y], "quantity": definition.initial_quantity,
 			"active": definition.initial_active, "properties": {}})
 		if definition.contaminant_fraction > 0: records.back().properties.contaminant_fraction = definition.contaminant_fraction

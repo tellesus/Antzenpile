@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=18 format=3]
+[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=22 format=3]
 [ext_resource type="Script" path="res://src/sim/world/scenario_definition.gd" id="scenario"]
 [ext_resource type="Script" path="res://src/sim/world/world_node_definition.gd" id="node"]
 [ext_resource type="Script" path="res://src/sim/world/terrain_definition.gd" id="terrain"]
@@ -6,6 +6,10 @@
 [ext_resource type="Resource" path="res://data/resources/protein.tres" id="protein"]
 [ext_resource type="Resource" path="res://data/resources/water.tres" id="water"]
 [ext_resource type="Resource" path="res://data/resources/nest_site.tres" id="nest"]
+[ext_resource type="Resource" path="res://data/sources/flower_nectar.tres" id="source_nectar"]
+[ext_resource type="Resource" path="res://data/sources/insect_remains.tres" id="source_insect"]
+[ext_resource type="Resource" path="res://data/sources/rain_puddle.tres" id="source_water"]
+[ext_resource type="Resource" path="res://data/sources/aphid_honeydew.tres" id="source_honey"]
 [sub_resource type="Resource" id="nest_site"]
 script = ExtResource("node")
 id = "nest_site_01"
@@ -21,11 +25,13 @@ position = Vector2(31, 18)
 script = ExtResource("node")
 id = "carb_sheltered"
 definition = ExtResource("carb")
+source_profile = ExtResource("source_nectar")
 position = Vector2(8, 16)
 [sub_resource type="Resource" id="protein_01"]
 script = ExtResource("node")
 id = "protein_01"
 definition = ExtResource("protein")
+source_profile = ExtResource("source_insect")
 position = Vector2(9, 29)
 [sub_resource type="Resource" id="protein_picnic"]
 script = ExtResource("node")
@@ -38,11 +44,13 @@ initial_active = false
 script = ExtResource("node")
 id = "water_01"
 definition = ExtResource("water")
+source_profile = ExtResource("source_water")
 position = Vector2(14, 13)
 [sub_resource type="Resource" id="aphid_01"]
 script = ExtResource("node")
 id = "aphid_01"
 definition = ExtResource("carb")
+source_profile = ExtResource("source_honey")
 position = Vector2(12, 33)
 initial_quantity = 20.0
 [sub_resource type="Resource" id="rival_food"]

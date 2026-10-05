@@ -18,6 +18,7 @@ static func entries(signals: Array[Dictionary], status: Dictionary, category: St
 		var state: String = "Reported empty" if reported_empty else "Previously delivered" if route.get("delivered_total", 0.0) > 0 else "Trace reported"
 		if category == "nest_site": state = "Last recheck unconfirmed" if reported_empty else "Possible shelter reported"
 		result.append({"id": signal_data.id, "knowledge_id": signal_data.source_knowledge_id, "category": category,
+			"source_type":signal_data.get("source_type",""),"memory_label":signal_data.get("memory_label",""),
 			"bearing": signal_data.get("bearing"), "age": signal_data.age, "state": state,
 			"workers": route.get("allocated_workers", 0),
 			"route_id": route.get("id", ""), "route_status": route.get("status", "none"), "desired_workers": route.get("desired_workers", 0),
@@ -30,10 +31,14 @@ static func entries(signals: Array[Dictionary], status: Dictionary, category: St
 
 
 static func display_name(entry: Dictionary) -> String:
-	if entry.get("knowledge_id", "") == "known:ambusher_carcass": return "Protein remains"
-	# A stable memory tag, independent of page/filter/order and hidden source names.
-	var tag: String = str(entry.get("knowledge_id", "")).sha256_text().left(4).to_upper()
-	return ("Aphid honeydew" if entry.get("honeydew", false) else Copy.resource(entry.get("category", "")).capitalize()) + " #" + tag
+	var type: String = entry.get("source_type", "")
+	var name: String = SourceCatalog.PROFILES[type].display_name if SourceCatalog.PROFILES.has(type) else "Aphid honeydew" if entry.get("honeydew",false) else "Protein remains" if entry.get("knowledge_id",entry.get("source_knowledge_id",""))=="known:ambusher_carcass" else {"carbohydrate":"Sweet trace","protein":"Protein trace","water":"Water trace","nest_site":"Shelter memory"}.get(entry.get("category",""),"Unidentified trace")
+	var label: String = entry.get("memory_label", "")
+	return name + (" " + label if not label.is_empty() else "")
+
+static func description(entry: Dictionary) -> String:
+	var type: String = entry.get("source_type", "")
+	return SourceCatalog.PROFILES[type].description if SourceCatalog.PROFILES.has(type) else "Identity unconfirmed · return a sample"
 
 
 static func receipt_label(entry: Dictionary, time: float, destination: String = "home") -> String:

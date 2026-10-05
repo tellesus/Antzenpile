@@ -288,6 +288,8 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 	var origin: Vector2 = simulation.run.colony.piles[pile_id].position
 	for signal_data: PerceivedSignal in perception.project(simulation.run.knowledge.nodes.values(), origin, simulation.run.simulation_time):
 		var record: Dictionary = signal_data.to_dict()
+		# Older exploited/tended producer history already established this identity.
+		if record.source_knowledge_id == "known:"+HONEYDEW_CONFIG.source_id and record.source_type.is_empty() and simulation.run.honeydew.relationship in ["exploited","tended"]: record.source_type = "aphid_honeydew"
 		var route: TrailRouteState = simulation.run.trails.find_route(pile_id, signal_data.source_knowledge_id)
 		record["foreign_contact"] = route != null and route.foreign_reports > 0
 		record["conflict_report"] = route.conflict_report if route != null else ""
@@ -422,7 +424,7 @@ func scout_mission_summaries(pile_id: String) -> Array[Dictionary]:
 
 func honeydew_summary(pile_id: String) -> Dictionary:
 	var producer_knowledge_id: String = "known:" + HONEYDEW_CONFIG.source_id
-	if pile_id == "home" and simulation.run.knowledge.nodes.has(producer_knowledge_id):
+	if pile_id == "home" and simulation.run.knowledge.nodes.has(producer_knowledge_id) and (simulation.run.knowledge.nodes[producer_knowledge_id].source_type == "aphid_honeydew" or simulation.run.honeydew.relationship in ["exploited","tended"]):
 		return {"knowledge_id": producer_knowledge_id,
 			"relationship": simulation.run.honeydew.relationship,
 			"protection_workers": simulation.run.honeydew.protection_workers,
@@ -440,7 +442,7 @@ func inward_status(pile_id: String) -> Dictionary:
 	if care_plan.get("kind") == "gatherers":
 		var source_id: String = simulation.run.trails.routes[care_plan.route_id].destination_knowledge_id
 		for signal_data: PerceivedSignal in perception.project([simulation.run.knowledge.nodes[source_id]], pile.position, simulation.run.simulation_time):
-			care_source_name = SourceMemory.display_name({"knowledge_id":source_id, "category":signal_data.category, "honeydew":source_id == "known:aphid_01"})
+			care_source_name = SourceMemory.display_name(signal_data.to_dict())
 	for cohort: BroodCohort in pile.brood_cohorts:
 		brood.append(cohort.to_dict())
 	var trail_workers: int = 0

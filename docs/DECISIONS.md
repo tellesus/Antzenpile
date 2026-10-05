@@ -10,6 +10,10 @@ Planned 1.0 includes reproductive continuity/queen replacement, daughter generat
 
 The roadmap explicitly separates Post 1.0: detailed mating/individual genomes/drift, large species/empire/campaign/annual-season systems and mobile production. Existing Home trial establishment remains a migration-aware proxy. Concrete source identities require supported evidence; legacy worlds do not acquire fabricated labels. New exact balance values are provisional until a bounded card tests them. Storage remains gated by a demonstrated decision; historical deferred 034 is not an instruction to add arbitrary caps.
 
+## A88 — Autonomous systems push to beta
+
+The player authorizes continued implementation from the new roadmap without feedback pauses, aiming for a feature-complete beta before player testing/tweaks. Proceed through bounded cards and commit their verified outcomes; headless conservation/save/input/draw checks remain required. Graphical/feel/audio checks are explicitly deferred to the beta. A beta means the M1–M7 system/content/complete-run scope is present and headlessly verified, with its known visual/balance limitations stated; final M8 art/music and M9 release acceptance are not silently declared complete. No computer-use or paid testing is introduced.
+
 ## Carried-forward non-negotiable boundaries
 
 - Godot/GDScript, pinned 4.7.2 2D Compatibility; Windows desktop first, touch-friendly controls. No incidental engine/addon/library upgrade.

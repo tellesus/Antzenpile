@@ -249,6 +249,7 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 		cohort.witnessed_attack = false
 		cohort.witnessed_fighting = false
 		cohort.detour_report = null
+		cohort.harvest_report = null
 		cohort.swarm_engaged = false
 		cohort.conflict_report = ""
 		cohort.conflict_serial = 0
@@ -371,10 +372,21 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 	cohort.payload = amount
 	cohort.resource_id = node.definition_id
 	cohort.contaminant_mass = amount * node.properties.get("contaminant_fraction",0.0)
+	if amount > 0 and _run.next_scout_id < WorkerLedger.MAX_COUNT and not node.source_type.is_empty() and _run.knowledge.nodes[route.destination_knowledge_id].source_type != node.source_type:
+		var sample := Observation.new()
+		sample.scout_id = "scout_%d" % _run.next_scout_id; _run.next_scout_id += 1
+		sample.source_node_id = node.id; sample.id = sample.scout_id+":"+node.id
+		sample.origin_pile = route.origin_pile; sample.definition_id = node.definition_id; sample.source_type = node.source_type
+		sample.first_observed_at = _run.simulation_time; sample.observed_at = _run.simulation_time
+		sample.estimated_position = node.position; sample.uncertainty_radius = 0.25; sample.closest_distance = 0; sample.proximity_confirmed = true
+		cohort.harvest_report = sample
 
 
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
+	if cohort.worker_count > 0 and cohort.harvest_report != null:
+		assert(not _run.delivered_observations.has(cohort.harvest_report.id))
+		_run.delivered_observations[cohort.harvest_report.id] = cohort.harvest_report.detached_copy()
 	if cohort.detour_report != null:
 		assert(not _run.delivered_observations.has(cohort.detour_report.id))
 		_run.delivered_observations[cohort.detour_report.id] = cohort.detour_report.detached_copy()

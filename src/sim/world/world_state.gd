@@ -38,6 +38,8 @@ func restore(data: Dictionary, definition_ids: Array[String]) -> bool:
 			return _reject("Empty/duplicate node ID")
 		if not value.definition_id is String or not definition_ids.has(value.definition_id):
 			return _reject("Unknown resource definition")
+		var source_type: Variant = value.get("source_type", "")
+		if not SourceCatalog.accepts(source_type, value.definition_id): return _reject("Unknown or incompatible source type")
 		if not _numbers(value.position, 2) or not _number(value.quantity) or value.quantity < 0.0:
 			return _reject("Invalid node position/quantity")
 		var position := Vector2(value.position[0], value.position[1])
@@ -50,6 +52,7 @@ func restore(data: Dictionary, definition_ids: Array[String]) -> bool:
 		var node := WorldNode.new()
 		node.id = value.id
 		node.definition_id = value.definition_id
+		node.source_type = source_type
 		node.position = position
 		node.quantity = value.quantity
 		node.active = value.active

@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 136. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 139. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 ## Ownership and dependency direction
 
@@ -39,5 +39,7 @@ Normal OUTWARD is a 2D sensory projection; INWARD is a functional network. Views
 Expected population/carriers include owned unresolved exterior losses until reports/absence settlement. ConflictPopover uses route/local summaries only. Post-run physical history is separate and never backs the planned normal report journal. Ended runs reject gameplay commands; review cannot resume revealed play.
 
 ## Development toward modular 1.0
+
+139 separates immutable SourceProfile metadata from the existing nutrient ResourceDefinition. Fresh scenario annotations are saved on physical nodes; close scout/harvest/carcass samples establish knowledge identity. SourceCatalog names approved identities and base-26 labels, without world lookup in views. A tiny ActivationFeedback view helper acknowledges taps without run mutations. See the card for validated migration and current limitations; yields/ecology rates remain unchanged.
 
 Use current family owners and immutable authored definitions. M1/M2/M3/M5 extend schemas only when a first complete source/chamber/trait/connection entry needs them. The future catalog schema is design, not an existing API. Avoid a universal effect interpreter, speculative folders, scene-owned simulation or an engine upgrade. Update this reference after an implemented contract changes.

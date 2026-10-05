@@ -30,7 +30,7 @@ func run(test: Object) -> bool:
 	view._signals = root.sensory_snapshot("home")
 	view._status = root.outward_status("home")
 	view.selected_id = "signal:known:aphid_01"
-	test.check(view._is_honeydew(view._selected_signal()) and view._signal_title_for(view._selected_signal()) == "Aphid honeydew" and view._status.honeydew.relationship == "unknown", "Returned scout evidence names the producer without revealing its condition")
+	test.check(view._is_honeydew(view._selected_signal()) and view._signal_title_for(view._selected_signal()).begins_with("Aphid honeydew ") and view._selected_signal().source_type=="aphid_honeydew" and view._status.honeydew.relationship == "unknown", "A close returned sample names and labels the producer without revealing its condition")
 	test.check(view._button_at(view._honeydew_button_rect().get_center()).is_empty(), "Protection is not offered before a loaded trail return")
 	var before: Dictionary = game.run.to_dict()
 	view._run_command("honeydew_start")

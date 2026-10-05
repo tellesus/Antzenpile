@@ -12,7 +12,7 @@ Windows desktop comes first. Keep touch-sized controls. Mobile, a fixed session-
 
 ## Milestone order
 
-M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1–M9 are planned; none of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
+M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1 is in progress (source identity complete); M2–M9 remain planned. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
 
 | Milestone | Player outcome and required scope | Dependencies | Exit evidence |
 | --- | --- | --- | --- |
@@ -48,9 +48,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 ## Next bounded card
 
-**M1-A: concrete source identity and its knowledge projection.** Extend the existing source-definition/observation path to distinguish nutrient role from known physical source type. Name recognized nectar, aphid honeydew, insect remains and water sources through returned evidence; retain an honest unidentified nutrient trace and stable local labels for old/partial records. Preserve stored quantities, ecology rates and existing saved worlds. Define only the schema/content required for these first working entries; remaining profiles follow after yield handling.
+**M1-A complete:** [139 returned resource identity](tasks/139_returned_resource_identity.md), five source profiles, delayed sample identification, stable knowledge labels and atomic old-save fallback. Full gate 8,805 checks/0; import/Main/headless source drawing passed. Mixed yields and remaining profiles are still future work.
 
-Verify delayed identification, source-label stability through saves/pile attention, historical age, no live quantity/toxin disclosure and ordinary route selection. Add activation feedback for any controls touched in this interface pass; the interface-wide contract is SYS-13. Then continue M1 report/order work. The next INWARD pass is M2 and must include queued reproductive investment; do not replace it with another workaround that toggles Auto Brood off.
+**Next: M1-B normal-play reports and activation feedback.** Build a bounded journal only from delivered/local facts, with observation/receipt dates, coalesced routine intake and navigable important records/competing warnings. Keep reading/acknowledging separate from orders and the private replay recorder. Extend the initial neutral view tap cue into consistent feedback on all controls. Continue M1 ordinary staffing/scout/source comparisons afterward. The next INWARD pass is M2 and must include queued reproductive investment; do not replace it with another workaround that toggles Auto Brood off. Player graphical/feel checks are deferred to the feature-complete systems beta (A88).
 
 ## Release acceptance and cost discipline
 

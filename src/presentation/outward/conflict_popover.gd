@@ -223,7 +223,7 @@ func _identity(route: Dictionary, status: Dictionary) -> String:
 	return "Foreign ants" if kind(route,status)=="gather" else "Unidentified threat"
 
 func _source_name(route: Dictionary, status: Dictionary) -> String:
-	return Memory.display_name({"knowledge_id":route.get("destination_knowledge_id",""),"category":route.get("category","carbohydrate"),"honeydew":route.get("destination_knowledge_id","")==status.get("honeydew",{}).get("knowledge_id","")})
+	return Memory.display_name({"knowledge_id":route.get("destination_knowledge_id",""),"category":route.get("category","carbohydrate"),"source_type":route.get("source_type",""),"memory_label":route.get("memory_label",""),"honeydew":route.get("destination_knowledge_id","")==status.get("honeydew",{}).get("knowledge_id","")})
 
 func _impression(view: Node2D, at: Vector2, route: Dictionary, status: Dictionary) -> void:
 	var identity: String = _identity(route,status)

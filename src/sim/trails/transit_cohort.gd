@@ -39,6 +39,7 @@ var witnessed_fighting: bool = false
 var detour_attempted: bool = false
 var detour: TrailDetour
 var detour_report: Observation
+var harvest_report: Observation
 
 
 func to_dict() -> Dictionary:
@@ -56,7 +57,8 @@ func to_dict() -> Dictionary:
 		"swarm_engaged": swarm_engaged, "rival_losses": rival_losses,
 		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "conflict_serial":conflict_serial, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
-		"detour_report": detour_report.to_dict() if detour_report != null else null}
+		"detour_report": detour_report.to_dict() if detour_report != null else null,
+		"harvest_report":harvest_report.to_dict() if harvest_report != null else null}
 
 
 func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: float) -> bool:
@@ -88,6 +90,10 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	var restored_detour: TrailDetour
 	var restored_report: Observation
+	var restored_harvest: Observation
+	if data.get("harvest_report") != null:
+		restored_harvest = Evidence.new()
+		if not data.harvest_report is Dictionary or not restored_harvest.restore(data.harvest_report,world,colony,time) or data.direction != "inbound" or data.payload <= 0 or restored_harvest.source_type.is_empty() or restored_harvest.definition_id != data.resource_id: return false
 	if data.get("detour") != null:
 		restored_detour = Detour.new()
 		if not data.detour is Dictionary or not restored_detour.restore(data.detour, world, colony, time, CONFIG.side_scout_max_steps):
@@ -183,4 +189,5 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	detour_attempted = data.get("detour_attempted", false)
 	detour = restored_detour
 	detour_report = restored_report
+	harvest_report = restored_harvest
 	return true
