@@ -1,10 +1,10 @@
 # Path toward a desktop release candidate
 
-Updated through card 133. This is a completion order, not a declaration that the original game is finished or that remaining features have been cut. Windows is the current delivery target; keep touch-friendly controls. Mobile production/device work and fixed session-duration balance remain tabled.
+Updated through card 136 and player follow-up 137 (2026-10-04). This is a completion order, not a declaration that the original game is finished or that remaining features have been cut. Windows is the current delivery target; keep touch-friendly controls. Mobile production/device work and fixed session-duration balance remain tabled. Systems completion and integrated balance precede the final graphics/music pass requested by the player.
 
 ## What the current build can do
 
-Hidden-world exploration and returned source memories feed paid trails, worker brood, internal care/development, genetics and a first independently staffed Daughter. Combat now includes surveys, standing force orders, reinforcement/pressure reports, withdrawal, true alternate courses and finite edible remains. Roadside adds the first unassailable surface disturbance. Both piles can pay for physical supplies, with independent receipts on their exclusive connection. Graphics/music are substantially developed. The current full suite passes 8,405 checks; this is correctness evidence, not release acceptance.
+Hidden-world exploration and returned source memories feed paid trails, worker brood, internal care/development, genetics and a first independently staffed Daughter. Combat includes surveys, flexible force orders, physical recruitment/reinforcement, returned pressure, withdrawal, true alternate courses and finite edible remains. The direct circular response is accepted by player feedback; its feel still needs polish. Roadside adds the first unassailable surface disturbance. Both piles can pay for physical supplies, with independent receipts on their exclusive connection. Graphics/music are developed and scheduled for another final pass. The latest full suite passes 8,784 checks; this is correctness evidence, not release acceptance.
 
 ## Completed first section — post-run history (133)
 
@@ -12,19 +12,23 @@ Hidden-world exploration and returned source memories feed paid trails, worker b
 
 ## Next development section
 
-**Run continuity and endings.** Scope biological success/continuation and genuine unrecoverable failure against actual queen, brood, living-worker, recall and two-pile behavior (original Part 6 §§68–73/97–99). Reuse the completed review/new-run path, preserve viable recovery and the explicit saved slot, and avoid arbitrary fixed session thresholds. Full generations/lineage and campaign transition remain visible original-design gaps.
+**Finish the everyday decision loop and interior scheduling.** Extend accepted clarity work to ordinary gathering/scouting, retrieved reports, competing warnings and growth costs. Orders should expose commitments, waiting causes, cancellation and recovery consistently. The next INWARD systems/balance pass includes a queued queen reproductive investment while Auto Brood stays enabled, with genuine opportunity to start under space/care/food constraints. The next interface pass includes consistent activation feedback; neither is implemented by this plan update.
+
+Then scope biological success/continuation and genuinely unrecoverable failure against actual queen, brood, living-worker, recall and two-pile behavior (original Part 6 §§68–73/97–99). Reuse the completed review/new-run path, preserve viable recovery and the explicit saved slot, and avoid arbitrary fixed session thresholds. Full generations/lineage and campaign transition remain visible original-design gaps.
 
 ## Following gates, in order
 
 | Section | Player-visible result | Evidence needed before expanding further |
 | --- | --- | --- |
-| Run continuity and endings | Distinguish a viable stalled colony, biological success/continuation and genuinely unrecoverable failure; give a clear review/new-run path. | Original Part 6 §§68–73/97–99; both piles, living carers/viable brood/queens, real recall, no false extinction or free recovery. Scope exact rules before code. |
-| Original-design completion | Close the next concrete biology/network/ecology gap identified below without adding disconnected feature scaffolding. | One independently useful outcome with ordinary player-directed scenarios and honest information. |
-| Integrated gameplay | Warnings lead to useful actions; source scarcity, care, supply, adaptation and conflict remain understandable across longer ordinary runs. | Unfunded scenario continuations, saved twins, scarcity/recovery and failed/withdrawn conflicts. Balance from observed choices, with session length still tabled. |
+| Everyday decisions and INWARD scheduling | Flexible, explained ordinary staffing; clear scout priorities/source comparisons; retrieved reports and competing warnings; queued reproduction alongside Auto Brood. | Useful commands and waiting/cancel/recovery states, protected care, real costs, saved queues and no hidden-world disclosure. Resolve competing brood priority when that card is expanded. |
+| Lifecycle, continuity and endings | Sustainable queens/reproduction/inheritance plus clear viable recovery, biological continuation and genuinely unrecoverable failure. | Original Part 3/5 and Part 6 §§68–73/97–99; living carers/viable brood/queens, real recall and both piles, no false extinction or free recovery. Scope exact rules before code. |
+| Planned network and ecology depth | Progress beyond the first Daughter toward meaningful anthill expansion and source/risk strategies; complete the agreed biology/network/ecology gaps below. | Expansion versus Home growth/adaptation has a practical tradeoff; planned isolation/abandonment, route relationships and danger responses operate coherently through existing ownership/information boundaries. One independently useful outcome per card. |
+| Integrated gameplay and balance | Scarcity, care, supplies, adaptation, fighting/avoidance and expansion create understandable choices across longer ordinary runs. | Small purposeful headless continuations/saved twins plus focused player playtests, including shortages and setbacks. Compare practical choices; no paid testing or broad brute-force sweep. Session length remains tabled. |
+| Final interface, graphics and music | Consistent activation feedback at the next interface pass; final readability, visual identity, threat impressions and musical pacing after systems settle. | Player visual/audio checks of real states, both standard/compact controls and long-run fatigue; no screen monitoring. Art/audio polish cannot establish systems completion. |
 | Windows packaging and onboarding | Launch, start, save/load, resume, adjust sound, review and exit without needing the editor or developer paths. | Clean tracked-file build/export preset, compatible templates, separate user saves, asset/attribution inventory and clean-machine smoke. No package exists yet. |
 | Current-art performance and release regressions | Stable readable play through mature colonies, many signals, conflict, rain and replay. | Measured frame times/memory/load/save sizes at stated desktop hardware/resolutions and 1×–64×; input/layout, long-run and save-upgrade regressions. Previous art proofs are not a current release guarantee. |
 
-The immediate release-quality blockers are biological run outcomes and recovery, a reproducible Windows build and current integrated performance/UX evidence. Passing them does not automatically complete the wider design. Keep the eventual feature-completion decision explicit instead of calling the current sandbox a release candidate.
+The major remaining work is a complete connected strategic run, the broader planned biology/network/ecology systems, and delivery evidence for that finished build. Biological run outcomes/recovery, a reproducible Windows package and current performance/save/UX evidence remain release-quality blockers. Keep the eventual 1.0 feature-completion decision explicit against the wider design below; this update makes no silent cuts and declares no release candidate or speculative finish date.
 
 ## Original design still represented in the roadmap
 

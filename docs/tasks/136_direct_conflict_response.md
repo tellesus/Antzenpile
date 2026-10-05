@@ -1,6 +1,6 @@
 # 136 — Direct conflict response and flexible recruitment
 
-Status: complete — implementation and headless gates; player graphical review open.
+Status: complete — implementation/headless gates; player accepts the circle as a substantial improvement, with further feel/polish deferred.
 
 Accepted outcome (A84, player screenshots and follow-up): tapping a conflict opens a circular status pop-over with direct Send/Reinforce, Retreat, Investigate and Alternate Approach actions. Current returned evidence leads; older reports expand on demand. Replace the tabbed threat panel and overlapping footer navigation. Honeydew introduction is accepted by the player.
 
@@ -21,3 +21,5 @@ Final full headless suite: **8,784 checks, zero failures**, exit 0, **66.30 seco
 Changed-file groups: response/recruitment/order/save contracts and trail reservation guard; controller/semantic commands and expected workforce projection; circular OUTWARD presentation and Help; focused new recruitment/pop-over suites plus updated Home/Daughter/rival/interface regressions; architecture/data/UI/decisions/roadmap and milestone README. User audio imports/images/translations and saved colony were preserved.
 
 Handoff: player check when convenient—tap Journey Alarm, choose a nonstandard force, verify recruits' return/wait status, and try Retreat/Another Approach; check readability around the circle at the usual window size. All Hands may reduce other tasks, which need deliberate reassignment afterward. Ordinary source staffing still uses existing controls, and 12/4 are starting suggestions rather than a measured optimum. Next bounded work is report/time readability and remaining ordinary gathering/scouting/growth guidance from the review; keep worker recommendations separate from real costs and capacities. Named large animals still require an actual evidence-bearing ecology card.
+
+Player follow-up: circle still feels somewhat janky but is accepted for now as a big improvement. Consistent interface-wide click feedback is deferred to the next interface pass. Queen reproduction queueing under Auto Brood belongs to the next INWARD/balance pass (A86); systems completion precedes the final graphics/music pass. This feedback is player assessment, not a new automated graphical/performance gate.
