@@ -333,6 +333,7 @@ func outward_status(pile_id: String) -> Dictionary:
 		"other_pile":"satellite_1" if pile_id == "home" and simulation.run.colony.piles.has("satellite_1") else "home" if pile_id != "home" else "",
 		"founding":camps if pile_id == "home" else {},"home_air": simulation.heat.home_air(),
 		"available_workers": simulation.run.colony.piles[pile_id].workers_assignable,
+		"workers_total":simulation.run.colony.piles[pile_id].workers_total + simulation.run.pending_for_pile(pile_id),
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
@@ -837,6 +838,7 @@ func create_trail_for(knowledge_id: String) -> Dictionary:
 func set_trail_target(route_id: String, target: int) -> Dictionary:
 	if not _owns_food_route(route_id): return {"accepted":false, "reason":"Trail belongs to another pile or job"}
 	var accepted: bool = simulation.set_trail_workers(route_id, target)
+	if accepted and target == 0: simulation.journey_response.cancel_order(route_id)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
 
@@ -851,14 +853,29 @@ func respond_to_journey(action: String, route_id: String) -> Dictionary:
 	if not _owns_food_route(route_id): return {"accepted":false,"reason":"Journey belongs to another pile or job"}
 	var system: JourneyResponseSystem = simulation.journey_response
 	var accepted: bool = false
+	if action.begins_with("commit_") or action.begins_with("all_commit_"):
+		var parts: PackedStringArray = action.trim_prefix("all_").split("_")
+		if parts.size() != 3 or parts[1] not in ["clear", "hunt"] or not parts[2].is_valid_int() or not JourneyOrders.valid_target(int(parts[2])) or int(parts[2]) == 0: return {"accepted":false,"reason":"Choose a valid goal and worker count"}
+		accepted = system.commit_force(route_id, parts[1], int(parts[2]), action.begins_with("all_"))
+	elif action.begins_with("force_") or action.begins_with("all_force_"):
+		var count_text: String = action.trim_prefix("all_").trim_prefix("force_")
+		if not count_text.is_valid_int(): return {"accepted":false,"reason":"Choose a whole worker count"}
+		accepted = system.set_force(route_id, int(count_text), action.begins_with("all_"))
+	elif action.begins_with("gather_") or action.begins_with("all_gather_"):
+		var count_text: String = action.trim_prefix("all_").trim_prefix("gather_")
+		if not count_text.is_valid_int(): return {"accepted":false,"reason":"Choose a whole worker count"}
+		accepted = system.reinforce_gatherers(route_id, int(count_text), action.begins_with("all_"))
 	match action:
-		"force_0", "force_12", "force_16", "force_20", "force_24": accepted = system.set_force(route_id, int(action.trim_prefix("force_")))
 		"goal_clear", "goal_hunt": accepted = system.set_goal(route_id, action.trim_prefix("goal_"))
 		"approach": accepted = system.investigate_approach(route_id)
 		"investigate": accepted = system.investigate(route_id)
 		"defend": accepted = system.defend(route_id)
-		"reinforce": accepted = system.reinforce(route_id)
+		"reinforce":
+			var known: Dictionary = system.summary(inward_pile_id)
+			if known.reinforcement_pending: return {"accepted":false,"reason":"Reinforcements already sent; await a returning messenger"}
+			accepted = system.set_force(route_id, int(known.workers) + system.CONFIG.reinforcement_workers)
 		"recall": accepted = system.recall() if simulation.run.journey_response.route_id == route_id else false
+		"cancel": system.cancel_order(route_id); accepted = true
 	return {"accepted":accepted,"reason":system.last_error if not accepted else ""}
 
 

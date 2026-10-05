@@ -11,6 +11,8 @@ const SUITES: Array[Script] = [
 	preload("res://tests/test_alternate_approaches.gd"),
 	preload("res://tests/test_predator_carcass.gd"),
 	preload("res://tests/test_conflict_management.gd"),
+	preload("res://tests/test_conflict_recruitment.gd"),
+	preload("res://tests/test_conflict_popover.gd"),
 	preload("res://tests/test_conflict_settlement.gd"),
 	preload("res://tests/test_rival_counterplay.gd"),
 	preload("res://tests/test_returned_defensive_pressure.gd"),

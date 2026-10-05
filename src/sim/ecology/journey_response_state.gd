@@ -23,7 +23,7 @@ func origin_id(trails: TrailNetwork) -> String:
 	return trails.routes[route_id].origin_pile if active() and trails.routes.has(route_id) else ""
 func to_dict() -> Dictionary:
 	return {"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
-		"impact_fraction":impact_fraction, "ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict(),"orders":orders.targets.duplicate(),"goals":orders.goals.duplicate(),"approach":approach.to_dict()}
+		"impact_fraction":impact_fraction, "ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict(),"orders":orders.targets.duplicate(),"goals":orders.goals.duplicate(),"approach":approach.to_dict(),"recruitment":orders.recruitment.duplicate(true)}
 
 func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: float, world: WorldState = null) -> bool:
 	if not data.has_all(["route_id","phase","workers","elapsed_ticks","departed_at","ambush_fraction","foreign_seen","sampled_at","reports"]): return false
@@ -85,6 +85,13 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	departed_at = float(data.departed_at); ambush_fraction = float(data.ambush_fraction); foreign_seen = data.foreign_seen; sampled_at = float(data.sampled_at); reports = data.reports.duplicate(true)
 	var restored_orders := JourneyOrders.new()
 	if not restored_orders.restore(data.get("orders", {}), trails): return false
+	if not restored_orders.restore_recruitment(data.get("recruitment", {}), colony, trails): return false
+	for id: String in restored_orders.recruitment:
+		var entry: Dictionary = restored_orders.recruitment[id]
+		if entry.kind == "defend":
+			var needed: int = restored_orders.targets.get(id, 0) - restored_defense.sent if data.phase != "idle" and data.route_id == id else restored_orders.targets.get(id, 0)
+			if needed != entry.count: return false
+		elif restored_orders.targets.get(id,0) > 0 or data.phase != "idle" and data.route_id == id: return false
 	var goals: Variant = data.get("goals", {})
 	if not goals is Dictionary: return false
 	for id: Variant in goals:

@@ -74,6 +74,8 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	if not _run.trails.routes.has(route_id) or typeof(target) != TYPE_INT or not WorkerLedger.valid_count(target):
 		return _reject("Unknown route or invalid worker target")
 	var route: TrailRouteState = _run.trails.routes[route_id]
+	for entry: Dictionary in _run.journey_response.orders.recruitment.values():
+		if entry.waiting.has(route_id) and target > route.desired_workers: return _reject("Workers recalled for a conflict order; cancel that order first")
 	if target > 0 and _run.journey_response.active() and _run.journey_response.route_id == route_id and _run.journey_response.approach.candidate != null: return _reject("Wait for the alternate-approach party to return")
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "trail:" + route.id

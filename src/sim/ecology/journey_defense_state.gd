@@ -58,7 +58,7 @@ func restore(data: Dictionary, party: Dictionary, colony: ColonyState, trails: T
 	if data.mode == "defend" and (not JourneyOrders.valid_target(int(initial)) or initial == 0): return false
 	for key: String in ["sent","lost","adapted_lost","extra_workers","extra_ticks","round_ticks","rounds","reported_losses"]:
 		if not WorkerLedger.valid_count(data[key]): return false
-	if data.sent > CONFIG.dispatched_cap or data.lost > data.sent or data.adapted_lost > data.lost or int(data.extra_workers) not in [0,CONFIG.reinforcement_workers] or (data.extra_workers == 0 and data.extra_ticks != 0) or data.round_ticks > CONFIG.round_ticks or data.rounds > CONFIG.max_rounds: return false
+	if data.lost > data.sent or data.adapted_lost > data.lost or (data.extra_workers == 0 and data.extra_ticks != 0) or data.round_ticks > CONFIG.round_ticks or data.rounds > CONFIG.max_rounds: return false
 	if not data.outcome is String or data.outcome not in ["","secured","withdrew","not_found"] or not typeof(data.observed_at) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.observed_at)) or data.observed_at < 0 or data.observed_at > time or (data.outcome != "") != (data.observed_at > 0): return false
 	var profiles: Dictionary[String,int] = {}
 	var profile_total: int = 0
@@ -84,7 +84,7 @@ func restore(data: Dictionary, party: Dictionary, colony: ColonyState, trails: T
 	for id: Variant in data.outcomes:
 		var record: Variant = data.outcomes[id]
 		if not id is String or not trails.routes.has(id) or trails.routes[id].purpose != "food" or not record is Dictionary or record.size() not in [5, 6] or not record.has_all(["outcome","lost","sent","observed_at","received_at"]) or record.get("goal", "clear") not in ["clear", "hunt"]: return false
-		if record.outcome not in ["secured","withdrew","not_found"] or not WorkerLedger.valid_count(record.lost) or not WorkerLedger.valid_count(record.sent) or record.sent < CONFIG.defense_workers or record.sent > CONFIG.dispatched_cap or record.lost > record.sent: return false
+		if record.outcome not in ["secured","withdrew","not_found"] or not WorkerLedger.valid_count(record.lost) or not WorkerLedger.valid_count(record.sent) or record.sent < 1 or record.lost > record.sent: return false
 		for key: String in ["observed_at","received_at"]:
 			if not typeof(record[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(record[key])): return false
 		if record.observed_at <= 0 or record.observed_at > record.received_at or record.received_at > time: return false
@@ -99,7 +99,7 @@ func restore(data: Dictionary, party: Dictionary, colony: ColonyState, trails: T
 	elif data.mode == "investigate":
 		if party.phase == "fighting" or data.sent != CONFIG.investigation_workers or data.lost != 0 or data.extra_workers != 0 or data.rounds != 0 or data.round_ticks != 0 or data.outcome != "": return false
 	else:
-		if data.sent < CONFIG.defense_workers or (int(data.sent) - CONFIG.defense_workers) % CONFIG.reinforcement_workers != 0 or party.workers < 1 or party.workers + data.extra_workers + data.lost != data.sent: return false
+		if data.sent < 1 or party.workers < 1 or party.workers + data.extra_workers + data.lost != data.sent: return false
 		if data.observed_at > 0 and data.observed_at < party.departed_at: return false
 		if (party.phase == "inbound") != (data.outcome != "") or (party.phase == "fighting") != (data.round_ticks > 0): return false
 	combat_multiplier = float(combat); extra_combat_multiplier = float(extra_combat)

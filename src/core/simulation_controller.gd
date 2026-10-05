@@ -94,6 +94,7 @@ func _attach_run(next_run: RunState) -> void:
 	humidity = Humidity.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
+	journey_response.recruitment.jobs = {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"supplies":supply,"daughter_supplies":daughter_supply,"rejection":guest}
 	brood_care = BroodCareRelief.new(run, {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"response":journey_response,"supplies":supply,"daughter_supplies":daughter_supply,"rejection":guest})
 	run.clock.tick.connect(_tick)
 	if run.history.frames.is_empty(): run.history.record(run,true)

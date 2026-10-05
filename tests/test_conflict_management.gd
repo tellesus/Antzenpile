@@ -9,11 +9,11 @@ func run(test: Object) -> bool:
 	var root := Root.new(); root.simulation = game
 	var baseline: Dictionary = Defense.new().snapshot(game)
 	var before: Dictionary = game.run.to_dict()
-	test.check(not game.journey_response.set_force("route_1", 13) and game.run.to_dict() == before, "Invalid force budget is atomic")
+	test.check(not game.journey_response.set_force("route_1", game.run.colony.piles.home.workers_total + game.run.pending_for_pile("home") + 1) and game.run.to_dict() == before, "Force beyond the known local workforce rejects atomically")
 	test.check(root.respond_to_journey("force_16", "route_1").accepted, "Known threat accepts a persistent force budget")
 	test.check(game.run.journey_response.defense.sent == 16 and game.run.journey_response.defense.initial_sent == 16, "Initial selected force physically departs with paid labor")
 	test.check(not root.outward_status("home").journey_response.reinforcement_pending, "Initial force is not mislabeled as pending reinforcement")
-	test.check(game.journey_response.set_force("route_1", 24) and game.run.journey_response.defense.extra_workers == 4, "Raised budget sends one real reinforcement batch")
+	test.check(game.journey_response.set_force("route_1", 24) and game.run.journey_response.defense.extra_workers == 8, "Raised budget sends the selected eight additional workers with real travel")
 	var twin := Controller.new()
 	test.check(twin.restore_snapshot(Defense.new().snapshot(game)), "Force intent and travel restore")
 	while game.run.journey_response.active():
@@ -29,7 +29,7 @@ func run(test: Object) -> bool:
 	test.check(game.journey_response.set_force("route_1", 0), "Cancel waiting intent without a departure")
 	game.run.colony.piles.home.resources.carbohydrate = 30; game.advance(2)
 	test.check(not game.run.journey_response.active(), "Canceled waiting order never launches later")
-	for malformed: Variant in [-1, 13, 28, "12"]:
+	for malformed: Variant in [-1, 1.5, WorkerLedger.MAX_COUNT + 1, "12"]:
 		var broken: Dictionary = baseline.duplicate(true); broken.journey_response.orders = {"route_1":malformed}
 		test.check(not twin.restore_snapshot(broken), "Malformed saved force budget rejected")
 	var legacy: Dictionary = baseline.duplicate(true); legacy.journey_response.erase("orders"); legacy.journey_response.defense.erase("initial_sent")
@@ -42,31 +42,27 @@ func run(test: Object) -> bool:
 func _check_order_interface(test: Object, root: Node, baseline: Dictionary) -> void:
 	var game := Controller.new(); game.restore_snapshot(baseline); root.simulation = game
 	var view := View.new(); test.get_root().add_child(view)
-	view.journey_command = root.respond_to_journey
+	view.journey_command = root.respond_to_journey; view.trail_set_command = root.set_trail_target
 	view._signals = root.sensory_snapshot("home"); view._status = root.outward_status("home")
 	view.selected_id = "threat:route_1"
-	view._pointer_press(view._goal_rect("hunt").get_center(), "mouse")
-	test.check(not game.run.journey_response.active() and game.run.journey_response.orders.goals.route_1 == "hunt", "Goal choice remains separate from committing a force")
 	var before: Dictionary = game.run.to_dict()
-	view._pointer_press(view._journey_rect("journey_defend").get_center(), "touch")
-	test.check(game.run.to_dict() == before, "Staffing explanation has no invisible duplicate dispatch action")
-	view._status.trails[0].desired_workers = 0
-	view._status.journey_response.outcomes.route_1 = {"outcome": "withdrew"}
-	test.check(view._button_at(view._journey_rect("journey_defend").get_center()) == "journey_panel", "Staffing explanation after a failed attempt cannot trigger an invisible avoidance action")
-	view._status = root.outward_status("home")
+	view._pointer_press(view._conflict_rect("conflict_send").get_center(), "mouse")
+	view._pointer_press(view._conflict_rect("draft_goal").get_center(), "mouse")
+	test.check(view.conflict.editing and view.conflict.goal == "hunt" and game.run.to_dict() == before, "Choosing workers and a goal is a free draft until ORDER")
 	game.run.colony.piles.home.resources.carbohydrate = 0
-	view._pointer_press(view._force_rect(20).get_center(), "touch")
-	test.check(not game.run.journey_response.active() and game.run.journey_response.orders.targets.route_1 == 20, "Explicit total order waits when unfunded without a partial departure")
+	view.conflict.amount = 20
+	view._pointer_press(view._conflict_rect("draft_commit").get_center(), "touch")
+	test.check(not game.run.journey_response.active() and game.run.journey_response.orders.targets.route_1 == 20, "Explicit order waits when unfunded without a partial departure")
 	view._status = root.outward_status("home")
-	view._pointer_press(view._journey_rect("journey_investigate").get_center(), "mouse")
+	view._pointer_press(view._conflict_rect("conflict_retreat").get_center(), "mouse")
 	game.run.colony.piles.home.resources.carbohydrate = 30; game.advance(1)
-	test.check(not game.run.journey_response.active() and game.run.journey_response.orders.targets.route_1 == 0, "Visible cancel prevents a queued order launching after food returns")
+	test.check(not game.run.journey_response.active() and game.run.journey_response.orders.targets.route_1 == 0 and game.run.journey_response.orders.recruitment.is_empty(), "Radial retreat cancels queued recruitment before food returns")
 	view._status = root.outward_status("home")
-	for finding: String in ["", "foreign", "surface"]:
+	for finding: String in ["", "surface"]:
 		view._status.journey_response.reports.route_1 = {"finding": finding}
 		view._status.trails[0].surface_warning = finding == "surface"
-		var route: Dictionary = view._selected_route(view._selected_signal())
+		var route: Dictionary = view._conflict_route()
 		before = game.run.to_dict()
-		view._pointer_press(view._force_rect(12).get_center(), "touch")
-		test.check(not view._can_mobilize(route) and not view._mobilize_block_reason(route).is_empty() and game.run.to_dict() == before, "Unavailable defense explains delivered %s evidence and absorbs old force coordinates" % finding)
+		view._pointer_press(view._conflict_rect("conflict_send").get_center(), "touch")
+		test.check(not view.conflict.reason("conflict_send",route,view._status).is_empty() and game.run.to_dict() == before, "Unavailable response explains delivered %s evidence without dispatch" % finding)
 	view.free()

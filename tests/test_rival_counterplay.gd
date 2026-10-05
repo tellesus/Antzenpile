@@ -50,13 +50,14 @@ func run(test: Object) -> bool:
 	var view := OutwardView.new(); test.get_root().add_child(view)
 	view._status = known; view._signals = root.sensory_snapshot("home")
 	view.selected_id = "signal:known:carb_exposed"; view.trail_set_command = root.set_trail_target
+	view.journey_command = root.respond_to_journey
 	view._run_command("journey_open")
-	test.check(view._rival_attention(), "Delivered rival fighting opens its own response topic")
+	test.check(view.conflict.kind(view._conflict_route(),known)=="gather", "Delivered rival fighting offers direct gatherer reinforcement")
 	var before: Dictionary = game.run.to_dict()
-	view._run_command("journey_topic")
-	test.check(not view._rival_attention() and game.run.to_dict() == before, "Survey/ambusher topic switch issues no orders")
-	view._run_command("journey_topic")
-	var event := InputEventScreenTouch.new(); event.pressed = true; event.position = view._journey_rect("journey_defend").get_center()
+	view._run_command("conflict_reports")
+	test.check(view.conflict.history_open and game.run.to_dict() == before, "Expanding returned history issues no orders")
+	view._run_command("draft_back")
+	var event := InputEventScreenTouch.new(); event.pressed = true; event.position = view._conflict_rect("conflict_retreat").get_center()
 	view._unhandled_input(event)
 	test.check(route.desired_workers == 0, "Rival-context touch withdrawal requests real travel rather than instant release")
 	for field: String in ["count","phase","travel","budget","serial"]:

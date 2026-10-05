@@ -38,7 +38,7 @@ const TRAIL_CONFIG = preload("res://data/trails/default_trails.tres")
 const CONFIG = preload("res://data/ecology/default_journey_response.tres")
 static func valid_report(record: Variant, time: float, delivered: bool) -> bool:
 	if not record is Dictionary or record.size() != (4 if delivered else 3) or not record.has_all(["pressure","observed_at","acknowledged_sent"]): return false
-	if record.pressure not in ["holding","resisted"] or not WorkerLedger.valid_count(record.acknowledged_sent) or record.acknowledged_sent < CONFIG.defense_workers or record.acknowledged_sent > CONFIG.dispatched_cap or (int(record.acknowledged_sent)-CONFIG.defense_workers)%CONFIG.reinforcement_workers != 0: return false
+	if record.pressure not in ["holding","resisted"] or not WorkerLedger.valid_count(record.acknowledged_sent) or record.acknowledged_sent < 1: return false
 	if not typeof(record.observed_at) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(record.observed_at)) or record.observed_at <= 0 or record.observed_at > time: return false
 	if delivered and (not record.has("received_at") or not typeof(record.received_at) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(record.received_at)) or record.received_at < record.observed_at or record.received_at > time): return false
 	return true

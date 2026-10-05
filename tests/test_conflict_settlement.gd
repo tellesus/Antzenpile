@@ -62,8 +62,10 @@ func run(test: Object) -> bool:
 	view.selected_id = "signal:"+root.trail_summaries("home")[0].destination_knowledge_id
 	view.trail_set_command = root.set_trail_target; view.journey_open = true
 	test.check(view._journey_recovery(root.trail_summaries("home")[0]), "Delivered defensive endpoint exposes resuming/avoidance recovery actions")
-	var event := InputEventMouseButton.new(); event.pressed = true; event.button_index = MOUSE_BUTTON_LEFT; event.position = view._journey_rect("journey_investigate").get_center()
+	var event := InputEventMouseButton.new(); event.pressed = true; event.button_index = MOUSE_BUTTON_LEFT; event.position = view._conflict_rect("journey_close").get_center()
 	view._unhandled_input(event)
+	view.trail_create_command = root.create_trail_for
+	view._pointer_press(view._trail_button_rect("trail_create").get_center(),"mouse")
 	test.check(game.run.trails.routes.route_1.desired_workers == 5 and game.run.trails.routes.route_1.active_workers == 0, "Mouse recovery commits five real gatherers before their departure")
 	view._run_command("journey_avoid")
 	test.check(game.run.trails.routes.route_1.desired_workers == 0, "Recovery also permits continued route avoidance")

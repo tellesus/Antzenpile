@@ -7,7 +7,10 @@ const TRAILS = preload("res://data/trails/default_trails.tres")
 const PATHFINDER = preload("res://src/sim/scouting/scout_pathfinder.gd")
 var _run: RunState
 var last_error: String = ""
-func _init(run_state: RunState): _run = run_state
+var recruitment: ConflictRecruitment
+func _init(run_state: RunState):
+	_run = run_state
+	recruitment = ConflictRecruitment.new(run_state)
 
 func investigate(route_id: String) -> bool:
 	return _dispatch(route_id,"investigate",CONFIG.investigation_workers)
@@ -38,26 +41,50 @@ func investigate_approach(route_id: String) -> bool:
 	return true
 
 func defend(route_id: String, count: int = CONFIG.defense_workers) -> bool:
-	if not JourneyOrders.valid_target(count) or count == 0: return _reject("Choose 12–24 workers in groups of four")
+	if not JourneyOrders.valid_target(count) or count == 0: return _reject("Choose a positive whole worker count")
 	var report: Dictionary = _run.journey_response.reports.get(route_id,{})
 	if _surface_warning(route_id): return _reject("Surface impacts cannot be fought; withdraw or test another approach")
 	if report.get("finding","") not in ["ambush","mixed"]: return _reject("A returned ambusher survey is required")
 	if _run.journey_response.defense.outcomes.get(route_id,{}).get("outcome","") == "secured": return _reject("Ambusher addressed; survey again if journey losses continue")
 	return _dispatch(route_id,"defend",count)
 
-func set_force(route_id: String, target: int) -> bool:
+func set_force(route_id: String, target: int, all_hands: bool = false) -> bool:
 	if not _run.trails.routes.has(route_id) or not JourneyOrders.valid_target(target): return _reject("Unknown journey or invalid force budget")
 	var state: JourneyResponseState = _run.journey_response
 	if target > 0:
+		var origin: String = _run.trails.routes[route_id].origin_pile
+		if target > _run.colony.piles[origin].workers_total + _run.pending_for_pile(origin): return _reject("Order exceeds this pile's known workforce")
 		if _surface_warning(route_id): return _reject("Surface impacts cannot be fought; withdraw or test another approach")
 		if state.active() and state.route_id == route_id and state.defense.mode != "defend": return _reject("Survey away; wait for its return or recall it")
 		if state.reports.get(route_id, {}).get("finding", "") not in ["ambush", "mixed"]: return _reject("Return a predator survey first")
 		if state.defense.outcomes.get(route_id, {}).get("outcome", "") == "secured": return _reject("This predator was already addressed")
 	state.orders.targets[route_id] = target
+	recruitment.cancel(route_id)
 	if target == 0 and state.active() and state.route_id == route_id: recall()
-	else: _fund_orders()
+	elif target > 0:
+		var needed: int = target - state.defense.sent if state.active() and state.route_id == route_id else target
+		if needed > 0: recruitment.request(route_id, needed, "defend", all_hands)
+		_fund_orders()
 	last_error = ""
 	return true
+
+func reinforce_gatherers(route_id: String, count: int, all_hands: bool = false) -> bool:
+	if not _run.trails.routes.has(route_id) or not JourneyOrders.valid_target(count) or count == 0: return _reject("Choose a positive whole local worker count")
+	var route: TrailRouteState = _run.trails.routes[route_id]
+	if route.purpose != "food" or route.foreign_reports == 0 and route.conflict_report == "": return _reject("Returned foreign-ant evidence is required")
+	if _run.journey_response.active() and _run.journey_response.route_id == route_id: return _reject("A response party is already on this journey")
+	var expected: int = route.allocated_workers + _run.trails.pending_losses(route_id)
+	if expected + count > _run.colony.piles[route.origin_pile].workers_total + _run.pending_for_pile(route.origin_pile): return _reject("Order exceeds this pile's known workforce")
+	if expected > WorkerLedger.MAX_COUNT - count: return _reject("Gathering target is full")
+	_run.journey_response.orders.targets[route_id] = 0
+	recruitment.request(route_id, count, "gather", all_hands, expected + count)
+	_fund_orders()
+	last_error = ""
+	return true
+
+func cancel_order(route_id: String) -> void:
+	_run.journey_response.orders.targets[route_id] = 0
+	recruitment.cancel(route_id)
 
 func set_goal(route_id: String, goal: String) -> bool:
 	var state: JourneyResponseState = _run.journey_response
@@ -66,29 +93,63 @@ func set_goal(route_id: String, goal: String) -> bool:
 	if state.active() and state.route_id == route_id: return _reject("Goal locked for the dispatched party; recall before changing it")
 	state.orders.goals[route_id] = goal; last_error = ""; return true
 
+func commit_force(route_id: String, goal: String, count: int, all_hands: bool = false) -> bool:
+	var goals: Dictionary = _run.journey_response.orders.goals
+	var previous: String = goals.get(route_id, "")
+	if not set_goal(route_id, goal): return false
+	if set_force(route_id, count, all_hands): return true
+	if previous.is_empty(): goals.erase(route_id)
+	else: goals[route_id] = previous
+	return false
+
 func _fund_orders() -> void:
 	var state: JourneyResponseState = _run.journey_response
-	if state.active():
-		var target: int = state.orders.targets.get(state.route_id, 0)
-		if state.defense.mode == "defend" and target > state.defense.sent and not _reinforcement_pending(): reinforce(state.route_id)
-		return
 	var ids: Array = state.orders.targets.keys(); ids.sort()
 	for id: String in ids:
-		if state.orders.targets[id] > 0 and defend(id, state.orders.targets[id]): return
+		var target: int = state.orders.targets[id]
+		if target > 0 and _surface_warning(id): cancel_order(id); continue
+		var needed: int = target - state.defense.sent if state.active() and state.route_id == id else target
+		if needed > 0 and not state.orders.recruitment.has(id): recruitment.request(id, needed, "defend", false)
+	ids = state.orders.recruitment.keys(); ids.sort()
+	for id: String in ids:
+		recruitment.fill(id)
+		if not recruitment.ready(id): continue
+		var entry: Dictionary = state.orders.recruitment[id]
+		if entry.kind == "gather":
+			var locked: bool = false
+			for other: String in state.orders.recruitment:
+				if other != id and state.orders.recruitment[other].waiting.has(id): locked = true
+			if locked: continue
+			var route: TrailRouteState = _run.trails.routes[id]
+			var pile: PileState = _run.colony.piles[route.origin_pile]
+			# Release and allocate in one command, before any other system can reuse labor.
+			if pile.workers_assignable + pile.workers.count(ConflictRecruitment.pool(id)) < maxi(0, int(entry.trail_target) - route.allocated_workers - _run.trails.pending_losses(id)): continue
+			var target: int = entry.trail_target
+			recruitment.cancel(id)
+			assert(recruitment.jobs.gatherers.set_workers(id, target))
+		elif state.active():
+			if state.route_id == id and state.defense.mode == "defend" and not _reinforcement_pending():
+				reinforce(id, int(entry.count))
+		elif defend(id, int(entry.count)):
+			return
 
 func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	if state.active() or not _run.trails.routes.has(route_id): return _reject("Another party is away or the journey is unknown")
 	var route: TrailRouteState = _run.trails.routes[route_id]
 	if route.purpose != "food" or route.reported_losses <= 0: return _reject("A returned journey loss is required")
+	var pending: Dictionary = state.orders.recruitment.get(route_id, {})
+	if not pending.is_empty() and (mode != "defend" or pending.kind != "defend" or pending.count != count): return _reject("Cancel the waiting recruitment order first")
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "journey:" + pile.id
 	var cost: float = _cost(route_id,count)
-	if pile.workers_assignable < count or pile.resources.carbohydrate < cost: return _reject("Needs %d available workers and travel food" % count)
+	var recruited: bool = recruitment.ready(route_id)
+	if not recruited and pile.workers_assignable < count or pile.resources.carbohydrate < cost: return _reject("Needs %d available workers and travel food" % count)
 	if not pile.workers.create_commitment(commitment,"other",route_id): return _reject("Party commitment unavailable")
-	var allocated: bool = pile.allocate_workers(commitment,count)
+	if recruited: recruitment.consume(route_id, commitment, count)
+	else: assert(pile.allocate_workers(commitment,count))
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
-	assert(allocated and paid)
+	assert(paid)
 	state.route_id = route_id; state.phase = "outbound"; state.workers = count; state.departed_at = _run.simulation_time
 	state.defense.combat_multiplier = pile.combat_multiplier() if mode == "defend" else 1.0
 	state.defense.mode = mode; state.defense.sent = count; state.defense.initial_sent = count
@@ -99,25 +160,32 @@ func _cost(route_id: String, count: int) -> float:
 	var segment: TrailSegmentState = _run.trails.segments[_run.trails.routes[route_id].segment_id]
 	return TRAILS.round_trip_energy_cost(count,segment.length(),segment.terrain_cost(_run.world))
 
-func reinforce(route_id: String) -> bool:
+func reinforce(route_id: String, count: int = CONFIG.reinforcement_workers) -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	var defense: JourneyDefenseState = state.defense
-	if not state.active() or state.route_id != route_id or defense.mode != "defend" or defense.extra_workers > 0 or defense.sent + CONFIG.reinforcement_workers > CONFIG.dispatched_cap: return _reject("No further reinforcement can be dispatched")
+	if not JourneyOrders.valid_target(count) or count == 0 or not state.active() or state.route_id != route_id or defense.mode != "defend" or defense.extra_workers > 0 or defense.sent > WorkerLedger.MAX_COUNT - count: return _reject("No further reinforcement can be dispatched")
 	if _reinforcement_pending(): return _reject("Reinforcements already sent; await a returning messenger")
 	var pile: PileState = _run.colony.piles[state.origin_id(_run.trails)]
-	var cost: float = _cost(route_id,CONFIG.reinforcement_workers)
-	if pile.workers_assignable < CONFIG.reinforcement_workers or pile.resources.carbohydrate < cost: return _reject("Reinforcement needs four workers and travel food")
-	var allocated: bool = pile.allocate_workers("journey:"+pile.id,CONFIG.reinforcement_workers)
+	var cost: float = _cost(route_id,count)
+	var recruited: bool = recruitment.ready(route_id)
+	if not recruited and pile.workers_assignable < count or pile.resources.carbohydrate < cost: return _reject("Reinforcement needs workers and travel food")
+	if recruited:
+		var entry: Dictionary = state.orders.recruitment[route_id]
+		assert(pile.workers.transfer(ConflictRecruitment.pool(route_id), "journey:" + pile.id, count))
+		entry.count -= count
+		if entry.count == 0: recruitment.cancel(route_id)
+	else: assert(pile.allocate_workers("journey:"+pile.id,count))
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
-	assert(allocated and paid)
+	assert(paid)
 	defense.extra_combat_multiplier = pile.combat_multiplier()
-	defense.extra_workers = CONFIG.reinforcement_workers; defense.extra_ticks = 0; defense.sent += CONFIG.reinforcement_workers
+	defense.extra_workers = count; defense.extra_ticks = 0; defense.sent += count
 	last_error = ""; return true
 
 func recall() -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	if not state.active(): return _reject("No party is away")
 	state.orders.targets[state.route_id] = 0
+	recruitment.cancel(state.route_id)
 	if state.phase in ["outbound","fighting"]:
 		if state.defense.mode == "defend":
 			_return("withdrew")
@@ -177,6 +245,9 @@ func _combat() -> void:
 	var defense: JourneyDefenseState = state.defense
 	defense.round_ticks -= 1
 	if defense.round_ticks > 0: return
+	# Small new commitments obey the existing retreat threshold before risking their last reporter.
+	if state.workers - state.pressure.messengers <= CONFIG.retreat_workers:
+		_return("withdrew"); return
 	defense.rounds += 1
 	var front: int = state.workers - state.pressure.messengers
 	var resistance: int = maxi(_run.predator.resistance, CONFIG.hunt_resistance if defense.goal == "hunt" else 0)
@@ -261,6 +332,7 @@ func _sample() -> void:
 func _arrive() -> void:
 	var state: JourneyResponseState = _run.journey_response
 	state.orders.targets[state.route_id] = 0
+	recruitment.cancel(state.route_id)
 	var finding: String = "surface" if state.impact_fraction >= 0 else "mixed" if state.ambush_fraction >= 0 and state.foreign_seen else "ambush" if state.ambush_fraction >= 0 else "foreign" if state.foreign_seen else "inconclusive"
 	if state.defense.mode == "defend":
 		state.defense.outcomes[state.route_id] = {"outcome":state.defense.outcome,"lost":state.defense.lost,"sent":state.defense.sent,"observed_at":state.defense.observed_at,"received_at":_run.simulation_time}
@@ -318,9 +390,9 @@ func summary(origin_id: String = "home") -> Dictionary:
 		"workers":state.workers + state.defense.extra_workers + state.defense.lost if own_party else 0,
 		"age":_run.simulation_time - state.departed_at if own_party else 0.0,"reports":reports,"outcomes":outcomes,"force_orders":orders,"goals":goals,"goal":state.defense.goal if own_party else "",
 		"reported_losses":state.defense.reported_for_pile(origin_id),"approach_reports":approaches,"testing_approach":own_party and state.approach.candidate != null,
-		"other_party":"Home" if other == "home" else "Daughter" if other != "" else "",
+		"other_party":"Home" if other == "home" else "Daughter" if other != "" else "", "recruitment":recruitment.summary(origin_id),
 		"pressure_reports": pressure_reports, "reinforcement_pending": own_party and state.defense.mode == "defend" and _reinforcement_pending(),
-		"reinforcement_available":own_party and state.defense.mode == "defend" and not _reinforcement_pending() and state.defense.sent + CONFIG.reinforcement_workers <= CONFIG.dispatched_cap}
+		"reinforcement_available":own_party and state.defense.mode == "defend" and not _reinforcement_pending()}
 
 func _surface_warning(route_id: String) -> bool:
 	if not _run.trails.routes.has(route_id): return false
