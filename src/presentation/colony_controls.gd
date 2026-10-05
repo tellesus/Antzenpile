@@ -1,5 +1,6 @@
 class_name ColonyControls
 extends Node2D
+var activation:=preload("res://src/presentation/activation_feedback.gd").new()
 
 const UIStyle = preload("res://src/presentation/organic_ui.gd")
 ## Explicit restart choices, separate from colony actions and save slots.
@@ -29,6 +30,9 @@ const GUIDE: Array = [
 	{"title":"Keep brood care available", "lines":["Available means free to take another job.","Existing brood keeps its carers at home.","Queen and Entrance show held care workers.","If an older colony stalls, inspect Nursery.","Its named release or recall restores care.","Traveling workers must reach home first."]},
 	{"title":"Gather aphid honeydew", "lines":["Aphids are small insects that feed on plants.","They produce sugary droplets called honeydew.","Gatherers carry those carbohydrates home.","After harvesting, assign aphid attendants.","Attendants improve output; they do not gather.","They do not defend the journey from predators."]}
 ]
+
+func _ready() -> void:
+	activation.attach(self,func() -> bool: return blocked.is_valid() and blocked.call())
 
 func _process(_delta: float) -> void: queue_redraw()
 
@@ -96,6 +100,7 @@ func activate_at(at: Vector2) -> bool:
 				seed_value = int(Time.get_ticks_usec() % 2147483646) + 1
 				if seed_value == seed_provider.call(): seed_value = seed_value % 2147483646 + 1
 			var result: Dictionary = start_command.call(seed_value, selected_scenario)
+			activation.outcome(result)
 			if result.get("accepted",false): opened = false
 	return true
 
@@ -106,7 +111,9 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	var press: bool = event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+	if press: activation.begin()
 	if press and activate_at(event.position):
+		activation.tap(event.position)
 		if interaction_started.is_valid(): interaction_started.call()
 		get_viewport().set_input_as_handled()
 	elif opened: get_viewport().set_input_as_handled()

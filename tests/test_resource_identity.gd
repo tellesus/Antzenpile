@@ -80,6 +80,7 @@ func _check_harvest(test: Object) -> void:
 		var frozen: Dictionary=twin.run.to_dict()
 		test.check(not twin.restore_snapshot(broken) and twin.run.to_dict()==frozen,"Malformed source identity/label "+gate+" rejects atomically")
 	var legacy: Dictionary=saved.duplicate(true)
+	legacy.erase("reports")
 	for node: Dictionary in legacy.world.nodes: node.erase("source_type")
 	for node: Dictionary in legacy.knowledge.nodes: node.erase("source_type"); node.erase("label_index")
 	for record: Dictionary in legacy.knowledge.observations: record.evidence.erase("source_type")

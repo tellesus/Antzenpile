@@ -80,6 +80,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		at = event.position
 	else:
 		return
+	activation.begin()
 	if activate_at(at):
 		activation.tap(at)
 		get_viewport().set_input_as_handled()
@@ -90,12 +91,14 @@ func activate_at(at: Vector2) -> bool:
 		var relief: Dictionary = _status.brood_care.relief
 		if not relief.is_empty() and relief.get("kind") != "returning" and _brood_care_rect().has_point(at) and brood_care_command.is_valid():
 			var result: Dictionary = brood_care_command.call(relief.duplicate(true))
+			activation.outcome(result)
 			show_feedback(result.get("reason", "Care reassignment unavailable"))
 		return true
 	if selected_id=="entrance" and not _status.get("reinforcement",{}).is_empty() and _reinforcement_rect().has_point(at):
 		if reinforcement_command.is_valid():
 			var recall: bool=_status.reinforcement.away
 			var result: Dictionary=reinforcement_command.call(recall)
+			activation.outcome(result)
 			show_feedback(("Return requested; settled workers stay" if recall else "8 settlers and 1 messenger dispatched") if result.get("accepted",false) else result.get("reason","Reinforcement unavailable"))
 		return true
 	if selected_id == "food_exchange" and _status.get("daughter",false):
@@ -105,6 +108,7 @@ func activate_at(at: Vector2) -> bool:
 		if supply_command.is_valid():
 			var enable: bool=not _status.supply.enabled
 			var result: Dictionary=supply_command.call(enable)
+			activation.outcome(result)
 			show_feedback(("Supply workers assigned" if enable else "Stop after current trip requested" if _status.supply.status=="away" else "Idle supply workers released") if result.get("accepted",false) else result.get("reason","Supply unavailable"))
 		return true
 	if selected_id=="food_exchange" and _status.get("daughter",false) and not Pressure.food_sources_needed(_status).is_empty() and _supply_link_rect().has_point(at):
@@ -114,6 +118,7 @@ func activate_at(at: Vector2) -> bool:
 		var target: String = "home" if _status.get("daughter",false) else "satellite_1"
 		if not _status.get("other_pile_attention", {}).is_empty() and pressure_command.is_valid():
 			var result: Dictionary = pressure_command.call(target)
+			activation.outcome(result)
 			if not result.get("accepted",false): show_feedback(result.get("reason", "Internal attention unavailable"))
 		elif pile_command.is_valid(): pile_command.call(target)
 		return true
@@ -125,6 +130,7 @@ func activate_at(at: Vector2) -> bool:
 			if _reproduction_rect().has_point(at) and _status.get("reproduction",{}).get("phase","none")=="none":
 				if reproduction_command.is_valid():
 					var result: Dictionary = reproduction_command.call()
+					activation.outcome(result)
 					show_feedback("Reproductive brood laid · keep food available" if result.get("accepted",false) else Copy.reason(result.get("reason","Reproduction unavailable")))
 				return true
 			if Rect2(get_viewport_rect().size.x-316,144,292,388).has_point(at): return true
@@ -132,6 +138,7 @@ func activate_at(at: Vector2) -> bool:
 			if _brood_intent_rect(intent).has_point(at):
 				if brood_intent_command.is_valid():
 					var result: Dictionary = brood_intent_command.call(intent)
+					activation.outcome(result)
 					show_feedback(("Growth intent set" if intent == "grow" else "Manual laying selected") if result.get("accepted", false) else result.get("reason", "Intent unavailable"))
 				return true
 	if selected_id == "food_exchange":
@@ -139,6 +146,7 @@ func activate_at(at: Vector2) -> bool:
 			if _food_source_rect(resource_id).has_point(at):
 				if food_sources_command.is_valid():
 					var result: Dictionary = food_sources_command.call(resource_id)
+					activation.outcome(result)
 					if not result.get("accepted", false): show_feedback(result.get("reason", "Sources unavailable"))
 				return true
 	if selected_id == "nursery" and _status.get("nursery_expansion", {}).get("state", "") == "available" and _nursery_expand_rect().has_point(at):
@@ -221,28 +229,34 @@ func _run_command(command: String) -> void:
 		"expand_nursery":
 			if nursery_expand_command.is_valid():
 				var result: Dictionary = nursery_expand_command.call()
+				activation.outcome(result)
 				show_feedback("Nursery expansion started" if result.get("accepted", false) else result.get("reason", "Expansion unavailable"))
 		"climate_0", "climate_1", "climate_2", "climate_4":
 			if humidity_command.is_valid():
 				var result: Dictionary = humidity_command.call(int(command.trim_prefix("climate_")))
+				activation.outcome(result)
 				show_feedback("Climate carers reassigned" if result.get("accepted", false) else result.get("reason", "Climate care unavailable"))
 		"cleanup_0", "cleanup_1", "cleanup_2", "cleanup_5":
 			if sanitation_command.is_valid():
 				var result: Dictionary = sanitation_command.call(int(command.trim_prefix("cleanup_")))
+				activation.outcome(result)
 				show_feedback("Cleanup workers reassigned" if result.get("accepted", false) else result.get("reason", "Cleanup unavailable"))
 		"develop_midden":
 			if midden_develop_command.is_valid():
 				var result: Dictionary = midden_develop_command.call()
+				activation.outcome(result)
 				show_feedback("Midden development started" if result.get("accepted", false) else result.get("reason", "Development unavailable"))
 		"honeydew":
 			if honeydew_command.is_valid():
 				var tending: bool = _status.get("honeydew", {}).get("relationship", "unknown") != "tended"
 				var result: Dictionary = honeydew_command.call(tending)
+				activation.outcome(result)
 				show_feedback(("Tending started" if tending else "Tending withdrawn") if result.get("accepted", false) else Copy.reason(result.get("reason", "Relationship unavailable")))
 		"guest_rejection":
 			if guest_rejection_command.is_valid():
 				var enabled: bool = not _status.get("guest", {}).get("rejection_active", false)
 				var result: Dictionary = guest_rejection_command.call(enabled)
+				activation.outcome(result)
 				show_feedback(("Rejection effort started" if enabled else "Rejection effort stopped") if result.get("accepted", false) else result.get("reason", "Effort unavailable"))
 		"outward":
 			if mode_command.is_valid():
@@ -253,27 +267,32 @@ func _run_command(command: String) -> void:
 		"develop":
 			if develop_command.is_valid():
 				var result: Dictionary = develop_command.call()
+				activation.outcome(result)
 				_feedback = "Development started" if result.get("accepted", false) else result.get("reason", "Requirements unmet")
 				_feedback_until = Time.get_ticks_msec() + 3000
 		"develop_nursery":
 			if nursery_develop_command.is_valid():
 				var result: Dictionary = nursery_develop_command.call()
+				activation.outcome(result)
 				_feedback = "Nursery development started" if result.get("accepted", false) else result.get("reason", "Requirements unmet")
 				_feedback_until = Time.get_ticks_msec() + 3000
 		"lay_brood":
 			if brood_command.is_valid():
 				var result: Dictionary = brood_command.call()
+				activation.outcome(result)
 				_feedback = "New brood started" if result.get("accepted", false) else result.get("reason", "Brood unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
 		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance", "adaptation_fighter", "cancel_adaptation":
 			if adaptation_command.is_valid():
 				var result: Dictionary = adaptation_command.call("" if command == "cancel_adaptation" else command.trim_prefix("adaptation_"))
+				activation.outcome(result)
 				_feedback = ("Queued adaptation cleared" if command == "cancel_adaptation" else "Next brood choice saved · changeable until laid") if result.get("accepted", false) else result.get("reason", "Adaptation unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
 		"save", "load":
 			var action: Callable = save_command if command == "save" else load_command
 			if action.is_valid():
 				var result: Dictionary = action.call()
+				activation.outcome(result)
 				_feedback = ("Run saved" if command == "save" else "Run loaded") if result.get("accepted", false) else result.get("reason", "Save unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
 		_:

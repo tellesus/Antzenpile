@@ -36,6 +36,8 @@ JourneyResponse owns the shared party, private travel/sample/combat state and de
 
 ## Chronology, bounds and compatibility
 
+140 optionally saves `reports` with initialized/since/next_id/omitted/seen and cached semantic record strings. There are at most 192 rows/512 fingerprints. Flat record kind/pile/subject/detail/date/quantity/repeat/unread fields validate against owned knowledge/routes/local content, chronology and finite counts; encoded rows contain no world positions, health, private phase or replay samples. Routine intake coalesces recorded totals and stays read after acknowledgment until a distinct event. Journal quantities use canonical five-decimal display units and seen numbers normalize floats; gameplay stores are unaffected. Old absent state starts at load and is primed before new ticks. Rival scent restore recovers only ≤1e-15 JSON noise on its existing 1e-10 runtime grid.
+
 Validate finite numbers, integral counts, valid IDs/owners, chronology and capacities before mutation. Returned records cannot precede observation or exceed run time. Pending reports cannot become known through load. Lost/migrated phenotypes and queens/reproductives may not be copied between owners.
 
 RunHistory is bounded private physical recording; ended state gates commands. Its storage limits/thinning are disclosed in review. The planned normal-play journal must be a separate knowledge/local-report store. New 1.0 content IDs, queued reproduction, generalized piles and queen migration each need a bounded migration/legacy test before shipping; no future saved fields are declared present here.

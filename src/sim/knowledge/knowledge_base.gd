@@ -85,6 +85,14 @@ func last_empty_report(knowledge_id: String) -> float:
 			result = entry.time
 	return result
 
+func latest_delivery(knowledge_id: String) -> Dictionary:
+	if not nodes.has(knowledge_id): return {}
+	var selected: Observation;var received: float=-1
+	for id: String in nodes[knowledge_id].evidence_ids:
+		if _received_at[id]>received or _received_at[id]==received and (selected==null or _preferred(observations[id],selected)):
+			selected=observations[id];received=_received_at[id]
+	return {"evidence":selected.detached_copy(),"received_at":received} if selected!=null else {}
+
 
 func recovery_report(knowledge_id: String, after: float) -> bool:
 	if not nodes.has(knowledge_id):

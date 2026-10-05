@@ -20,6 +20,7 @@ var source_category: String = "carbohydrate"
 var source_page: int = 0
 var signal_provider: Callable
 var status_provider: Callable
+var caption_exclusions: Callable
 var dispatch_command: Callable
 var scout_recall_command: Callable
 var exploration_command: Callable
@@ -155,6 +156,7 @@ func _pointer_press(at: Vector2, kind: String) -> void:
 	cancel_pointer_gesture()
 	var command: String = _button_at(at)
 	if not command.is_empty():
+		activation.begin()
 		_run_command(command)
 		if not command.ends_with("_panel"): activation.tap(at)
 		return
@@ -240,6 +242,7 @@ func _run_command(command: String) -> void:
 	if command=="establish":
 		if establish_command.is_valid():
 			var result: Dictionary=establish_command.call(_selected_signal().source_knowledge_id)
+			activation.outcome(result)
 			show_feedback("Daughter pile established" if result.get("accepted",false) else result.get("reason","Establishment unavailable"))
 		return
 	if command=="inspect_daughter":
@@ -249,12 +252,14 @@ func _run_command(command: String) -> void:
 		var selected: Dictionary=_selected_signal()
 		if selected.get("category")=="nest_site" and founding_command.is_valid():
 			var result: Dictionary=founding_command.call(selected.source_knowledge_id)
+			activation.outcome(result)
 			show_feedback("Founding party dispatched · await report" if result.get("accepted",false) else result.get("reason","Founding unavailable"),not result.get("accepted",false))
 		return
 	if command == "scout_recall":
 		var mission: Dictionary = _selected_mission()
 		if mission.get("awaiting", mission.get("returned_at", 0.0) < 0.0) and scout_recall_command.is_valid():
 			var result: Dictionary = scout_recall_command.call(mission.id)
+			activation.outcome(result)
 			show_feedback("Return requested · await arrival" if result.get("accepted", false) else result.get("reason", "Recall unavailable"), not result.get("accepted", false))
 		return
 	if command == "journey_open":
@@ -274,6 +279,7 @@ func _run_command(command: String) -> void:
 		var route: Dictionary = _selected_route(_selected_signal())
 		if not route.is_empty() and journey_command.is_valid():
 			var result: Dictionary = journey_command.call(command.trim_prefix("journey_"), route.id)
+			activation.outcome(result)
 			var waiting: bool = _status.get("journey_response", {}).get("force_orders", {}).get(route.id, 0) > 0
 			show_feedback(("Goal changed for waiting order" if waiting else "Goal selected · ORDER commits workers") if result.get("accepted", false) else result.get("reason", "Unavailable"), not result.get("accepted", false))
 		return
@@ -281,6 +287,7 @@ func _run_command(command: String) -> void:
 		var route: Dictionary = _selected_route(_selected_signal())
 		if not route.is_empty() and journey_command.is_valid():
 			var result: Dictionary = journey_command.call(command.trim_prefix("journey_"), route.id)
+			activation.outcome(result)
 			var target: int = int(command.trim_prefix("journey_force_"))
 			show_feedback(("Order canceled · sent workers return by travel" if target == 0 else "Ordered %d total · sends when funded · one attempt" % target) if result.get("accepted", false) else result.get("reason", "Unavailable"), not result.get("accepted", false))
 		return
@@ -289,6 +296,7 @@ func _run_command(command: String) -> void:
 		if not route.is_empty() and trail_set_command.is_valid():
 			var target: int = route.desired_workers+SWARM_CONFIG.reinforcement_step if command == "rival_reinforce" else maxi(5,route.desired_workers) if command == "journey_gather" else 0
 			var result: Dictionary = trail_set_command.call(route.id,target)
+			activation.outcome(result)
 			var message: String = "Gathering target raised by 4; workers travel" if command == "rival_reinforce" else "Gathering ordered; safety is not guaranteed" if command == "journey_gather" else "Avoiding route; returning ants still travel"
 			show_feedback(message if result.get("accepted",false) else result.get("reason","Order unavailable"),not result.get("accepted",false))
 		return
@@ -305,6 +313,7 @@ func _run_command(command: String) -> void:
 		var route: Dictionary = _selected_route(_selected_signal())
 		if not route.is_empty() and journey_command.is_valid():
 			var result: Dictionary = journey_command.call(command.trim_prefix("journey_"),route.id)
+			activation.outcome(result)
 			var message: Dictionary = {"journey_investigate":"Survey dispatched · findings arrive on return","journey_defend":"Defenders dispatched","journey_reinforce":"Reinforcements sent · await messenger confirmation","journey_recall":"Return requested · workers still travel home","journey_approach":"Approach party sent · await return"}
 			show_feedback(message[command] if result.get("accepted",false) else result.get("reason","Response unavailable"), not result.get("accepted", false))
 		return
@@ -331,10 +340,12 @@ func _run_command(command: String) -> void:
 		"daughter_pressure":
 			if not _status.get("daughter_attention", {}).is_empty() and pressure_command.is_valid():
 				var result: Dictionary = pressure_command.call(_status.daughter_attention.get("pile_id","satellite_1"))
+				activation.outcome(result)
 				if not result.get("accepted", false): show_feedback(result.get("reason", "Internal attention unavailable"))
 		"internal_pressure":
 			if not _status.get("internal_attention", {}).is_empty() and pressure_command.is_valid():
 				var result: Dictionary = pressure_command.call(_status.get("pile_id","home"))
+				activation.outcome(result)
 				if not result.get("accepted", false): _feedback = result.get("reason", "Internal attention unavailable")
 		"sources":
 			if _journey_attention(): selected_id = ""; journey_open = false; conflict.reset()
@@ -348,6 +359,7 @@ func _run_command(command: String) -> void:
 			if not action.is_valid():
 				return
 			var result: Dictionary = action.call(signal_data.source_knowledge_id)
+			activation.outcome(result)
 			_request_rejected = not result.get("accepted", false)
 			_request_selection = selected_id
 			_feedback = ("Producers tended" if command == "honeydew_start" else "Tending withdrawn") if result.get("accepted", false) else Copy.reason(result.get("reason", "Tending unavailable"))
@@ -356,6 +368,7 @@ func _run_command(command: String) -> void:
 			if signal_data.is_empty() or not investigate_command.is_valid():
 				return
 			var result: Dictionary = investigate_command.call(signal_data.source_knowledge_id)
+			activation.outcome(result)
 			_request_rejected = not result.get("accepted", false)
 			_request_selection = selected_id
 			_feedback = "Scout sent to recheck source" if result.get("accepted", false) else result.get("reason", "Investigation unavailable")
@@ -411,13 +424,16 @@ func _run_command(command: String) -> void:
 			var action: Callable = save_command if command == "save" else load_command
 			if action.is_valid():
 				var result: Dictionary = action.call()
+				activation.outcome(result)
 				_feedback = ("Run saved" if command == "save" else "Run loaded") if result.get("accepted", false) else result.get("reason", "Save unavailable")
 		_:
 			if command.begins_with("explore_") and exploration_command.is_valid():
 				var result: Dictionary = exploration_command.call(int(command.trim_prefix("explore_")))
+				activation.outcome(result)
 				_feedback = "Exploration effort updated · surplus returns home" if result.get("accepted", false) else result.get("reason", "Exploration unavailable")
 			elif command in ["exploration_bias", "exploration_general"] and exploration_bias_command.is_valid():
 				var result: Dictionary = exploration_bias_command.call(facing if command == "exploration_bias" else null)
+				activation.outcome(result)
 				_feedback = "Exploration attention updated" if result.get("accepted", false) else result.get("reason", "Attention unavailable")
 			if command.begins_with("speed_") and speed_command.is_valid():
 				speed_command.call(int(command.trim_prefix("speed_")))
@@ -458,6 +474,7 @@ func _run_conflict_command(command: String) -> void:
 			var action: String = "gather_%d" % conflict.amount if conflict.draft_kind == "gather" else "force_%d" % (int(state.workers)+conflict.amount) if own else "commit_%s_%d" % [conflict.goal,conflict.amount]
 			if conflict.all_hands: action = "all_" + action
 			var result: Dictionary = journey_command.call(action, route.id)
+			activation.outcome(result)
 			if result.get("accepted",false): conflict.editing = false
 			show_feedback("Order accepted · recruits and reports travel" if result.get("accepted",false) else result.get("reason","Order unavailable"),not result.get("accepted",false))
 		"conflict_reports": conflict.history_open = not conflict.history_open; conflict.editing = false
@@ -470,15 +487,18 @@ func _run_conflict_command(command: String) -> void:
 			show_feedback("Response canceled · this trail's travelers return home")
 		"conflict_survey":
 			var result: Dictionary = journey_command.call("investigate",route.id)
+			activation.outcome(result)
 			show_feedback("Survey sent · learn on return" if result.get("accepted",false) else result.get("reason","Survey unavailable"),not result.get("accepted",false))
 		"conflict_approach":
 			var action: String = conflict.approach_action(route,_status)
 			if action == "waiting": show_feedback("Gatherers must reach home before the test",true); return
 			if action in ["withdraw","resume"] and trail_set_command.is_valid():
 				var result: Dictionary = trail_set_command.call(route.id,0 if action == "withdraw" else 5)
+				activation.outcome(result)
 				show_feedback(("Gatherers recalled · then test another approach" if action == "withdraw" else "Gathering resumed · future safety remains uncertain") if result.get("accepted",false) else result.get("reason","Order unavailable"),not result.get("accepted",false))
 			else:
 				var result: Dictionary = journey_command.call("approach",route.id)
+				activation.outcome(result)
 				show_feedback("Three workers testing a longer course · await return" if result.get("accepted",false) else result.get("reason","Test unavailable"),not result.get("accepted",false))
 
 
@@ -663,6 +683,8 @@ func _draw_trails(size: Vector2) -> void:
 func _prepare_signal_captions(size: Vector2) -> void:
 	_signal_labels.clear()
 	_caption_blocks.clear()
+	if caption_exclusions.is_valid():
+		for rect: Rect2 in caption_exclusions.call(): _caption_blocks.append(rect)
 	if not sources_open and not exploration_open and not _status.get("other_pile", "").is_empty(): _caption_blocks.append(_button_rect("pile"))
 	for entry: Dictionary in _placed:
 		_caption_blocks.append(Rect2(entry.center - Vector2.ONE * entry.radius, Vector2.ONE * entry.radius * 2))

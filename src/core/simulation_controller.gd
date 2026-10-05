@@ -43,6 +43,7 @@ var supply: InterpileSupplySystem
 var reinforcement: WorkerReinforcementSystem
 var founding: FoundingSystem
 var reproduction: ReproductionSystem
+var reports: ReportSystem
 
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
@@ -94,6 +95,8 @@ func _attach_run(next_run: RunState) -> void:
 	humidity = Humidity.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
+	reports = preload("res://src/sim/knowledge/report_system.gd").new(run)
+	reports.prime()
 	journey_response.recruitment.jobs = {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"supplies":supply,"daughter_supplies":daughter_supply,"rejection":guest}
 	brood_care = BroodCareRelief.new(run, {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"response":journey_response,"supplies":supply,"daughter_supplies":daughter_supply,"rejection":guest})
 	run.clock.tick.connect(_tick)
@@ -260,6 +263,7 @@ func stop_guest_rejection() -> bool:
 
 func _tick(delta: float) -> void:
 	if run.history.ended: return
+	if not run.reports.initialized: reports.prime()
 	surface_impact.tick()
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():
@@ -286,6 +290,7 @@ func _tick(delta: float) -> void:
 	daughter_supply.tick()
 	reinforcement.tick()
 	food_toxicity.tick(delta)
+	reports.capture()
 	run.history.record(run)
 
 

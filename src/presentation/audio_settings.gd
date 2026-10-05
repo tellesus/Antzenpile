@@ -1,5 +1,6 @@
 class_name AudioSettings
 extends Node2D
+var activation:=preload("res://src/presentation/activation_feedback.gd").new()
 
 const UIStyle = preload("res://src/presentation/organic_ui.gd")
 ## Shared presentation overlay. Modal input never reaches colony controls.
@@ -11,6 +12,9 @@ var interaction_started: Callable
 var opened: bool = false
 var feedback: String = ""
 var _font: Font = ThemeDB.fallback_font
+
+func _ready() -> void:
+	activation.attach(self,func() -> bool: return blocked.is_valid() and blocked.call())
 
 func _process(_delta: float) -> void: queue_redraw()
 
@@ -49,7 +53,9 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	var press: bool = event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+	if press: activation.begin()
 	if press and activate_at(event.position):
+		activation.tap(event.position)
 		if interaction_started.is_valid(): interaction_started.call()
 		get_viewport().set_input_as_handled()
 	elif opened:

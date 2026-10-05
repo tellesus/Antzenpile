@@ -25,6 +25,7 @@ var audio_preferences: AudioPreferences = preload("res://src/audio/audio_prefere
 var _audio_settings: AudioSettings
 var _review: RunReview
 var _colony_controls: ColonyControls
+var _reports_view: Node2D
 var _discovery_notice: ReturnedDiscovery = preload("res://src/presentation/returned_discovery.gd").new()
 var _discovery_reports: int = 0
 
@@ -38,6 +39,7 @@ func _ready() -> void:
 		var outward: OutwardView = Outward.new()
 		outward.signal_provider = focused_outward_signals
 		outward.status_provider = focused_outward_status
+		outward.caption_exclusions = report_regions
 		outward.dispatch_command = dispatch_facing
 		outward.scout_recall_command = recall_scout
 		outward.exploration_command = set_exploration
@@ -115,6 +117,16 @@ func _ready() -> void:
 		_colony_controls.interaction_started = cancel_field_gesture
 		_colony_controls.z_index = 101
 		add_child(_colony_controls)
+		_reports_view=preload("res://src/presentation/report_controls.gd").new()
+		_reports_view.provider=report_snapshot
+		_reports_view.inspect_command=inspect_report
+		_reports_view.need_command=inspect_need
+		_reports_view.read_command=mark_reports_read
+		_reports_view.pause_command=simulation.toggle_pause
+		_reports_view.blocked=report_controls_blocked
+		_reports_view.interaction_started=cancel_field_gesture
+		_reports_view.z_index=102
+		add_child(_reports_view)
 		_review = preload("res://src/presentation/run_review.gd").new()
 		_review.new_command = review_new_colony
 		_review.load_command = quick_load
@@ -184,15 +196,78 @@ func cancel_field_gesture() -> void:
 
 
 func interaction_blocked() -> bool:
-	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened
+	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened or _reports_view!=null and _reports_view.opened
 
 
 func sound_controls_blocked() -> bool:
-	return simulation.run.history.ended or debug_is_open() or _colony_controls != null and _colony_controls.opened
+	return simulation.run.history.ended or debug_is_open() or _colony_controls != null and _colony_controls.opened or _reports_view!=null and _reports_view.opened
 
 
 func colony_controls_blocked() -> bool:
-	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened
+	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _reports_view!=null and _reports_view.opened
+
+func report_controls_blocked() -> bool:
+	return simulation.run.history.ended or debug_is_open() or _audio_settings!=null and _audio_settings.opened or _colony_controls!=null and _colony_controls.opened or mode=="outward" and _outward_view!=null and (_outward_view.sources_open or _outward_view.exploration_open)
+
+func report_regions() -> Array[Rect2]:
+	var result: Array[Rect2]=[]
+	if _reports_view!=null and not report_controls_blocked():
+		result.append(_reports_view.button_rect())
+		if _reports_view.opened: result.append(_reports_view.panel_rect())
+	return result
+
+func report_snapshot(detailed: bool = false) -> Dictionary:
+	var journal: ReportJournal=simulation.run.reports
+	var result: Dictionary={"time":simulation.run.simulation_time,"paused":simulation.run.clock.paused,"unread":journal.unread_count(),"omitted":journal.omitted,"since":journal.since,"abbreviated":journal.omitted>0 or journal.seen.size()>=ReportJournal.SEEN_LIMIT}
+	if not detailed: return result
+	result.entries=journal.project("");result.needs=[];result.trails=[];result.sources={}
+	for id: String in simulation.run.colony.piles:
+		for need: Dictionary in Pressure.needs(inward_status(id)):
+			need.pile_id=id;result.needs.append(need)
+	for route: TrailRouteState in simulation.run.trails.routes.values(): result.trails.append({"id":route.id,"destination_knowledge_id":route.destination_knowledge_id})
+	for node: KnownNode in simulation.run.knowledge.nodes.values(): result.sources[node.id]={"category":node.definition_id,"source_type":node.source_type,"memory_label":SourceCatalog.label(node.label_index)}
+	return result
+
+func mark_reports_read(id: int) -> Dictionary:
+	if simulation.run.history.ended or id<0: return {"accepted":false,"reason":"Report unavailable"}
+	return {"accepted":simulation.run.reports.mark_read(id),"reason":""}
+
+func inspect_need(pile_id: String, organ: String) -> Dictionary:
+	if not simulation.run.colony.piles.has(pile_id): return {"accepted":false,"reason":"Pile unavailable"}
+	var valid: bool=false
+	for need: Dictionary in Pressure.needs(inward_status(pile_id)): valid=valid or need.organ==organ
+	if not valid: return {"accepted":false,"reason":"Condition improved or changed"}
+	inspect_pile(pile_id)
+	if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
+	if _reports_view!=null: _reports_view.opened=false
+	set_mode("inward")
+	return {"accepted":true,"reason":""}
+
+func inspect_report(id: int) -> Dictionary:
+	var selected: Dictionary={}
+	for entry: Dictionary in simulation.run.reports.entries:
+		if entry.id==id: selected=entry;break
+	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
+	if selected.kind in ["project","brood","trait","supplies"]:
+		inspect_pile(selected.pile_id)
+		var organ: String=selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
+		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
+		set_mode("inward")
+	else:
+		var knowledge_id: String=selected.subject_id if selected.kind=="source" else simulation.run.trails.routes[selected.subject_id].destination_knowledge_id
+		inspect_outward_pile(selected.pile_id)
+		if _outward_view!=null:
+			_outward_view.sources_open=false;_outward_view.exploration_open=false
+			_outward_view.selected_id="signal:"+knowledge_id
+			_outward_view.journey_open=selected.kind not in ["source","intake","camp"]
+			_outward_view.conflict.reset();_outward_view._process(0)
+			for signal_data: Dictionary in _outward_view._signals:
+				if signal_data.source_knowledge_id==knowledge_id and signal_data.bearing!=null: _outward_view.facing=signal_data.bearing;break
+			_outward_view._process(0)
+		set_mode("outward")
+	mark_reports_read(id)
+	if _reports_view!=null: _reports_view.opened=false
+	return {"accepted":true,"reason":""}
 
 
 func current_seed() -> int:
@@ -550,6 +625,7 @@ func quick_load() -> Dictionary:
 
 
 func _refresh_loaded_views() -> void:
+	if _reports_view!=null: _reports_view.opened=false;_reports_view.page=0;_reports_view.status={}
 	if _review != null: _review.open({})
 	set_mode("outward" if mode == "review" else mode)
 	inward_pile_id = "home"
@@ -665,7 +741,7 @@ func start_adaptation(trait_id: String) -> Dictionary:
 
 func queue_adaptation(trait_id: String) -> Dictionary:
 	var accepted: bool = simulation.queue_adaptation(inward_pile_id, trait_id)
-	return {"accepted": accepted, "reason": simulation.adaptation.last_error}
+	return {"accepted": accepted, "queued":accepted and not trait_id.is_empty(), "reason": simulation.adaptation.last_error}
 
 
 func start_nursery_development() -> Dictionary:
@@ -878,7 +954,7 @@ func respond_to_journey(action: String, route_id: String) -> Dictionary:
 			accepted = system.set_force(route_id, int(known.workers) + system.CONFIG.reinforcement_workers)
 		"recall": accepted = system.recall() if simulation.run.journey_response.route_id == route_id else false
 		"cancel": system.cancel_order(route_id); accepted = true
-	return {"accepted":accepted,"reason":system.last_error if not accepted else ""}
+	return {"accepted":accepted,"queued":accepted and simulation.run.journey_response.orders.recruitment.has(route_id),"reason":system.last_error if not accepted else ""}
 
 
 func dispatch_facing(bearing: float) -> bool:

@@ -113,6 +113,7 @@ func run(test: Object) -> bool:
 	test.check(not restored.run.restore(invalid) and restored.run.to_dict() == before, "Snapshot cannot duplicate pending and consumed evidence")
 	# A genuine unconsumed delivery remains valid and is processed on the next tick.
 	var pending: Dictionary = saved.duplicate(true)
+	pending.erase("reports") # This fixture moves receipt back before knowledge consumption.
 	pending.delivered_observations.append(pending.knowledge.observations[0].evidence.duplicate(true))
 	pending.knowledge = {"nodes": [], "observations": []}
 	test.check(restored.run.restore(pending), "Pending delivery restores before consumption")

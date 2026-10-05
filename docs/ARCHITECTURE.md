@@ -34,6 +34,8 @@ GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance 
 
 ## Information and presentation
 
+140 composes ReportSystem after fixed-tick owners. It captures only delivered knowledge/route/response records and locally visible emergence/projects/traits; it never reads World or RunHistory. Run-owned ReportJournal bounds semantic entries/seen fingerprints, caches immutable encoded rows and primes legacy loads without invented history. Normal ReportControls uses detached rows/current needs, explicit pause/read/free inspection and modal shielding. ColonyPressure.needs exposes concurrent causes and ranks ongoing clearing below untreated strain. Menu/view/review activation cues consume explicit command outcomes; accepted means accepted intent, not remote victory.
+
 Normal OUTWARD is a 2D sensory projection; INWARD is a functional network. Views send semantic callbacks and use detached approved snapshots. Source quantity/availability, enemy location/health, live combat casualties, candidate route geometry and private scout findings never enter normal UI. Current local air/weather and internal symptoms are permitted local observations.
 
 Expected population/carriers include owned unresolved exterior losses until reports/absence settlement. ConflictPopover uses route/local summaries only. Post-run physical history is separate and never backs the planned normal report journal. Ended runs reject gameplay commands; review cannot resume revealed play.

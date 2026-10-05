@@ -50,7 +50,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M1-A complete:** [139 returned resource identity](tasks/139_returned_resource_identity.md), five source profiles, delayed sample identification, stable knowledge labels and atomic old-save fallback. Full gate 8,805 checks/0; import/Main/headless source drawing passed. Mixed yields and remaining profiles are still future work.
 
-**Next: M1-B normal-play reports and activation feedback.** Build a bounded journal only from delivered/local facts, with observation/receipt dates, coalesced routine intake and navigable important records/competing warnings. Keep reading/acknowledging separate from orders and the private replay recorder. Extend the initial neutral view tap cue into consistent feedback on all controls. Continue M1 ordinary staffing/scout/source comparisons afterward. The next INWARD pass is M2 and must include queued reproductive investment; do not replace it with another workaround that toggles Auto Brood off. Player graphical/feel checks are deferred to the feature-complete systems beta (A88).
+**M1-B complete:** [140 reports/needs/feedback](tasks/140_reports_needs_and_feedback.md), a bounded delivered/local journal, grouped receipts, saved read state, free navigation, simultaneous needs and common control cues. Final full 9,043/0, import/Main/headless drawing passed.
+
+**Next: M1-C ordinary gathering orders, source comparison and scout intent.** Remove the mandatory initial five-worker batch from ordinary gathering; expose chosen whole targets, a provisional suggestion, known waiting/recall and remaining care. Compare only known intake/age/order/risk and show standing exploration/priorities clearly. Preserve explicit replacement after reported casualties and real travel. The next INWARD systems pass is M2 and must include queued reproductive investment; do not replace it with toggling Auto Brood off. Player graphical/feel checks defer to the feature-complete systems beta (A88).
 
 ## Release acceptance and cost discipline
 

@@ -44,20 +44,29 @@ static func food_sources_needed(status: Dictionary) -> Array[String]:
 	return result
 
 static func attention(status: Dictionary) -> Dictionary:
+	var items: Array[Dictionary]=needs(status)
+	return items[0].duplicate(true) if not items.is_empty() else {}
+
+static func needs(status: Dictionary) -> Array[Dictionary]:
+	var result: Array[Dictionary]=[];var ongoing: Dictionary={}
 	var causes: Array[String] = nursery_causes(status)
 	var guest: Dictionary = status.get("guest", {})
 	if guest.get("observation", "") in ["loss", "foreign"]:
 		var symptom: String = "CLEARING EFFORT" if guest.get("rejection_active", false) else "INTERNAL FOREIGNNESS" if guest.observation == "foreign" else "NURSERY LOSSES · CAUSE UNCERTAIN"
-		return {"organ": "guest", "causes": [symptom], "title": "CHECK NURSERY HARM"}
+		var need: Dictionary={"organ": "guest", "causes": [symptom], "title": "CHECK NURSERY HARM"}
+		if guest.get("rejection_active",false): ongoing=need
+		else: result.append(need)
 	if status.get("food_sharing",{}).get("recent",false):
-		return {"organ":"food_exchange","causes":[("DAUGHTER" if status.get("daughter",false) else "HOME") + " LOSSES · CAUSE UNCERTAIN"],"title":"CHECK FOOD EXCHANGE"}
+		result.append({"organ":"food_exchange","causes":[("DAUGHTER" if status.get("daughter",false) else "HOME") + " LOSSES · CAUSE UNCERTAIN"],"title":"CHECK FOOD EXCHANGE"})
+	if not causes.is_empty():
+		var organ: String = "midden" if causes == ["REFUSE"] and status.get("midden", {}).get("revealed", false) else "nursery"
+		result.append({"organ": organ, "causes": causes, "title": "CHECK " + organ.to_upper()})
 	if causes.is_empty():
 		# A conservative daughter can stop laying before larvae fail to feed.
 		# This is a known local reserve gate, not a predicted food crisis.
 		var production: Dictionary = status.get("brood_production", {})
 		var waiting: String = production.get("waiting", "")
 		if status.get("daughter", false) and production.get("intent", "manual") == "grow" and waiting in ["carbohydrate", "protein", "water", "care"]:
-			return {"organ":"queen", "causes":["GROW WAITING · " + ("CARE" if waiting == "care" else "CARB RESERVE" if waiting == "carbohydrate" else waiting.to_upper() + " RESERVE")], "title":"CHECK QUEEN"}
-		return {}
-	var organ: String = "midden" if causes == ["REFUSE"] and status.get("midden", {}).get("revealed", false) else "nursery"
-	return {"organ": organ, "causes": causes, "title": "CHECK " + organ.to_upper()}
+			result.append({"organ":"queen", "causes":["GROW WAITING · " + ("CARE" if waiting == "care" else "CARB RESERVE" if waiting == "carbohydrate" else waiting.to_upper() + " RESERVE")], "title":"CHECK QUEEN"})
+	if not ongoing.is_empty(): result.append(ongoing)
+	return result

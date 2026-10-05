@@ -1,5 +1,6 @@
 class_name RunReview
 extends Node2D
+var activation:=preload("res://src/presentation/activation_feedback.gd").new()
 ## Post-run truth only. Stored keyframes do not drive or resume simulation.
 
 const UIStyle = preload("res://src/presentation/organic_ui.gd")
@@ -25,6 +26,7 @@ func open(snapshot: Dictionary) -> void:
 
 func _ready() -> void:
 	if data.is_empty(): visible=false; set_process(false); set_process_input(false)
+	activation.attach(self,func() -> bool: return not visible)
 
 func map_rect() -> Rect2:
 	var size: Vector2 = get_viewport_rect().size
@@ -81,6 +83,7 @@ func activate_at(at: Vector2) -> bool:
 			"load":
 				if load_command.is_valid():
 					var result: Dictionary = load_command.call()
+					activation.outcome(result)
 					if not result.accepted: feedback=result.reason
 		return true
 	var recent: Array = _recent_events()
@@ -94,7 +97,9 @@ func activate_at(at: Vector2) -> bool:
 func _input(event: InputEvent) -> void:
 	if not visible: return
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT or event is InputEventScreenTouch:
-		if event.pressed: activate_at(event.position)
+		if event.pressed:
+			activation.begin()
+			if activate_at(event.position): activation.tap(event.position)
 		else: _dragging=false
 	elif _dragging and (event is InputEventMouseMotion or event is InputEventScreenDrag): _scrub(event.position)
 	get_viewport().set_input_as_handled()

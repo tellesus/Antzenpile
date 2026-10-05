@@ -41,7 +41,7 @@ func run(test: Object) -> bool:
 	view._unhandled_input(mouse)
 	test.check(view.selected_id == "guest" and root.simulation.run.to_dict() == before, "Nursery mouse link shares free attention with OUTWARD")
 	test.check(root.set_guest_rejection(true).accepted, "Known loss funds existing local rejection labor")
-	test.check(root.outward_status("home").internal_attention.causes == ["CLEARING EFFORT"], "Known assigned effort remains inspectable during clearing")
+	test.check(ColonyPressure.needs(root.inward_status("home")).any(func(need: Dictionary) -> bool: return need.organ=="guest" and need.causes==["CLEARING EFFORT"]), "Assigned clearing remains inspectable among concurrent needs without obscuring untreated strain")
 	root.simulation.advance(60.0)
 	test.check(root.guest_summary("home").observation == "purged" and root.guest_summary("home").workers_committed == 0 and root.outward_status("home").internal_attention.get("organ", "") != "guest", "Purge settles urgency and releases workers; historical losses remain")
 	root.simulation.advance(601.0)

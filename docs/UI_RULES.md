@@ -34,6 +34,8 @@ Aphid honeydew is introduced as sugary aphid droplets. Attendants improve produc
 
 ## Growth, network and presentation
 
+140 adds Reports to both normal modes, with retained returned/local history, saved unread state, grouping, observation/receipt dates, current competing needs, free inspection links and explicit Pause/Space. Reading does not automatically pause or dispatch; marking history read cannot solve a current need. Legacy/thinned history is disclosed. Report modal input shields the sensory field and other menus; source captions reserve its actual regions. A common brief neutral/accepted/queued/rejected tap cue covers views, Colony/Help, Sound, Reports and ended review; it conveys command acknowledgment, not hidden outcome. Graphical assessment remains deferred to beta.
+
 New contexts follow identity/pile → current condition/order → action/cost/waiting → evidence. Name payer/recipient and shared-connection conflicts. Carers, trial/reproductive nurses and construction labor are separate. Multiple observed needs must become discoverable in M1; the current preferred-warning system is not a complete needs journal.
 
 Keep darkness, negative space, thin luminous trails, capped representative ants and restrained effects/readability without bloom. Graphic signals explain current knowledge, not hidden parameters. Final art/music follows systems completion. No screen monitoring or desktop automation; the player supplies focused visual/audio feedback. Headless input/layout/drawing proves its tested paths, not visual feel or renderer performance.

@@ -36,6 +36,7 @@ var scout_missions: Dictionary[String, ScoutMissionMemory] = {}
 var scout_losses: Dictionary[String, int] = {}
 var next_scout_id: int = 1
 var knowledge: KnowledgeBase = Knowledge.new()
+var reports: ReportJournal = preload("res://src/sim/knowledge/report_journal.gd").new()
 var trails: TrailNetwork = Trails.new()
 var rain: RainState = Rain.new()
 var honeydew: HoneydewState = Honeydew.new()
@@ -95,7 +96,7 @@ func to_dict() -> Dictionary:
 	for id: String in ids:
 		delivered.append(delivered_observations[id].to_dict())
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
-	return {"history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
+	return {"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"daughter_supply":daughter_supply.to_dict(), "supply_origin":supply_origin,
@@ -490,6 +491,8 @@ func restore(data: Dictionary) -> bool:
 		if minimum_ticks > restored_clock.tick_count-reproductive.laid_tick: return false
 		if pile.brood_lost_total != pile.brood_health.losses + (restored_guest.reported_losses if pile.id == "home" else 0):
 			return false
+	var restored_reports := preload("res://src/sim/knowledge/report_journal.gd").new()
+	if not restored_reports.restore(data.get("reports",restored_reports.to_dict()),restored_colony,restored_knowledge,restored_trails,restored_clock.simulation_time): return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()
@@ -507,6 +510,7 @@ func restore(data: Dictionary) -> bool:
 	next_scout_id = int(data.next_scout_id)
 	delivered_observations = restored_delivered
 	knowledge = restored_knowledge
+	reports = restored_reports
 	reinforcement = restored_reinforcement
 	supply = restored_supply
 	daughter_supply = restored_daughter_supply

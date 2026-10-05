@@ -57,6 +57,9 @@ func restore(data: Dictionary, world: WorldState, tick: int) -> bool:
 	cargo = float(data.cargo)
 	stored_carbohydrate = float(data.stored_carbohydrate)
 	pheromone = float(data.pheromone)
+	# Runtime scent already uses this grid; recover only JSON representation noise.
+	var canonical_scent: float=snappedf(pheromone,0.0000000001)
+	if absf(pheromone-canonical_scent)<=1e-15: pheromone=canonical_scent
 	contacts_total = int(data.contacts_total)
 	unreturned_contacts = int(data.unreturned_contacts)
 	reinforcement = restored_reinforcement
