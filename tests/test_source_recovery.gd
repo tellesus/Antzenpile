@@ -101,7 +101,7 @@ func run(test: Object) -> bool:
 	for signal_data: Dictionary in view._signals:
 		if signal_data.source_knowledge_id == "known:carb_exposed":
 			view.selected_id = signal_data.id
-	test.check(view._investigation_title(view._selected_signal()) == "WATCH AND RESUME GATHERING" and view._recheck_title(view._selected_route(view._selected_signal())) == "TRY GATHERING", "Checking and uncertain gathering have distinct contextual names")
+	test.check(view._investigation_title(view._selected_signal()) == "WATCH · AUTO RESUME" and view._recheck_title(view._selected_route(view._selected_signal())) == "TRY GATHERING", "Checking and uncertain gathering have distinct contextual names")
 	view._pointer_press(view._investigate_button_rect().get_center(), "touch")
 	view._status = root.outward_status("home")
 	test.check(view._investigation_title(view._selected_signal()) == "STOP RECOVERY WATCH", "Touch arms a persistent watch with a clear stop action")
@@ -120,6 +120,18 @@ func run(test: Object) -> bool:
 	report(risky, risky.run.simulation_time, true)
 	risky.advance(1)
 	test.check(risky.run.trails.routes.route_1.status == "depleted", "Returned danger blocks automatic recovery and leaves manual approval to the player")
+	var risky_root := Root.new(); risky_root.simulation = risky
+	var risky_view := View.new()
+	risky_view._signals = risky_root.sensory_snapshot("home")
+	risky_view._status = risky_root.outward_status("home")
+	for signal_data: Dictionary in risky_view._signals:
+		if signal_data.source_knowledge_id == "known:carb_exposed": risky_view.selected_id = signal_data.id
+	var known_route: Dictionary = risky_view._selected_route(risky_view._selected_signal())
+	test.check(risky_view._recovery_needs_approval(known_route) and risky_view._recovery_note(known_route).contains("choose Resume"), "A confirmed new supply report still explains the required manual action after returned danger")
+	risky.trails.set_recovery_watch("route_1", false)
+	risky_view._status = risky_root.outward_status("home")
+	test.check(risky_view._investigation_title(risky_view._selected_signal()) == "WATCH · MANUAL RESUME", "A risky recovery watch never promises automatic gathering")
+	risky_view.free(); risky_root.free()
 	var stopped := fixture()
 	stopped.trails.set_recovery_watch("route_1", true)
 	stopped.set_trail_workers("route_1", 0)

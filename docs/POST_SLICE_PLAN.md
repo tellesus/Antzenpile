@@ -1,8 +1,12 @@
 # Post-slice development plan
 
-## Consultancy review — 134 complete; recommendations pending acceptance
+## Current priority — player-led gameplay clarity (accepted 2026-10-04)
 
-The player's 2026-10-04 gameplay/communication review is recorded in [findings and staged improvement plan](GAMEPLAY_REVIEW_2026_10_04.md) and [card 134](tasks/134_gameplay_consultancy_review.md). New background evidence covers nine ordinary economic runs, fifteen ambusher branches and twelve rival branches; the full suite recorded 8,405 passing checks. Recommended priorities are honest order/recovery wording, persistent returned reports and readable decision time, then scouting/source/growth/trait/network clarity before measured tuning. This review changes no gameplay or locked decision. Its proposed short clarity milestone is not yet accepted as a replacement for the current completion order below.
+[135 order/recovery clarity](tasks/135_order_and_recovery_clarity.md) is complete: explicit orders, unavailable-action reasons, accurate recovery/recall wording and an aphid honeydew introduction; 8,421 headless checks and Main passed. Player visual feedback remains open. Next scope flexible worker commitments together with direct conflict controls: alerting trail first, nest second, explicit all-hands before other jobs; then the circular radial pop-over with returned status and evidence-based threat impressions. Keep each handoff useful and independently verified. Follow with persistent reports/time readability and remaining source/scouting/growth guidance from the review. Use existing assets/code, headless checks and focused player playtests only; $0 budget and limited compute. No screen monitoring or hired testers. Desktop endings remain the next broader feature after this accepted clarity milestone.
+
+## Consultancy review — 134 complete; direction refined by player testing
+
+The player's 2026-10-04 gameplay/communication review is recorded in [findings and staged improvement plan](GAMEPLAY_REVIEW_2026_10_04.md) and [card 134](tasks/134_gameplay_consultancy_review.md). Background evidence covers nine ordinary economic runs, fifteen ambusher branches and twelve rival branches; the full suite recorded 8,405 passing checks. The player's subsequent testing accepts a clarity milestone with staffing, conflict navigation and aphid introduction refinements, recorded in A84 and prioritized above. Historical priorities below remain context.
 
 ## Current priority — desktop completion path (132–133)
 

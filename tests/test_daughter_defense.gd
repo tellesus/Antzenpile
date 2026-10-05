@@ -77,7 +77,7 @@ func run(test: Object) -> bool:
  test.check(Parent.new().exact(game,200) and not game.run.journey_response.active() and game.run.colony.piles.satellite_1.workers_available==local and game.run.predator.defeated_at==0,"Physical recalled local party meets its batch and returns all workers")
  var view:=View.new();test.get_root().add_child(view);view.journey_command=root.respond_to_journey
  view._signals=root.sensory_snapshot("satellite_1");view._status=root.outward_status("satellite_1");view.selected_id="threat:"+route.id
- view._pointer_press(view._journey_rect("journey_defend").get_center(),"mouse")
+ view._pointer_press(view._force_rect(12).get_center(),"mouse")
  test.check(game.run.journey_response.defense.mode=="defend","Mouse local mobilization uses the returned ambusher control")
  game.advance(4);view._status=root.outward_status("satellite_1");view._pointer_press(view._journey_rect("journey_defend").get_center(),"touch")
  test.check(game.run.journey_response.defense.extra_workers==4,"Touch reinforcement funds the same local semantic command")

@@ -33,7 +33,7 @@ static func display_name(entry: Dictionary) -> String:
 	if entry.get("knowledge_id", "") == "known:ambusher_carcass": return "Protein remains"
 	# A stable memory tag, independent of page/filter/order and hidden source names.
 	var tag: String = str(entry.get("knowledge_id", "")).sha256_text().left(4).to_upper()
-	return ("Honeydew" if entry.get("honeydew", false) else Copy.resource(entry.get("category", "")).capitalize()) + " #" + tag
+	return ("Aphid honeydew" if entry.get("honeydew", false) else Copy.resource(entry.get("category", "")).capitalize()) + " #" + tag
 
 
 static func receipt_label(entry: Dictionary, time: float, destination: String = "home") -> String:

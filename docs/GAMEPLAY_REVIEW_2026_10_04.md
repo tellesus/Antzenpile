@@ -223,20 +223,20 @@ Long-term replayability needs more than new seed labels: current scenario layout
 
 ## Recommended implementation sequence
 
-Expand one bounded card at a time against the actual code. Do not prewrite a large backlog of speculative systems. This is a proposed short clarity milestone before resuming the release path, not an automatic replacement of the existing priority on run continuity/endings.
+Expand one bounded card at a time against the actual code. Do not prewrite a large backlog of speculative systems. The player has accepted the first clarity step before run continuity/endings, with these refinements: flexible worker counts with honest suggested sizes; conflict staffing from the alerted trail, then the nest, with explicit all-hands before other jobs; a circular radial conflict pop-over with unfolding returned status; evidence-based threat impressions; and a clear aphid honeydew introduction. Card 135 handles current order/recovery wording and the introduction. The integrated recruitment/response follow-up must implement the new worker policy before claiming it in the UI. No paid testing or screen monitoring.
 
 | Stage | Bounded player-visible outcomes, in order | Exit evidence |
 | --- | --- | --- |
 | A — Trust the controls | Explicit force-order actions; accurate watch/recall/waiting language; Nursery cause/assignment explanations. Then make simultaneous local needs discoverable. | No misleading dispatch/auto-resume promises. Relevant funded/blocked/returning scenarios, approved-data boundary checks and standard/compact input/readability checks. |
 | B — Notice and understand | Bounded returned-report history with links; consistent pause access and optional important-event interruption. Then the short contextual opening guide and topic-based help. | A novice completes the first loop; critical evidence remains retrievable at every speed; no private event triggers. |
 | C — Choose a strategy | Source comparisons and exploration priorities; combat goal/aftermath organization; current trait-expression explanation. Then local growth/network commitment summaries. | Players can explain costs, ownership and plausible alternatives before acting, and recognize the result afterward. Existing mechanics remain conserved and headless. |
-| D — Improve measured decisions | Paired human playtests and ordinary-command continuation comparisons. Adjust only demonstrated pacing, opportunity-cost or balance problems. Resume scoped endings/completion work with clearer gameplay evidence. | Multiple useful strategies, viable recovery, less clerical command repetition and no loss of uncertainty. Publish each accepted tuning change with its before/after evidence. |
+| D — Improve measured decisions | Focused feedback from the player's ordinary sessions and small targeted headless comparisons only where needed. Reuse existing measurements. Adjust demonstrated pacing, opportunity-cost or balance problems, then resume endings/completion. | Useful choices, viable recovery and less clerical repetition in the player's experience; acknowledge the limited sample. Publish each accepted tuning change with its before/after evidence. |
 
 Stages A–C primarily improve presentation/approved summaries. Reports persistence and pause preferences need explicit ownership/save contracts. Any change to automatic recovery eligibility, supply routing, adaptive scout intent, trait effects or biological endings is a separately accepted mechanics change. Do not amend the decision register merely to record recommendations as though the player had chosen them.
 
 ## Playtest and acceptance plan
 
-Run an initial formative round with roughly five unfamiliar players and two returning players, then repeat the problematic tasks after fixes. This is a suggested research sample, not statistical proof. Use the same build/settings and include one delayed-discovery seed. Observe real decisions; do not coach them through the panels.
+Player constraints accepted after the review: $0 budget, limited compute, no hired testers and no agent-driven computer use or screen monitoring. Use the player's ordinary sessions for short, specific questions from the table below; do not require recruitment or a research sample. Run focused headless regressions while changing behavior and the required full suite after final changes, reusing existing evidence instead of repeating broad evaluations. Ask for a targeted manual check only where perception or usability cannot be established headlessly. Record uncertainty rather than treating one person's feedback as statistical proof.
 
 | Task | What to observe |
 | --- | --- |
@@ -257,7 +257,7 @@ Each implementation card follows the normal targeted → final full-headless →
 
 ## Recommended next action
 
-Begin with the bounded **order clarity and recovery wording** outcome from Stage A. It has high confidence, touches existing interactions, and directly prevents costly misunderstandings. Follow immediately with reports/time-control work so the next playtest measures decisions that players can actually see and respond to. Preserve the source-backed desktop completion plan while this proposed clarity milestone is considered.
+Begin with the accepted bounded **order clarity and recovery wording** outcome from Stage A, including aphid honeydew introduction. Next address the player's flexible staffing and direct conflict-response feedback, then reports/time-control clarity. Preserve the source-backed desktop completion plan and keep testing within the $0, headless-plus-player-feedback constraint.
 
 ## Implementation evidence map
 
