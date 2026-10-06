@@ -12,6 +12,9 @@ var direction: String = "outbound"
 var worker_count: int = 0
 var resource_id: String = ""
 var payload: float = 0.0
+var cargo_source_type: String=""
+var cargo_yields: Dictionary[String,float]={}
+var cargo_bulk: float=1.0
 var contaminant_mass: float = 0.0
 var remaining_ticks: int = 1
 var unpaid_energy_cost: float = 0.0
@@ -46,6 +49,7 @@ func to_dict() -> Dictionary:
 	return {"id": id, "route_id": route_id, "direction": direction,
 		"worker_count": worker_count, "resource_id": resource_id,
 		"payload": payload, "remaining_ticks": remaining_ticks, "contaminant_mass": contaminant_mass,
+		"cargo_source_type":cargo_source_type,"cargo_yields":cargo_yields.duplicate(),"cargo_bulk":cargo_bulk,
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
 		"combat_multiplier":combat_multiplier, "chemistry_fraction": chemistry_fraction,
@@ -73,8 +77,19 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if not typeof(data.payload) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.payload)) or data.payload < 0.0:
 		return false
+	if data.payload>0 and (data.resource_id not in PileState.RESOURCE_IDS or data.direction!="inbound"): return false
+	var source: Variant=data.get("cargo_source_type","");var yields: Variant=data.get("cargo_yields",{});var bulk: Variant=data.get("cargo_bulk",1.0)
+	if not source is String or not yields is Dictionary or yields.size()>3 or not typeof(bulk) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(bulk)) or bulk<0.25 or bulk>4: return false
+	var restored_yields: Dictionary[String,float]={}
+	for key: Variant in yields:
+		if key not in PileState.RESOURCE_IDS or not typeof(yields[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(yields[key])) or yields[key]<=0 or yields[key]>10: return false
+		restored_yields[key]=float(String.num(float(yields[key]),5))
+	if yields.is_empty():
+		if source!="" or bulk!=1: return false
+	elif data.direction!="inbound" or data.payload<=0 or source.is_empty() or not SourceCatalog.accepts(source,data.resource_id) or not yields.has(data.resource_id): return false
 	var contamination: Variant = data.get("contaminant_mass",0.0)
-	if not typeof(contamination) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(contamination)) or contamination < 0 or contamination > data.payload or (contamination > 0 and (data.resource_id != "carbohydrate" or data.direction != "inbound")): return false
+	var carbohydrate: float=float(yields.get("carbohydrate",0)) if not yields.is_empty() else 1.0 if data.resource_id=="carbohydrate" else 0.0
+	if not typeof(contamination) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(contamination)) or contamination < 0 or contamination > data.payload*carbohydrate or (contamination > 0 and data.direction != "inbound"): return false
 	if data.has("unpaid_energy_cost") and (not typeof(data.unpaid_energy_cost) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.unpaid_energy_cost)) or data.unpaid_energy_cost < 0.0):
 		return false
 	var energy: Variant = data.get("energy_multiplier", 1.0)
@@ -164,6 +179,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	worker_count = int(data.worker_count)
 	resource_id = data.resource_id
 	payload = float(data.payload)
+	cargo_source_type=source;cargo_yields=restored_yields;cargo_bulk=float(bulk)
 	contaminant_mass = float(contamination)
 	remaining_ticks = int(data.remaining_ticks)
 	unpaid_energy_cost = float(data.get("unpaid_energy_cost", 0.0))
@@ -191,3 +207,17 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	detour_report = restored_report
 	harvest_report = restored_harvest
 	return true
+
+func outputs() -> Dictionary:
+	if resource_id.is_empty(): return {}
+	var result: Dictionary={}
+	var yields: Dictionary=cargo_yields if not cargo_yields.is_empty() else {resource_id:1.0}
+	for id: String in PileState.RESOURCE_IDS:
+		if not yields.has(id): continue
+		var amount: float=payload*float(yields[id])
+		if id=="carbohydrate": amount=maxf(0,amount-unpaid_energy_cost)
+		result[id]=float(String.num(amount,5)) if not cargo_yields.is_empty() else amount
+	return result
+
+func clear_cargo() -> void:
+	resource_id="";payload=0;contaminant_mass=0;cargo_source_type="";cargo_yields.clear();cargo_bulk=1

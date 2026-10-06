@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=22 format=3]
+[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=23 format=3]
 [ext_resource type="Script" path="res://src/sim/world/scenario_definition.gd" id="scenario"]
 [ext_resource type="Script" path="res://src/sim/world/world_node_definition.gd" id="node"]
 [ext_resource type="Script" path="res://src/sim/world/terrain_definition.gd" id="terrain"]
@@ -10,6 +10,7 @@
 [ext_resource type="Resource" path="res://data/sources/insect_remains.tres" id="source_insect"]
 [ext_resource type="Resource" path="res://data/sources/rain_puddle.tres" id="source_water"]
 [ext_resource type="Resource" path="res://data/sources/aphid_honeydew.tres" id="source_honey"]
+[ext_resource type="Resource" path="res://data/sources/ripe_fruit.tres" id="source_fruit"]
 [sub_resource type="Resource" id="nest_site"]
 script = ExtResource("node")
 id = "nest_site_01"
@@ -20,6 +21,7 @@ initial_quantity = 1.0
 script = ExtResource("node")
 id = "carb_exposed"
 definition = ExtResource("carb")
+source_profile = ExtResource("source_fruit")
 position = Vector2(31, 18)
 [sub_resource type="Resource" id="carb_sheltered"]
 script = ExtResource("node")

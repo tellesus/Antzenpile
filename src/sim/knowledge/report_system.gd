@@ -22,7 +22,12 @@ func capture(recording: bool = true) -> void:
 	for route_id: String in route_ids:
 		var route: TrailRouteState=_run.trails.routes[route_id]
 		if route.purpose=="food" and journal.changed("gathering/"+route.id,route.desired_workers): journal.add("gathering",route.origin_pile,route.id,time,time,"target",route.desired_workers,0,recording)
-		if not route.receipt.is_empty() and journal.changed("intake/"+route.id,route.receipt.last_at) and route.purpose=="food":
+		if not route.nutrient_receipts.is_empty():
+			for id: String in PileState.RESOURCE_IDS:
+				if not route.nutrient_receipts.has(id): continue
+				var receipt: Dictionary=route.nutrient_receipts[id]
+				if journal.changed("intake/"+route.id+"/"+id,receipt.last_at): journal.add("intake",route.origin_pile,route.id,receipt.last_at,receipt.last_at,id,receipt.last_amount,receipt.last_amount,recording)
+		elif not route.receipt.is_empty() and journal.changed("intake/"+route.id,route.receipt.last_at) and route.purpose=="food":
 			journal.add("intake",route.origin_pile,route.id,route.receipt.last_at,route.receipt.last_at,_run.knowledge.nodes[route.destination_knowledge_id].definition_id,route.receipt.last_amount,route.receipt.last_amount,recording)
 		var previous: int=int(journal.seen.get("loss/"+route.id,0))
 		if journal.changed("loss/"+route.id,route.reported_losses) and route.reported_losses>previous:

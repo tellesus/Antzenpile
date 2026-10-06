@@ -20,6 +20,7 @@ var reported_depleted: bool = false
 var resume_on_report: bool = false
 var last_empty_report_at: float = 0.0
 var delivered_total: float = 0.0
+var nutrient_receipts: Dictionary[String,Dictionary]={}
 var receipt: Dictionary = {}
 var energy_limited: bool = false
 var foreign_reports: int = 0
@@ -50,6 +51,7 @@ func to_dict() -> Dictionary:
 		"status": status, "departure_cooldown_ticks": departure_cooldown_ticks,
 		"resume_on_report": resume_on_report, "last_empty_report_at": last_empty_report_at,
 		"reported_depleted": reported_depleted, "delivered_total": delivered_total, "receipt": receipt.duplicate(true),
+		"nutrient_receipts":nutrient_receipts.duplicate(true),
 		"reported_impact_losses": reported_impact_losses, "impact_report": impact_report.duplicate(true),
 		"reported_rival_losses": reported_rival_losses, "conflict_report": conflict_report, "conflict_serial":conflict_serial,"settled_conflict_serial":settled_conflict_serial,
 		"conflict_observed_at": conflict_observed_at, "conflict_received_at": conflict_received_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
@@ -94,6 +96,17 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 			if not typeof(saved_receipt[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(saved_receipt[key])) or saved_receipt[key] <= 0: return false
 		if typeof(saved_receipt.earlier_unrecorded) != TYPE_BOOL or saved_receipt.first_at > saved_receipt.last_at or saved_receipt.last_amount > data.delivered_total: return false
 		if saved_receipt.first_at < knowledge.nodes[data.destination_knowledge_id].first_delivered_at: return false
+	var nutrient_data: Variant=data.get("nutrient_receipts",{})
+	if not nutrient_data is Dictionary or nutrient_data.size()>3 or data.get("purpose","food")!="food" and not nutrient_data.is_empty(): return false
+	var restored_nutrients: Dictionary[String,Dictionary]={}
+	for id: Variant in nutrient_data:
+		var entry: Variant=nutrient_data[id]
+		if id not in PileState.RESOURCE_IDS or not entry is Dictionary or entry.size()!=5 or not entry.has_all(["first_at","last_at","last_amount","earlier_unrecorded","total"]) or not entry.earlier_unrecorded is bool: return false
+		for key: String in ["first_at","last_at","last_amount","total"]:
+			if not typeof(entry[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(entry[key])) or entry[key]<=0: return false
+		if entry.first_at>entry.last_at or entry.last_amount>entry.total or entry.first_at<knowledge.nodes[data.destination_knowledge_id].first_delivered_at: return false
+		if id==knowledge.nodes[data.destination_knowledge_id].definition_id and absf(float(entry.total)-float(data.delivered_total))>0.00001: return false
+		restored_nutrients[id]=entry.duplicate(true)
 	if data.has("energy_limited") and typeof(data.energy_limited) != TYPE_BOOL:
 		return false
 	var expected_status: String = "inactive" if data.allocated_workers == 0 else "recalling" if data.desired_workers == 0 else "depleted" if data.reported_depleted else "active"
@@ -161,6 +174,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	resume_on_report = resume
 	last_empty_report_at = float(empty_at)
 	delivered_total = float(data.delivered_total)
+	nutrient_receipts=restored_nutrients
 	receipt = saved_receipt.duplicate(true)
 	energy_limited = data.get("energy_limited", false)
 	foreign_reports = int(reports)

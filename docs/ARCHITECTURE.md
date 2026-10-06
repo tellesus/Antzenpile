@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 145. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 146. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 ## Ownership and dependency direction
 
@@ -39,6 +39,8 @@ GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance 
 144 introduces immutable ChamberDefinition/Catalog and typed ChamberProject/Set/System. The first complete entry is Reproductive Alcove: queued care-protected funding, prepaid construction, cancellation without consumed-food refund and real completion. New projects have ledger pools and clock-validated dates; legacy chamber flags/definitions retain their behavior and costs. Dedicated reproductive capacity subtracts supported reproductive occupancy from shared Nursery space without adding worker slots or caregivers. Queued reproductive laying dates the start of its aging interval, preserving immediate funded saves.
 
 145 adds Ventilation Gallery under that owner, with a bounded regulation-step hook after completion. Humidity and Heat still own distinct actual water debits; no new operating pool or passive immunity. EffortDraft exposes whole climate/cleanup/scout ranges through existing care-protected setters. Suggestions use approved local/known summaries; editing is unsaved attention, not a universal allocator.
+
+146 SourceProfile supplies immutable per-portion yields/bulk. Transit captures a sparse three-nutrient recipe at harvest, withdraws portions once and settles/deposits at physical return; no recipe/world lookup at arrival. Bulk/loss/messenger paths preserve actual payload/dose and evidence. Routes own optional per-nutrient receipts alongside legacy primary totals; approved SourceMemory filters/Reports use actual receipts and known type roles, never live source stock. Garden Edge's first fruit entry uses these rules; generic old worlds/cargo remain unit-primary.
 
 ## Information and presentation
 

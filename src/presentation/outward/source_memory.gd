@@ -8,16 +8,19 @@ const SORT_NAMES: Dictionary={"label":"LABEL","recent":"RECENT REPORT","intake":
 static func entries(signals: Array[Dictionary], status: Dictionary, category: String, order: String="label") -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for signal_data: Dictionary in signals:
-		if signal_data.category != category:
-			continue
+		if signal_data.category not in ["carbohydrate","protein","water","nest_site"]: continue
 		var route: Dictionary = {}
 		for trail: Dictionary in status.get("trails", []):
 			if trail.destination_knowledge_id == signal_data.source_knowledge_id:
 				route = trail
 				break
+		var nutrients: Dictionary=route.get("nutrient_receipts",{})
+		if signal_data.category!=category and category not in SourceCatalog.roles(signal_data.get("source_type",""),signal_data.category) and not nutrients.has(category): continue
+		var category_receipt: Dictionary=nutrients.get(category,{})
+		var total: float=category_receipt.get("total",route.get("delivered_total",0.0) if signal_data.category==category else 0.0)
 		var hint: Dictionary = status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {})
 		var reported_empty: bool = hint.get("last_return_empty", route.get("status", "") == "depleted")
-		var state: String = "Reported empty" if reported_empty else "Previously delivered" if route.get("delivered_total", 0.0) > 0 else "Trace reported"
+		var state: String = "Reported empty" if reported_empty else "Previously delivered" if total > 0 else "Trace reported"
 		if category == "nest_site": state = "Last recheck unconfirmed" if reported_empty else "Possible shelter reported"
 		result.append({"id": signal_data.id, "knowledge_id": signal_data.source_knowledge_id, "category": category,
 			"source_type":signal_data.get("source_type",""),"memory_label":signal_data.get("memory_label",""),
@@ -25,8 +28,8 @@ static func entries(signals: Array[Dictionary], status: Dictionary, category: St
 			"workers": route.get("allocated_workers", 0),
 			"waiting_workers":route.get("waiting_workers",0),
 			"route_id": route.get("id", ""), "route_status": route.get("status", "none"), "desired_workers": route.get("desired_workers", 0),
-			"receipt": route.get("receipt", {}).duplicate(true),
-			"delivered_total": route.get("delivered_total", 0.0),
+			"receipt": category_receipt.duplicate(true) if not category_receipt.is_empty() else route.get("receipt", {}).duplicate(true) if signal_data.category==category else {},
+			"delivered_total": total,
 			"danger": route.get("journey_alarm",route.get("reported_losses", 0) > 0 and not route.get("ambusher_addressed",false) or route.get("foreign_reports", 0) > 0),
 			"honeydew": status.get("honeydew", {}).get("knowledge_id", "") == signal_data.source_knowledge_id})
 	sort_entries(result,order)
@@ -54,6 +57,12 @@ static func staffing_label(entry: Dictionary) -> String:
 	return "Target %d · %d assigned · %d wait" % [entry.get("desired_workers",0),entry.get("workers",0),entry.get("waiting_workers",0)]
 static func intake_label(entry: Dictionary) -> String:
 	return "Received %.1f total · historical intake" % entry.get("delivered_total",0) if entry.get("delivered_total",0)>0 else "No intake yet · yield unproven"
+
+static func bundle_label(route: Dictionary) -> String:
+	var parts: Array[String]=[]
+	for id: String in PileState.RESOURCE_IDS:
+		if route.get("nutrient_receipts",{}).has(id): parts.append("%.1f %s" % [route.nutrient_receipts[id].total,Copy.resource(id)])
+	return "Intake: "+" · ".join(parts)
 
 
 static func display_name(entry: Dictionary) -> String:

@@ -1,6 +1,6 @@
 # Current state contracts
 
-Baseline: gameplay through 145. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
+Baseline: gameplay through 146. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
 
 ## Persistent envelope and run
 
@@ -20,6 +20,8 @@ The run owns scenario/seed, fixed clock, separate simulation/genetic RNG state, 
 - Only owned unresolved losses are added back to expected population/expression presentation. Raw truth is never used as an instantaneous UI casualty count.
 
 ## World, observation and travel
+
+146 optionally saves Transit `cargo_source_type`, `cargo_yields`, `cargo_bulk` (defaults empty/empty/1 for legacy unit-primary cargo). Captured recipes require supported type/primary, inbound positive payload, positive finite whitelisted C/P/W rates and bounded bulk; world/profile changes cannot refresh the carried recipe. Mixed portions use canonical five-decimal precision. Output carbohydrate alone settles deferred fuel; contamination remains normalized to carried carbohydrate under the existing food-toxicity model. Food-route optional `nutrient_receipts` maps each nutrient to first/last date, last amount, earlier-unrecorded flag and total; dates/counts/primary total/purpose validate atomically. Old absence invents no secondary intake. Messenger/loss paths preserve ratios and unique evidence.
 
 139 adds optional physical `source_type`, confirmed Observation identity, derived KnownNode identity and persisted positive unique `label_index`. Empty legacy type remains unknown; legacy labels derive deterministically from first receipt. Saved typed identity must match the physical profile/nutrient and a confirmed observation; later broad evidence retains prior identity. TransitCohort optionally captures `harvest_report` under a unique logical observation ID, with route/owner/profile/counter validation; it creates no new worker. A surviving physical return delivers it through the existing inbox; the last lost carrier discards it. Source labels/type project from approved knowledge/producer history, never live stock.
 

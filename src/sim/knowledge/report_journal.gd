@@ -24,7 +24,7 @@ func add(kind: String, pile: String, subject: String, observed: float, received:
 	if kind == "intake":
 		for index: int in entries.size():
 			var existing: Dictionary = entries[index]
-			if existing.kind == kind and existing.subject_id == subject:
+			if existing.kind == kind and existing.subject_id == subject and existing.detail==detail:
 				existing.observed_at=observed; existing.received_at=received; existing.amount=amount
 				existing.total=_quantity(existing.total+amount); existing.repeats=mini(WorkerLedger.MAX_COUNT,existing.repeats+1)
 				_serialized[index]=JSON.stringify(existing,"",true,true); return

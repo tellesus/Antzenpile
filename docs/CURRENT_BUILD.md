@@ -1,6 +1,6 @@
 # Current build and gaps
 
-Baseline: gameplay through card 145; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
+Baseline: gameplay through card 146; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
 
 ## Implemented foundation
 
@@ -9,7 +9,7 @@ Baseline: gameplay through card 145; design reset through 138. The pre-reset gam
 | Runtime and saves | Godot 4.7.2 Compatibility, headless fixed ticks, seeded continuation, strict atomic saves, separate hidden reality/knowledge/presentation. | Packaged Windows build, migration policy for new schemas, measured final performance. |
 | Labor | Authoritative ledger, aggregate brood/travel, held care, capped scouts; flexible gathering/unsent queue and whole climate/cleanup/scout effort with suggestions and real recall. | Partial aphid tending under its producer family; broader network jobs. |
 | Perception and scouts | Returned memories, standing exploration/rechecks, physical recall/missing settlement; shared cap eight; persistent delivered/local journal; knowledge-based source comparisons and named priorities/local/shared effort waits. | Remaining content profiles and generalized multi-pile scouting. |
-| Resources | Three nutrient stores; physical gathering/energy/depletion/renewal; five immutable identities from close returned/harvested samples and stable A/B labels; generic legacy fallback. | Mixed yields and remaining concrete profiles/handling behavior; current identity definitions are not a complete mechanical food catalog. |
+| Resources | Three stores; physical gathering/energy/depletion/renewal; six identities/stable labels; captured mixed cargo, nutrient receipts/filters and finite ripe fruit in Garden Edge; legacy fallback. | Remaining concrete profiles/handling/availability behavior; current roster is incomplete. |
 | Routes | Separate route/segment types, scent/familiarity, aggregate cohorts, detours, actual alternate courses and incoming cargo. | Shared multi-segment connections and broader network traffic/closure; no automatic optimal-route planner. |
 | INWARD | Queen, Nursery, Food Exchange, Entrance, Midden, local care/health; development/expansion; modular paid projects, Reproductive Alcove and staffed Ventilation Gallery. | Refuge/broader organ/network entries; mixed-yield Food Exchange. |
 | Brood/reproductives | Auto/manual worker brood; saved reproductive/adaptation priority with Auto Brood on; Alcove space; paid Home groups and physical first founding. | Daughter reproductives; queen health/replacement and generational continuity. |
@@ -20,11 +20,11 @@ Baseline: gameplay through card 145; design reset through 138. The pre-reset gam
 | Environment and health | Rain/heat, moisture/temperature care, refuse-related brood strain, recurring guest harm/clearing and contaminated intake. | Planned zone/connection/nest disturbances, new site profiles and useful evacuation counterplay. |
 | Runs and presentation | Backyard/Garden Edge/Roadside; voluntary end, sampled post-run physical review; layered desktop art/music and normal sensory UI. | Biological continuation/failure rules, integrated scenario arcs, final graphics/music, onboarding and distribution. |
 
-Queen health/death/replacement, multiple daughters, moving predators, species-specific dog behavior and the remaining chamber/trait/resource entries are **not implemented**. Five source identity profiles and reproductive investment queueing are implemented. Home worker-trial establishment is a retained prototype proxy. Daughter offspring use captured founder traits; there is no full mating/latent-genome simulation.
+Queen health/death/replacement, multiple daughters, moving predators, species-specific dog behavior and remaining chamber/trait/resource entries are **not implemented**. Six source identities, mixed-food delivery and reproductive queueing work. Home worker-trial establishment is a retained prototype proxy. Daughter offspring use founder traits; there is no full mating/latent-genome simulation.
 
 ## Latest actual verification
 
-[Card 145](tasks/145_ventilation_and_local_effort.md) recorded 9,249 checks/zero failures in 90.92 seconds, targeted 1,253/zero, clean import/Main and standard/compact headless Gallery/local/scout effort drawing. [144](tasks/144_reproductive_alcove.md) recorded the prior 9,208/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks are explicitly deferred to the feature-complete systems beta.
+[Card 146](tasks/146_mixed_food_cargo.md) recorded 9,283 checks/zero failures in 92.76 seconds, targeted 1,248/zero, clean import/Main and standard/compact headless fruit/filter/nutrient-report drawing. [145](tasks/145_ventilation_and_local_effort.md) recorded the prior 9,249/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the feature-complete systems beta.
 
 The player supplies manual visual feedback. No screen monitoring, desktop automation, paid testers or broad compute sweeps are authorized. The documentation reset does not rerun the engine or claim new gameplay evidence. Existing user audio imports/images/translations and saved slot are preserved.
 

@@ -258,10 +258,11 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 	else:
 		cohort.witnessed_attack = cohort.worker_count > 0
 	var payload_before: float = cohort.payload
-	cohort.payload = minf(cohort.payload, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
+	cohort.payload = minf(cohort.payload, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier/cohort.cargo_bulk)
+	if not cohort.cargo_yields.is_empty(): cohort.payload=float(String.num(cohort.payload,5))
 	cohort.contaminant_mass *= cohort.payload / payload_before if payload_before > 0 else 0.0
 	if cohort.payload == 0.0:
-		cohort.resource_id = ""
+		cohort.clear_cargo()
 	if cohort.worker_count == 0:
 		cohort.impact_witness_at = 0.0
 		cohort.witnessed_attack = false
@@ -348,7 +349,8 @@ func _depart(route: TrailRouteState) -> void:
 	if pile.resources.carbohydrate < energy_cost:
 		# A carbohydrate trip can replenish an exhausted pile. Pay the available reserve
 		# now and settle the remainder against its cargo; other routes must wait.
-		if _run.knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate":
+		var destination: KnownNode=_run.knowledge.nodes[route.destination_knowledge_id]
+		if "carbohydrate" not in SourceCatalog.roles(destination.source_type,destination.definition_id):
 			route.energy_limited = true
 			return
 		var available: float = pile.resources.carbohydrate
@@ -382,14 +384,21 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	if not node.active or node.quantity <= 0.0 or node.position.distance_to(route.estimated_destination) > CONFIG.interaction_radius * (1.0 + 0.5 * reliability(segment)):
 		return
-	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
+	var profile: SourceProfile=SourceCatalog.PROFILES.get(node.source_type)
+	var bulk: float=profile.bulk if profile!=null else 1.0
+	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier/bulk)
+	if profile!=null and (not profile.yields.is_empty() or bulk!=1): amount=float(String.num(amount,5))
 	# Canonical decimal quantities match saved resource precision.
 	node.quantity = float(String.num(maxf(0.0, node.quantity - amount), 5))
 	if node.quantity == 0.0:
 		node.active = false
 	cohort.payload = amount
 	cohort.resource_id = node.definition_id
-	cohort.contaminant_mass = amount * node.properties.get("contaminant_fraction",0.0)
+	if profile!=null and (not profile.yields.is_empty() or bulk!=1):
+		cohort.cargo_source_type=node.source_type;cohort.cargo_bulk=bulk
+		cohort.cargo_yields.assign(SourceCatalog.nutrients(node.source_type,node.definition_id))
+	var carbohydrate: float=cohort.cargo_yields.get("carbohydrate",0.0) if not cohort.cargo_yields.is_empty() else 1.0 if node.definition_id=="carbohydrate" else 0.0
+	cohort.contaminant_mass = amount * carbohydrate * node.properties.get("contaminant_fraction",0.0)
 	if amount > 0 and _run.next_scout_id < WorkerLedger.MAX_COUNT and not node.source_type.is_empty() and _run.knowledge.nodes[route.destination_knowledge_id].source_type != node.source_type:
 		var sample := Observation.new()
 		sample.scout_id = "scout_%d" % _run.next_scout_id; _run.next_scout_id += 1
@@ -399,6 +408,14 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 		sample.estimated_position = node.position; sample.uncertainty_radius = 0.25; sample.closest_distance = 0; sample.proximity_confirmed = true
 		cohort.harvest_report = sample
 
+
+func _record_nutrient(route: TrailRouteState, id: String, amount: float) -> void:
+	var primary: String=_run.knowledge.nodes[route.destination_knowledge_id].definition_id
+	if not route.nutrient_receipts.has(id):
+		var old: Dictionary=route.receipt if id==primary else {}
+		route.nutrient_receipts[id]={"first_at":old.get("first_at",_run.simulation_time),"last_at":_run.simulation_time,"last_amount":amount,"earlier_unrecorded":old.get("earlier_unrecorded",route.delivered_total>0 if id==primary else false),"total":route.delivered_total if id==primary else 0.0}
+	var entry: Dictionary=route.nutrient_receipts[id]
+	entry.last_at=_run.simulation_time;entry.last_amount=amount;entry.total=float(String.num(float(entry.total)+amount,5))
 
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
@@ -445,10 +462,15 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		var recorded: bool = _run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail")
 		assert(recorded)
 	if cohort.payload > 0.0:
-		var net_payload: float = maxf(0.0, cohort.payload - cohort.unpaid_energy_cost)
-		var net_contaminant: float = cohort.contaminant_mass * net_payload / cohort.payload
-		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload, net_contaminant)
-		assert(deposited)
+		var outputs: Dictionary=cohort.outputs()
+		var carbohydrate: float=cohort.payload*cohort.cargo_yields.get("carbohydrate",0.0) if not cohort.cargo_yields.is_empty() else cohort.payload if cohort.resource_id=="carbohydrate" else 0.0
+		for id: String in PileState.RESOURCE_IDS:
+			var amount: float=outputs.get(id,0.0)
+			if amount<=0: continue
+			var contamination: float=cohort.contaminant_mass*amount/carbohydrate if id=="carbohydrate" and carbohydrate>0 else 0.0
+			var deposited: bool=pile.deposit_resource(id,amount,contamination);assert(deposited)
+			if not cohort.cargo_yields.is_empty(): _record_nutrient(route,id,amount)
+		var net_payload: float=outputs.get(cohort.resource_id,0.0)
 		var recorded_amount: float = roundf(net_payload * 100000.0) / 100000.0
 		if recorded_amount > 0:
 			if route.receipt.is_empty():

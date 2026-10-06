@@ -5,3 +5,5 @@ extends Resource
 @export var resource_id: String = ""
 @export var display_name: String = ""
 @export_multiline var description: String = ""
+@export var yields: Dictionary[String,float] = {}
+@export var bulk: float = 1.0

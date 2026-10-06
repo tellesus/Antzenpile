@@ -80,13 +80,18 @@ func _messenger(cohort: TransitCohort, route: TrailRouteState, report: String = 
 	messenger.chemistry_fraction = cohort.chemistry_fraction
 	messenger.unpaid_energy_cost = roundf(cohort.unpaid_energy_cost / (cohort.worker_count + cohort.lost_workers) * 100000.0) / 100000.0
 	cohort.unpaid_energy_cost = roundf((cohort.unpaid_energy_cost - messenger.unpaid_energy_cost) * 100000.0) / 100000.0
-	messenger.payload = minf(cohort.payload, TRAILS.carry_per_worker * cohort.carry_multiplier)
+	messenger.payload = minf(cohort.payload, TRAILS.carry_per_worker * cohort.carry_multiplier/cohort.cargo_bulk)
+	if not cohort.cargo_yields.is_empty(): messenger.payload=float(String.num(messenger.payload,5))
 	messenger.contaminant_mass = cohort.contaminant_mass * messenger.payload / cohort.payload if cohort.payload > 0.0 else 0.0
 	cohort.contaminant_mass -= messenger.contaminant_mass
 	cohort.payload -= messenger.payload
+	if not cohort.cargo_yields.is_empty(): cohort.payload=float(String.num(cohort.payload,5))
 	messenger.resource_id = cohort.resource_id if messenger.payload > 0.0 else ""
+	if messenger.payload>0:
+		messenger.cargo_source_type=cohort.cargo_source_type;messenger.cargo_bulk=cohort.cargo_bulk;messenger.cargo_yields=cohort.cargo_yields.duplicate()
+		messenger.harvest_report=cohort.harvest_report;cohort.harvest_report=null
 	if cohort.payload == 0.0:
-		cohort.resource_id = ""
+		cohort.clear_cargo()
 	messenger.predator_encountered = cohort.predator_encountered
 	messenger.foreign_contact = cohort.foreign_contact
 	messenger.foreign_sampled = true

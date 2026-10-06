@@ -873,6 +873,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"recovery_ready": simulation.run.knowledge.recovery_report(route.destination_knowledge_id, route.last_empty_report_at),
 				"delivered_total": route.delivered_total,
 				"receipt": route.receipt.duplicate(true),
+				"nutrient_receipts":route.nutrient_receipts.duplicate(true),
 				"pheromone_strength": segment.pheromone_strength,
 				"route_familiarity": segment.route_familiarity})
 	summaries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.id < b.id)

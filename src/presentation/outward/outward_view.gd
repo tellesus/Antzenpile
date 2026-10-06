@@ -927,7 +927,8 @@ func _draw_context(size: Vector2) -> void:
 		_label(body.position + Vector2(16, 185), "Target %d · %d assigned · %d wait" % [route.desired_workers, route.allocated_workers,route.get("waiting_workers",0)], Color("8fa1a8"), 13)
 		var traffic: String = "%d travelling · %d checking" % [route.active_workers, route.checking_workers] if route.get("checking_workers", 0) > 0 else "%d gatherers away" % route.active_workers
 		_label(body.position + Vector2(16, 205), traffic, Color("8fa1a8"), 15)
-		_label(body.position + Vector2(16, 225), "Delivered %.1f %s total" % [route.delivered_total, Copy.resource(selected.category)], Color("8fa1a8"), 15)
+		var intake: String=Memories.bundle_label(route) if not route.get("nutrient_receipts",{}).is_empty() else "Delivered %.1f %s total" % [route.delivered_total,Copy.resource(selected.category)]
+		_label(body.position + Vector2(16, 225),Copy.fit_line(intake,_font,13,260), Color("8fa1a8"), 13)
 		if route.status == "depleted":
 			if route.active_workers == 0:
 				_draw_trail_button("trail_recheck", _recheck_title(route))

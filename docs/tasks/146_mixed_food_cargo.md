@@ -1,9 +1,17 @@
 # 146 — Captured mixed-food cargo and ripe fruit
 
-Status: planned. M2-D/SYS-03/04/05/13/14, RES-FRUIT.
+Status: complete. M2-D/SYS-03/04/05/13/14, RES-FRUIT.
 
 Outcome: one actual fruit portion supplies carbohydrates and water after real harvesting/return, with clear roles/receipts. Garden Edge gets a finite ripe-fruit source; supported returned samples identify it. Existing generic saved sources keep prior single-nutrient behavior. One gathering job pays labor/travel once even when the known source appears in two nutrient filters.
 
 Scope: immutable per-portion yields, captured validated cargo bundle/bulk, real depletion/debt/loss/delivery and recipient receipts/journal; first complete mixed entry before adding more profiles. Provisional fruit yield 1 carbohydrate + 0.25 water, bulk 1. Three stores/feeding efficiency remain; no new currency, cap/spoilage, forecast or automatic optimum. Old absent cargo uses primary-nutrient unit yield. Other source behaviors follow their content cards/M6.
 
 Verify one harvest/withdrawal and return, nutrient conservation/fuel debt/contamination/loss/recall, profiles cannot retrofit cargo, Home/Daughter ownership, multi-filter same route, no identity/yield/stock before justified return, grouped nutrient receipts and old/corrupt exact saves/four speeds. Targeted then full/import/Main/headless input/draw; player feel deferred to beta. Evaluate cache only from a demonstrated buffering bottleneck.
+
+Implemented: immutable yields/bulk and a finite Garden Edge `ripe_fruit` entry (1 carbohydrate/0.25 water per portion). Transit captures recipe/type/bulk at physical harvest; stock withdraws once and all outputs deposit only after actual return. Only carried carbohydrates settle travel debt; water/protein do not become fuel. Mixed portions keep canonical precision through loss/messenger splitting; actual capacity, proportional contamination and unique harvest evidence stay conserved. Existing generic worlds/cargo retain primary unit yields; earlier five identities/rates stay unchanged.
+
+Food routes retain primary receipt/total compatibility plus validated per-nutrient receipt totals/dates. Root projects only those actual returns; known types or received roles permit a source in several nutrient filters, sharing one route/worker cost. Each filter compares its own intake. Reports group by route AND nutrient, so water is not mislabeled as carbohydrates. Source context shows a compact actual bundle intake.
+
+Evidence: targeted **1,248/0**; full **9,283/0 in 92.76 seconds**; clean pinned headless import/Main120 and **15 Outward + 15 Reports drawing callbacks**, standard/compact. Real Garden scout/three-worker harvest, captured inbound/private depletion, recall/arrival/toxicity, per-filter/grouped receipts/no duplicate, malformed data and old Garden fallback pass. Deferred fuel, saved/four-speed settlement, prepared real-junction split/ledger/loss and Daughter payer/receipt ownership pass. Graphical/feel/audio acceptance deferred by A88; player assets/slot untouched.
+
+Changed groups: SourceProfile/Catalog and fruit/scenario content; transit/route receipt schema/validation, physical harvest/delivery/loss/messenger adapters; approved multi-filter/context/report projection; meaningful food/save/speed/ownership coverage; current contracts/status/catalog. Logs ignored under `.godot/card146_*`. Handoff: cracked seeds/picnic crumbs using these rules, record the actual cache gate, then M3 adaptation definitions.

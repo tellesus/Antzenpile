@@ -85,6 +85,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 				elif not supply.valid_route(route): return false
 		elif knowledge.nodes[route.destination_knowledge_id].definition_id not in PileState.RESOURCE_IDS: return false
 		if not route.receipt.is_empty() and route.receipt.last_at > time: return false
+		for entry: Dictionary in route.nutrient_receipts.values():
+			if entry.last_at>time: return false
 		var suffix: String = route.id.trim_prefix("route_")
 		if route.id != "route_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() >= data.next_route_id or route.segment_id != "segment_" + suffix:
 			return false
@@ -145,13 +147,13 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if fraction < -0.00002 or fraction > 1.0 + 0.00002 or absf(cohort.carry_multiplier - AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction)) > 0.00002:
 			return false
 		var maximum_energy_cost: float = CONFIG.round_trip_energy_cost(cohort.worker_count + cohort.lost_workers, segment.length(), segment.terrain_cost(world)) * cohort.energy_multiplier * (1.0 + AdaptationRules.CHEMISTRY.extra_travel_energy * cohort.chemistry_fraction)
-		if cohort.unpaid_energy_cost > maximum_energy_cost + 0.00001 or (cohort.unpaid_energy_cost > 0.0 and knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate"):
+		if cohort.unpaid_energy_cost > maximum_energy_cost + 0.00001 or (cohort.unpaid_energy_cost > 0.0 and "carbohydrate" not in SourceCatalog.roles(knowledge.nodes[route.destination_knowledge_id].source_type,knowledge.nodes[route.destination_knowledge_id].definition_id)):
 			return false
 		var source_id: String = knowledge.nodes[route.destination_knowledge_id].source_node_id
 		if not world.nodes.has(source_id):
 			return false
 		if cohort.harvest_report != null and (cohort.harvest_report.source_node_id != source_id or cohort.harvest_report.origin_pile != route.origin_pile): return false
-		if cohort.payload > float(cohort.worker_count) * CONFIG.carry_per_worker * cohort.carry_multiplier + 0.00001 or (not cohort.resource_id.is_empty() and cohort.resource_id != world.nodes[source_id].definition_id):
+		if cohort.payload > float(cohort.worker_count) * CONFIG.carry_per_worker * cohort.carry_multiplier/cohort.cargo_bulk + 0.00001 or (not cohort.resource_id.is_empty() and cohort.resource_id != world.nodes[source_id].definition_id):
 			return false
 		active_counts[route.id] = active_counts.get(route.id, 0) + cohort.worker_count
 		cohort_counts[route.id] = cohort_counts.get(route.id, 0) + 1

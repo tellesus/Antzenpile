@@ -62,7 +62,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M2-C complete:** [145 Ventilation Gallery and local effort](tasks/145_ventilation_and_local_effort.md), paid bounded staffed regulation and whole climate/cleanup/scout targets with free drafts/suggestions, existing care/water/dispatch owners and presets. Full 9,249/0; import/Main/headless drawing passed.
 
-**Next: [146 captured mixed-food cargo and ripe fruit](tasks/146_mixed_food_cargo.md)**, using established orders/source/report/queue/project foundations. Player graphical/feel checks defer to the systems beta (A88).
+**M2-D complete:** [146 mixed-food cargo and ripe fruit](tasks/146_mixed_food_cargo.md), captured yields/bulk, real single harvest/travel/return, nutrient receipts/grouping and multi-filter same route; Garden Edge fruit supplies C/W. Full 9,283/0; import/Main/headless drawing passed.
+
+**Next: [147 seeds/picnic food and cache gate](tasks/147_seeds_and_picnic_food.md)**, then M3 inherited adaptations. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 
