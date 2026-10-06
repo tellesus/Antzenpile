@@ -1,6 +1,6 @@
 # Current state contracts
 
-Baseline: gameplay through 139. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
+Baseline: gameplay through 143. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
 
 ## Persistent envelope and run
 
@@ -14,6 +14,7 @@ The run owns scenario/seed, fixed clock, separate simulation/genetic RNG state, 
 - PileState has three nutrient stores (`carbohydrate`, `protein`, `water`), aggregate brood, current queen count, reproduction, development, health and genetics. There is no current concrete food inventory, generalized queen record or reproduction queue.
 - Held worker-brood care is derived from occupancy/care configuration minus dedicated trial nurses, clamped safely. `workers_assignable` excludes held care. Reproductive nurses have their own commitment; new work uses `allocate_workers`.
 - Brood captures stage/progress, trial/inherited traits and real losses. Genetics stores disjoint living/lost/imported/exported phenotype bundles. Existing established trait IDs are `lean`, `load`, `persistent`, `security`, `tolerance`, `fighter`; exclusive pairs remain lean/load and security/tolerance.
+- 143 optionally adds pile `investments`: exactly `{reproduction: bool, priority: Array[String]}` with at most unique adaptation/reproduction members, matching the actual pending trait and reproductive intent. Queueing requires a laying queen and current supported Home capability; paid reproduction is independent and cannot be canceled into refunds. Absent old state derives existing adaptation priority and no reproductive intent. Invalid types, membership, duplicates or unsupported daughter/queen combinations reject atomically. No timestamps are needed: order preserves accepted intent chronology, including replacement/reordering.
 - Only owned unresolved losses are added back to expected population/expression presentation. Raw truth is never used as an instantaneous UI casualty count.
 
 ## World, observation and travel
@@ -42,4 +43,4 @@ JourneyResponse owns the shared party, private travel/sample/combat state and de
 
 Validate finite numbers, integral counts, valid IDs/owners, chronology and capacities before mutation. Returned records cannot precede observation or exceed run time. Pending reports cannot become known through load. Lost/migrated phenotypes and queens/reproductives may not be copied between owners.
 
-RunHistory is bounded private physical recording; ended state gates commands. Its storage limits/thinning are disclosed in review. The planned normal-play journal must be a separate knowledge/local-report store. New 1.0 content IDs, queued reproduction, generalized piles and queen migration each need a bounded migration/legacy test before shipping; no future saved fields are declared present here.
+RunHistory is bounded private physical recording; ended state gates commands. Its storage limits/thinning are disclosed in review. The normal-play journal is a separate knowledge/local-report store; 143 adds primitive semantic investment/paid-laying records with local Queen inspection. New 1.0 content IDs, generalized piles and queen migration each need a bounded migration/legacy test before shipping; no future saved fields are declared present here.

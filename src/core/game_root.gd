@@ -85,7 +85,8 @@ func _ready() -> void:
 		inward.brood_command = start_brood
 		inward.brood_care_command = relieve_brood_care
 		inward.brood_intent_command = set_brood_intent
-		inward.reproduction_command = start_reproduction
+		inward.reproduction_command = toggle_reproductive_queue
+		inward.investment_priority_command = prioritize_investment
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
 		inward.adaptation_command = queue_adaptation
@@ -249,9 +250,9 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies"]:
+	if selected.kind in ["project","brood","trait","supplies","investment"]:
 		inspect_pile(selected.pile_id)
-		var organ: String=selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
+		var organ: String="queen" if selected.kind=="investment" else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
 		set_mode("inward")
 	else:
@@ -556,6 +557,7 @@ func inward_status(pile_id: String) -> Dictionary:
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
 	return {"reinforcement":simulation.reinforcement.summary(), "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
 		"reproduction": simulation.reproduction.summary(pile_id),
+		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
 			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
 			"water_used": (pile.humidity.water_used_units + pile.temperature.water_used_units) / 100000.0},
@@ -741,6 +743,15 @@ func relieve_brood_care(plan: Dictionary) -> Dictionary:
 func start_reproduction() -> Dictionary:
 	var accepted: bool = simulation.start_reproduction(inward_pile_id)
 	return {"accepted":accepted,"reason":simulation.reproduction.last_error}
+
+func toggle_reproductive_queue() -> Dictionary:
+	var pending: bool=simulation.run.colony.piles[inward_pile_id].investments.reproduction
+	var accepted: bool=simulation.queue_reproduction(inward_pile_id,not pending)
+	return {"accepted":accepted,"queued":accepted and not pending,"reason":simulation.investments.last_error}
+
+func prioritize_investment(kind: String) -> Dictionary:
+	var accepted: bool=simulation.prioritize_investment(inward_pile_id,kind)
+	return {"accepted":accepted,"queued":accepted,"reason":simulation.investments.last_error}
 
 
 func set_brood_intent(intent: String) -> Dictionary:

@@ -35,6 +35,7 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"dispatch": text="%d ants dispatched: %s" % [entry.amount,"survey" if entry.detail=="investigate" else "defense"]
 		"order": text="Force order: %d total" % entry.amount if entry.amount>0 else "Force order canceled"
 		"gathering": text="Gathering target: %d total" % entry.amount if entry.amount>0 else "Gathering stopped · travelers return"
+		"investment": text={"none":"No special investment pending","adaptation":"Adaptation next · %d queued" % entry.amount,"reproduction":"Reproduction next · %d queued" % entry.amount,"adaptation_laid":"Paid adaptation brood laid","reproduction_laid":"Paid reproductive brood laid"}.get(entry.detail,"Investment updated")
 	return pile_name(entry.pile_id)+" · "+text
 
 static func detail(entry: Dictionary, time: float) -> String:

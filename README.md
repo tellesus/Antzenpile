@@ -4,9 +4,9 @@ A colony-scale strategy/4X game about learning an uncertain world, investing liv
 
 ## Current build
 
-The prototype supports returned scout memories, standing exploration/rechecks, physical gathering/recall, brood/care/development, six inherited worker traits, first daughter founding/local work, two-way paid supplies and conflict/avoidance. Journey Alarm opens direct circular response controls with flexible recruitment: alerted trail → free nest → explicit All Hands. Aphid honeydew is introduced as sugary aphid droplets. Voluntary End Run opens a separate sampled physical history.
+The prototype supports returned scout memories, five concrete source identities, remembered-source comparisons, named standing exploration/rechecks, flexible gathering/queued staffing and real recall, brood/care/development, six inherited traits, first daughter founding/local work and two-way paid supplies. A retained delivered/local report journal exposes simultaneous needs. Reproductive and adaptation investment queues have saved next priority; Auto Brood can stay on. Journey Alarm opens direct circular controls with alerted trail → free nest → explicit All Hands recruitment. Aphid honeydew is introduced as sugary aphid droplets. Voluntary End Run opens a separate sampled physical history.
 
-Latest runtime gate: **8,784 headless checks, zero failures**, clean import/Main and headless conflict drawing. The player accepts the circle as an improvement. This is a systems prototype, not a release candidate. Multiple daughters, queen replacement/generations, reproduction queueing under Auto Brood, concrete resource catalogs and new chambers/traits are planned, not implemented. See [Current Build](docs/CURRENT_BUILD.md).
+Latest runtime gate: **9,168 headless checks, zero failures**, clean import/Main and standard/compact headless input/drawing. This is a systems prototype, not a release candidate. Multiple daughters, queen replacement/generations, mixed yields/remaining source content and new chambers/traits are planned, not implemented. The player accepts the circle and defers further graphical/feel/audio checks to the systems beta. See [Current Build](docs/CURRENT_BUILD.md).
 
 ## Current design and implementation order
 

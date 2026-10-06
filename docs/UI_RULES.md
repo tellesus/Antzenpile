@@ -1,6 +1,6 @@
 # Current UI contracts and development boundaries
 
-Baseline: gameplay through 139. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Historical implementation notes are [archive-only](archive/pre_1_0/contracts/UI_RULES.md). Interface-wide outcome feedback, the reproductive queue and remaining source profiles are still planned; initial neutral view cues and five identities work.
+Baseline: gameplay through 143. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Historical implementation notes are [archive-only](archive/pre_1_0/contracts/UI_RULES.md). Five identities, common outcome feedback, delivered/local reports, source comparisons, flexible gathering and reproductive investment queues work; remaining content stays planned.
 
 ## Views and evidence
 
@@ -30,7 +30,7 @@ Circle/draft/history reserve their actual bounds from captions; overlapping radi
 
 139 replaces primary hash tags with stable knowledge-owned labels and names supported source identities. Unconfirmed sources remain Sweet/Protein/Water traces; older generic worlds acquire no invented kind. Typed contexts give a short handling/nutrition description, while availability/report age still remains historical. Source/browser/conflict/care names use approved metadata. Outward/Inward taps get a neutral brief cue; it does not claim a successful dispatch. Other controls and outcome colors follow in M1-B.
 
-Auto Brood repeats supported ordinary laying; Manual stops new automatic laying while existing cohorts continue. Manual laying still needs continuing food/care. Queued adaptation is editable until laying, then locked in its cohort. Current reproductives start immediately if supported; they cannot yet be queued under Auto Brood. The planned queue/priority rules in SYS-06 must be implemented and saved explicitly.
+Auto Brood repeats supported ordinary laying; Manual stops new automatic laying while existing cohorts continue. Manual laying still needs continuing food/care. 143 queues one reproductive group alongside one adaptation; Queen and selected trait expose free cancel/reorder while unfunded, actual wait and explicit next priority. Earliest queued intent is the default; eligible specials take the next opportunity before Auto Brood, while structural waits permit prerequisite growth. Auto Brood stays on. Paid groups remain locked; cancel clears only pending intent. Queue/priority and paid-laying facts enter local Reports. Home-only reproductive/trial capability still awaits M4 generalization.
 
 Recovery watches distinguish Auto Resume from Manual Resume after known danger. Watching/rechecking requires standing exploration; effort off can leave priorities queued. Recall waits for actual workers/cargo, including suspect intake. Scout search, source recheck, danger survey, gathering, tending and defense are separately named jobs.
 

@@ -104,6 +104,6 @@ func run(test: Object) -> bool:
 	var ui := View.new(); test.get_root().add_child(ui); ui.selected_id="queen"; ui._status=colony.inward_status("home")
 	before=game.run.to_dict()
 	test.check(ui.activate_at(ui._queen_tab_rect("reproduction").get_center()) and ui.queen_tab=="reproduction" and game.run.to_dict()==before,"Reproductive tab is independent free attention")
-	test.check(ui.activate_at(ui._brood_rect().get_center()) and game.run.to_dict()==before,"Ready reproductive panel cannot issue hidden worker-laying commands")
+	test.check(not ui.activate_at(ui._brood_rect().get_center()) and game.run.to_dict()==before,"Ready reproductive panel cannot issue hidden worker-laying commands")
 	ui.queue_free(); colony.free()
 	return true

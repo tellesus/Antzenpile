@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 142. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 143. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 ## Ownership and dependency direction
 
@@ -33,6 +33,8 @@ JourneyResponse owns one shared party slot across both piles. Combat, reinforcem
 The implemented network is Home plus `satellite_1`. The founding/settler/supply contracts still contain that bounded scope; generalized multi-pile IDs/connections do not exist yet. Home and Daughter supplies share one exclusive physical connection with independent payer receipts. Settler handoff is a ledger transfer, not a death/birth. Do not make content-catalog claims imply arbitrary networks already work.
 
 GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance at laying, movement captures effects at departure, and loss/transfer preserves profiles. Home uses queued worker trials; Daughter offspring use founder queen traits. Full queen records, daughter trials/reproductive generations and new traits require their roadmap cards.
+
+143 adds per-pile InvestmentIntent and an injected InvestmentSystem coordinating existing adaptation/reproduction laying owners. At most one pending trait and one reproductive intent coexist; priority order preserves earliest queuing/replacement and supports explicit reorder. Eligible specials get the next opportunity before ordinary Auto Brood; structurally ineligible early/follow-up intents allow prerequisite growth. Manual laying honors the first pending intent. Queuing spends no resources/space/labor; actual laying removes only its funded intent, leaving paid cohorts and other pending work intact. Current reproductive/trial capability remains Home-only until M4.
 
 ## Information and presentation
 

@@ -47,6 +47,10 @@ func capture(recording: bool = true) -> void:
 	var pile_ids: Array=_run.colony.piles.keys();pile_ids.sort()
 	for pile_id: String in pile_ids:
 		var pile: PileState=_run.colony.piles[pile_id]
+		if journal.changed("investment/"+pile.id,",".join(pile.investments.priority)+"/"+pile.queued_adaptation): journal.add("investment",pile.id,pile.id,time,time,pile.investments.first() if not pile.investments.priority.is_empty() else "none",pile.investments.priority.size(),0,recording)
+		if pile.reproduction.phase!="none" and journal.changed("investment/"+pile.id+"/laid",pile.reproduction.laid_tick): journal.add("investment",pile.id,pile.id,time,time,"reproduction_laid",0,0,recording)
+		var trial: BroodCohort=pile.trial_cohort()
+		if trial!=null and journal.changed("investment/"+pile.id+"/trial",trial.id): journal.add("investment",pile.id,pile.id,time,time,"adaptation_laid",0,0,recording)
 		for detail: String in ["emerged","lost"]:
 			var value: int=pile.brood_matured_total if detail=="emerged" else pile.brood_lost_total
 			var key: String="brood/"+pile.id+"/"+detail;var before: int=int(journal.seen.get(key,0))

@@ -6,12 +6,14 @@ const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 const Adaptation = preload("res://src/sim/colony/adaptation_system.gd")
 var _run: RunState
 var _adaptation: RefCounted
+var _investments: RefCounted
 var last_error: String = ""
 
 
-func _init(run_state: RunState, adaptation_system: RefCounted = null) -> void:
+func _init(run_state: RunState, adaptation_system: RefCounted = null, investment_system: RefCounted=null) -> void:
 	_run = run_state
 	_adaptation = adaptation_system if adaptation_system != null else Adaptation.new(_run)
+	_investments=investment_system if investment_system!=null else preload("res://src/sim/colony/investment_system.gd").new(_run,_adaptation,ReproductionSystem.new(_run))
 
 
 func start(pile_id: String) -> bool:
@@ -19,10 +21,14 @@ func start(pile_id: String) -> bool:
 		last_error = "Unknown pile"
 		return false
 	var pile: PileState = _run.colony.piles[pile_id]
-	if not pile.queued_adaptation.is_empty():
-		var accepted: bool = _adaptation.start_queued(pile_id)
-		last_error = _adaptation.last_error
+	if not pile.investments.priority.is_empty():
+		var accepted: bool = _investments.start_next(pile_id)
+		last_error = _investments.last_error
 		return accepted
+	return _start_ordinary(pile_id)
+
+func _start_ordinary(pile_id: String) -> bool:
+	var pile: PileState=_run.colony.piles[pile_id]
 	if pile.queen_count < 1:
 		last_error = "No queen in pile"
 		return false
@@ -65,7 +71,8 @@ func production_status(pile_id: String) -> Dictionary:
 	var pile: PileState = _run.colony.piles[pile_id]
 	var waiting: String = "ready"
 	var pending: int = pile.nursery_occupied_space() + CONFIG.starting_count
-	if not pile.queued_adaptation.is_empty(): waiting = "adaptation"
+	var special: String=_investments.next_eligible(pile)
+	if not special.is_empty(): waiting = special
 	elif pile.brood_intent == "manual": waiting = "manual"
 	elif pile.queen_count < 1: waiting = "queen"
 	elif pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pending > pile.nursery_brood_capacity(): waiting = "space"
@@ -130,12 +137,10 @@ func tick(delta: float) -> void:
 		var care_fraction: float = minf(1.0, float(pile.nursery_care_capacity()) / occupied) if occupied > 0 else 1.0
 		for cohort: BroodCohort in pile.brood_cohorts.duplicate():
 			_advance(pile, cohort, delta, care_fraction)
-		# A player's selected trial owns the next laying opportunity, even in Manual.
-		# Do not let ordinary Auto Brood consume that slot while the trial is waiting.
-		if not pile.queued_adaptation.is_empty():
-			_adaptation.start_queued(id)
+		if not _investments.next_eligible(pile).is_empty():
+			_investments.start_next(id,true)
 		elif pile.brood_intent == "grow" and production_status(id).waiting == "ready":
-			start(id)
+			_start_ordinary(id)
 
 
 func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction: float) -> void:

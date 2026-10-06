@@ -18,17 +18,20 @@ func queue_choice(pile_id: String, trait_id: Variant) -> bool:
 	if trait_id != "" and not AdaptationRules.can_queue(pile, trait_id):
 		return _reject("Adaptation already locked, inherited or unavailable")
 	pile.queued_adaptation = trait_id
+	if trait_id.is_empty(): pile.investments.remove("adaptation")
+	else: pile.investments.add("adaptation")
 	last_error = ""
 	return true
 
 
-func start_queued(pile_id: String) -> bool:
+func start_queued(pile_id: String, respect_priority: bool=true) -> bool:
 	if not _run.colony.piles.has(pile_id): return _reject("Unknown pile")
 	var pile: PileState = _run.colony.piles[pile_id]
 	if not pile.foundation.is_empty(): return _reject("Daughter lineage selection is not yet available")
 	if pile.queued_adaptation.is_empty(): return _reject("No adaptation queued")
-	if not start(pile_id, pile.queued_adaptation): return false
+	if not start(pile_id, pile.queued_adaptation,respect_priority): return false
 	pile.queued_adaptation = ""
+	pile.investments.remove("adaptation")
 	return true
 
 
@@ -36,7 +39,7 @@ func queued_status(pile_id: String) -> Dictionary:
 	if not _run.colony.piles.has(pile_id): return {}
 	var pile: PileState = _run.colony.piles[pile_id]
 	return {"trait_id": pile.queued_adaptation,
-		"waiting": laying_blocker(pile, pile.queued_adaptation) if not pile.queued_adaptation.is_empty() else "none"}
+		"waiting": "priority" if not pile.queued_adaptation.is_empty() and pile.investments.first()=="reproduction" and ReproductionSystem.new(_run).structural_blocker(pile).is_empty() else laying_blocker(pile, pile.queued_adaptation) if not pile.queued_adaptation.is_empty() else "none"}
 
 
 func laying_blocker(pile: PileState, trait_id: String) -> String:
@@ -53,13 +56,14 @@ func laying_blocker(pile: PileState, trait_id: String) -> String:
 	return "ready"
 
 
-func start(pile_id: String, trait_id: String) -> bool:
+func start(pile_id: String, trait_id: String, respect_priority: bool=true) -> bool:
 	if not AdaptationRules.valid_trait(trait_id):
 		return _reject("Unknown adaptation")
 	if not _run.colony.piles.has(pile_id):
 		return _reject("Unknown pile")
 	var pile: PileState = _run.colony.piles[pile_id]
 	if not pile.foundation.is_empty(): return _reject("Daughter lineage selection is not yet available")
+	if respect_priority and pile.investments.first()=="reproduction": return _reject("Queued reproduction has priority")
 	if not pile.queued_adaptation.is_empty() and pile.queued_adaptation != trait_id:
 		return _reject("Another adaptation is queued for the next brood")
 	var blocker: String = laying_blocker(pile, trait_id)
@@ -96,6 +100,7 @@ func start(pile_id: String, trait_id: String) -> bool:
 	cohort.recognition_comparison = pile.recognition_experience and not pile.recognition_candidate
 	pile.brood_cohorts.append(cohort)
 	pile.queued_adaptation = ""
+	pile.investments.remove("adaptation")
 	last_error = ""
 	return true
 

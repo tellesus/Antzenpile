@@ -44,6 +44,7 @@ var supply: InterpileSupplySystem
 var reinforcement: WorkerReinforcementSystem
 var founding: FoundingSystem
 var reproduction: ReproductionSystem
+var investments: RefCounted
 var reports: ReportSystem
 
 
@@ -80,7 +81,9 @@ func _attach_run(next_run: RunState) -> void:
 	swarm = Swarm.new(run, trails.apply_loss)
 	trails.swarm = swarm
 	adaptation = Adaptation.new(run)
-	brood = Brood.new(run, adaptation)
+	reproduction = ReproductionSystem.new(run)
+	investments=preload("res://src/sim/colony/investment_system.gd").new(run,adaptation,reproduction)
+	brood = Brood.new(run, adaptation,investments)
 	food_toxicity = FoodToxicitySystem.new(run)
 	brood_health = BroodHealthSystem.new(run, brood.lose_one)
 	heat = HeatSystem.new(run)
@@ -88,7 +91,6 @@ func _attach_run(next_run: RunState) -> void:
 	daughter_supply = InterpileSupplySystem.new(run,"satellite_1")
 	reinforcement = WorkerReinforcementSystem.new(run)
 	founding = FoundingSystem.new(run)
-	reproduction = ReproductionSystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
@@ -255,6 +257,14 @@ func start_founding(knowledge_id: String) -> bool:
 func start_reproduction(pile_id: String) -> bool:
 	if run.history.ended: return false
 	return reproduction.start(pile_id)
+
+func queue_reproduction(pile_id: String, enabled: Variant=true) -> bool:
+	if run.history.ended: return false
+	return investments.queue_reproduction(pile_id,enabled)
+
+func prioritize_investment(pile_id: String, kind: Variant) -> bool:
+	if run.history.ended: return false
+	return investments.prioritize(pile_id,kind)
 
 
 func stop_guest_rejection() -> bool:

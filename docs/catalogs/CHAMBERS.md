@@ -27,7 +27,7 @@ Every organ uses the same context hierarchy: identity/pile → current function/
 
 | ID | Function and supported features | Development/staffing | 1.0 work |
 | --- | --- | --- | --- |
-| CH-QUEEN — Queen | Worker brood intent, reproductive investment, lineage/queen viability and replacement. | Existing Auto/manual brood and reproductive costs remain. New lifecycle states come through SYS-08. | Partial; unify next-investment queue and expose viable replacement/continuation. |
+| CH-QUEEN — Queen | Worker brood intent, reproductive investment, lineage/queen viability and replacement. | Existing Auto/manual brood and reproductive costs remain; saved reproductive/adaptation priority implemented in [143](../tasks/143_reproductive_investment_queue.md). New lifecycle states come through SYS-08. | Partial; queue works with Auto Brood, viable replacement/continuation remains M4. |
 | CH-NURSERY — Nursery | Aggregate egg/larva/pupa occupancy, feeding/care, local health and climate. | Primitive/developed/expanded capacities already exist; further development is a paid project, not an endless level ladder. | Foundation; move capacities/projects into explicit definitions and account for reproductive subspaces. |
 | CH-EXCHANGE — Food Exchange | Converts delivered nutrition into feeding; reveals shortages and recent receipts. | Existing paid development/feeding efficiency; running food demand remains real. | Partial; support captured mixed yields and readable intake/feeding distinction. |
 | CH-ENTRANCE — Entrance | Local departure/return, current supply/migration/evacuation commitments and connection navigation. | Physical route jobs pay local workers/food. | Partial; multiple connections and named transport actions, never simultaneous reuse of the same cohort. |

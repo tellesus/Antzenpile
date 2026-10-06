@@ -34,6 +34,7 @@ var brood_command: Callable
 var brood_care_command: Callable
 var brood_intent_command: Callable
 var reproduction_command: Callable
+var investment_priority_command: Callable
 var queen_tab: String = "workers"
 var activation := preload("res://src/presentation/activation_feedback.gd").new()
 var adaptation_command: Callable
@@ -127,13 +128,15 @@ func activate_at(at: Vector2) -> bool:
 			if _queen_tab_rect(tab).has_point(at):
 				queen_tab=tab; queue_redraw(); return true
 		if queen_tab=="reproduction":
-			if _reproduction_rect().has_point(at) and _status.get("reproduction",{}).get("phase","none")=="none":
+			if _priority_rect("reproduction").has_point(at) and _both_investments():
+				_prioritize("reproduction");return true
+			if _reproduction_rect().has_point(at):
 				if reproduction_command.is_valid():
 					var result: Dictionary = reproduction_command.call()
 					activation.outcome(result)
-					show_feedback("Reproductive brood laid · keep food available" if result.get("accepted",false) else Copy.reason(result.get("reason","Reproduction unavailable")))
+					show_feedback(("Reproductive intent canceled · paid brood continues" if _status.get("investments",{}).get("reproduction",false) else "Reproductive group queued · Auto Brood may stay on") if result.get("accepted",false) else Copy.reason(result.get("reason","Reproduction unavailable")))
 				return true
-			if Rect2(get_viewport_rect().size.x-316,144,292,388).has_point(at): return true
+			if Rect2(get_viewport_rect().size.x-316,144,292,340).has_point(at): return true
 		for intent: String in ["manual", "grow"]:
 			if _brood_intent_rect(intent).has_point(at):
 				if brood_intent_command.is_valid():
@@ -187,6 +190,7 @@ func activate_at(at: Vector2) -> bool:
 		_run_command("guest_rejection")
 		return true
 	if selected_id == "adaptation" and web_selection in ["lean", "load", "persistent", "security", "tolerance", "fighter"] and _can_choose_adaptation():
+		if _both_investments() and _priority_rect("adaptation").has_point(at): _prioritize("adaptation");return true
 		if _adaptation_rect(web_selection).has_point(at):
 			_run_command("cancel_adaptation" if _queued_trait() == web_selection else "adaptation_" + web_selection)
 			return true
@@ -387,7 +391,14 @@ func _queen_tab_rect(tab: String) -> Rect2:
 
 
 func _reproduction_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x-300,466,260,44)
+	return Rect2(get_viewport_rect().size.x-300,390,260,44)
+
+func _priority_rect(_kind: String) -> Rect2: return Rect2(get_viewport_rect().size.x-300,440,260,44)
+func _both_investments() -> bool: return _status.get("investments",{}).get("priority",[]).size()==2
+func _prioritize(kind: String) -> void:
+	if not investment_priority_command.is_valid(): return
+	var result: Dictionary=investment_priority_command.call(kind);activation.outcome(result)
+	show_feedback("Next investment changed · paid brood stays locked" if result.get("accepted",false) else result.get("reason","Priority unavailable"))
 
 
 func _brood_intent_rect(intent: String) -> Rect2:
@@ -451,6 +462,7 @@ func _queued_trait() -> String:
 
 
 func _can_lay_brood() -> bool:
+	if _status.get("investments",{}).get("next","")=="reproduction": return _status.investments.reproduction_wait.is_empty()
 	if not _queued_trait().is_empty(): return _status.get("adaptation_queue", {}).get("waiting", "") == "ready"
 	return _status.get("queens", 0) > 0 and _status.get("brood", []).size() < _status.get("nursery_brood_capacity", 0) / maxi(1, _status.get("brood_batch_count", 8)) and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
 
@@ -631,6 +643,7 @@ func _draw_context(size: Vector2) -> void:
 	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292,466 if selected_id=="entrance" and not _status.get("reinforcement",{}).is_empty() else  (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses and _status.food_exchange_state != "developed" else 388 if food_attention or selected_id == "queen" or selected_id=="food_exchange" and _status.get("daughter",false) or selected_id=="entrance" and not _status.get("supply",{}).is_empty() else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	if selected_id == "food_exchange" and _status.get("daughter",false): box.size.y = 444 if food_attention else 388
 	if selected_id == "nursery" and _guest_attention(): box.size.y = 526
+	if selected_id=="queen" and queen_tab=="reproduction": box.size.y=340
 	var web: bool = selected_id == "adaptation"
 	UIStyle.surface(self, box, Color("17141f") if web else Color("111921"))
 	UIStyle.surface(self, box, Color("786683") if web else Color("41535a"), true)
@@ -688,8 +701,10 @@ func _draw_context(size: Vector2) -> void:
 			_label(box.position + Vector2(16, 273), wait_text, Color("a9b9bc"), 15)
 			if production.waiting == "adaptation":
 				_label(box.position + Vector2(16, 273), "Next: " + Web.short_title(_queued_trait()), Color("d9c5a5"), 15)
-			_label(box.position + Vector2(16, 294), Web.queue_wait(_status) if production.waiting == "adaptation" else "Auto checks food, care and space.", Color("8fa1a8"), 15)
-			_label(box.position + Vector2(16, 313), "Queued trial has priority." if production.waiting == "adaptation" else "Brood inherits the founding queen." if _status.get("daughter",false) else "Manual brood still needs feeding.", Color("8fa1a8"), 15)
+			elif production.waiting=="reproduction": _label(box.position+Vector2(16,273),"Next: reproductive group",Color("d9c5a5"),15)
+			var next_wait: String=Web.queue_wait(_status) if production.waiting=="adaptation" else _status.get("investments",{}).get("reproduction_wait","") if production.waiting=="reproduction" else "Auto checks food, care and space."
+			_label(box.position + Vector2(16, 294),Copy.fit_line(next_wait,_font,13,260), Color("8fa1a8"), 13)
+			_label(box.position + Vector2(16, 313), "Special investment has priority." if production.waiting in ["adaptation","reproduction"] else "Brood inherits the founding queen." if _status.get("daughter",false) else "Manual brood still needs feeding.", Color("8fa1a8"), 13)
 			_draw_brood_button()
 		"nursery":
 			var brood: Array = _status.brood
@@ -889,41 +904,19 @@ func _draw_reinforcement_context(box: Rect2) -> void:
 func _draw_reproduction_context(box: Rect2) -> void:
 	var state: Dictionary = _status.get("reproduction",{})
 	var phase: String = state.get("phase","none")
-	if phase=="departed":
-		_detail_line(box,111,"Reproductives committed away")
-		_detail_line(box,139,"Inspect Shelter in OUTWARD")
-		_detail_line(box,179,"Active laying queens: %d" % _status.queens)
-		_detail_line(box,207,"Home worker brood can continue")
-		return
-	if phase=="ready":
-		_detail_line(box,111,"1 young queen · 2 supporting males")
-		_detail_line(box,139,"Ready for a founding expedition")
-		_detail_line(box,179,"Active laying queens: %d" % _status.queens)
-		_detail_line(box,207,"Reproductives are not workers")
-		_detail_line(box,253,"Workers and food must travel")
-		_detail_line(box,279,"to a remembered nest site.")
-		return
-	if phase in ["egg","larva","pupa"]:
-		_detail_line(box,111,"Reproductive %s · %.0f%%" % [phase,state.get("progress",0.0)*100])
-		_detail_line(box,139,"%d spaces · %d nurses committed" % [state.space,state.nurses])
-		_detail_line(box,179,"1 young queen + 2 males developing")
-		var missing: Array = state.get("food_shortfalls",[])
-		var names: Array[String] = []
-		for id: String in missing: names.append(Copy.resource(id))
-		_detail_line(box,207,"Waiting for "+" / ".join(names) if not names.is_empty() else "Fed from on-hand stores" if phase=="larva" else "Development continues with care")
-		_detail_line(box,253,"Four nurses support this group")
-		_detail_line(box,279,"Worker brood and trials still compete")
-		_detail_line(box,301,"for food and free Nursery space.")
-		return
-	_detail_line(box,111,"Raise 1 young queen + 2 males")
-	_detail_line(box,139,"Needs %d emerged workers" % state.get("emerged_required",32))
-	_detail_line(box,167,"Developed Nursery + Food Exchange")
-	_detail_line(box,199,"%d free spaces · %d nurses" % [state.get("space",8),state.get("nurses",4)])
+	var intent: Dictionary=_status.get("investments",{})
+	var queued: bool=intent.get("reproduction",false)
 	var costs: Dictionary = state.get("costs",{})
-	_detail_line(box,225,"Lay: %.0f carbs · %.0f protein · %.0f water" % [costs.get("carbohydrate",12),costs.get("protein",12),costs.get("water",8)])
-	_detail_line(box,253,"Larvae also need sustained feeding")
-	_detail_line(box,279,"Brood develops into reproductives")
-	_draw_action(_reproduction_rect(),"LAY REPRODUCTIVE BROOD",Copy.reason(state.get("blocker","Requirements unavailable")))
+	var current: String="Raise 1 young queen + 2 males" if phase=="none" else "Ready · inspect a remembered shelter" if phase=="ready" else "Founding group committed away" if phase=="departed" else "%s · %.0f%% · 1 queen + 2 males" % [phase.capitalize(),state.get("progress",0)*100]
+	var next: String="Next: reproductives" if intent.get("next","")=="reproduction" else "Next: "+Web.short_title(_queued_trait()) if intent.get("next","")=="adaptation" else "No special investment queued"
+	var wait: String=intent.get("reproduction_wait",state.get("blocker",""))
+	if queued and intent.get("next","")=="adaptation": wait="Adaptation has first priority"
+	var missing: Array=state.get("food_shortfalls",[])
+	var lines: Array[String]=[current,"%d spaces · %d nurses when laid" % [state.get("space",8),state.get("nurses",4)],"Lay: %.0f carbs · %.0f protein · %.0f water" % [costs.get("carbohydrate",12),costs.get("protein",12),costs.get("water",8)],"Queueing is free · larvae need feeding",next,wait if not wait.is_empty() else "Ready · next tick lays the queued group" if queued else "Auto Brood may stay on", "Paid group locked; cancel clears intent"]
+	if not missing.is_empty(): lines[3]="Current larvae need "+" / ".join(missing)
+	for index: int in lines.size(): _label(box.position+Vector2(16,111+index*19),Copy.fit_line(lines[index],_font,12,260),Color("a9b9bc"),12)
+	_draw_action(_reproduction_rect(),"CANCEL QUEUED GROUP" if queued else "QUEUE NEXT GROUP")
+	if _both_investments(): _draw_action(_priority_rect("reproduction"),"REPRODUCTIVES NEXT"+(" ✓" if intent.get("next","")=="reproduction" else ""))
 
 
 func _draw_genetic_context(box: Rect2) -> void:
@@ -960,8 +953,12 @@ func _draw_genetic_context(box: Rect2) -> void:
 		var queued: bool = _queued_trait() == web_selection
 		_draw_action(rect, "CANCEL QUEUED CHOICE" if queued else "REPLACE QUEUED CHOICE" if not _queued_trait().is_empty() else "QUEUE FOR NEXT BROOD", "", Color("28212f"))
 		UIStyle.surface(self, rect, Color("a28aaf"), true)
-		_detail_line(box, 302, Web.queue_wait(_status) if queued else "Paid only when eggs are laid")
-		_detail_line(box, 326, "Change choice until eggs are laid" if queued else "Replaces choice; no waiting list")
+		if _both_investments():
+			_label(box.position+Vector2(16,235),Copy.fit_line(Web.queue_wait(_status),_font,12,260),Color("a9b9bc"),12)
+			_draw_action(_priority_rect("adaptation"),"ADAPTATION NEXT"+(" ✓" if _status.investments.next=="adaptation" else ""))
+		else:
+			_detail_line(box, 302, Web.queue_wait(_status) if queued else "Paid only when eggs are laid")
+			_detail_line(box, 326, "Change choice until eggs are laid" if queued else "Replaces choice; no waiting list")
 	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
 		_detail_line(box, 185, "Locked · " + str(_status.adaptation_trial.stage).capitalize())
 		_detail_line(box, 211, "Expresses only with surviving adults")
@@ -1003,6 +1000,7 @@ func _detail_line(box: Rect2, y: float, value: String) -> void:
 
 
 func _brood_block_reason() -> String:
+	if _status.get("investments",{}).get("next","")=="reproduction": return Copy.reason(_status.investments.reproduction_wait)
 	if not _queued_trait().is_empty():
 		return Web.queue_wait(_status) if _status.get("adaptation_queue", {}).get("waiting", "") != "ready" else ""
 	if _status.get("queens", 0) < 1: return "No queen available"
@@ -1019,7 +1017,7 @@ func _draw_action(box: Rect2, title: String, shortage: String = "", color: Color
 
 
 func _draw_brood_button() -> void:
-	_draw_action(_brood_rect(), "LAY QUEUED TRIAL NOW" if not _queued_trait().is_empty() else "LAY %d BROOD NOW" % _status.brood_batch_count, _brood_block_reason())
+	_draw_action(_brood_rect(), "LAY NEXT INVESTMENT" if not _status.get("investments",{}).get("priority",[]).is_empty() else "LAY QUEUED TRIAL NOW" if not _queued_trait().is_empty() else "LAY %d BROOD NOW" % _status.brood_batch_count, _brood_block_reason())
 
 
 func _draw_nursery_develop_button() -> void:

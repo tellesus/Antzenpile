@@ -8,24 +8,29 @@ var _run: RunState
 var last_error: String = ""
 func _init(run_state: RunState) -> void: _run=run_state
 
-func blocker(pile: PileState) -> String:
+func structural_blocker(pile: PileState) -> String:
 	if not pile.foundation.is_empty(): return "Daughter reproductive generations are not yet available"
 	if pile.id=="home" and _run.founding.phase not in ["none","failed","established"]: return "Founding group is committed away from Home"
 	if pile.reproduction.phase!="none": return "A reproductive group is already growing or ready"
 	if pile.queen_count<1: return "No queen can lay reproductive brood"
 	if pile.brood_matured_total<CONFIG.emerged_required: return "Raise %d workers before reproductive brood" % CONFIG.emerged_required
 	if pile.nursery_state!="developed" or pile.food_exchange_state!="developed": return "Develop Nursery and Food Exchange first"
-	if not pile.queued_adaptation.is_empty(): return "Queued adaptation owns the next brood slot"
+	return ""
+
+func blocker(pile: PileState, respect_priority: bool=true) -> String:
+	var structural: String=structural_blocker(pile)
+	if not structural.is_empty(): return structural
+	if respect_priority and not pile.queued_adaptation.is_empty() and pile.investments.first()!="reproduction": return "Queued adaptation owns the next brood slot"
 	if pile.nursery_brood_capacity()-pile.nursery_occupied_space()<CONFIG.space: return "Need %d free Nursery spaces" % CONFIG.space
 	if pile.workers_assignable<CONFIG.nurses: return "Need %d available reproductive nurses" % CONFIG.nurses
 	for id: String in PileState.RESOURCE_IDS:
 		if pile.resources[id]<CONFIG.costs()[id]: return "Need %.0f %s for reproductive laying" % [CONFIG.costs()[id],id]
 	return ""
 
-func start(pile_id: String) -> bool:
+func start(pile_id: String, respect_priority: bool=true) -> bool:
 	if not _run.colony.piles.has(pile_id): last_error="Unknown pile"; return false
 	var pile: PileState = _run.colony.piles[pile_id]
-	last_error = blocker(pile)
+	last_error = blocker(pile,respect_priority)
 	if not last_error.is_empty(): return false
 	var commitment: String = "reproduction:"+pile_id
 	if not pile.workers.create_commitment(commitment,"internal",pile_id): last_error="Reproductive nurse assignment unavailable"; return false
@@ -38,6 +43,7 @@ func start(pile_id: String) -> bool:
 		last_error="Could not fund reproductive laying"; return false
 	pile.reproduction.phase="egg"; pile.reproduction.laid_tick=_run.clock.tick_count
 	pile.reproduction.inherited_traits=pile.offspring_traits()
+	pile.investments.reproduction=false;pile.investments.remove("reproduction")
 	return true
 
 func tick() -> void:

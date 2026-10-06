@@ -7,6 +7,7 @@ var food_toxicity := FoodToxicityState.new()
 var brood_health := BroodHealthState.new()
 var temperature := TemperatureState.new()
 var reproduction := ReproductionState.new()
+var investments := preload("res://src/sim/colony/investment_intent.gd").new()
 
 const Ledger = preload("res://src/sim/colony/worker_ledger.gd")
 const Brood = preload("res://src/sim/colony/brood_cohort.gd")
@@ -71,6 +72,7 @@ func to_dict() -> Dictionary:
 		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
 		"brood_intent": brood_intent,
 		"queued_adaptation": queued_adaptation,
+		"investments":investments.to_dict(),
 		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
 		"adapted_workers_lost": adapted_workers_lost,
 		"genetics": genetics.to_dict(),
@@ -392,6 +394,9 @@ func restore(data: Dictionary) -> bool:
 	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), restored_genetics.established, candidate, recognition_available, locked_trait)):
 		return false
 	var restored_reproduction := ReproductionState.new()
+	var restored_investments:=preload("res://src/sim/colony/investment_intent.gd").new()
+	var investment_data: Variant=data.get("investments",{"reproduction":false,"priority":["adaptation"] if restored_queue!="" else []})
+	if not investment_data is Dictionary or not restored_investments.restore(investment_data,restored_queue!="",int(data.queen_count),not founding_data.is_empty()): return false
 	var reproduction_data: Variant = data.get("reproduction",restored_reproduction.to_dict())
 	if not reproduction_data is Dictionary or not restored_reproduction.restore(reproduction_data,restored,data.id,restored_genetics.established,emerged,restored_nursery_state,data.food_exchange_state,int(data.queen_count)): return false
 	if occupied+restored_reproduction.occupied_space()>brood_limit: return false
@@ -460,6 +465,7 @@ func restore(data: Dictionary) -> bool:
 	brood_lost_total = int(brood_lost)
 	brood_intent = restored_intent
 	queued_adaptation = restored_queue
+	investments=restored_investments
 	adaptation_repertoire = repertoire
 	adapted_workers_total = int(adapted)
 	adapted_workers_lost = int(adapted_lost)

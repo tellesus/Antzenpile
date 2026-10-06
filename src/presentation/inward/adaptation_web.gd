@@ -76,6 +76,7 @@ static func queue_wait(status: Dictionary) -> String:
 	if waiting == "ready":
 		return "Ready · resume to lay" if status.get("paused", false) else "Ready · lays on next tick"
 	return {"space": "Waiting for Nursery space", "trial": "Waiting for current trial to finish",
+		"priority":"Reproductives have next priority",
 		"nurses": "Waiting for two available nurses", "population": "Population limit reached",
 		"carbohydrate": "Waiting for trial carbs", "protein": "Waiting for trial protein",
 		"water": "Waiting for trial water", "unavailable": "Trait unavailable"}.get(waiting, "")

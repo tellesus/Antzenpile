@@ -1,9 +1,17 @@
 # 143 — Queue reproductive investment with Auto Brood
 
-Status: planned. M2-A/SYS-05/06/13/14.
+Status: complete. M2-A/SYS-05/06/13/14.
 
 Outcome: leave Auto Brood on, queue one reproductive group, see what it needs and cancel/reorder it while unfunded. One queued adaptation and one reproductive intent may coexist. The earlier queued intent is next unless deliberately reordered. Existing paid brood continues; eligible special investment has priority over new ordinary laying, while structurally ineligible early intent permits ordinary growth toward its prerequisites.
 
 Scope: per-pile saved queue/priority, existing paid laying owners and deterministic scheduling; visible Queen and adaptation waiting/priority controls and semantic queue reports. Keep the current Home-only reproductive/trial foundation until M4; do not fabricate daughter capability, queens/mating or refund paid groups. Queue itself spends no ants/food/space. Alcove comes in the following organ card.
 
 Verify automatic growth plus reproductive laying, simultaneous queues and explicit priority/cancel, structural versus resource/space waits, continuing paid care/feeding, no free/duplicate payment, lock after laying, exact old/corrupt save and all four speeds, Queen/adaptation mouse/touch/draw. Targeted then full/import/Main; manual feel deferred to systems beta.
+
+Implemented: optional typed InvestmentIntent, existing trait plus one reproductive intent and unique ordered priority; replacement preserves its position, explicit priority reorders and cancellation removes only unpaid intent. InvestmentSystem coordinates existing laying owners. Eligible specials get the next space/nurse/food opportunity before ordinary Auto Brood; early structural/group-slot waits permit prerequisite growth or a later eligible special. Manual laying respects the first pending intent. Paid brood keeps inherited traits, care, feeding and its commitment; follow-up queue/cancel never refunds it. Home-only trial/reproductive capability remains until M4.
+
+Queen has compact QUEUE/CANCEL and priority controls; selected traits can regain priority; worker production describes the next investment and real wait. Auto Brood remains on. Local queue/priority and paid-laying reports inspect Queen; no hidden truth is added. Old saves derive their existing adaptation priority and no invented reproduction, with strict atomic corruption validation.
+
+Evidence: targeted **941/0**; final full **9,168/0 in 84.13 seconds**; clean pinned headless import/Main120 and **14 reproductive/priority/paid drawing callbacks**, standard/compact. Tests cover both priorities, real single payment/nurses, early growth, eligible underfunded/space waits, follow-up cancellation, legacy/type/membership corruption, four speeds and actual Queen mouse/touch/trait priority. Earlier full found one old exact-state assertion missing the new saved priority; updated it and the final gate passed. No failed final gate remains. Graphical/feel/audio acceptance deferred by A88; user assets/slot untouched.
+
+Changed groups: typed queue/scheduler, pile save/validation and existing brood/adaptation/reproduction owners; controller/Root projections/commands, Queen/trait controls and semantic local reports; meaningful queue plus updated old intent regressions; current contracts/status/catalog. Logs ignored under `.godot/card143_*`. Handoff: [144 reproductive alcove](144_reproductive_alcove.md), then Ventilation Gallery/appropriate effort controls and captured yield bundles.

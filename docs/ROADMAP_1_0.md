@@ -12,7 +12,7 @@ Windows desktop comes first. Keep touch-sized controls. Mobile, a fixed session-
 
 ## Milestone order
 
-M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1 is in progress (source identity complete); M2–M9 remain planned. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
+M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 is in progress with reproductive queue/priority complete; M3–M9 remain planned. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
 
 | Milestone | Player outcome and required scope | Dependencies | Exit evidence |
 | --- | --- | --- | --- |
@@ -56,7 +56,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M1-D complete:** [142 source comparison and scout intent](tasks/142_source_comparison_and_scout_intent.md), knowledge-based sorts, historical intake/target/wait comparison, compact Home/Daughter browsers and named scout priorities/actual local waits. Full 9,126/0; import/Main/headless drawing passed. Existing binary aphid tending remains partial until producer effort is generalized; internal effort controls will be rounded out with M2 organs.
 
-**Next: M2 queued reproductive investment and priority**, using the now-established M1 orders/source/report foundations. Auto Brood must stay on; do not replace queueing with toggling it off. Then modular paid organs/yield bundles and remaining suitable staffing complete these foundations. Player graphical/feel checks defer to the feature-complete systems beta (A88).
+**M2-A complete:** [143 reproductive investment queue](tasks/143_reproductive_investment_queue.md), saved editable reproductive/adaptation priority, structural versus funding waits, Auto Brood continuation, immutable paid groups and local reports. Full 9,168/0; import/Main/headless drawing passed.
+
+**Next: [144 Reproductive Alcove](tasks/144_reproductive_alcove.md)**, then Ventilation Gallery/appropriate effort controls and captured yield bundles. These use the now-established orders/source/report/queue foundations. Player graphical/feel checks defer to the feature-complete systems beta (A88).
 
 ## Release acceptance and cost discipline
 

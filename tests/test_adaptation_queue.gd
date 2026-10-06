@@ -29,6 +29,7 @@ func _replacement_and_priority(test: Object):
 	var before: Dictionary = game.run.to_dict()
 	test.check(game.queue_adaptation("home", "lean"), "Full Primitive Nursery accepts a pending adaptation")
 	before.colony.piles[0].queued_adaptation = "lean"
+	before.colony.piles[0].investments.priority = ["adaptation"]
 	test.check(game.run.to_dict() == before and game.adaptation.queued_status("home").waiting == "space", "Queue changes only saved intent, not resources, workers, brood, clock or RNG")
 	test.check(game.queue_adaptation("home", "load"), "A new choice replaces the pending trait")
 	before.colony.piles[0].queued_adaptation = "load"
@@ -92,7 +93,7 @@ func _followup_and_save(test: Object):
 	test.check(pile.adaptation_repertoire == "lean" and pile.trial_cohort().adaptation_id == "tolerance" and pile.trial_cohort().inherited_traits == ["lean", "tolerance"] and pile.queued_adaptation == "", "Follow-up locks the replacement choice and captures established traits at actual laying")
 	before = game.run.to_dict()
 	test.check(not game.queue_adaptation("home", "security") and game.run.to_dict() == before, "Conflicting recognition branch cannot replace a laid trial")
-	var old: Dictionary = snapshot(funded(false)); old.colony.piles[0].erase("queued_adaptation")
+	var old: Dictionary = snapshot(funded(false)); old.colony.piles[0].erase("queued_adaptation");old.colony.piles[0].erase("investments")
 	test.check(copy.restore_snapshot(old) and copy.run.colony.piles.home.queued_adaptation == "", "Legacy saves default to no queued adaptation")
 	var bad: Dictionary = old.duplicate(true); bad.colony.piles[0].queued_adaptation = "persistent"
 	before = copy.run.to_dict()
@@ -139,6 +140,7 @@ func _ui(test: Object):
 	test.check(view.web_selection == "load" and view._queued_trait() == "lean", "Inspecting another graph leaf does not silently overwrite the queue")
 	touch.position = view._adaptation_rect("load").get_center(); view._unhandled_input(touch); view._process(0)
 	before.colony.piles[0].queued_adaptation = "load"
+	before.colony.piles[0].investments.priority = ["adaptation"]
 	test.check(root.simulation.run.to_dict() == before and view._queued_trait() == "load", "Explicit touch action replaces only next-brood intent")
 	view._unhandled_input(touch); view._process(0)
 	test.check(view._queued_trait() == "" and root.simulation.run.colony.piles.home.trial_cohort() == null, "Queued leaf offers cancellation without changing existing brood")

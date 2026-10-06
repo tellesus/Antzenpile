@@ -38,6 +38,7 @@ func run(test: Object) -> bool:
 	test.check(view.web_selection == "lean" and root.simulation.run.to_dict() == before, "Mouse selects a genetic leaf without buying or mutating gameplay")
 	test.check(view._adaptation_rect("lean") == view._adaptation_rect("load"), "Selected genetic choices share one consistent action location")
 	before.colony.piles[0].queued_adaptation = "lean"
+	before.colony.piles[0].investments.priority = ["adaptation"]
 	test.check(view.activate_at(view._adaptation_rect("lean").get_center()) and root.simulation.run.to_dict() == before and root.inward_status("home").adaptation_queue.waiting == "space", "Full Nursery accepts a queued choice without laying, spending or a timing window")
 	root.simulation = known_fixture()
 	view._status = root.inward_status("home")
