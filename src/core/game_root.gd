@@ -52,6 +52,7 @@ func _ready() -> void:
 		outward.pile_command = inspect_outward_pile
 		outward.trail_create_command = create_trail_for
 		outward.gather_order_command = order_gathering
+		outward.effort_command = set_effort
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
 		outward.investigate_command = focused_source_investigation
@@ -88,6 +89,7 @@ func _ready() -> void:
 		inward.reproduction_command = toggle_reproductive_queue
 		inward.investment_priority_command = prioritize_investment
 		inward.chamber_command = order_chamber
+		inward.effort_command = set_effort
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
 		inward.adaptation_command = queue_adaptation
@@ -309,6 +311,7 @@ func inspect_pile(pile_id: String) -> bool:
 		_inward_view.selected_id=""; _inward_view.queen_tab="workers"; _inward_view._feedback=""; _inward_view._process(0)
 		_inward_view.gathering.reset()
 		_inward_view.chamber_controls.reset()
+		_inward_view.effort_draft.opened=false
 	return true
 
 
@@ -343,7 +346,7 @@ func inspect_outward_pile(pile_id: String) -> bool:
 		_inward_view.selected_id = ""
 		_inward_view.gathering.reset()
 	set_mode("outward")
-	if _inward_view!=null: _inward_view.chamber_controls.reset()
+	if _inward_view!=null: _inward_view.chamber_controls.reset();_inward_view.effort_draft.opened=false
 	if _outward_view != null: _outward_view._process(0)
 	return true
 
@@ -563,6 +566,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"reproduction": simulation.reproduction.summary(pile_id),
 		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
+			"cap":simulation.humidity.CONFIG.care_cap,"suggestion":1,"gallery":pile.chambers.complete("ventilation_gallery"),
 			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
 			"water_used": (pile.humidity.water_used_units + pile.temperature.water_used_units) / 100000.0},
 		"midden": midden_summary(pile_id),
@@ -673,6 +677,7 @@ func _refresh_loaded_views() -> void:
 		_inward_view._feedback = ""
 		_inward_view.chamber_controls.reset()
 		_inward_view._process(0)
+		_inward_view.effort_draft.opened=false
 	if _debug_view != null:
 		_debug_view.set_process_input(true)
 		_debug_view.snapshot_provider = simulation.run.to_dict
@@ -697,7 +702,13 @@ func midden_summary(pile_id: String) -> Dictionary:
 	if not simulation.run.colony.piles.has(pile_id):
 		return {}
 	var state: SanitationState = simulation.run.colony.piles[pile_id].midden
+	var pile: PileState=simulation.run.colony.piles[pile_id]
+	var expected: int=pile.workers_total+simulation.run.pending_for_pile(pile_id)
+	var generated: float=(expected*SANITATION_CONFIG.worker_quarters_per_tick+pile.nursery_occupied_space()*SANITATION_CONFIG.brood_quarters_per_tick)/4.0
+	var removal: int=SANITATION_CONFIG.removal_units_per_worker_tick*(SANITATION_CONFIG.developed_multiplier if state.state=="developed" else 1)
+	var suggestion: int=clampi(ceili(generated/removal)+(1 if state.burden_units>=SANITATION_CONFIG.strain_units else 0),1,SANITATION_CONFIG.cleaner_cap)
 	return {"revealed": state.revealed, "state": state.state,
+		"cap":SANITATION_CONFIG.cleaner_cap,"suggestion":suggestion,
 		"burden": float(state.burden_units) / SANITATION_CONFIG.units_per_quantity,
 		"cleaners": state.cleaners, "larval_rate": state.larval_rate(),
 		"progress": float(state.progress_ticks) / SANITATION_CONFIG.build_ticks,
@@ -718,6 +729,14 @@ func set_sanitation_workers(target: int) -> Dictionary:
 func set_humidity_workers(target: int) -> Dictionary:
 	var accepted: bool = simulation.set_humidity_workers(inward_pile_id, target)
 	return {"accepted": accepted, "reason": simulation.humidity.last_error}
+
+func set_effort(kind: String, count: Variant) -> Dictionary:
+	var accepted: bool=false;var reason: String="Unknown staffing job"
+	match kind:
+		"climate": accepted=simulation.set_humidity_workers(inward_pile_id,count);reason=simulation.humidity.last_error
+		"cleanup": accepted=simulation.set_sanitation_workers(inward_pile_id,count);reason=simulation.sanitation.last_error
+		"exploration": accepted=simulation.set_exploration(count,inward_pile_id);reason=simulation.scouting.last_error
+	return {"accepted":accepted,"queued":accepted and kind=="exploration","reason":reason}
 
 
 func guest_summary(pile_id: String) -> Dictionary:

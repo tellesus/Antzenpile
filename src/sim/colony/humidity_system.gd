@@ -43,15 +43,16 @@ func tick() -> void:
 		var ambient: int = CONFIG.wet_ambient if raining else CONFIG.dry_ambient
 		var drift: int = CONFIG.wet_step if raining else CONFIG.dry_step
 		state.moisture = int(move_toward(state.moisture, ambient, drift))
-		var adjustment: int = mini(absi(CONFIG.starting - state.moisture), state.carers * CONFIG.care_step)
+		var care_step: int=pile.chambers.climate_step(CONFIG.care_step)
+		var adjustment: int = mini(absi(CONFIG.starting - state.moisture), state.carers * care_step)
 		if state.moisture < CONFIG.starting and adjustment > 0:
 			# Moisture and water cost share the same authored per-worker ratio.
-			var cost: int = ceili(float(adjustment) * CONFIG.water_units_per_worker_tick / CONFIG.care_step)
+			var cost: int = ceili(float(adjustment) * CONFIG.water_units_per_worker_tick / care_step)
 			if pile.resources.water < cost / 100000.0:
 				cost = floori(pile.resources.water * 100000.0)
 			if cost > WorkerLedger.MAX_COUNT - state.water_used_units:
 				continue
-			adjustment = mini(adjustment, floori(float(cost) * CONFIG.care_step / CONFIG.water_units_per_worker_tick))
+			adjustment = mini(adjustment, floori(float(cost) * care_step / CONFIG.water_units_per_worker_tick))
 			var paid: bool = pile.consume_resources({"water": cost / 100000.0})
 			assert(paid)
 			state.water_used_units += cost

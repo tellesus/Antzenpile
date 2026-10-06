@@ -60,7 +60,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M2-B complete:** [144 Reproductive Alcove](tasks/144_reproductive_alcove.md), first modular paid organ project, care-protected queue/funding/cancel, independent pile ownership and eight exclusive reproductive spaces. Full 9,208/0; import/Main/headless drawing passed. First funded reproductive saves also have validated interval dates.
 
-**Next: [145 Ventilation Gallery and local effort](tasks/145_ventilation_and_local_effort.md)**, then captured yield bundles. These use the established orders/source/report/queue/project foundations. Player graphical/feel checks defer to the feature-complete systems beta (A88).
+**M2-C complete:** [145 Ventilation Gallery and local effort](tasks/145_ventilation_and_local_effort.md), paid bounded staffed regulation and whole climate/cleanup/scout targets with free drafts/suggestions, existing care/water/dispatch owners and presets. Full 9,249/0; import/Main/headless drawing passed.
+
+**Next: [146 captured mixed-food cargo and ripe fruit](tasks/146_mixed_food_cargo.md)**, using established orders/source/report/queue/project foundations. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

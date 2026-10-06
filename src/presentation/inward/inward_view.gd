@@ -37,6 +37,8 @@ var reproduction_command: Callable
 var investment_priority_command: Callable
 var chamber_controls:=preload("res://src/presentation/inward/chamber_controls.gd").new()
 var chamber_command: Callable
+var effort_draft:=preload("res://src/presentation/effort_draft.gd").new()
+var effort_command: Callable
 var queen_tab: String = "workers"
 var activation := preload("res://src/presentation/activation_feedback.gd").new()
 var adaptation_command: Callable
@@ -90,6 +92,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if effort_draft.opened:
+		var effort_action: String=effort_draft.action_at(get_viewport_rect().size,at)
+		if not effort_action.is_empty(): effort_draft.activate(self,get_viewport_rect().size,effort_action,effort_command);return true
+		for command: String in ["outward","pause","speed_1","speed_4","speed_16","speed_64"]:
+			if _button_rect(command).has_point(at): _run_command(command);return true
+		return true
+	if not chamber_controls.opened and _effort_available() and _effort_link_rect().has_point(at):
+		var kind: String="climate" if selected_id=="nursery" else "cleanup"
+		var state: Dictionary=_status.get("humidity" if kind=="climate" else "midden",{})
+		effort_draft.begin(kind,int(state.get("carers" if kind=="climate" else "cleaners",0)),int(state.get("cap",4 if kind=="climate" else 8)),int(state.get("suggestion",1)));return true
 	if chamber_controls.activate(self,at,_status.get("chambers",[]),chamber_command): return true
 	if chamber_controls.opened:
 		for command: String in ["outward","pause","speed_1","speed_4","speed_16","speed_64"]:
@@ -401,6 +413,8 @@ func _reproduction_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x-300,390,260,44)
 
 func _priority_rect(_kind: String) -> Rect2: return Rect2(get_viewport_rect().size.x-300,440,260,44)
+func _effort_link_rect() -> Rect2: return Rect2(get_viewport_rect().size.x-140,150,100,44)
+func _effort_available() -> bool: return selected_id=="nursery" and _status.get("nursery_state","")=="developed" or selected_id=="midden" and _status.get("midden",{}).get("revealed",false)
 func _both_investments() -> bool: return _status.get("investments",{}).get("priority",[]).size()==2
 func _prioritize(kind: String) -> void:
 	if not investment_priority_command.is_valid(): return
@@ -488,6 +502,7 @@ func _draw() -> void:
 		_draw_context(size)
 		_draw_controls(size)
 		chamber_controls.draw(self,_status.get("chambers",[]))
+		if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
 		activation.draw(self)
 		return
 	var centers: Dictionary = positions(size)
@@ -521,6 +536,7 @@ func _draw() -> void:
 	_draw_context(size)
 	_draw_controls(size)
 	chamber_controls.draw(self,_status.get("chambers",[]))
+	if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
 	activation.draw(self)
 
 
@@ -640,6 +656,7 @@ func _draw_hud(size: Vector2) -> void:
 
 
 func _draw_context(size: Vector2) -> void:
+	if effort_draft.opened or chamber_controls.opened: return
 	if selected_id.is_empty() or _status.is_empty():
 		return
 	if selected_id == "food_exchange" and _status.get("daughter",false) and gathering.opened:
@@ -657,6 +674,7 @@ func _draw_context(size: Vector2) -> void:
 	UIStyle.surface(self, box, Color("17141f") if web else Color("111921"))
 	UIStyle.surface(self, box, Color("786683") if web else Color("41535a"), true)
 	_label(box.position + Vector2(16, 31), "Adaptation Web" if web else _title(selected_id), Color("decce8") if web else Color("d9d3be"), 20)
+	if _effort_available(): _draw_action(_effort_link_rect(),"STAFFING")
 	if web and web_selection == "honeydew":
 		_draw_relationship_context(box)
 		return

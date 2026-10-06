@@ -4,6 +4,8 @@ var projects: Dictionary[String,ChamberProject]={}
 func complete(id: String) -> bool: return projects.has(id) and projects[id].phase=="complete"
 func reproductive_spaces() -> int:
 	return ChamberCatalog.DEFINITIONS.reproductive_alcove.reproductive_spaces if complete("reproductive_alcove") else 0
+func climate_step(base: int) -> int:
+	return floori(float(base)*ChamberCatalog.DEFINITIONS.ventilation_gallery.climate_gain_percent/100.0) if complete("ventilation_gallery") else base
 func to_dict() -> Array[Dictionary]:
 	var result: Array[Dictionary]=[];var ids: Array=projects.keys();ids.sort()
 	for id: String in ids: result.append(projects[id].to_dict())

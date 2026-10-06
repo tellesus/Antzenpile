@@ -53,6 +53,6 @@ func summary(pile_id: String) -> Array[Dictionary]:
 	for id: String in ids:
 		var definition: ChamberDefinition=ChamberCatalog.DEFINITIONS[id]
 		var project: ChamberProject=pile.chambers.projects.get(id)
-		result.append({"id":id,"name":definition.display_name,"description":definition.description,"phase":project.phase if project!=null else "unbuilt","progress":float(project.progress_ticks)/definition.duration_ticks if project!=null else 0,"workers":definition.workers,"duration":definition.duration_ticks*SimulationClock.TICK_INTERVAL,"costs":definition.costs(),"wait":blocker(pile,definition) if project==null or project.phase=="queued" else "","space":definition.reproductive_spaces,"occupied":pile.reproduction.occupied_space() if pile.chambers.complete(id) else 0})
+		result.append({"id":id,"name":definition.display_name,"description":definition.description,"phase":project.phase if project!=null else "unbuilt","progress":float(project.progress_ticks)/definition.duration_ticks if project!=null else 0,"workers":definition.workers,"duration":definition.duration_ticks*SimulationClock.TICK_INTERVAL,"costs":definition.costs(),"wait":blocker(pile,definition) if project==null or project.phase=="queued" else "","space":definition.reproductive_spaces,"climate_gain":definition.climate_gain_percent,"occupied":mini(pile.reproduction.occupied_space(),definition.reproductive_spaces) if pile.chambers.complete(id) else 0})
 	return result
 func _reject(reason: String) -> bool: last_error=reason;return false

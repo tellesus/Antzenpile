@@ -1,6 +1,6 @@
 # Current state contracts
 
-Baseline: gameplay through 144. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
+Baseline: gameplay through 145. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
 
 ## Persistent envelope and run
 
@@ -16,6 +16,7 @@ The run owns scenario/seed, fixed clock, separate simulation/genetic RNG state, 
 - Brood captures stage/progress, trial/inherited traits and real losses. Genetics stores disjoint living/lost/imported/exported phenotype bundles. Existing established trait IDs are `lean`, `load`, `persistent`, `security`, `tolerance`, `fighter`; exclusive pairs remain lean/load and security/tolerance.
 - 143 optionally adds pile `investments`: exactly `{reproduction: bool, priority: Array[String]}` with at most unique adaptation/reproduction members, matching the actual pending trait and reproductive intent. Queueing requires a laying queen and current supported Home capability; paid reproduction is independent and cannot be canceled into refunds. Absent old state derives existing adaptation priority and no reproductive intent. Invalid types, membership, duplicates or unsupported daughter/queen combinations reject atomically. No timestamps are needed: order preserves accepted intent chronology, including replacement/reordering.
 - 144 optionally adds pile `chambers`, an array of unique typed `{id,phase,progress_ticks,funded_tick}` records for implemented definitions. Queued state has zero progress/date and no pool; developing requires developed Nursery and exact `organ:<pile>:<id>` internal workers; complete requires full duration and no builders. Unknown/duplicate/orphan/foreign pools or unsupported progress reject; RunState checks funding date/progress against the clock. Old absence means no organs. Shared occupancy is total brood less the completed Alcove's supported reproductive spaces; worker capacity/care stays unchanged. Scheduled reproductive laying captures its interval's start before same-interval aging.
+- 145 adds `ventilation_gallery` using the same project record. Its immutable 150% definition multiplies integer humidity/heat steps with downward rounding after completion; existing systems retain actual water counters. No saved efficiency override or new operating count is introduced. Whole climate/cleanup/scout targets remain in their existing owners; EffortDraft is unsaved attention.
 - Only owned unresolved losses are added back to expected population/expression presentation. Raw truth is never used as an instantaneous UI casualty count.
 
 ## World, observation and travel

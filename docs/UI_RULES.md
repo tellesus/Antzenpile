@@ -1,6 +1,6 @@
 # Current UI contracts and development boundaries
 
-Baseline: gameplay through 144. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Five identities, common outcome feedback, delivered/local reports, source comparisons, flexible gathering, reproductive investment queues and a paid Alcove work; remaining content stays planned.
+Baseline: gameplay through 145. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Five identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
 
 ## Views and evidence
 
@@ -19,6 +19,8 @@ Inspecting, selecting a trait, opening history and browsing are free attention. 
 142 adds source sorting by colony label, report recency, historical total intake, worker target or known alarm. Zero intake means unproven yield. Compact Home pages use one row; standard uses two; Daughter cards/actions fit above time controls. Exploration names recurring/queued/awaiting source priorities and local/shared/manual effort, with actual off/target/cap/care/labor/spacing waits. Viewing/sorting/page changes never dispatch, and turning attention does not change search bias.
 
 144 CHAMBERS is free project inspection with a standard/compact context above time controls. Queue/cancel are explicit; requirements name construction labor, nutrition and time. Pending/developing/complete occupancy remains local. Cancel releases builders without recreating spent food; completed organs stay locked. Queen owns reproductive intent; Queen/Nursery distinguish exclusive Alcove and shared worker space. Project history links inspect without issuing orders; attention resets on pile/load/new run.
+
+145 STAFFING in Nursery/Midden and EFFORT in Exploration open a free whole-count draft with suggestion/zero/max and explicit ASSIGN or SET TARGET; presets remain shortcuts. Show local free workers/care, supported range, water/cleanup role or shared scout/spacing/travel meaning. Gallery improves staffed regulation after completion; water remains real. Drafts shield underlying actions/captions and clear on pile/load/new run; competing context actions hide during modal attention.
 
 ## Implemented conflict surface
 

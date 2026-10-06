@@ -45,7 +45,7 @@ Decision: spend nutrition/work/time on predictable reproductive scheduling versu
 
 ### CH-VENTILATION — Ventilation Gallery
 
-**Planned M2.** A paid extension for developed piles that improves the existing climate job's regulation efficiency. It is an upgrade to humidity/temperature care, not an independent magic cooling source. Passive shelter and staffed ventilation are separate: staffing still uses local workers and humidifying/cooling can still require water.
+**Implemented M2 in [145](../tasks/145_ventilation_and_local_effort.md).** A paid extension improves regulation by up to 50% per actual worker/water use, with integer steps rounded down. Provisional project: 24C/12P/8W, four care-protected builders, 90 seconds. No passive cooling/moistening or extra workers; only completion activates the hook. Staffing and humidifying/cooling water remain with their existing owners.
 
 Its target is a practical alternative to continually increasing climate workers in an exposed/hot or damp site. It must not erase site character or give complete weather immunity. The existing Nursery regulation remains usable before this project completes.
 

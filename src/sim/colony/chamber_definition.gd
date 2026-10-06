@@ -10,4 +10,5 @@ extends Resource
 @export var protein: float=12
 @export var water: float=8
 @export var reproductive_spaces: int=0
+@export var climate_gain_percent: int=100
 func costs() -> Dictionary: return {"carbohydrate":carbohydrate,"protein":protein,"water":water}

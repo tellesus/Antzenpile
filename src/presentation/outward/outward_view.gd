@@ -28,6 +28,8 @@ var exploration_bias_command: Callable
 var exploration_open: bool = false
 var source_sort: String = "label"
 var priority_page: int = 0
+var effort_draft:=preload("res://src/presentation/effort_draft.gd").new()
+var effort_command: Callable
 var pause_command: Callable
 var speed_command: Callable
 var founding_command: Callable
@@ -96,6 +98,7 @@ func _process(delta: float) -> void:
 
 
 func reset_mission_visuals() -> void:
+	effort_draft.opened=false
 	gathering_draft.opened=false
 	conflict.reset()
 	_seen_missions.clear()
@@ -180,6 +183,7 @@ func cancel_pointer_gesture() -> void:
 
 
 func _panel_at(at: Vector2) -> bool:
+	if effort_draft.opened and effort_draft.panel(get_viewport_rect().size).has_point(at): return true
 	if sources_open and _sources_panel_rect().has_point(at): return true
 	if exploration_open and _exploration_panel_rect().has_point(at): return true
 	if not _selected_signal().is_empty() or not _selected_mission().is_empty():
@@ -196,6 +200,7 @@ func _exploration_panel_rect() -> Rect2:
 
 
 func _context_panel_rect() -> Rect2:
+	if effort_draft.opened: return effort_draft.panel(get_viewport_rect().size)
 	if gathering_draft.opened: return gathering_draft.panel(get_viewport_rect().size)
 	if _journey_attention(): return conflict.layout(get_viewport_rect().size).bounds
 	var height: float = 448 if _journey_attention() else 292 if not _selected_mission().is_empty() else 344 + _evidence_offset()
@@ -239,6 +244,11 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 
 func _run_command(command: String) -> void:
+	if command.begins_with("effort_"):
+		effort_draft.activate(self,get_viewport_rect().size,command,effort_command);return
+	if command=="exploration_edit":
+		var policy: Dictionary=_status.get("exploration",{})
+		effort_draft.begin("exploration",int(policy.get("target",0)),int(_status.get("scout_cap",8))-int(policy.get("other_target",0)),5);return
 	if command.begins_with("gather_") or command=="trail_create":
 		_run_gathering_command(command);return
 	if command.begins_with("conflict_") or command.begins_with("draft_"):
@@ -364,6 +374,7 @@ func _run_command(command: String) -> void:
 				activation.outcome(result)
 				if not result.get("accepted", false): _feedback = result.get("reason", "Internal attention unavailable")
 		"sources":
+			effort_draft.opened=false
 			gathering_draft.opened=false
 			if _journey_attention(): selected_id = ""; journey_open = false; conflict.reset()
 			sources_open = not sources_open
@@ -559,6 +570,9 @@ func _button_rect(command: String) -> Rect2:
 
 
 func _button_at(at: Vector2) -> String:
+	if effort_draft.opened:
+		var effort_action: String=effort_draft.action_at(get_viewport_rect().size,at)
+		if not effort_action.is_empty(): return effort_action
 	if gathering_draft.opened:
 		var gather_command: String=gathering_draft.command_at(at,get_viewport_rect().size)
 		if not gather_command.is_empty(): return gather_command
@@ -580,7 +594,7 @@ func _button_at(at: Vector2) -> String:
 			return "source_page"
 		return "source_panel"
 	if exploration_open:
-		for command: String in ["explore_0", "explore_2", "explore_5", "explore_8", "exploration_bias", "exploration_general","exploration_priorities"]:
+		for command: String in ["explore_0", "explore_2", "explore_5", "explore_8", "exploration_bias", "exploration_general","exploration_priorities","exploration_edit"]:
 			if _exploration_rect(command).has_point(at):
 				return command
 	var mission: Dictionary = _selected_mission()
@@ -736,6 +750,7 @@ func _prepare_signal_captions(size: Vector2) -> void:
 		_caption_blocks.append(Rect2(size.x - 316, 144, 292, 400 if _selected_signal().get("category")=="nest_site" else 344 + _evidence_offset()))
 	if sources_open: _caption_blocks.append(_sources_panel_rect())
 	if exploration_open: _caption_blocks.append(_exploration_panel_rect())
+	if effort_draft.opened: _caption_blocks.append(effort_draft.panel(size))
 	var ordered: Array[Dictionary] = _placed.duplicate()
 	ordered.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		if (a.id == selected_id) != (b.id == selected_id): return a.id == selected_id
@@ -841,6 +856,7 @@ func _draw_hud(size: Vector2) -> void:
 
 
 func _draw_context(size: Vector2) -> void:
+	if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("available_workers",0)));return
 	var mission: Dictionary = _selected_mission()
 	if not mission.is_empty():
 		_draw_mission_context(mission, size)
@@ -1219,6 +1235,7 @@ func _draw_sources() -> void:
 
 
 func _exploration_rect(command: String) -> Rect2:
+	if command=="exploration_edit": return Rect2(168,154,64,44)
 	if command=="exploration_priorities": return Rect2(240,154,76,44)
 	var index: int = ["explore_0", "explore_2", "explore_5", "explore_8"].find(command)
 	if index >= 0:
@@ -1230,6 +1247,7 @@ func _draw_exploration() -> void:
 	UIStyle.surface(self, _exploration_panel_rect(), Color("111921"))
 	var policy: Dictionary = _status.get("exploration", {"target": 0, "away": 0, "bias": null})
 	_label(Vector2(40, 177), "Exploration", Color("d3dcd4"), 20)
+	UIStyle.surface(self,_exploration_rect("exploration_edit"),Color("283b3f"));_label(_exploration_rect("exploration_edit").get_center()+Vector2(0,5),"EFFORT",Color("d3dcd4"),11,HORIZONTAL_ALIGNMENT_CENTER)
 	_label(Vector2(40, 203), "Target %d scouts · %d currently away" % [policy.target, policy.away], Color("a8b9b6"), 14)
 	for target: int in [0, 2, 5, 8]:
 		var box: Rect2 = _exploration_rect("explore_%d" % target)

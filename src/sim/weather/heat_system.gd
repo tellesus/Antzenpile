@@ -35,13 +35,14 @@ func tick() -> void:
 		if pile.nursery_state != "developed": continue
 		var state: TemperatureState = pile.temperature
 		state.temperature = int(move_toward(state.temperature, air, CONFIG.drift_per_tick))
-		var adjustment: int = mini(maxi(0, state.temperature - CONFIG.baseline), pile.humidity.carers * CONFIG.care_step)
+		var care_step: int=pile.chambers.climate_step(CONFIG.care_step)
+		var adjustment: int = mini(maxi(0, state.temperature - CONFIG.baseline), pile.humidity.carers * care_step)
 		if adjustment == 0: continue
 		# Shared climate labor, but each actual humidity/cooling water debit remains distinct.
-		var cost: int = ceili(float(adjustment) * CONFIG.water_units_per_worker_tick / CONFIG.care_step)
+		var cost: int = ceili(float(adjustment) * CONFIG.water_units_per_worker_tick / care_step)
 		cost = mini(cost, floori(pile.resources.water * 100000.0))
 		if cost > WorkerLedger.MAX_COUNT - state.water_used_units: continue
-		adjustment = mini(adjustment, floori(float(cost) * CONFIG.care_step / CONFIG.water_units_per_worker_tick))
+		adjustment = mini(adjustment, floori(float(cost) * care_step / CONFIG.water_units_per_worker_tick))
 		if adjustment == 0: continue
 		var paid: bool = pile.consume_resources({"water": cost / 100000.0})
 		assert(paid)

@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 144. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 145. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 ## Ownership and dependency direction
 
@@ -37,6 +37,8 @@ GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance 
 143 adds per-pile InvestmentIntent and an injected InvestmentSystem coordinating existing adaptation/reproduction laying owners. At most one pending trait and one reproductive intent coexist; priority order preserves earliest queuing/replacement and supports explicit reorder. Eligible specials get the next opportunity before ordinary Auto Brood; structurally ineligible early/follow-up intents allow prerequisite growth. Manual laying honors the first pending intent. Queuing spends no resources/space/labor; actual laying removes only its funded intent, leaving paid cohorts and other pending work intact. Current reproductive/trial capability remains Home-only until M4.
 
 144 introduces immutable ChamberDefinition/Catalog and typed ChamberProject/Set/System. The first complete entry is Reproductive Alcove: queued care-protected funding, prepaid construction, cancellation without consumed-food refund and real completion. New projects have ledger pools and clock-validated dates; legacy chamber flags/definitions retain their behavior and costs. Dedicated reproductive capacity subtracts supported reproductive occupancy from shared Nursery space without adding worker slots or caregivers. Queued reproductive laying dates the start of its aging interval, preserving immediate funded saves.
+
+145 adds Ventilation Gallery under that owner, with a bounded regulation-step hook after completion. Humidity and Heat still own distinct actual water debits; no new operating pool or passive immunity. EffortDraft exposes whole climate/cleanup/scout ranges through existing care-protected setters. Suggestions use approved local/known summaries; editing is unsaved attention, not a universal allocator.
 
 ## Information and presentation
 

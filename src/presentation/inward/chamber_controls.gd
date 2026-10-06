@@ -46,6 +46,9 @@ func draw(view: Node2D, entries: Array) -> void:
 	if not chosen.is_empty():
 		var costs: Dictionary=chosen.costs
 		var lines: Array[String]=[chosen.name,chosen.description,"%d construction ants · %s" % [chosen.workers,Copy.duration(chosen.duration)],"Build: %.0f carbs · %.0f protein · %.0f water" % [costs.carbohydrate,costs.protein,costs.water],"%s · %.0f%%" % [chosen.phase.capitalize(),chosen.progress*100],chosen.wait if not chosen.wait.is_empty() else "%d/%d reproductive spaces occupied" % [chosen.occupied,chosen.space] if chosen.phase=="complete" else "Existing care and feeding continue","Queue is free; funding pays once","Cancel releases workers, refunds no spent food","Queen controls reproductive intent"]
+		if chosen.id=="ventilation_gallery":
+			lines[5]=chosen.wait if not chosen.wait.is_empty() else "Climate staff and water still required"
+			lines[8]="Assign climate carers in Nursery"
 		for index: int in lines.size(): _text(view,box.position+Vector2(232,64+index*23),lines[index],14 if index==0 else 12,box.size.x-248)
 		if chosen.phase!="complete":
 			var target: Rect2=rect(size,"order");Style.surface(view,target,Color("35463d"));_text(view,target.position+Vector2(12,28),"CANCEL PROJECT" if chosen.phase in ["queued","developing"] else "QUEUE CONSTRUCTION",13,target.size.x-24)
