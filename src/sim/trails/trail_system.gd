@@ -13,6 +13,7 @@ var last_error: String = ""
 var _run: RunState
 var _predator: PredatorSystem
 var _rival: RivalSystem
+var surface_impact: SurfaceImpactSystem
 var swarm: SwarmSystem
 
 
@@ -22,27 +23,29 @@ func _init(run_state: RunState, predator_system: PredatorSystem = null, rival_sy
 	_rival = rival_system if rival_system != null else RivalSystem.new(run_state)
 
 
-func create_route(origin_id: String, knowledge_id: String) -> bool:
+func create_route(origin_id: String, knowledge_id: String, count: Variant = CONFIG.initial_workers) -> bool:
 	if not _run.colony.piles.has(origin_id) or not _run.knowledge.nodes.has(knowledge_id):
 		return _reject("Destination is not known to this colony")
+	if _run.knowledge.nodes[knowledge_id].definition_id not in PileState.RESOURCE_IDS:
+		return _reject("Gatherers need a food or water source")
+	var pile: PileState = _run.colony.piles[origin_id]
+	if typeof(count)!=TYPE_INT or not WorkerLedger.valid_count(count) or count<1 or count>pile.workers_total+_run.pending_for_pile(origin_id): return _reject("Choose a whole target within this pile's known workforce")
 	var existing: TrailRouteState = _run.trails.find_route(origin_id, knowledge_id)
 	if existing != null:
 		if existing.status in ["inactive", "recalling"]:
-			return set_workers(existing.id, CONFIG.initial_workers)
+			return set_workers(existing.id, count)
 		return _reject("A route to this destination already exists")
-	var pile: PileState = _run.colony.piles[origin_id]
 	var estimate: Vector2 = _run.knowledge.nodes[knowledge_id].estimated_position
 	if not estimate.is_finite() or estimate == pile.position:
 		return _reject("Destination has no usable direction")
 	if _run.trails.next_route_id >= WorkerLedger.MAX_COUNT:
 		return _reject("Route ID unavailable")
-	if pile.workers_available < CONFIG.initial_workers:
-		return _reject("Not enough available workers")
+	var assigned: int=mini(int(count),pile.workers_assignable)
 	var id: String = "route_%d" % _run.trails.next_route_id
 	var commitment: String = "trail:" + id
-	if pile.workers.count(commitment) >= 0 or not pile.workers.create_commitment(commitment, "trail", id):
+	if pile.workers.count(commitment) >= 0 or assigned>0 and not pile.workers.create_commitment(commitment, "trail", id):
 		return _reject("Trail commitment unavailable")
-	if not pile.workers.allocate(commitment, CONFIG.initial_workers):
+	if assigned>0 and not pile.allocate_workers(commitment, assigned):
 		pile.workers.retire_commitment(commitment)
 		return _reject("Not enough available workers")
 	var route := Route.new()
@@ -51,9 +54,10 @@ func create_route(origin_id: String, knowledge_id: String) -> bool:
 	route.destination_knowledge_id = knowledge_id
 	route.estimated_destination = estimate
 	route.segment_id = "segment_%d" % _run.trails.next_route_id
-	route.desired_workers = CONFIG.initial_workers
-	route.allocated_workers = CONFIG.initial_workers
-	route.status = "active"
+	route.desired_workers = int(count)
+	route.waiting_workers = int(count)-assigned
+	route.allocated_workers = assigned
+	route.status = "active" if assigned>0 else "inactive"
 	var segment := Segment.new()
 	segment.id = route.segment_id
 	segment.route_id = route.id
@@ -71,25 +75,31 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	if not _run.trails.routes.has(route_id) or typeof(target) != TYPE_INT or not WorkerLedger.valid_count(target):
 		return _reject("Unknown route or invalid worker target")
 	var route: TrailRouteState = _run.trails.routes[route_id]
+	for entry: Dictionary in _run.journey_response.orders.recruitment.values():
+		if entry.waiting.has(route_id) and target > route.desired_workers: return _reject("Workers recalled for a conflict order; cancel that order first")
+	if target > 0 and _run.journey_response.active() and _run.journey_response.route_id == route_id and _run.journey_response.approach.candidate != null: return _reject("Wait for the alternate-approach party to return")
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var commitment: String = "trail:" + route.id
+	if route.purpose!="food": return _reject("Founding workers belong to their expedition")
 	var requested: int = int(target)
+	if requested>pile.workers_total+_run.pending_for_pile(pile.id): return _reject("Order exceeds this pile's known workforce")
 	var expected: int = route.allocated_workers + _run.trails.pending_losses(route.id)
 	if requested == route.desired_workers and requested <= expected:
+		route.waiting_workers=0
 		last_error = ""
 		return true
 	if requested > expected:
-		var needed: int = requested - expected
-		if pile.workers_available < needed:
-			return _reject("Not enough available workers")
-		if route.status == "inactive" and not pile.workers.create_commitment(commitment, "trail", route.id):
+		var needed: int = mini(requested - expected,pile.workers_assignable)
+		if needed>0 and route.allocated_workers==0 and pile.workers.count(commitment)<0 and not pile.workers.create_commitment(commitment, "trail", route.id):
 			return _reject("Trail commitment unavailable")
-		if not pile.workers.allocate(commitment, needed):
+		if needed>0 and not pile.allocate_workers(commitment, needed):
 			if route.status == "inactive":
 				pile.workers.retire_commitment(commitment)
 			return _reject("Could not allocate workers")
 		route.allocated_workers += needed
+		route.waiting_workers=requested-expected-needed
 	else:
+		route.waiting_workers=0
 		var releasable: int = mini(route.allocated_workers - requested, route.allocated_workers - route.active_workers)
 		if releasable > 0:
 			if not pile.workers.release(commitment, releasable):
@@ -131,6 +141,20 @@ func recheck(route_id: String) -> bool:
 	last_error = ""
 	return true
 
+func _fund_waiting(route: TrailRouteState) -> void:
+	if route.purpose!="food" or route.waiting_workers==0 or route.reported_depleted: return
+	var pile: PileState=_run.colony.piles[route.origin_pile]
+	var count: int=mini(route.waiting_workers,pile.workers_assignable)
+	if count==0: return
+	var commitment: String="trail:"+route.id
+	var created: bool=pile.workers.count(commitment)<0
+	if created and not pile.workers.create_commitment(commitment,"trail",route.id): return
+	if not pile.allocate_workers(commitment,count):
+		if created: pile.workers.retire_commitment(commitment)
+		return
+	route.allocated_workers+=count;route.waiting_workers-=count
+	route.status="active"
+
 
 func set_recovery_watch(route_id: String, enabled: bool) -> bool:
 	if not _run.trails.routes.has(route_id):
@@ -151,6 +175,7 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var route: TrailRouteState = _run.trails.routes[id]
+		_fund_waiting(route)
 		if route.resume_on_report and route.status == "depleted" and route.active_workers == 0 and route.reported_losses == 0 and route.foreign_reports == 0 and _run.knowledge.recovery_report(route.destination_knowledge_id, route.last_empty_report_at):
 			var resumed: bool = recheck(id)
 			assert(resumed)
@@ -160,6 +185,7 @@ func tick(delta: float) -> void:
 	for id: String in ids:
 		var cohort: TransitCohort = _run.trails.cohorts[id]
 		var route: TrailRouteState = _run.trails.routes[cohort.route_id]
+		if surface_impact != null: surface_impact.encounter(cohort)
 		if cohort.detour != null:
 			if cohort.detour.tick(_run.world, _run.rng, _run.simulation_time):
 				cohort.detour_report = cohort.detour.observation.detached_copy()
@@ -190,7 +216,7 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var route: TrailRouteState = _run.trails.routes[id]
-		if route.status == "active" and route.departure_cooldown_ticks == 0:
+		if route.purpose=="food" and route.status == "active" and route.departure_cooldown_ticks == 0:
 			_depart(route)
 
 
@@ -201,7 +227,7 @@ func _encounter(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var progress: float = 1.0 - float(cohort.remaining_ticks) / _leg_ticks(route)
 	if cohort.direction == "inbound":
 		progress = 1.0 - progress
-	var point: Vector2 = segment.start.lerp(segment.end, progress)
+	var point: Vector2 = segment.point_at( progress)
 	if point.distance_to(PREDATOR_CONFIG.position) > PREDATOR_CONFIG.radius:
 		return
 	# Saturated encounters still consume this journey's one opportunity.
@@ -215,7 +241,7 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
 	var phenotype: String = pile.genetics.loss_profile(adapted == 1, pile.adaptation_repertoire, pile.workers_total, _run.rng)
-	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "ambush" if cause == "predator" else "foreign conflict", phenotype)
+	var removed: bool = pile.lose_workers("trail:" + route.id, 1, adapted, "surface impact" if cause == "impact" else "ambush" if cause == "predator" else "foreign conflict", phenotype)
 	assert(removed)
 	route.allocated_workers -= 1
 	route.active_workers -= 1
@@ -227,19 +253,25 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 	if cause == "rival":
 		cohort.rival_losses += 1
 		cohort.witnessed_fighting = cohort.worker_count > 0
+	elif cause == "impact":
+		cohort.impact_losses += 1
 	else:
 		cohort.witnessed_attack = cohort.worker_count > 0
 	var payload_before: float = cohort.payload
-	cohort.payload = minf(cohort.payload, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
+	cohort.payload = minf(cohort.payload, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier/cohort.cargo_bulk)
+	if not cohort.cargo_yields.is_empty(): cohort.payload=float(String.num(cohort.payload,5))
 	cohort.contaminant_mass *= cohort.payload / payload_before if payload_before > 0 else 0.0
 	if cohort.payload == 0.0:
-		cohort.resource_id = ""
+		cohort.clear_cargo()
 	if cohort.worker_count == 0:
+		cohort.impact_witness_at = 0.0
 		cohort.witnessed_attack = false
 		cohort.witnessed_fighting = false
 		cohort.detour_report = null
+		cohort.harvest_report = null
 		cohort.swarm_engaged = false
 		cohort.conflict_report = ""
+		cohort.conflict_serial = 0
 		cohort.conflict_observed_at = 0.0
 	if route.allocated_workers == 0:
 		var retired: bool = pile.workers.retire_commitment("trail:" + route.id)
@@ -254,7 +286,7 @@ func _maybe_detour(cohort: TransitCohort, route: TrailRouteState) -> bool:
 		return false
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	var progress: float = 1.0 - float(cohort.remaining_ticks) / float(_leg_ticks(route))
-	var join: Vector2 = segment.start.lerp(segment.end, progress).round()
+	var join: Vector2 = segment.point_at( progress).round()
 	if not _run.world.bounds.has_point(join) or not is_finite(Pathfinder.travel_cost(_run.world, join)):
 		return false
 	var ids: Array = _run.world.nodes.keys()
@@ -304,8 +336,8 @@ func _depart(route: TrailRouteState) -> void:
 		return
 	var worker_count: int = mini(idle, CONFIG.workers_per_cohort)
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-	var length: float = segment.start.distance_to(segment.end)
-	var terrain_cost: float = Segment.terrain_cost_for(_run.world, segment.start, segment.end)
+	var length: float = segment.length()
+	var terrain_cost: float = segment.terrain_cost(_run.world)
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	var fraction: float = pile.adaptation_fraction()
 	# Quantize captured phenotype to the same stable decimal precision used for resource debits.
@@ -317,11 +349,17 @@ func _depart(route: TrailRouteState) -> void:
 	if pile.resources.carbohydrate < energy_cost:
 		# A carbohydrate trip can replenish an exhausted pile. Pay the available reserve
 		# now and settle the remainder against its cargo; other routes must wait.
-		if _run.knowledge.nodes[route.destination_knowledge_id].definition_id != "carbohydrate":
+		var destination: KnownNode=_run.knowledge.nodes[route.destination_knowledge_id]
+		if "carbohydrate" not in SourceCatalog.roles(destination.source_type,destination.definition_id):
 			route.energy_limited = true
 			return
 		var available: float = pile.resources.carbohydrate
 		unpaid_energy_cost = roundf((energy_cost - available) * 100000.0) / 100000.0
+		var known_profile: SourceProfile=SourceCatalog.PROFILES.get(destination.source_type)
+		var known_bulk: float=known_profile.bulk if known_profile!=null else 1.0
+		var potential: float=worker_count*CONFIG.carry_per_worker*carry_multiplier/known_bulk*SourceCatalog.nutrients(destination.source_type,destination.definition_id).get("carbohydrate",0.0)
+		if potential+0.00001<unpaid_energy_cost:
+			route.energy_limited=true;return
 		if not pile.consume_resources({"carbohydrate": available}):
 			return
 	elif not pile.consume_resources({"carbohydrate": energy_cost}):
@@ -333,6 +371,7 @@ func _depart(route: TrailRouteState) -> void:
 	cohort.unpaid_energy_cost = unpaid_energy_cost
 	cohort.energy_multiplier = energy_multiplier
 	cohort.carry_multiplier = carry_multiplier
+	cohort.combat_multiplier = pile.combat_multiplier()
 	cohort.chemistry_fraction = chemistry
 	cohort.remaining_ticks = _leg_ticks(route)
 	_run.trails.cohorts[cohort.id] = cohort
@@ -350,17 +389,44 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	if not node.active or node.quantity <= 0.0 or node.position.distance_to(route.estimated_destination) > CONFIG.interaction_radius * (1.0 + 0.5 * reliability(segment)):
 		return
-	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier)
-	node.quantity = maxf(0.0, node.quantity - amount)
+	var profile: SourceProfile=SourceCatalog.PROFILES.get(node.source_type)
+	var bulk: float=profile.bulk if profile!=null else 1.0
+	var amount: float = minf(node.quantity, cohort.worker_count * CONFIG.carry_per_worker * cohort.carry_multiplier/bulk)
+	if profile!=null and (not profile.yields.is_empty() or bulk!=1): amount=float(String.num(amount,5))
+	# Canonical decimal quantities match saved resource precision.
+	node.quantity = float(String.num(maxf(0.0, node.quantity - amount), 5))
 	if node.quantity == 0.0:
 		node.active = false
 	cohort.payload = amount
 	cohort.resource_id = node.definition_id
-	cohort.contaminant_mass = amount * node.properties.get("contaminant_fraction",0.0)
+	if profile!=null and (not profile.yields.is_empty() or bulk!=1):
+		cohort.cargo_source_type=node.source_type;cohort.cargo_bulk=bulk
+		cohort.cargo_yields.assign(SourceCatalog.nutrients(node.source_type,node.definition_id))
+	var carbohydrate: float=cohort.cargo_yields.get("carbohydrate",0.0) if not cohort.cargo_yields.is_empty() else 1.0 if node.definition_id=="carbohydrate" else 0.0
+	cohort.contaminant_mass = amount * carbohydrate * node.properties.get("contaminant_fraction",0.0)
+	if amount > 0 and _run.next_scout_id < WorkerLedger.MAX_COUNT and not node.source_type.is_empty() and _run.knowledge.nodes[route.destination_knowledge_id].source_type != node.source_type:
+		var sample := Observation.new()
+		sample.scout_id = "scout_%d" % _run.next_scout_id; _run.next_scout_id += 1
+		sample.source_node_id = node.id; sample.id = sample.scout_id+":"+node.id
+		sample.origin_pile = route.origin_pile; sample.definition_id = node.definition_id; sample.source_type = node.source_type
+		sample.first_observed_at = _run.simulation_time; sample.observed_at = _run.simulation_time
+		sample.estimated_position = node.position; sample.uncertainty_radius = 0.25; sample.closest_distance = 0; sample.proximity_confirmed = true
+		cohort.harvest_report = sample
 
+
+func _record_nutrient(route: TrailRouteState, id: String, amount: float) -> void:
+	var primary: String=_run.knowledge.nodes[route.destination_knowledge_id].definition_id
+	if not route.nutrient_receipts.has(id):
+		var old: Dictionary=route.receipt if id==primary else {}
+		route.nutrient_receipts[id]={"first_at":old.get("first_at",_run.simulation_time),"last_at":_run.simulation_time,"last_amount":amount,"earlier_unrecorded":old.get("earlier_unrecorded",route.delivered_total>0 if id==primary else false),"total":route.delivered_total if id==primary else 0.0}
+	var entry: Dictionary=route.nutrient_receipts[id]
+	entry.last_at=_run.simulation_time;entry.last_amount=amount;entry.total=float(String.num(float(entry.total)+amount,5))
 
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var pile: PileState = _run.colony.piles[route.origin_pile]
+	if cohort.worker_count > 0 and cohort.harvest_report != null:
+		assert(not _run.delivered_observations.has(cohort.harvest_report.id))
+		_run.delivered_observations[cohort.harvest_report.id] = cohort.harvest_report.detached_copy()
 	if cohort.detour_report != null:
 		assert(not _run.delivered_observations.has(cohort.detour_report.id))
 		_run.delivered_observations[cohort.detour_report.id] = cohort.detour_report.detached_copy()
@@ -373,8 +439,20 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if cohort.worker_count > 0 and cohort.conflict_report != "" and cohort.conflict_observed_at >= route.conflict_observed_at:
 		route.conflict_report = cohort.conflict_report
 		route.conflict_observed_at = cohort.conflict_observed_at
+		route.conflict_received_at = _run.simulation_time
+		route.conflict_serial = cohort.conflict_serial
+		if cohort.conflict_report in ["secured","withdrew","dispersed"] and cohort.conflict_serial > route.settled_conflict_serial:
+			route.settled_conflict_serial = cohort.conflict_serial
+			if cohort.conflict_report in ["withdrew","dispersed"]:
+				var paused: bool = set_workers(route.id,0)
+				assert(paused)
 	if cohort.lost_workers > 0:
 		route.reported_losses += cohort.lost_workers
+		route.reported_impact_losses += cohort.impact_losses
+		if cohort.worker_count > 0 and cohort.impact_witness_at > 0:
+			var estimate: Vector2 = _run.trails.segments[route.segment_id].point_at(0.5).round()
+			route.impact_report = {"observed_at":cohort.impact_witness_at,"received_at":_run.simulation_time,"estimated_position":[estimate.x,estimate.y]}
+			_run.journey_response.orders.targets[route.id] = 0
 		route.reported_rival_losses += cohort.rival_losses
 		route.last_loss_time = _run.simulation_time
 		if cohort.worker_count == 0:
@@ -389,10 +467,15 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 		var recorded: bool = _run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail")
 		assert(recorded)
 	if cohort.payload > 0.0:
-		var net_payload: float = maxf(0.0, cohort.payload - cohort.unpaid_energy_cost)
-		var net_contaminant: float = cohort.contaminant_mass * net_payload / cohort.payload
-		var deposited: bool = pile.deposit_resource(cohort.resource_id, net_payload, net_contaminant)
-		assert(deposited)
+		var outputs: Dictionary=cohort.outputs()
+		var carbohydrate: float=cohort.payload*cohort.cargo_yields.get("carbohydrate",0.0) if not cohort.cargo_yields.is_empty() else cohort.payload if cohort.resource_id=="carbohydrate" else 0.0
+		for id: String in PileState.RESOURCE_IDS:
+			var amount: float=outputs.get(id,0.0)
+			if amount<=0: continue
+			var contamination: float=cohort.contaminant_mass*amount/carbohydrate if id=="carbohydrate" and carbohydrate>0 else 0.0
+			var deposited: bool=pile.deposit_resource(id,amount,contamination);assert(deposited)
+			if not cohort.cargo_yields.is_empty(): _record_nutrient(route,id,amount)
+		var net_payload: float=outputs.get(cohort.resource_id,0.0)
 		var recorded_amount: float = roundf(net_payload * 100000.0) / 100000.0
 		if recorded_amount > 0:
 			if route.receipt.is_empty():
@@ -428,7 +511,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 
 func _leg_ticks(route: TrailRouteState) -> int:
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-	return CONFIG.leg_ticks(segment.start.distance_to(segment.end))
+	return CONFIG.leg_ticks(segment.length())
 
 
 static func reliability(segment: TrailSegmentState) -> float:

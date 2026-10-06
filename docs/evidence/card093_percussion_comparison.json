@@ -1,0 +1,44 @@
+{
+  "comparison": "Actual 092/093 48-second, 44100-Hz mono 16-bit exports",
+  "woodblock_events_before": 12,
+  "woodblock_events_after": 0,
+  "shaker_events_before": 64,
+  "shaker_events_after": 8,
+  "shaker_hit_gain_before": 0.016,
+  "shaker_hit_gain_after": 0.009,
+  "stems": [
+    {
+      "stem": "base_loop",
+      "byte_identical": true,
+      "sha256": "540ca19434286dd5bfc016d24f80d50af021c9a33f7612116f1ce44bb189a7ec",
+      "energy_above_2500_hz_change_db": 0.0,
+      "pcm_peak": 0.28778076171875,
+      "pcm_boundary_delta": 0.00018310546875
+    },
+    {
+      "stem": "growth_loop",
+      "byte_identical": true,
+      "sha256": "bd190bc3499d059f228c976184fc4907aa606d2f8d7c9a6d1f1f032d42712273",
+      "energy_above_2500_hz_change_db": 0.0,
+      "pcm_peak": 0.15460205078125,
+      "pcm_boundary_delta": 6.103515625e-05
+    },
+    {
+      "stem": "nursery_loop",
+      "byte_identical": true,
+      "sha256": "dcfe169b336d8b91fe88a08a8586f315f8bb676e15e9cc767ecbaf1d11e2377e",
+      "energy_above_2500_hz_change_db": 0.0,
+      "pcm_peak": 0.199798583984375,
+      "pcm_boundary_delta": 0.0
+    },
+    {
+      "stem": "midden_loop",
+      "byte_identical": false,
+      "sha256": "4a6983d40fe42201200141123d805cae86021ae03ab729b6ab85ccab01fcda21",
+      "energy_above_2500_hz_change_db": -15.801210505050909,
+      "pcm_peak": 0.08831787109375,
+      "pcm_boundary_delta": 0.0
+    }
+  ],
+  "limit": "Spectral/event reduction verifies the targeted change; subjective timbre approval requires player listening."
+}

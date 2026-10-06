@@ -1,0 +1,218 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"brood_emerged": 16,
+			"brood_started": 4,
+			"commands": [
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:aphid_01"
+				},
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:water_01"
+				},
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:protein_01"
+				}
+			],
+			"daughter_effort": 2,
+			"defense": {
+				"route_9": {
+					"lost": 0,
+					"observed_at": 5837.75,
+					"outcome": "secured",
+					"received_at": 5869.0,
+					"sent": 16
+				}
+			},
+			"duration": 1200,
+			"home_effort": 2,
+			"known_attention": {},
+			"local_coverage": 57,
+			"local_intake": 69.91078,
+			"passed": true,
+			"peak_detail": 6,
+			"population_conserved": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 14.83471,
+				"protein": 11.40748,
+				"water": 24.66428
+			},
+			"workers": 128
+		},
+		{
+			"brood_emerged": 8,
+			"brood_started": 0,
+			"commands": [
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:aphid_01"
+				},
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:water_01"
+				},
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:protein_01"
+				}
+			],
+			"daughter_effort": 2,
+			"defense": {
+				"route_9": {
+					"lost": 2,
+					"observed_at": 6936.0,
+					"outcome": "secured",
+					"received_at": 6967.0,
+					"sent": 16
+				}
+			},
+			"duration": 1200,
+			"home_effort": 2,
+			"known_attention": {
+				"causes": [
+					"GROW WAITING · CARB RESERVE"
+				],
+				"organ": "queen",
+				"pile_id": "satellite_1",
+				"title": "CHECK DAUGHTER QUEEN"
+			},
+			"local_coverage": 68,
+			"local_intake": 34.55402,
+			"passed": true,
+			"peak_detail": 6,
+			"population_conserved": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591,
+			"stores": {
+				"carbohydrate": 10.18902,
+				"protein": 23.21548,
+				"water": 50.87616
+			},
+			"workers": 117
+		},
+		{
+			"brood_emerged": 16,
+			"brood_started": 2,
+			"commands": [
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:aphid_01"
+				},
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:water_01"
+				},
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:protein_01"
+				}
+			],
+			"daughter_effort": 2,
+			"defense": {
+				"route_9": {
+					"lost": 0,
+					"observed_at": 6273.25,
+					"outcome": "secured",
+					"received_at": 6304.5,
+					"sent": 16
+				}
+			},
+			"duration": 1200,
+			"home_effort": 2,
+			"known_attention": {
+				"causes": [
+					"GROW WAITING · CARB RESERVE"
+				],
+				"organ": "queen",
+				"pile_id": "satellite_1",
+				"title": "CHECK DAUGHTER QUEEN"
+			},
+			"local_coverage": 66,
+			"local_intake": 51.82494,
+			"passed": true,
+			"peak_detail": 7,
+			"population_conserved": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"stores": {
+				"carbohydrate": 12.96358,
+				"protein": 14.85314,
+				"water": 68.02848
+			},
+			"workers": 111
+		},
+		{
+			"brood_emerged": 16,
+			"brood_started": 1,
+			"commands": [
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:aphid_01"
+				},
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:water_01"
+				},
+				{
+					"accepted": true,
+					"reason": "",
+					"source": "known:protein_01"
+				}
+			],
+			"daughter_effort": 2,
+			"defense": {
+				"route_9": {
+					"lost": 1,
+					"observed_at": 6034.5,
+					"outcome": "secured",
+					"received_at": 6065.0,
+					"sent": 16
+				}
+			},
+			"duration": 1200,
+			"home_effort": 2,
+			"known_attention": {
+				"causes": [
+					"GROW WAITING · CARB RESERVE"
+				],
+				"organ": "queen",
+				"pile_id": "satellite_1",
+				"title": "CHECK DAUGHTER QUEEN"
+			},
+			"local_coverage": 70,
+			"local_intake": 48.52337,
+			"passed": true,
+			"peak_detail": 7,
+			"population_conserved": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591,
+			"stores": {
+				"carbohydrate": 3.76763,
+				"protein": 14.715,
+				"water": 49.09528
+			},
+			"workers": 142
+		}
+	]
+}

@@ -1,0 +1,345 @@
+{
+	"duration_seconds": 7200,
+	"engine": "4.7.2-stable (official)",
+	"failures": 0,
+	"platform": "Windows",
+	"policy": "Five general scouts, returned basic-resource gathering/rechecks, paid chamber growth and repeated manual brood; guest rejection on observed losses. Compare no cleanup, five cleaners plus paid Midden on first symptoms, and two basic/one developed cleaner from need reveal. No injected state/resources or removed hazards. Truth only records invariants/evidence.",
+	"rows": [
+		{
+			"cleanup_at": -1.0,
+			"final": {
+				"emerged": 47,
+				"guest_losses": 9,
+				"health": {
+					"condition": "severe",
+					"larval_rate": 0.5,
+					"losses": 39
+				},
+				"known_sources": 7,
+				"midden": "primitive",
+				"refuse": 145.96563,
+				"stores": {
+					"carbohydrate": 0.00088,
+					"protein": 72.78009,
+					"water": 105.23185
+				},
+				"workers": 76
+			},
+			"first_health_loss": 2637.75,
+			"first_symptoms": 2080.5,
+			"peak_burden": 10000,
+			"response": "neglect",
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"cleanup_at": 2085.0,
+			"final": {
+				"emerged": 47,
+				"guest_losses": 9,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"known_sources": 7,
+				"midden": "primitive",
+				"refuse": 0.0,
+				"stores": {
+					"carbohydrate": 0.00088,
+					"protein": 72.78009,
+					"water": 105.23185
+				},
+				"workers": 76
+			},
+			"first_health_loss": -1.0,
+			"first_symptoms": 2080.5,
+			"peak_burden": 1380,
+			"response": "symptoms",
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"cleanup_at": 370.0,
+			"final": {
+				"emerged": 32,
+				"guest_losses": 9,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"known_sources": 7,
+				"midden": "developed",
+				"refuse": 0.0,
+				"stores": {
+					"carbohydrate": 0.00166,
+					"protein": 67.61644,
+					"water": 86.62781
+				},
+				"workers": 60
+			},
+			"first_health_loss": -1.0,
+			"first_symptoms": -1.0,
+			"peak_burden": 0,
+			"response": "prevention",
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"cleanup_at": -1.0,
+			"final": {
+				"emerged": 47,
+				"guest_losses": 9,
+				"health": {
+					"condition": "severe",
+					"larval_rate": 0.5,
+					"losses": 39
+				},
+				"known_sources": 7,
+				"midden": "primitive",
+				"refuse": 141.84132,
+				"stores": {
+					"carbohydrate": 0.00124,
+					"protein": 72.43242,
+					"water": 106.32696
+				},
+				"workers": 72
+			},
+			"first_health_loss": 2635.5,
+			"first_symptoms": 2078.25,
+			"peak_burden": 10000,
+			"response": "neglect",
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591
+		},
+		{
+			"cleanup_at": 2080.0,
+			"final": {
+				"emerged": 47,
+				"guest_losses": 9,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"known_sources": 7,
+				"midden": "primitive",
+				"refuse": 0.0,
+				"stores": {
+					"carbohydrate": 0.00124,
+					"protein": 72.43242,
+					"water": 106.32696
+				},
+				"workers": 72
+			},
+			"first_health_loss": -1.0,
+			"first_symptoms": 2078.25,
+			"peak_burden": 1320,
+			"response": "symptoms",
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591
+		},
+		{
+			"cleanup_at": 370.0,
+			"final": {
+				"emerged": 32,
+				"guest_losses": 9,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"known_sources": 7,
+				"midden": "developed",
+				"refuse": 0.0,
+				"stores": {
+					"carbohydrate": 5e-05,
+					"protein": 67.58438,
+					"water": 112.24937
+				},
+				"workers": 57
+			},
+			"first_health_loss": -1.0,
+			"first_symptoms": -1.0,
+			"peak_burden": 0,
+			"response": "prevention",
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591
+		},
+		{
+			"cleanup_at": -1.0,
+			"final": {
+				"emerged": 47,
+				"guest_losses": 9,
+				"health": {
+					"condition": "severe",
+					"larval_rate": 0.5,
+					"losses": 39
+				},
+				"known_sources": 7,
+				"midden": "primitive",
+				"refuse": 142.82315,
+				"stores": {
+					"carbohydrate": 0.00136,
+					"protein": 72.72797,
+					"water": 111.89453
+				},
+				"workers": 71
+			},
+			"first_health_loss": 2639.5,
+			"first_symptoms": 2082.25,
+			"peak_burden": 10000,
+			"response": "neglect",
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		},
+		{
+			"cleanup_at": 2085.0,
+			"final": {
+				"emerged": 47,
+				"guest_losses": 9,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"known_sources": 7,
+				"midden": "primitive",
+				"refuse": 0.0,
+				"stores": {
+					"carbohydrate": 0.00136,
+					"protein": 72.72797,
+					"water": 111.89453
+				},
+				"workers": 71
+			},
+			"first_health_loss": -1.0,
+			"first_symptoms": 2082.25,
+			"peak_burden": 1336,
+			"response": "symptoms",
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		},
+		{
+			"cleanup_at": 370.0,
+			"final": {
+				"emerged": 32,
+				"guest_losses": 9,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"known_sources": 7,
+				"midden": "developed",
+				"refuse": 0.0,
+				"stores": {
+					"carbohydrate": 0.00024,
+					"protein": 67.92694,
+					"water": 117.89531
+				},
+				"workers": 56
+			},
+			"first_health_loss": -1.0,
+			"first_symptoms": -1.0,
+			"peak_burden": 0,
+			"response": "prevention",
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		},
+		{
+			"cleanup_at": -1.0,
+			"final": {
+				"emerged": 40,
+				"guest_losses": 9,
+				"health": {
+					"condition": "severe",
+					"larval_rate": 0.5,
+					"losses": 37
+				},
+				"known_sources": 7,
+				"midden": "primitive",
+				"refuse": 132.30445,
+				"stores": {
+					"carbohydrate": 0.00021,
+					"protein": 72.79951,
+					"water": 105.94036
+				},
+				"workers": 67
+			},
+			"first_health_loss": 2779.5,
+			"first_symptoms": 2222.25,
+			"peak_burden": 10000,
+			"response": "neglect",
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591
+		},
+		{
+			"cleanup_at": 2225.0,
+			"final": {
+				"emerged": 40,
+				"guest_losses": 9,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"known_sources": 7,
+				"midden": "primitive",
+				"refuse": 0.0,
+				"stores": {
+					"carbohydrate": 0.00021,
+					"protein": 72.79951,
+					"water": 105.94036
+				},
+				"workers": 67
+			},
+			"first_health_loss": -1.0,
+			"first_symptoms": 2222.25,
+			"peak_burden": 1304,
+			"response": "symptoms",
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591
+		},
+		{
+			"cleanup_at": 380.0,
+			"final": {
+				"emerged": 24,
+				"guest_losses": 9,
+				"health": {
+					"condition": "stable",
+					"larval_rate": 1.0,
+					"losses": 0
+				},
+				"known_sources": 7,
+				"midden": "developed",
+				"refuse": 0.0,
+				"stores": {
+					"carbohydrate": 0.00237,
+					"protein": 67.689,
+					"water": 87.42375
+				},
+				"workers": 48
+			},
+			"first_health_loss": -1.0,
+			"first_symptoms": -1.0,
+			"peak_burden": 0,
+			"response": "prevention",
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591
+		}
+	]
+}

@@ -15,6 +15,8 @@ func project(known_nodes: Array[KnownNode], origin: Vector2, time: float) -> Arr
 		signal_data.id = "signal:" + known.id
 		signal_data.source_knowledge_id = known.id
 		signal_data.category = CONFIG.categories.get(known.definition_id, "unknown")
+		signal_data.source_type = known.source_type
+		signal_data.memory_label = SourceCatalog.label(known.label_index)
 		var offset: Vector2 = known.estimated_position - origin
 		signal_data.estimated_distance = offset.length()
 		if offset != Vector2.ZERO:

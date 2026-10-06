@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SourceProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/world/source_profile.gd" id="profile"]
+[resource]
+script = ExtResource("profile")
+id = "insect_remains"
+resource_id = "protein"
+display_name = "Insect remains"
+description = "Finite protein for growing brood"

@@ -90,10 +90,12 @@ func run(test: Object) -> bool:
 	root.simulation = ready_game()
 	var view := View.new(); test.get_root().add_child(view); view.journey_command = root.respond_to_journey
 	view._signals = root.sensory_snapshot("home"); view._status = root.outward_status("home"); view.selected_id = "threat:route_1"
-	view._pointer_press(view._journey_rect("journey_defend").get_center(),"mouse")
+	view._pointer_press(view._conflict_rect("conflict_send").get_center(),"mouse")
+	view._pointer_press(view._conflict_rect("draft_commit").get_center(),"mouse")
 	test.check(root.simulation.run.journey_response.defense.mode == "defend","Mouse mobilization uses a distinct defense action")
 	root.simulation.advance(4); view._status = root.outward_status("home")
-	view._pointer_press(view._journey_rect("journey_defend").get_center(),"touch")
+	view._pointer_press(view._conflict_rect("conflict_send").get_center(),"touch")
+	view._pointer_press(view._conflict_rect("draft_commit").get_center(),"touch")
 	test.check(root.simulation.run.journey_response.defense.extra_workers == 4,"Touch reinforces by real dispatch")
 	view.queue_free(); root.free()
 	_test_retreat_and_genetics(test)
@@ -110,7 +112,7 @@ func _test_retreat_and_genetics(test: Object) -> void:
 		var result: Dictionary = candidate.run.journey_response.defense.outcomes.route_1
 		if result.outcome == "withdrew":
 			var copy := Controller.new()
-			test.check(result.sent - result.lost == 3 and candidate.run.predator.defeated_at == 0 and copy.restore_snapshot(snapshot(candidate)),"Weak aggregate swarm retreats with surviving labor and persistent manageable threat")
+			test.check(result.sent - result.lost >= 3 and result.sent - result.lost <= 3 + candidate.journey_response.CONFIG.max_messengers and candidate.run.predator.defeated_at == 0 and copy.restore_snapshot(snapshot(candidate)),"Weak aggregate swarm retreats with surviving labor and persistent manageable threat")
 			withdrew = true; break
 	test.check(withdrew,"Bounded combat seed coverage exercises actual automatic retreat")
 	# Obtain expressed adults through the ordinary paid brood trial.

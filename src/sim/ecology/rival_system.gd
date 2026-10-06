@@ -29,6 +29,7 @@ func tick(delta: float) -> void:
 		state.remaining_ticks = leg
 		return
 	state.pheromone = snappedf(state.pheromone * pow(0.5, delta / TRAILS.pheromone_half_life_seconds), 0.0000000001)
+	_tick_reinforcement()
 	if _run.swarm.active() and _run.swarm.rival_engaged:
 		return
 	state.remaining_ticks -= 1
@@ -47,15 +48,29 @@ func tick(delta: float) -> void:
 		state.direction = "outbound"
 	state.remaining_ticks = leg
 
+func _tick_reinforcement() -> void:
+	var rival: RivalState = _run.rival
+	var group: RivalReinforcementState = rival.reinforcement
+	if group.phase in ["idle", "engaged"]: return
+	group.remaining_ticks -= 1
+	if group.remaining_ticks > 0: return
+	if group.phase == "outbound" and _run.swarm.active() and group.swarm_serial == _run.swarm.serial:
+		group.phase = "engaged"
+		return
+	var released: bool = rival.workers.release("rival:reinforcement",rival.workers.count("rival:reinforcement"))
+	var retired: bool = rival.workers.retire_commitment("rival:reinforcement")
+	assert(released and retired)
+	group.phase = "idle"; group.remaining_ticks = 0; group.travel_ticks = 0
+
 
 func sample_contact(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if cohort.worker_count <= 0 or cohort.foreign_sampled or _run.rival.pheromone < 0.1 or _run.rival.contacts_total >= WorkerLedger.MAX_COUNT:
 		return
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-	var progress: float = 1.0 - float(cohort.remaining_ticks) / TRAILS.leg_ticks(segment.start.distance_to(segment.end))
+	var progress: float = 1.0 - float(cohort.remaining_ticks) / TRAILS.leg_ticks(segment.length())
 	if cohort.direction == "inbound":
 		progress = 1.0 - progress
-	var point: Vector2 = segment.start.lerp(segment.end, progress)
+	var point: Vector2 = segment.point_at( progress)
 	var start: Vector2 = CONFIG.pile_position
 	var finish: Vector2 = _run.world.nodes[CONFIG.food_id].position
 	var span: Vector2 = finish - start

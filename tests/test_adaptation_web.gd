@@ -24,7 +24,7 @@ func run(test: Object) -> bool:
 	test.get_root().add_child(view)
 	view._status = root.inward_status("home")
 	view.selected_id = "adaptation"
-	view.adaptation_command = root.start_adaptation
+	view.adaptation_command = root.queue_adaptation
 	view.honeydew_command = root.set_honeydew_protection
 	var before: Dictionary = root.simulation.run.to_dict()
 	for trait_id: String in ["lean", "load"]:
@@ -37,7 +37,9 @@ func run(test: Object) -> bool:
 	view._unhandled_input(mouse)
 	test.check(view.web_selection == "lean" and root.simulation.run.to_dict() == before, "Mouse selects a genetic leaf without buying or mutating gameplay")
 	test.check(view._adaptation_rect("lean") == view._adaptation_rect("load"), "Selected genetic choices share one consistent action location")
-	test.check(view.activate_at(view._adaptation_rect("lean").get_center()) and root.simulation.run.to_dict() == before and view._feedback.contains("space"), "Unavailable leaf action returns real Nursery rejection feedback")
+	before.colony.piles[0].queued_adaptation = "lean"
+	before.colony.piles[0].investments.priority = ["adaptation"]
+	test.check(view.activate_at(view._adaptation_rect("lean").get_center()) and root.simulation.run.to_dict() == before and root.inward_status("home").adaptation_queue.waiting == "space", "Full Nursery accepts a queued choice without laying, spending or a timing window")
 	root.simulation = known_fixture()
 	view._status = root.inward_status("home")
 	test.check(Web.visible_nodes(view._status).has("honeydew") and view._status.honeydew.relationship == "unknown", "Scout-delivered producer evidence reveals an unestablished ecological leaf")

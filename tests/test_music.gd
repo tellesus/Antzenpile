@@ -16,7 +16,7 @@ func run(test: Object) -> bool:
 	test.check(root.music_state("home").development_level == 1, "Developed maps to one semantic growth layer")
 	var base: AudioStreamWAV = Audio.BASE_LOOP
 	var growth: AudioStreamWAV = Audio.GROWTH_LOOP
-	test.check(is_equal_approx(base.get_length(), 8.0) and is_equal_approx(growth.get_length(), 8.0), "Original stems share an eight-second loop duration")
+	test.check(is_equal_approx(base.get_length(), 48.0) and is_equal_approx(growth.get_length(), 48.0), "Authored stems share the full sixteen-bar loop duration")
 	var controller: AudioController = Audio.new()
 	controller.state_provider = root.music_state.bind("home")
 	test.get_root().add_child(controller)

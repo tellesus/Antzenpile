@@ -18,11 +18,11 @@ func start_rejection() -> bool:
 	var pile: PileState = _run.colony.piles.home
 	if state.phase != "tolerated" or state.encounter_losses < 1:
 		return _reject("No unresolved nursery loss evidence")
-	if pile.workers_available < CONFIG.rejection_workers:
+	if pile.workers_assignable < CONFIG.rejection_workers:
 		return _reject("Four available workers required")
 	if not pile.workers.create_commitment("rejection:home", "internal", "home"):
 		return _reject("Rejection effort unavailable")
-	var allocated: bool = pile.workers.allocate("rejection:home", CONFIG.rejection_workers)
+	var allocated: bool = pile.allocate_workers("rejection:home", CONFIG.rejection_workers)
 	assert(allocated)
 	state.phase = "rejecting"
 	# Odor acquisition pauses during effort. Recalculate only when restarting after toleration.

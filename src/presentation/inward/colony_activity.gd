@@ -14,9 +14,11 @@ static func health(status: Dictionary, organ: String) -> float:
 		return clampf(status.get("midden", {}).get("larval_rate", 1.0), 0.0, 1.0)
 	if organ != "nursery":
 		return 1.0
-	var result: float = minf(status.get("humidity", {}).get("larval_rate", 1.0), status.get("midden", {}).get("larval_rate", 1.0))
+	var result: float = minf(minf(status.get("brood_health", {}).get("larval_rate", 1.0), status.get("humidity", {}).get("larval_rate", 1.0)), status.get("midden", {}).get("larval_rate", 1.0))
+	result = minf(result, status.get("temperature", {}).get("larval_rate", 1.0))
 	for cohort: Dictionary in status.get("brood", []):
 		result = minf(result, minf(cohort.get("nutrition", 1.0), cohort.get("care", 1.0)))
+	if not status.get("reproduction",{}).get("food_shortfalls",[]).is_empty(): result=0.0
 	return clampf(result, 0.0, 1.0)
 
 
@@ -29,6 +31,8 @@ static func jobs(status: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	if status.get("nursery_occupied_space", 0) > 0 and status.get("nursery_care_capacity", 0) > 0:
 		result.append({"role": "nursing", "from": "queen", "to": "nursery", "color": Color("c6cbb2")})
+	if status.get("reproduction",{}).get("phase","none") in ["egg","larva","pupa"]:
+		result.append({"role":"reproductive nursing","from":"food_exchange","to":"queen","color":Color("d9c9a7")})
 	if status.get("trail_workers", 0) > 0:
 		result.append({"role": "circulation", "from": "entrance", "to": "food_exchange", "color": Color("dcb477")})
 	var midden: Dictionary = status.get("midden", {})
@@ -78,7 +82,7 @@ static func brood_stages(status: Dictionary) -> Array[String]:
 
 
 static func pressure(status: Dictionary, organ: String) -> String:
-	if organ == "food_exchange": return "HOME LOSSES" if status.get("food_sharing",{}).get("recent",false) else ""
+	if organ == "food_exchange": return ("DAUGHTER LOSSES" if status.get("daughter",false) else "HOME LOSSES") if status.get("food_sharing",{}).get("recent",false) else ""
 	var midden: Dictionary = status.get("midden", {})
 	if organ == "midden":
 		return "REFUSE PRESSURE" if midden.get("larval_rate", 1.0) < 1.0 else ""

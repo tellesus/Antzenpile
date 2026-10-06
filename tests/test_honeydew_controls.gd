@@ -30,7 +30,7 @@ func run(test: Object) -> bool:
 	view._signals = root.sensory_snapshot("home")
 	view._status = root.outward_status("home")
 	view.selected_id = "signal:known:aphid_01"
-	test.check(view._is_honeydew(view._selected_signal()) and view._signal_title_for(view._selected_signal()) == "Honeydew trace" and view._status.honeydew.relationship == "unknown", "Returned scout evidence names the producer without revealing its condition")
+	test.check(view._is_honeydew(view._selected_signal()) and view._signal_title_for(view._selected_signal()).begins_with("Aphid honeydew ") and view._selected_signal().source_type=="aphid_honeydew" and view._status.honeydew.relationship == "unknown", "A close returned sample names and labels the producer without revealing its condition")
 	test.check(view._button_at(view._honeydew_button_rect().get_center()).is_empty(), "Protection is not offered before a loaded trail return")
 	var before: Dictionary = game.run.to_dict()
 	view._run_command("honeydew_start")
@@ -63,7 +63,7 @@ func run(test: Object) -> bool:
 	test.check(pile.workers.create_commitment("test_busy", "other", "test") and pile.workers.allocate("test_busy", spare - 5), "Fixture reserves other labor to exercise shortage")
 	view._status = root.outward_status("home")
 	view._pointer_press(protect.get_center(), "mouse")
-	test.check(view._feedback == "Not enough available workers to tend producers" and game.run.honeydew.relationship == "exploited" and pile.workers.count("honeydew:home") == -1, "Insufficient labor gives a concise rejection without partial commitment")
+	test.check(view._feedback == "Not enough available workers for aphid attendants" and game.run.honeydew.relationship == "exploited" and pile.workers.count("honeydew:home") == -1, "Insufficient labor gives a concise rejection without partial commitment")
 	test.check(pile.workers.release("test_busy", spare - 5) and pile.workers.retire_commitment("test_busy"), "Fixture releases unrelated commitment")
 	for size: Vector2 in [Vector2(1280, 720), Vector2(900, 600)]:
 		var x: float = size.x - 300.0

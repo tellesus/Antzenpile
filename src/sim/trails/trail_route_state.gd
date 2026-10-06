@@ -4,12 +4,14 @@ extends RefCounted
 
 const CONFIG = preload("res://data/trails/default_trails.tres")
 
+var purpose: String = "food"
 var id: String
 var origin_pile: String
 var destination_knowledge_id: String
 var estimated_destination: Vector2
 var segment_id: String
 var desired_workers: int = 0
+var waiting_workers: int = 0
 var allocated_workers: int = 0
 var active_workers: int = 0
 var status: String = "inactive"
@@ -18,13 +20,19 @@ var reported_depleted: bool = false
 var resume_on_report: bool = false
 var last_empty_report_at: float = 0.0
 var delivered_total: float = 0.0
+var nutrient_receipts: Dictionary[String,Dictionary]={}
 var receipt: Dictionary = {}
 var energy_limited: bool = false
 var foreign_reports: int = 0
 var last_foreign_time: float = 0.0
+var reported_impact_losses: int = 0
+var impact_report: Dictionary = {}
 var reported_rival_losses: int = 0
 var conflict_report: String = ""
 var conflict_observed_at: float = 0.0
+var conflict_received_at: float = 0.0
+var conflict_serial: int = 0
+var settled_conflict_serial: int = 0
 var reported_losses: int = 0
 var last_loss_time: float = 0.0
 var attack_reports: int = 0
@@ -34,18 +42,23 @@ var last_witness_time: float = 0.0
 
 
 func to_dict() -> Dictionary:
-	return {"id": id, "origin_pile": origin_pile,
+	var record: Dictionary = {"id": id, "origin_pile": origin_pile,
 		"destination_knowledge_id": destination_knowledge_id,
 		"estimated_destination": [estimated_destination.x, estimated_destination.y],
 		"segment_id": segment_id, "desired_workers": desired_workers,
+		"waiting_workers":waiting_workers,
 		"allocated_workers": allocated_workers, "active_workers": active_workers,
 		"status": status, "departure_cooldown_ticks": departure_cooldown_ticks,
 		"resume_on_report": resume_on_report, "last_empty_report_at": last_empty_report_at,
 		"reported_depleted": reported_depleted, "delivered_total": delivered_total, "receipt": receipt.duplicate(true),
-		"reported_rival_losses": reported_rival_losses, "conflict_report": conflict_report,
-		"conflict_observed_at": conflict_observed_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
+		"nutrient_receipts":nutrient_receipts.duplicate(true),
+		"reported_impact_losses": reported_impact_losses, "impact_report": impact_report.duplicate(true),
+		"reported_rival_losses": reported_rival_losses, "conflict_report": conflict_report, "conflict_serial":conflict_serial,"settled_conflict_serial":settled_conflict_serial,
+		"conflict_observed_at": conflict_observed_at, "conflict_received_at": conflict_received_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
 		"attack_reports": attack_reports, "fighting_reports": fighting_reports,
 		"missing_workers": missing_workers, "last_witness_time": last_witness_time}
+	if purpose != "food": record.purpose=purpose
+	return record
 
 
 func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bounds: Rect2) -> bool:
@@ -67,6 +80,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	for key: String in ["desired_workers", "allocated_workers", "active_workers"]:
 		if not WorkerLedger.valid_count(data[key]):
 			return false
+	var waiting: Variant=data.get("waiting_workers",0)
+	if not WorkerLedger.valid_count(waiting) or waiting>data.desired_workers or data.get("purpose","food")!="food" and waiting!=0: return false
 	if data.active_workers > data.allocated_workers:
 		return false
 	if not WorkerLedger.valid_count(data.departure_cooldown_ticks) or data.departure_cooldown_ticks > CONFIG.departure_interval_ticks or typeof(data.reported_depleted) != TYPE_BOOL:
@@ -81,6 +96,17 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 			if not typeof(saved_receipt[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(saved_receipt[key])) or saved_receipt[key] <= 0: return false
 		if typeof(saved_receipt.earlier_unrecorded) != TYPE_BOOL or saved_receipt.first_at > saved_receipt.last_at or saved_receipt.last_amount > data.delivered_total: return false
 		if saved_receipt.first_at < knowledge.nodes[data.destination_knowledge_id].first_delivered_at: return false
+	var nutrient_data: Variant=data.get("nutrient_receipts",{})
+	if not nutrient_data is Dictionary or nutrient_data.size()>3 or data.get("purpose","food")!="food" and not nutrient_data.is_empty(): return false
+	var restored_nutrients: Dictionary[String,Dictionary]={}
+	for id: Variant in nutrient_data:
+		var entry: Variant=nutrient_data[id]
+		if id not in PileState.RESOURCE_IDS or not entry is Dictionary or entry.size()!=5 or not entry.has_all(["first_at","last_at","last_amount","earlier_unrecorded","total"]) or not entry.earlier_unrecorded is bool: return false
+		for key: String in ["first_at","last_at","last_amount","total"]:
+			if not typeof(entry[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(entry[key])) or entry[key]<=0: return false
+		if entry.first_at>entry.last_at or entry.last_amount>entry.total or entry.first_at<knowledge.nodes[data.destination_knowledge_id].first_delivered_at: return false
+		if id==knowledge.nodes[data.destination_knowledge_id].definition_id and absf(float(entry.total)-float(data.delivered_total))>0.00001: return false
+		restored_nutrients[id]=entry.duplicate(true)
 	if data.has("energy_limited") and typeof(data.energy_limited) != TYPE_BOOL:
 		return false
 	var expected_status: String = "inactive" if data.allocated_workers == 0 else "recalling" if data.desired_workers == 0 else "depleted" if data.reported_depleted else "active"
@@ -94,10 +120,26 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	var foreign_time: Variant = data.get("last_foreign_time", 0.0)
 	if not WorkerLedger.valid_count(reports) or not typeof(foreign_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(foreign_time)) or foreign_time < 0.0 or ((reports == 0) != (foreign_time == 0.0)):
 		return false
+	var impact_deaths: Variant = data.get("reported_impact_losses", 0)
+	var impact: Variant = data.get("impact_report", {})
+	if not WorkerLedger.valid_count(impact_deaths) or impact_deaths > losses or not impact is Dictionary: return false
+	if not impact.is_empty():
+		if impact.size() != 3 or not impact.has_all(["observed_at", "received_at", "estimated_position"]) or impact_deaths == 0: return false
+		for key: String in ["observed_at", "received_at"]:
+			var value: Variant = impact[key]
+			if not typeof(value) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(value)) or value <= 0: return false
+		if impact.observed_at > impact.received_at or impact.received_at > loss_time: return false
+		if not impact.estimated_position is Array or impact.estimated_position.size() != 2: return false
+		for value: Variant in impact.estimated_position:
+			if not typeof(value) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(value)): return false
+		if not bounds.has_point(Vector2(impact.estimated_position[0], impact.estimated_position[1])): return false
 	var rival_deaths: Variant = data.get("reported_rival_losses", 0)
 	var conflict: Variant = data.get("conflict_report", "")
 	var conflict_time: Variant = data.get("conflict_observed_at", 0.0)
-	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths > losses or not conflict in ["", "contested", "secured", "withdrew", "dispersed"] or not typeof(conflict_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(conflict_time)) or conflict_time < 0.0 or ((conflict == "") != (conflict_time == 0.0)):
+	var conflict_receipt: Variant = data.get("conflict_received_at", 0.0)
+	if not WorkerLedger.valid_count(data.get("conflict_serial",0)) or not WorkerLedger.valid_count(data.get("settled_conflict_serial",0)) or data.get("settled_conflict_serial",0) > data.get("conflict_serial",0): return false
+	if not typeof(conflict_receipt) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(conflict_receipt)) or conflict_receipt < 0 or conflict_receipt > 0 and (conflict == "" or conflict_receipt < conflict_time): return false
+	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths + impact_deaths > losses or not conflict in ["", "contested", "holding", "resisted", "reinforced", "secured", "withdrew", "dispersed"] or not typeof(conflict_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(conflict_time)) or conflict_time < 0.0 or ((conflict == "") != (conflict_time == 0.0)):
 		return false
 	var attacks: Variant = data.get("attack_reports", 0)
 	var fights: Variant = data.get("fighting_reports", 0)
@@ -106,7 +148,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	for count: Variant in [attacks, fights, missing]:
 		if not WorkerLedger.valid_count(count):
 			return false
-	if attacks > losses - rival_deaths or fights > rival_deaths or missing > losses - attacks - fights:
+	if attacks > losses - rival_deaths - impact_deaths or fights > rival_deaths or missing > losses - attacks - fights:
 		return false
 	if not typeof(witness_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(witness_time)) or witness_time < 0.0 or witness_time > loss_time or ((attacks + fights == 0) != (witness_time == 0.0)):
 		return false
@@ -114,12 +156,16 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	var empty_at: Variant = data.get("last_empty_report_at", knowledge.last_empty_report(data.destination_knowledge_id) if data.reported_depleted else 0.0)
 	if not resume is bool or not typeof(empty_at) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(empty_at)) or empty_at < 0:
 		return false
+	var saved_purpose: Variant=data.get("purpose","food")
+	if not saved_purpose is String or saved_purpose not in ["food","founding","interpile"]: return false
+	purpose=saved_purpose
 	id = data.id
 	origin_pile = data.origin_pile
 	destination_knowledge_id = data.destination_knowledge_id
 	estimated_destination = endpoint
 	segment_id = data.segment_id
 	desired_workers = int(data.desired_workers)
+	waiting_workers = int(waiting)
 	allocated_workers = int(data.allocated_workers)
 	active_workers = int(data.active_workers)
 	status = data.status
@@ -128,13 +174,17 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	resume_on_report = resume
 	last_empty_report_at = float(empty_at)
 	delivered_total = float(data.delivered_total)
+	nutrient_receipts=restored_nutrients
 	receipt = saved_receipt.duplicate(true)
 	energy_limited = data.get("energy_limited", false)
 	foreign_reports = int(reports)
 	last_foreign_time = float(foreign_time)
+	reported_impact_losses = int(impact_deaths); impact_report = impact.duplicate(true)
 	reported_rival_losses = int(rival_deaths)
 	conflict_report = conflict
 	conflict_observed_at = float(conflict_time)
+	conflict_received_at = float(conflict_receipt)
+	conflict_serial = int(data.get("conflict_serial",0)); settled_conflict_serial = int(data.get("settled_conflict_serial",0))
 	reported_losses = int(losses)
 	last_loss_time = float(loss_time)
 	attack_reports = int(attacks)

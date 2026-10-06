@@ -4,15 +4,15 @@ extends RefCounted
 
 static func reason(value: String) -> String:
 	return {
-		"Honeydew producers have not been exploited": "Harvest honeydew before assigning tenders",
-		"Not enough workers to protect the producers": "Not enough available workers to tend producers",
+		"Honeydew producers have not been exploited": "Harvest honeydew before assigning aphid attendants",
+		"Not enough workers to protect the producers": "Not enough available workers for aphid attendants",
 		"Protection commitment unavailable": "Tending assignment unavailable",
-		"Could not commit protection workers": "Could not assign tending workers"
+		"Could not commit protection workers": "Could not assign aphid attendants"
 	}.get(value, value)
 
 
 static func resource(id: String) -> String:
-	return {"carbohydrate": "carbs", "protein": "protein", "water": "water"}.get(id, id)
+	return {"carbohydrate": "carbs", "protein": "protein", "water": "water", "nest_site": "nest site"}.get(id, id)
 
 
 static func duration(seconds: float) -> String:
@@ -20,8 +20,16 @@ static func duration(seconds: float) -> String:
 	return "%ds" % elapsed if elapsed < 60 else "%dm %02ds" % [elapsed / 60, elapsed % 60]
 
 
+static func fit_line(value: String, font: Font, size: int, width: float) -> String:
+	if font.get_string_size(value, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= width: return value
+	var shortened: String = value
+	while not shortened.is_empty() and font.get_string_size(shortened + "…", HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > width:
+		shortened = shortened.left(shortened.length() - 1)
+	return shortened + "…"
+
+
 static func local_shortage(status: Dictionary, costs: Dictionary, workers: int) -> String:
-	var available: int = status.get("workers_available", status.get("available_workers", 0))
+	var available: int = status.get("workers_assignable", status.get("workers_available", status.get("available_workers", 0)))
 	if available < workers: return "Need %d more available workers" % (workers - available)
 	for id: String in ["carbohydrate", "protein", "water"]:
 		var shortage: float = float(costs.get(id, 0.0)) - float(status.get("resources", {}).get(id, 0.0))

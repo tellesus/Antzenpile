@@ -19,6 +19,20 @@ func run(test: Object) -> bool:
 		routes.append({"id": "route_%d" % index, "destination_knowledge_id": "known_%d" % index,
 			"pheromone_strength": 0.8, "route_familiarity": 0.8, "active_workers": 10000})
 	var size := Vector2(1280, 720)
+	var start := Vector2(100,500)
+	var finish := Vector2(500,100)
+	var organic: Dictionary = Scent.geometry(start,finish,"proof_route")
+	test.check(organic.points[0] == start and organic.points[Scent.STEPS] == finish, "Organic chemistry retains its sensory endpoints")
+	test.check(organic == Scent.geometry(start,finish,"proof_route"), "Organic routes remain stable between redraws")
+	test.check(organic.points != Scent.geometry(start,finish,"other_route").points, "Distinct routes have independent organic shapes")
+	test.check(organic.points != Scent.geometry(start,finish+Vector2(50,0),"proof_route").points, "Facing/viewport changes invalidate cached geometry")
+	for point: Vector2 in organic.points:
+		test.check(point.is_finite() and absf((point-start).dot((finish-start).normalized().orthogonal())) <= 32.0, "Trail variation stays finite within its bounded sensory corridor")
+	for index: int in 100:
+		Scent.geometry(start,finish,"cache_%d" % index)
+	test.check(Scent._geometry_cache.size() <= Scent.CACHE_LIMIT, "Rotations and long sessions cannot grow the route cache without bound")
+	test.check(Art.impression_gain({"category":"water","confidence":0.1},false) == 0.0 and Art.impression_gain({"category":"water","confidence":0.8},false) > 0.9, "Water develops an impression only from sufficiently confident knowledge")
+	test.check(Art.impression_gain({"category":"water","confidence":0.8},true) == 0.0 and Art.impression_gain({"category":"unknown","confidence":1.0},false) == 0.0, "Empty/unknown sources cannot acquire a fresh object impression")
 	var placed: Array[Dictionary] = Panorama.project(signals, 0.0, size)
 	var before: Array[Dictionary] = routes.duplicate(true)
 	var ants: Array[Dictionary] = Scent.representatives(routes, placed, size, 1.0)
@@ -30,6 +44,11 @@ func run(test: Object) -> bool:
 		test.check(ant.position.is_finite() and ant.direction.length_squared() > 0.0 and ant.category == "water", "Representative has finite sensory placement and resource identity")
 	for route: Dictionary in routes:
 		route.pheromone_strength = 0.0
+		route.route_familiarity = 0.0
+		route.reported_losses = 1
+	test.check(not Scent.alarm_markers(routes,placed,size).is_empty(), "Returned journey alarms survive loss of chemistry and familiarity")
+	for route: Dictionary in routes:
+		route.route_familiarity = 0.8
 	test.check(Scent.representatives(routes, placed, size, 1.0).is_empty() and Scent.strokes(routes, placed, size)[0].ghost, "Memory ghosts carry no invented ant traffic")
 	for route: Dictionary in routes:
 		route.pheromone_strength = 0.8

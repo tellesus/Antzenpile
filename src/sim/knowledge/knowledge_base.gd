@@ -85,6 +85,14 @@ func last_empty_report(knowledge_id: String) -> float:
 			result = entry.time
 	return result
 
+func latest_delivery(knowledge_id: String) -> Dictionary:
+	if not nodes.has(knowledge_id): return {}
+	var selected: Observation;var received: float=-1
+	for id: String in nodes[knowledge_id].evidence_ids:
+		if _received_at[id]>received or _received_at[id]==received and (selected==null or _preferred(observations[id],selected)):
+			selected=observations[id];received=_received_at[id]
+	return {"evidence":selected.detached_copy(),"received_at":received} if selected!=null else {}
+
 
 func recovery_report(knowledge_id: String, after: float) -> bool:
 	if not nodes.has(knowledge_id):
@@ -101,6 +109,7 @@ func recovery_report(knowledge_id: String, after: float) -> bool:
 
 
 static func _valid_evidence(evidence: Observation, time: float) -> bool:
+	if not SourceCatalog.accepts(evidence.source_type, evidence.definition_id) or not evidence.source_type.is_empty() and not evidence.proximity_confirmed: return false
 	if evidence.id != evidence.scout_id + ":" + evidence.source_node_id or evidence.scout_id.is_empty() or evidence.source_node_id.is_empty() or evidence.origin_pile.is_empty() or evidence.definition_id.is_empty():
 		return false
 	for value: float in [evidence.first_observed_at, evidence.observed_at, evidence.uncertainty_radius, evidence.closest_distance]:
@@ -113,6 +122,10 @@ func _rebuild_node(source_id: String) -> void:
 	var node := Known.new()
 	node.id = "known:" + source_id
 	node.source_node_id = source_id
+	if nodes.has(node.id): node.label_index = nodes[node.id].label_index
+	else:
+		for known: KnownNode in nodes.values(): node.label_index = maxi(node.label_index, known.label_index)
+		node.label_index += 1
 	node.first_observed_at = INF
 	node.first_delivered_at = INF
 	var selected: Observation
@@ -122,6 +135,7 @@ func _rebuild_node(source_id: String) -> void:
 		var evidence: Observation = observations[id]
 		if evidence.source_node_id != source_id:
 			continue
+		if not evidence.source_type.is_empty(): node.source_type = evidence.source_type
 		node.evidence_ids.append(id)
 		node.first_observed_at = minf(node.first_observed_at, evidence.first_observed_at)
 		node.first_delivered_at = minf(node.first_delivered_at, _received_at[id])
@@ -221,6 +235,19 @@ func restore(data: Dictionary, validated_evidence: Dictionary[String, Observatio
 		return _reject("Archive evidence mismatch")
 	for evidence: Observation in candidate.observations.values():
 		candidate._rebuild_node(evidence.source_node_id)
+	var labeled: int = 0
+	var used_labels: Dictionary = {}
+	for record: Variant in data.nodes:
+		if not record is Dictionary or not record.get("id") is String or not candidate.nodes.has(record.id): return _reject("Unknown known-node label")
+		if record.has("label_index"):
+			if not WorkerLedger.valid_count(record.label_index) or record.label_index < 1 or record.label_index > data.nodes.size() or used_labels.has(int(record.label_index)): return _reject("Invalid or duplicate memory label")
+			used_labels[int(record.label_index)] = true; labeled += 1
+			candidate.nodes[record.id].label_index = int(record.label_index)
+	if labeled != 0 and labeled != data.nodes.size(): return _reject("Incomplete memory labels")
+	if labeled == 0:
+		var memories: Array = candidate.nodes.values()
+		memories.sort_custom(func(a: KnownNode,b: KnownNode) -> bool: return a.first_delivered_at < b.first_delivered_at if a.first_delivered_at != b.first_delivered_at else a.id < b.id)
+		for index: int in memories.size(): memories[index].label_index = index + 1
 	var rebuilt_nodes: Array = candidate.to_dict().nodes
 	if rebuilt_nodes.size() != data.nodes.size():
 		return _reject("Known nodes disagree with their evidence")
@@ -264,6 +291,9 @@ static func _matches_quantized_position(record: Dictionary, expected: Dictionary
 	var comparable: Dictionary = record.duplicate(true)
 	if expected.has("collective_search") and not comparable.has("collective_search"):
 		comparable.collective_search = false
+	if expected.has("source_type") and not comparable.has("source_type"): comparable.source_type = ""
+	if expected.has("label_index"):
+		comparable.label_index = int(comparable.get("label_index", expected.label_index))
 	var position := Vector2(record.estimated_position[0], record.estimated_position[1])
 	comparable.estimated_position = [position.x, position.y]
 	for field: String in ["uncertainty_radius", "closest_distance"]:

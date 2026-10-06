@@ -7,6 +7,7 @@ var scout_id: String
 var origin_pile: String
 var source_node_id: String
 var definition_id: String
+var source_type: String = ""
 var first_observed_at: float
 var observed_at: float
 var estimated_position: Vector2
@@ -23,6 +24,7 @@ func detached_copy() -> Observation:
 	copy.origin_pile = origin_pile
 	copy.source_node_id = source_node_id
 	copy.definition_id = definition_id
+	copy.source_type = source_type
 	copy.first_observed_at = first_observed_at
 	copy.observed_at = observed_at
 	copy.estimated_position = estimated_position
@@ -35,7 +37,7 @@ func detached_copy() -> Observation:
 
 func to_dict() -> Dictionary:
 	return {"id": id, "scout_id": scout_id, "origin_pile": origin_pile,
-		"source_node_id": source_node_id, "definition_id": definition_id,
+		"source_node_id": source_node_id, "definition_id": definition_id, "source_type":source_type,
 		"first_observed_at": first_observed_at, "observed_at": observed_at,
 		"estimated_position": [estimated_position.x, estimated_position.y],
 		"uncertainty_radius": uncertainty_radius, "closest_distance": closest_distance,
@@ -53,6 +55,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	# Validate identity only; historical evidence must not refresh from current truth.
 	if data.definition_id != world.nodes[data.source_node_id].definition_id:
 		return false
+	var type: Variant = data.get("source_type", "")
+	if not SourceCatalog.accepts(type, data.definition_id) or not type.is_empty() and (type != world.nodes[data.source_node_id].source_type or not data.proximity_confirmed): return false
 	for key: String in ["first_observed_at", "observed_at", "uncertainty_radius", "closest_distance"]:
 		if not typeof(data[key]) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data[key])) or data[key] < 0:
 			return false
@@ -73,6 +77,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	origin_pile = data.origin_pile
 	source_node_id = data.source_node_id
 	definition_id = data.definition_id
+	source_type = type
 	first_observed_at = data.first_observed_at
 	observed_at = data.observed_at
 	estimated_position = estimate
@@ -81,7 +86,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	# Legacy senses derive float64 uncertainty from a float32 physical distance.
 	# Recover that exact calculation when JSON changed only its final bit.
 	var physical_distance: float = Vector2(closest_distance, 0).x
-	if absf(physical_distance - closest_distance) <= 1e-15:
+	if absf(physical_distance - closest_distance) <= 1e-12:
 		closest_distance = physical_distance
 	var config: ScoutConfig = preload("res://data/scouting/default_scouts.tres")
 	var physical_radius: float = config.localization_floor + closest_distance * config.distance_uncertainty
@@ -91,7 +96,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		var rounded_radius: float = roundf(uncertainty_radius * 1e8) / 1e8
 		if absf(rounded_radius - uncertainty_radius) <= 1e-15:
 			uncertainty_radius = rounded_radius
-	elif absf(physical_radius - uncertainty_radius) <= 1e-15:
+	elif absf(physical_radius - uncertainty_radius) <= 1e-12:
 		uncertainty_radius = physical_radius
 	proximity_confirmed = data.proximity_confirmed
 	collective_search = data.get("collective_search", false)

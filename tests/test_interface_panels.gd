@@ -20,6 +20,7 @@ func run(test: Object) -> bool:
 			view.selected_id = view._signals[0].id if panel in ["source", "journey"] else "mission:scout_a" if panel == "mission" else ""
 			view._status.scout_missions = [{"id": "scout_a"}]
 			var at: Vector2 = Vector2(120, 180) if panel in ["sources", "exploration"] else Vector2(view.get_viewport_rect().size.x - 180, 210)
+			if panel == "journey": at = view.conflict.layout(view.get_viewport_rect().size).center
 			var facing: float = view.facing
 			var selected: String = view.selected_id
 			view._pointer_press(at, kind)

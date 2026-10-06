@@ -13,13 +13,13 @@ func set_workers(pile_id: String, target: Variant) -> bool:
 	if pile.nursery_state != "developed":
 		return _reject("Develop the Nursery before assigning climate carers")
 	var current: int = pile.humidity.carers
-	if target > current and pile.workers_available < target - current:
+	if target > current and pile.workers_assignable < target - current:
 		return _reject("More available climate carers required")
 	var id: String = "humidity:" + pile_id
 	if target > current:
 		if current == 0 and not pile.workers.create_commitment(id, "internal", pile_id):
 			return _reject("Climate commitment unavailable")
-		var allocated: bool = pile.workers.allocate(id, target - current)
+		var allocated: bool = pile.allocate_workers(id, target - current)
 		assert(allocated)
 	elif target < current:
 		var released: bool = pile.workers.release(id, current - target)
@@ -43,15 +43,16 @@ func tick() -> void:
 		var ambient: int = CONFIG.wet_ambient if raining else CONFIG.dry_ambient
 		var drift: int = CONFIG.wet_step if raining else CONFIG.dry_step
 		state.moisture = int(move_toward(state.moisture, ambient, drift))
-		var adjustment: int = mini(absi(CONFIG.starting - state.moisture), state.carers * CONFIG.care_step)
+		var care_step: int=pile.chambers.climate_step(CONFIG.care_step)
+		var adjustment: int = mini(absi(CONFIG.starting - state.moisture), state.carers * care_step)
 		if state.moisture < CONFIG.starting and adjustment > 0:
 			# Moisture and water cost share the same authored per-worker ratio.
-			var cost: int = ceili(float(adjustment) * CONFIG.water_units_per_worker_tick / CONFIG.care_step)
+			var cost: int = ceili(float(adjustment) * CONFIG.water_units_per_worker_tick / care_step)
 			if pile.resources.water < cost / 100000.0:
 				cost = floori(pile.resources.water * 100000.0)
 			if cost > WorkerLedger.MAX_COUNT - state.water_used_units:
 				continue
-			adjustment = mini(adjustment, floori(float(cost) * CONFIG.care_step / CONFIG.water_units_per_worker_tick))
+			adjustment = mini(adjustment, floori(float(cost) * care_step / CONFIG.water_units_per_worker_tick))
 			var paid: bool = pile.consume_resources({"water": cost / 100000.0})
 			assert(paid)
 			state.water_used_units += cost

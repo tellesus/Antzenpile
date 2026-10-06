@@ -1,0 +1,581 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"camp_at": 1933.5,
+			"captures": {
+				"messenger": 1911.75,
+				"outbound": 1770.25,
+				"ready": 1933.5,
+				"settling": 1791.75
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 20.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 25.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 40.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 45.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 55.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 85.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 140.0
+				},
+				{
+					"action": "trial load",
+					"time": 175.0
+				},
+				{
+					"action": "lay brood",
+					"time": 360.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 360.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 365.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 465.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 465.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 505.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 545.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 545.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 555.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 600.0
+				},
+				{
+					"action": "lay brood",
+					"time": 630.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 630.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 640.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 695.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 815.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 870.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 915.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 1175.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				}
+			],
+			"final": {
+				"active_queens": 1,
+				"available": 32,
+				"committed_settlers": 11,
+				"emerged": 47,
+				"knowledge": 8,
+				"stores": {
+					"carbohydrate": 114.78333,
+					"protein": 62.0032,
+					"water": 66.43055
+				},
+				"workers": 77
+			},
+			"founding_at": 1770.0,
+			"laid_at": 990.0,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"standing_growth": true
+		},
+		{
+			"camp_at": 2933.0,
+			"captures": {
+				"messenger": 2911.5,
+				"outbound": 2770.25,
+				"ready": 2933.0,
+				"settling": 2791.5
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 20.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 35.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 40.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 45.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 45.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 85.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 105.0
+				},
+				{
+					"action": "trial load",
+					"time": 175.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 175.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 455.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 455.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 500.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 550.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 560.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 560.0
+				},
+				{
+					"action": "lay brood",
+					"time": 730.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 730.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 730.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 770.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 905.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 905.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 905.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 920.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 945.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1090.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1265.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 1625.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1960.0
+				}
+			],
+			"final": {
+				"active_queens": 1,
+				"available": 41,
+				"committed_settlers": 11,
+				"emerged": 54,
+				"knowledge": 8,
+				"stores": {
+					"carbohydrate": 116.8806,
+					"protein": 10.71112,
+					"water": 115.54313
+				},
+				"workers": 84
+			},
+			"founding_at": 2770.0,
+			"laid_at": 1450.0,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591,
+			"standing_growth": true
+		},
+		{
+			"camp_at": 2368.5,
+			"captures": {
+				"messenger": 2346.75,
+				"outbound": 2205.25,
+				"ready": 2368.5,
+				"settling": 2226.75
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 30.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 35.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 45.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 55.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 105.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 140.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 150.0
+				},
+				{
+					"action": "trial load",
+					"time": 230.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 230.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 485.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 485.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 490.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 665.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 700.0
+				},
+				{
+					"action": "lay brood",
+					"time": 705.0
+				},
+				{
+					"action": "gather known:carb_exposed",
+					"time": 705.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 730.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 730.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 745.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 935.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 935.0
+				},
+				{
+					"action": "lay brood",
+					"time": 1065.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 1295.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 1555.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 1600.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 1600.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 1600.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 1860.0
+				}
+			],
+			"final": {
+				"active_queens": 1,
+				"available": 30,
+				"committed_settlers": 11,
+				"emerged": 47,
+				"knowledge": 8,
+				"stores": {
+					"carbohydrate": 98.38721,
+					"protein": 61.6,
+					"water": 101.1525
+				},
+				"workers": 72
+			},
+			"founding_at": 2205.0,
+			"laid_at": 1425.0,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"standing_growth": true
+		},
+		{
+			"camp_at": 2137.5,
+			"captures": {
+				"messenger": 2116.25,
+				"outbound": 1975.25,
+				"ready": 2137.5,
+				"settling": 1996.25
+			},
+			"events": [
+				{
+					"action": "gather known:carb_exposed",
+					"time": 25.0
+				},
+				{
+					"action": "develop Food Exchange",
+					"time": 50.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 125.0
+				},
+				{
+					"action": "protect harvested producer",
+					"time": 170.0
+				},
+				{
+					"action": "support known risky producer",
+					"time": 175.0
+				},
+				{
+					"action": "gather known:protein_01",
+					"time": 265.0
+				},
+				{
+					"action": "lay brood",
+					"time": 440.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 440.0
+				},
+				{
+					"action": "gather known:water_01",
+					"time": 445.0
+				},
+				{
+					"action": "develop Nursery",
+					"time": 465.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 500.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 500.0
+				},
+				{
+					"action": "trial load",
+					"time": 555.0
+				},
+				{
+					"action": "lay brood",
+					"time": 835.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 835.0
+				},
+				{
+					"action": "gather known:aphid_01",
+					"time": 835.0
+				},
+				{
+					"action": "gather known:rival_food_01",
+					"time": 835.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 845.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 875.0
+				},
+				{
+					"action": "withdraw foreign contact",
+					"time": 880.0
+				},
+				{
+					"action": "trial persistent",
+					"time": 915.0
+				},
+				{
+					"action": "gather known:protein_picnic",
+					"time": 915.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 930.0
+				},
+				{
+					"action": "watch reported depletion",
+					"time": 1095.0
+				},
+				{
+					"action": "recall empty food",
+					"time": 1095.0
+				},
+				{
+					"action": "gather known:carb_sheltered",
+					"time": 1240.0
+				},
+				{
+					"action": "reject observed guest",
+					"time": 1260.0
+				},
+				{
+					"action": "trial tolerance",
+					"time": 1275.0
+				}
+			],
+			"final": {
+				"active_queens": 1,
+				"available": 30,
+				"committed_settlers": 11,
+				"emerged": 47,
+				"knowledge": 8,
+				"stores": {
+					"carbohydrate": 118.74181,
+					"protein": 37.6,
+					"water": 56.63375
+				},
+				"workers": 75
+			},
+			"founding_at": 1975.0,
+			"laid_at": 1195.0,
+			"passed": true,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591,
+			"standing_growth": true
+		}
+	]
+}

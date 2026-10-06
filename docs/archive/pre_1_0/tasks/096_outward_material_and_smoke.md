@@ -1,0 +1,17 @@
+> **ARCHIVE ONLY — frozen 2026-10-04.** Historical record; not an active plan, current contract or implementation instruction. Use the [current documentation](../../../README.md). Original path: `docs/tasks/096_outward_material_and_smoke.md`. Historical status and recommendations below apply only to their recorded build.
+
+# 096 — OUTWARD local material and smoky signals
+
+Status: complete (2026-10-03). Depends on 095. Authorized by player v2 graphics handoff.
+
+Outcome: Home sits in a broader dark near-ground material field; remembered resources read as drifting colored smoke rather than crystalline lace. Keep the panorama's unknown darkness, organic trails and luminous representative ants.
+
+Scope: original editable local Home sculpt/packed surface finish; baked foreground/depth shading in the art, no remote scenery, ants or UI baked in. Reusable neutral smoky density mask, tinted/layered only by approved returned category/strength/confidence/empty status. Existing water impression remains recognition-gated. Preserve actual signal/trail/scout anchors, opacity/representative caps, caption reservations, mouse/touch controls, pause and RNG isolation. No simulation, balance, perception, anatomy, gameplay or mobile work.
+
+Verify: fresh 095 baseline is comparable before this bounded change; uncertain/clear/stale/empty water, busy/quiet/rain, standard/compact/large desktop captures and input fixtures. Unknown signals stay absent; isolated rendering preserves the simulation snapshot. Import, Main smoke and final full suite once after final code; paired isolated desktop intervals/draws/texture memory, honest actual render sizes. Retain editable sources and concise provenance/limitations in GRAPHICS_PASS_NOTES.md. Commit separately; publish both graphics cards together.
+
+Completed: original local Home sculpt and packed imagegen surface/smoke source; broad low material field aligned to existing anchors; three drifting neutral smoke layers using returned data. Existing water confidence/empty/unknown gates, organic trails, representative caps, input and pause remain. No simulation or music changes.
+
+Evidence: final full suite **6060 checks / 0 failures**, import and 90-frame Main smoke passed. Actual source mouse/touch selection, quiet unknown scene, paused smoke/rain, busy standard/compact/large scenes and detached snapshot equality passed. Uncertain/clear/stale/empty water were reviewed. Two finished exports reproduce pixel-for-pixel from the packed Blender source. Desktop busy OUTWARD p95 3.040 -> 3.287 ms at standard size, draws 342 -> 337; combined standard INWARD texture memory 57.46 MiB (+32.54 MiB pre-pass). A rare 19.142 ms live-64x interval prompted a 20s follow-up: 31,526 frames, p95 0.758 ms, worst 2.139 ms, zero intervals above 16.667 ms. Record both results, not a worst-case guarantee. GRAPHICS_PASS_NOTES.md links full evidence and actual render dimensions.
+
+Changed groups: SensoryArt Home/smoke composition; two exported PNGs/imports, editable base/finished Blender sources and two authoring scripts; input/rain/quiet and interval probes; milestone README, architecture/UI/roadmap/source notes and evidence. No paid/runtime dependencies; mobile testing/optimization/export remains tabled. Unrelated imports/user files are preserved. Publish with 095; restart and visually playtest this substantially larger desktop graphics pass before further art refinement.

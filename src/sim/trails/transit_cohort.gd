@@ -12,11 +12,15 @@ var direction: String = "outbound"
 var worker_count: int = 0
 var resource_id: String = ""
 var payload: float = 0.0
+var cargo_source_type: String=""
+var cargo_yields: Dictionary[String,float]={}
+var cargo_bulk: float=1.0
 var contaminant_mass: float = 0.0
 var remaining_ticks: int = 1
 var unpaid_energy_cost: float = 0.0
 var energy_multiplier: float = 1.0
 var carry_multiplier: float = 1.0
+var combat_multiplier: float = 1.0
 var chemistry_fraction: float = 0.0
 var lost_workers: int = 0
 var adapted_lost_workers: int = 0
@@ -25,32 +29,40 @@ var foreign_contact: bool = false
 var foreign_sampled: bool = false
 var reports_source_outcome: bool = true
 var swarm_engaged: bool = false
+var impact_losses: int = 0
+var impact_serial: int = 0
+var impact_witness_at: float = 0.0
 var rival_losses: int = 0
 var conflict_report: String = ""
 var conflict_observed_at: float = 0.0
+var conflict_serial: int = 0
 var predator_encountered: bool = false
 var witnessed_attack: bool = false
 var witnessed_fighting: bool = false
 var detour_attempted: bool = false
 var detour: TrailDetour
 var detour_report: Observation
+var harvest_report: Observation
 
 
 func to_dict() -> Dictionary:
 	return {"id": id, "route_id": route_id, "direction": direction,
 		"worker_count": worker_count, "resource_id": resource_id,
 		"payload": payload, "remaining_ticks": remaining_ticks, "contaminant_mass": contaminant_mass,
+		"cargo_source_type":cargo_source_type,"cargo_yields":cargo_yields.duplicate(),"cargo_bulk":cargo_bulk,
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
-		"chemistry_fraction": chemistry_fraction,
+		"combat_multiplier":combat_multiplier, "chemistry_fraction": chemistry_fraction,
 		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
 		"lost_profiles": lost_profiles.duplicate(),
 		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
 		"foreign_sampled": foreign_sampled, "reports_source_outcome": reports_source_outcome,
+		"impact_losses": impact_losses, "impact_serial": impact_serial, "impact_witness_at": impact_witness_at,
 		"swarm_engaged": swarm_engaged, "rival_losses": rival_losses,
-		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
+		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "conflict_serial":conflict_serial, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
-		"detour_report": detour_report.to_dict() if detour_report != null else null}
+		"detour_report": detour_report.to_dict() if detour_report != null else null,
+		"harvest_report":harvest_report.to_dict() if harvest_report != null else null}
 
 
 func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: float) -> bool:
@@ -65,12 +77,25 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	if not typeof(data.payload) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.payload)) or data.payload < 0.0:
 		return false
+	if data.payload>0 and (data.resource_id not in PileState.RESOURCE_IDS or data.direction!="inbound"): return false
+	var source: Variant=data.get("cargo_source_type","");var yields: Variant=data.get("cargo_yields",{});var bulk: Variant=data.get("cargo_bulk",1.0)
+	if not source is String or not yields is Dictionary or yields.size()>3 or not typeof(bulk) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(bulk)) or bulk<0.25 or bulk>4: return false
+	var restored_yields: Dictionary[String,float]={}
+	for key: Variant in yields:
+		if key not in PileState.RESOURCE_IDS or not typeof(yields[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(yields[key])) or yields[key]<=0 or yields[key]>10: return false
+		restored_yields[key]=float(String.num(float(yields[key]),5))
+	if yields.is_empty():
+		if source!="" or bulk!=1: return false
+	elif data.direction!="inbound" or data.payload<=0 or source.is_empty() or not SourceCatalog.accepts(source,data.resource_id) or not yields.has(data.resource_id): return false
 	var contamination: Variant = data.get("contaminant_mass",0.0)
-	if not typeof(contamination) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(contamination)) or contamination < 0 or contamination > data.payload or (contamination > 0 and (data.resource_id != "carbohydrate" or data.direction != "inbound")): return false
+	var carbohydrate: float=float(yields.get("carbohydrate",0)) if not yields.is_empty() else 1.0 if data.resource_id=="carbohydrate" else 0.0
+	if not typeof(contamination) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(contamination)) or contamination < 0 or contamination > data.payload*carbohydrate or (contamination > 0 and data.direction != "inbound"): return false
 	if data.has("unpaid_energy_cost") and (not typeof(data.unpaid_energy_cost) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.unpaid_energy_cost)) or data.unpaid_energy_cost < 0.0):
 		return false
 	var energy: Variant = data.get("energy_multiplier", 1.0)
 	var carry: Variant = data.get("carry_multiplier", 1.0)
+	var combat: Variant = data.get("combat_multiplier", 1.0)
+	if not typeof(combat) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(combat)) or combat < 1 or combat > 1 + AdaptationRules.FIGHTING.extra_combat_weight: return false
 	var chemistry: Variant = data.get("chemistry_fraction", 0.0)
 	if not typeof(chemistry) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(chemistry)) or chemistry < 0.0 or chemistry > 1.0:
 		return false
@@ -80,6 +105,10 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	var restored_detour: TrailDetour
 	var restored_report: Observation
+	var restored_harvest: Observation
+	if data.get("harvest_report") != null:
+		restored_harvest = Evidence.new()
+		if not data.harvest_report is Dictionary or not restored_harvest.restore(data.harvest_report,world,colony,time) or data.direction != "inbound" or data.payload <= 0 or restored_harvest.source_type.is_empty() or restored_harvest.definition_id != data.resource_id: return false
 	if data.get("detour") != null:
 		restored_detour = Detour.new()
 		if not data.detour is Dictionary or not restored_detour.restore(data.detour, world, colony, time, CONFIG.side_scout_max_steps):
@@ -98,11 +127,17 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	var losses: Variant = data.get("lost_workers", 0)
 	var adapted_losses: Variant = data.get("adapted_lost_workers", 0)
+	var impact_deaths: Variant = data.get("impact_losses", 0)
+	var impact_id: Variant = data.get("impact_serial", 0)
+	var impact_time: Variant = data.get("impact_witness_at", 0.0)
+	if not WorkerLedger.valid_count(impact_deaths) or not WorkerLedger.valid_count(impact_id): return false
+	if not typeof(impact_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(impact_time)) or impact_time < 0 or impact_time > time: return false
+	if impact_deaths > losses or ((impact_deaths == 0) != (impact_id == 0)) or impact_time > 0 and (impact_deaths == 0 or data.worker_count == 0): return false
 	var rival_deaths: Variant = data.get("rival_losses", 0)
-	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths > losses:
+	if not WorkerLedger.valid_count(rival_deaths) or rival_deaths + impact_deaths > losses:
 		return false
 	var encountered: Variant = data.get("predator_encountered", false)
-	if not WorkerLedger.valid_count(losses) or losses > CONFIG.workers_per_cohort or losses - rival_deaths > 1 or not WorkerLedger.valid_count(adapted_losses) or adapted_losses > losses or typeof(encountered) != TYPE_BOOL or (losses > rival_deaths and not encountered):
+	if not WorkerLedger.valid_count(losses) or losses > CONFIG.workers_per_cohort or losses - rival_deaths - impact_deaths > 1 or not WorkerLedger.valid_count(adapted_losses) or adapted_losses > losses or typeof(encountered) != TYPE_BOOL or (losses > rival_deaths + impact_deaths and not encountered):
 		return false
 	if data.worker_count == 0 and (losses == 0 or data.payload != 0.0 or restored_detour != null or restored_report != null):
 		return false
@@ -122,14 +157,15 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	var fighting_witness: Variant = data.get("witnessed_fighting", false)
 	if typeof(attack_witness) != TYPE_BOOL or typeof(fighting_witness) != TYPE_BOOL:
 		return false
-	if (attack_witness and (data.worker_count == 0 or losses <= rival_deaths)) or (fighting_witness and (data.worker_count == 0 or rival_deaths == 0)):
+	if (attack_witness and (data.worker_count == 0 or losses <= rival_deaths + impact_deaths)) or (fighting_witness and (data.worker_count == 0 or rival_deaths == 0)):
 		return false
 	for key: String in ["foreign_sampled", "reports_source_outcome", "swarm_engaged"]:
 		if typeof(data.get(key, key == "reports_source_outcome")) != TYPE_BOOL:
 			return false
 	var report: Variant = data.get("conflict_report", "")
 	var report_time: Variant = data.get("conflict_observed_at", 0.0)
-	if not report in ["", "contested", "secured", "withdrew", "dispersed"] or not typeof(report_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(report_time)) or report_time < 0.0 or report_time > time or ((report == "") != (report_time == 0.0)):
+	if not WorkerLedger.valid_count(data.get("conflict_serial",0)): return false
+	if not report in ["", "contested", "holding", "resisted", "reinforced", "secured", "withdrew", "dispersed"] or not typeof(report_time) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(report_time)) or report_time < 0.0 or report_time > time or ((report == "") != (report_time == 0.0)):
 		return false
 	if not data.get("reports_source_outcome", true) and (data.direction != "inbound" or (data.worker_count > 0 and report == "")):
 		return false
@@ -143,11 +179,13 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	worker_count = int(data.worker_count)
 	resource_id = data.resource_id
 	payload = float(data.payload)
+	cargo_source_type=source;cargo_yields=restored_yields;cargo_bulk=float(bulk)
 	contaminant_mass = float(contamination)
 	remaining_ticks = int(data.remaining_ticks)
 	unpaid_energy_cost = float(data.get("unpaid_energy_cost", 0.0))
 	energy_multiplier = float(energy)
 	carry_multiplier = float(carry)
+	combat_multiplier = float(combat)
 	chemistry_fraction = snappedf(float(chemistry), 0.00001)
 	lost_workers = int(losses)
 	adapted_lost_workers = int(adapted_losses)
@@ -159,10 +197,27 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	foreign_sampled = data.get("foreign_sampled", foreign_contact)
 	reports_source_outcome = data.get("reports_source_outcome", true)
 	swarm_engaged = data.get("swarm_engaged", false)
+	impact_losses = int(impact_deaths); impact_serial = int(impact_id); impact_witness_at = float(impact_time)
 	rival_losses = int(rival_deaths)
 	conflict_report = report
 	conflict_observed_at = float(report_time)
+	conflict_serial = int(data.get("conflict_serial",0))
 	detour_attempted = data.get("detour_attempted", false)
 	detour = restored_detour
 	detour_report = restored_report
+	harvest_report = restored_harvest
 	return true
+
+func outputs() -> Dictionary:
+	if resource_id.is_empty(): return {}
+	var result: Dictionary={}
+	var yields: Dictionary=cargo_yields if not cargo_yields.is_empty() else {resource_id:1.0}
+	for id: String in PileState.RESOURCE_IDS:
+		if not yields.has(id): continue
+		var amount: float=payload*float(yields[id])
+		if id=="carbohydrate": amount=maxf(0,amount-unpaid_energy_cost)
+		result[id]=float(String.num(amount,5)) if not cargo_yields.is_empty() else amount
+	return result
+
+func clear_cargo() -> void:
+	resource_id="";payload=0;contaminant_mass=0;cargo_source_type="";cargo_yields.clear();cargo_bulk=1

@@ -12,6 +12,7 @@ var stored_carbohydrate: float = 0.0
 var pheromone: float = 0.0
 var contacts_total: int = 0
 var unreturned_contacts: int = 0
+var reinforcement: RivalReinforcementState = RivalReinforcementState.new()
 
 
 func _init() -> void:
@@ -21,7 +22,7 @@ func _init() -> void:
 func to_dict() -> Dictionary:
 	return {"workers": workers.to_dict(), "direction": direction, "remaining_ticks": remaining_ticks,
 		"cargo": cargo, "stored_carbohydrate": stored_carbohydrate, "pheromone": pheromone,
-		"contacts_total": contacts_total, "unreturned_contacts": unreturned_contacts}
+		"contacts_total": contacts_total, "unreturned_contacts": unreturned_contacts, "reinforcement": reinforcement.to_dict()}
 
 
 func restore(data: Dictionary, world: WorldState, tick: int) -> bool:
@@ -36,6 +37,8 @@ func restore(data: Dictionary, world: WorldState, tick: int) -> bool:
 	if data.pheromone > 1.0 or data.cargo > maxi(0, ledger.count("rival:trail")) * TRAILS.carry_per_worker or (data.direction != "inbound" and data.cargo != 0.0) or not WorkerLedger.valid_count(data.contacts_total) or not WorkerLedger.valid_count(data.unreturned_contacts) or data.unreturned_contacts > data.contacts_total:
 		return false
 	var commitments: Dictionary = ledger.to_dict().commitments
+	var restored_reinforcement := RivalReinforcementState.new()
+	if not restored_reinforcement.restore(data.get("reinforcement",restored_reinforcement.to_dict()),ledger,world): return false
 	if data.direction == "dormant":
 		if not commitments.is_empty() or data.remaining_ticks != 0 or data.stored_carbohydrate != 0.0 or data.pheromone != 0.0 or data.contacts_total != 0:
 			return false
@@ -46,7 +49,7 @@ func restore(data: Dictionary, world: WorldState, tick: int) -> bool:
 		var maximum_store: float = floorf(float(tick - CONFIG.first_tick) / (leg * 2)) * CONFIG.trail_workers * TRAILS.carry_per_worker
 		if data.stored_carbohydrate > maximum_store + 0.00001 or world.nodes[CONFIG.food_id].quantity > CONFIG.food_capacity:
 			return false
-		if data.remaining_ticks < 1 or data.remaining_ticks > leg or commitments.size() != 1 or commitments.get("rival:trail", {}).get("kind") != "trail" or commitments.get("rival:trail", {}).get("owner_id") != "rival_route_1" or ledger.count("rival:trail") > CONFIG.trail_workers:
+		if data.remaining_ticks < 1 or data.remaining_ticks > leg or commitments.size() != (1 if restored_reinforcement.phase == "idle" else 2) or commitments.get("rival:trail", {}).get("kind") != "trail" or commitments.get("rival:trail", {}).get("owner_id") != "rival_route_1" or ledger.count("rival:trail") > CONFIG.trail_workers:
 			return false
 	workers = ledger
 	direction = data.direction
@@ -54,6 +57,10 @@ func restore(data: Dictionary, world: WorldState, tick: int) -> bool:
 	cargo = float(data.cargo)
 	stored_carbohydrate = float(data.stored_carbohydrate)
 	pheromone = float(data.pheromone)
+	# Runtime scent already uses this grid; recover only JSON representation noise.
+	var canonical_scent: float=snappedf(pheromone,0.0000000001)
+	if absf(pheromone-canonical_scent)<=1e-15: pheromone=canonical_scent
 	contacts_total = int(data.contacts_total)
 	unreturned_contacts = int(data.unreturned_contacts)
+	reinforcement = restored_reinforcement
 	return true

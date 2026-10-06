@@ -11,13 +11,13 @@ func set_workers(pile_id: String, target: Variant) -> bool:
 	var current: int = pile.midden.cleaners
 	if not pile.midden.revealed:
 		return _reject("Refuse isolation need has not emerged")
-	if target > current and pile.workers_available < target - current:
+	if target > current and pile.workers_assignable < target - current:
 		return _reject("More available cleanup workers required")
 	var id: String = "sanitation:" + pile_id
 	if target > current:
 		if current == 0 and not pile.workers.create_commitment(id, "internal", pile_id):
 			return _reject("Cleanup commitment unavailable")
-		var allocated: bool = pile.workers.allocate(id, target - current)
+		var allocated: bool = pile.allocate_workers(id, target - current)
 		assert(allocated)
 	elif target < current:
 		var released: bool = pile.workers.release(id, current - target)
@@ -34,7 +34,7 @@ func start(pile_id: String) -> bool:
 	var pile: PileState = _run.colony.piles[pile_id]
 	if not pile.midden.revealed or pile.midden.state != "primitive":
 		return _reject("Midden development is not available")
-	if pile.workers_available < CONFIG.build_workers:
+	if pile.workers_assignable < CONFIG.build_workers:
 		return _reject("Four excavation workers required")
 	for resource: String in CONFIG.costs():
 		if pile.resources[resource] < CONFIG.costs()[resource]:
@@ -42,7 +42,7 @@ func start(pile_id: String) -> bool:
 	var id: String = "midden:" + pile_id
 	if not pile.workers.create_commitment(id, "internal", pile_id):
 		return _reject("Midden excavation commitment unavailable")
-	var allocated: bool = pile.workers.allocate(id, CONFIG.build_workers)
+	var allocated: bool = pile.allocate_workers(id, CONFIG.build_workers)
 	var paid: bool = pile.consume_resources(CONFIG.costs())
 	assert(allocated and paid)
 	pile.midden.state = "developing"

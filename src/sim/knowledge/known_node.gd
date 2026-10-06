@@ -5,6 +5,8 @@ const CONFIG = preload("res://data/knowledge/default_knowledge.tres")
 var id: String
 var source_node_id: String
 var definition_id: String
+var source_type: String = ""
+var label_index: int = 0
 var estimated_position: Vector2
 var uncertainty_radius: float
 var confidence: float
@@ -29,7 +31,7 @@ static func aged_confidence(baseline: float, age: float) -> float:
 
 
 func to_dict() -> Dictionary:
-	return {"id": id, "source_node_id": source_node_id, "definition_id": definition_id,
+	return {"id": id, "source_node_id": source_node_id, "definition_id": definition_id, "source_type":source_type, "label_index":label_index,
 		"estimated_position": [estimated_position.x, estimated_position.y],
 		"uncertainty_radius": uncertainty_radius, "confidence": confidence,
 		"first_observed_at": first_observed_at, "last_observed_at": last_observed_at,

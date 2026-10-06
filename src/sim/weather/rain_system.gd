@@ -55,5 +55,5 @@ func _refill_exterior_water(raining_seconds: float) -> void:
 	var added: float = minf(CONFIG.exterior_water_per_second * raining_seconds, maxf(0.0, CONFIG.exterior_water_capacity - source.quantity))
 	if added <= 0.0:
 		return
-	source.quantity = minf(CONFIG.exterior_water_capacity, snappedf(source.quantity + added, 0.00001))
+	source.quantity = minf(CONFIG.exterior_water_capacity, float(String.num(source.quantity + added, 5)))
 	source.active = true

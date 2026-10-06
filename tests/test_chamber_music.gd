@@ -39,7 +39,7 @@ func run(test: Object) -> bool:
 	audio.restart_after_load()
 	test.check(audio.nursery_gain == strained.nursery_gain and audio.get_child_count() == 4, "Reload restores current condition and reuses all players")
 	for loop: AudioStreamWAV in [Audio.BASE_LOOP, Audio.GROWTH_LOOP, Audio.NURSERY_LOOP, Audio.MIDDEN_LOOP]:
-		test.check(loop.mix_rate == 22050 and is_equal_approx(loop.get_length(), 8.0), "Authored stems retain equal sample rate and duration")
+		test.check(loop.mix_rate == 44100 and is_equal_approx(loop.get_length(), 48.0), "Authored stems retain equal sample rate and full sixteen-bar duration")
 	test.check(root.simulation.run.to_dict() == snapshot, "Music condition/attention/fades leave simulation and RNG untouched")
 	audio.free()
 	root.free()

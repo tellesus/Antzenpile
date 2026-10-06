@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1")
-categories = {"carbohydrate": "carbohydrate", "protein": "protein", "water": "water"}
+categories = {"carbohydrate": "carbohydrate", "protein": "protein", "water": "water", "nest_site": "nest_site"}
 distance_scale = 10.0
 likely_threshold = 0.25
 clear_threshold = 0.65

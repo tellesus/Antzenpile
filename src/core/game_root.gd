@@ -16,13 +16,16 @@ var simulation: SimulationController
 var perception: PerceptionModel = Perception.new()
 var _debug_view: Node
 var _outward_view: Node2D
+var inward_pile_id: String="home"
 var _inward_view: Node2D
 var _audio_controller: AudioController
 var save_service: SaveService = Save.new()
 var mode: String = "outward"
 var audio_preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
 var _audio_settings: AudioSettings
+var _review: RunReview
 var _colony_controls: ColonyControls
+var _reports_view: Node2D
 var _discovery_notice: ReturnedDiscovery = preload("res://src/presentation/returned_discovery.gd").new()
 var _discovery_reports: int = 0
 
@@ -34,17 +37,25 @@ func _ready() -> void:
 	if DisplayServer.get_name() != "headless":
 		audio_preferences.load_file()
 		var outward: OutwardView = Outward.new()
-		outward.signal_provider = sensory_snapshot.bind("home")
-		outward.status_provider = outward_status.bind("home")
+		outward.signal_provider = focused_outward_signals
+		outward.status_provider = focused_outward_status
+		outward.caption_exclusions = report_regions
 		outward.dispatch_command = dispatch_facing
+		outward.scout_recall_command = recall_scout
 		outward.exploration_command = set_exploration
 		outward.exploration_bias_command = set_exploration_bias
 		outward.pause_command = simulation.toggle_pause
 		outward.speed_command = simulation.set_time_scale
+		outward.founding_command = start_founding
+		outward.establish_command = establish_daughter
+		outward.inspect_daughter_command = inspect_pile
+		outward.pile_command = inspect_outward_pile
 		outward.trail_create_command = create_trail_for
+		outward.gather_order_command = order_gathering
+		outward.effort_command = set_effort
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
-		outward.investigate_command = toggle_investigation_priority
+		outward.investigate_command = focused_source_investigation
 		outward.journey_command = respond_to_journey
 		outward.honeydew_start_command = start_honeydew_tending
 		outward.honeydew_stop_command = stop_honeydew_tending
@@ -56,7 +67,12 @@ func _ready() -> void:
 		add_child(outward)
 		_outward_view = outward
 		var inward: Node2D = Inward.new()
-		inward.status_provider = inward_status.bind("home")
+		inward.status_provider = focused_inward_status
+		inward.pile_command = inspect_pile
+		inward.pressure_command = inspect_internal_pressure
+		inward.supply_command = set_daughter_supply
+		inward.reinforcement_command = daughter_worker_reinforcement
+		inward.gathering_command = daughter_gathering_command
 		inward.mode_command = set_mode.bind("outward")
 		inward.pause_command = simulation.toggle_pause
 		inward.speed_command = simulation.set_time_scale
@@ -68,10 +84,15 @@ func _ready() -> void:
 		inward.sanitation_command = set_sanitation_workers
 		inward.humidity_command = set_humidity_workers
 		inward.brood_command = start_brood
+		inward.brood_care_command = relieve_brood_care
 		inward.brood_intent_command = set_brood_intent
+		inward.reproduction_command = toggle_reproductive_queue
+		inward.investment_priority_command = prioritize_investment
+		inward.chamber_command = order_chamber
+		inward.effort_command = set_effort
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
-		inward.adaptation_command = start_adaptation
+		inward.adaptation_command = queue_adaptation
 		inward.input_blocked = interaction_blocked
 		inward.save_command = quick_save
 		inward.load_command = quick_load
@@ -96,10 +117,26 @@ func _ready() -> void:
 		_colony_controls.seed_provider = current_seed
 		_colony_controls.scenario_provider = current_scenario
 		_colony_controls.start_command = start_new_colony
+		_colony_controls.end_command = end_run_review
 		_colony_controls.blocked = colony_controls_blocked
 		_colony_controls.interaction_started = cancel_field_gesture
 		_colony_controls.z_index = 101
 		add_child(_colony_controls)
+		_reports_view=preload("res://src/presentation/report_controls.gd").new()
+		_reports_view.provider=report_snapshot
+		_reports_view.inspect_command=inspect_report
+		_reports_view.need_command=inspect_need
+		_reports_view.read_command=mark_reports_read
+		_reports_view.pause_command=simulation.toggle_pause
+		_reports_view.blocked=report_controls_blocked
+		_reports_view.interaction_started=cancel_field_gesture
+		_reports_view.z_index=102
+		add_child(_reports_view)
+		_review = preload("res://src/presentation/run_review.gd").new()
+		_review.new_command = review_new_colony
+		_review.load_command = quick_load
+		_review.z_index = 200
+		add_child(_review)
 	# Lazy load keeps truth-view code out of the headless runtime and release input path.
 	if OS.is_debug_build() and DisplayServer.get_name() != "headless":
 		_debug_view = load("res://src/debug/debug_world_view.gd").new()
@@ -143,6 +180,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func set_mode(next_mode: String) -> bool:
+	if simulation.run.history.ended: return false
 	if not next_mode in ["outward", "inward"]:
 		return false
 	cancel_field_gesture()
@@ -163,15 +201,79 @@ func cancel_field_gesture() -> void:
 
 
 func interaction_blocked() -> bool:
-	return debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened
+	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened or _reports_view!=null and _reports_view.opened
 
 
 func sound_controls_blocked() -> bool:
-	return debug_is_open() or _colony_controls != null and _colony_controls.opened
+	return simulation.run.history.ended or debug_is_open() or _colony_controls != null and _colony_controls.opened or _reports_view!=null and _reports_view.opened
 
 
 func colony_controls_blocked() -> bool:
-	return debug_is_open() or _audio_settings != null and _audio_settings.opened
+	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _reports_view!=null and _reports_view.opened
+
+func report_controls_blocked() -> bool:
+	return simulation.run.history.ended or debug_is_open() or _audio_settings!=null and _audio_settings.opened or _colony_controls!=null and _colony_controls.opened or mode=="outward" and _outward_view!=null and (_outward_view.sources_open or _outward_view.exploration_open)
+
+func report_regions() -> Array[Rect2]:
+	var result: Array[Rect2]=[]
+	if _reports_view!=null and not report_controls_blocked():
+		result.append(_reports_view.button_rect())
+		if _reports_view.opened: result.append(_reports_view.panel_rect())
+	return result
+
+func report_snapshot(detailed: bool = false) -> Dictionary:
+	var journal: ReportJournal=simulation.run.reports
+	var result: Dictionary={"time":simulation.run.simulation_time,"paused":simulation.run.clock.paused,"unread":journal.unread_count(),"omitted":journal.omitted,"since":journal.since,"abbreviated":journal.omitted>0 or journal.seen.size()>=ReportJournal.SEEN_LIMIT}
+	if not detailed: return result
+	result.entries=journal.project("");result.needs=[];result.trails=[];result.sources={}
+	for id: String in simulation.run.colony.piles:
+		for need: Dictionary in Pressure.needs(inward_status(id)):
+			need.pile_id=id;result.needs.append(need)
+	for route: TrailRouteState in simulation.run.trails.routes.values(): result.trails.append({"id":route.id,"destination_knowledge_id":route.destination_knowledge_id})
+	for node: KnownNode in simulation.run.knowledge.nodes.values(): result.sources[node.id]={"category":node.definition_id,"source_type":node.source_type,"memory_label":SourceCatalog.label(node.label_index)}
+	return result
+
+func mark_reports_read(id: int) -> Dictionary:
+	if simulation.run.history.ended or id<0: return {"accepted":false,"reason":"Report unavailable"}
+	return {"accepted":simulation.run.reports.mark_read(id),"reason":""}
+
+func inspect_need(pile_id: String, organ: String) -> Dictionary:
+	if not simulation.run.colony.piles.has(pile_id): return {"accepted":false,"reason":"Pile unavailable"}
+	var valid: bool=false
+	for need: Dictionary in Pressure.needs(inward_status(pile_id)): valid=valid or need.organ==organ
+	if not valid: return {"accepted":false,"reason":"Condition improved or changed"}
+	inspect_pile(pile_id)
+	if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
+	if _reports_view!=null: _reports_view.opened=false
+	set_mode("inward")
+	return {"accepted":true,"reason":""}
+
+func inspect_report(id: int) -> Dictionary:
+	var selected: Dictionary={}
+	for entry: Dictionary in simulation.run.reports.entries:
+		if entry.id==id: selected=entry;break
+	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
+	if selected.kind in ["project","brood","trait","supplies","investment","chamber"]:
+		inspect_pile(selected.pile_id)
+		var organ: String="nursery" if selected.kind=="chamber" else "queen" if selected.kind=="investment" else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
+		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
+		if selected.kind=="chamber" and _inward_view!=null: _inward_view.chamber_controls.opened=true;_inward_view.chamber_controls.selected=selected.subject_id
+		set_mode("inward")
+	else:
+		var knowledge_id: String=selected.subject_id if selected.kind=="source" else simulation.run.trails.routes[selected.subject_id].destination_knowledge_id
+		inspect_outward_pile(selected.pile_id)
+		if _outward_view!=null:
+			_outward_view.sources_open=false;_outward_view.exploration_open=false
+			_outward_view.selected_id="signal:"+knowledge_id
+			_outward_view.journey_open=selected.kind not in ["source","intake","camp"]
+			_outward_view.conflict.reset();_outward_view._process(0)
+			for signal_data: Dictionary in _outward_view._signals:
+				if signal_data.source_knowledge_id==knowledge_id and signal_data.bearing!=null: _outward_view.facing=signal_data.bearing;break
+			_outward_view._process(0)
+		set_mode("outward")
+	mark_reports_read(id)
+	if _reports_view!=null: _reports_view.opened=false
+	return {"accepted":true,"reason":""}
 
 
 func current_seed() -> int:
@@ -193,30 +295,114 @@ func start_new_colony(seed_value: Variant, scenario: Variant = "") -> Dictionary
 	return {"accepted": true, "reason": ""}
 
 
+func focused_inward_status() -> Dictionary:
+	var status: Dictionary = inward_status(inward_pile_id)
+	status["other_pile_attention"] = pile_internal_attention("home" if inward_pile_id != "home" else "satellite_1")
+	if inward_pile_id == "satellite_1": status["gathering"] = daughter_gathering_summary()
+	return status
+
+
+func inspect_pile(pile_id: String) -> bool:
+	if not simulation.run.colony.piles.has(pile_id): return false
+	if inward_pile_id != pile_id: _reset_outward_attention()
+	inward_pile_id=pile_id
+	set_mode("inward")
+	if _inward_view!=null:
+		_inward_view.selected_id=""; _inward_view.queen_tab="workers"; _inward_view._feedback=""; _inward_view._process(0)
+		_inward_view.gathering.reset()
+		_inward_view.chamber_controls.reset()
+		_inward_view.effort_draft.opened=false
+	return true
+
+
+func focused_outward_signals() -> Array[Dictionary]:
+	return sensory_snapshot(inward_pile_id)
+
+
+func focused_outward_status() -> Dictionary:
+	return outward_status(inward_pile_id)
+
+
+func _reset_outward_attention() -> void:
+	if _outward_view == null: return
+	cancel_field_gesture()
+	_outward_view.facing = 0.0
+	_outward_view.selected_id = ""
+	_outward_view.sources_open = false
+	_outward_view.source_page = 0
+	_outward_view.exploration_open = false
+	_outward_view.journey_open = false
+	_outward_view.approach_focus = false; _outward_view.rival_focus = false
+	_outward_view._feedback = ""
+	_outward_view._request_rejected = false
+	_outward_view.reset_mission_visuals()
+
+
+func inspect_outward_pile(pile_id: String) -> bool:
+	if not simulation.run.colony.piles.has(pile_id): return false
+	if inward_pile_id != pile_id: _reset_outward_attention()
+	inward_pile_id = pile_id
+	if _inward_view != null:
+		_inward_view.selected_id = ""
+		_inward_view.gathering.reset()
+	set_mode("outward")
+	if _inward_view!=null: _inward_view.chamber_controls.reset();_inward_view.effort_draft.opened=false
+	if _outward_view != null: _outward_view._process(0)
+	return true
+
+
+func focused_source_investigation(knowledge_id: String) -> Dictionary:
+	return toggle_investigation_priority(knowledge_id)
+
+
+func _home_order() -> Dictionary:
+	return {"accepted": false, "reason": "Inspect Home to give this order"}
+
+
+func _owns_food_route(route_id: String) -> bool:
+	var route: TrailRouteState = simulation.run.trails.routes.get(route_id)
+	return route != null and route.origin_pile == inward_pile_id and route.purpose == "food"
+
+
 func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
+	if simulation.run.history.ended: return []
 	var result: Array[Dictionary] = []
 	if not simulation.run.colony.piles.has(pile_id):
 		return result
 	var origin: Vector2 = simulation.run.colony.piles[pile_id].position
 	for signal_data: PerceivedSignal in perception.project(simulation.run.knowledge.nodes.values(), origin, simulation.run.simulation_time):
 		var record: Dictionary = signal_data.to_dict()
+		# Older exploited/tended producer history already established this identity.
+		if record.source_knowledge_id == "known:"+HONEYDEW_CONFIG.source_id and record.source_type.is_empty() and simulation.run.honeydew.relationship in ["exploited","tended"]: record.source_type = "aphid_honeydew"
 		var route: TrailRouteState = simulation.run.trails.find_route(pile_id, signal_data.source_knowledge_id)
 		record["foreign_contact"] = route != null and route.foreign_reports > 0
 		record["conflict_report"] = route.conflict_report if route != null else ""
 		if route != null and route.reported_losses > 0:
-			record.risk = "past_loss" if journey_addressed(route) else "reported_loss"
+			record.risk = "reported_loss" if journey_alarm(route) else "past_loss"
 		result.append(record)
+	for route: TrailRouteState in simulation.run.trails.routes.values():
+		if route.origin_pile != pile_id or route.impact_report.is_empty(): continue
+		var report: Dictionary = simulation.run.journey_response.reports.get(route.id, {})
+		if report.get("received_at", 0.0) > route.impact_report.received_at: continue
+		var offset: Vector2 = Vector2(route.impact_report.estimated_position[0], route.impact_report.estimated_position[1]) - origin
+		result.append({"id":"threat:" + route.id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat",
+			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":5.0,
+			"confidence":0.75,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time - route.impact_report.observed_at,
+			"risk":"reported_attack","threat_kind":"surface","traffic":null,"foreign_contact":false,"conflict_report":""})
 	for id: String in simulation.run.journey_response.reports:
 		var report: Dictionary = simulation.run.journey_response.reports[id]
-		if report.finding not in ["ambush","mixed"]: continue
+		var impact: Dictionary = simulation.run.trails.routes[id].impact_report
+		if not impact.is_empty() and report.received_at <= impact.received_at: continue
+		if report.finding not in ["ambush","mixed","surface"]: continue
 		var route: TrailRouteState = simulation.run.trails.routes[id]
 		if route.origin_pile != pile_id: continue
 		var segment: TrailSegmentState = simulation.run.trails.segments[route.segment_id]
 		var offset: Vector2 = segment.start.lerp(segment.end,report.fraction) - origin
+		if report.has("estimated_position"): offset = Vector2(report.estimated_position[0],report.estimated_position[1]) - origin
 		result.append({"id":"threat:" + id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat",
 			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":3.0,
 			"confidence":0.75,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time - report.observed_at,
-			"risk":"reported_attack","traffic":null,"foreign_contact":false,"conflict_report":""})
+			"risk":"reported_attack","threat_kind":report.finding,"traffic":null,"foreign_contact":false,"conflict_report":""})
 	return result
 
 
@@ -226,21 +412,40 @@ func outward_status(pile_id: String) -> Dictionary:
 	var temporal_hints: Dictionary = {}
 	for known_id: String in simulation.run.knowledge.nodes:
 		temporal_hints[known_id] = simulation.run.knowledge.temporal_hint(known_id)
-	return {"available_workers": simulation.run.colony.piles[pile_id].workers_available,
+	var camps: Dictionary={}
+	for known_id: String in simulation.run.knowledge.nodes:
+		if simulation.run.knowledge.nodes[known_id].definition_id=="nest_site": camps[known_id]=simulation.founding.summary(known_id)
+	var status: Dictionary = {"pile_id":pile_id, "pile_name":"Home" if pile_id == "home" else "Daughter",
+		"other_pile":"satellite_1" if pile_id == "home" and simulation.run.colony.piles.has("satellite_1") else "home" if pile_id != "home" else "",
+		"founding":camps if pile_id == "home" else {},"home_air": simulation.heat.home_air(),
+		"available_workers": simulation.run.colony.piles[pile_id].workers_assignable,
+		"workers_total":simulation.run.colony.piles[pile_id].workers_total + simulation.run.pending_for_pile(pile_id),
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
 		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
 		"scout_missions": scout_mission_summaries(pile_id),
-		"honeydew": honeydew_summary(pile_id), "exploration": exploration_summary(),
-		"journey_response": simulation.journey_response.summary(),
-		"internal_attention": Pressure.attention(inward_status(pile_id))}
+		"honeydew": honeydew_summary(pile_id),
+		"journey_response": simulation.journey_response.summary(pile_id),
+		"internal_attention": Pressure.attention(inward_status(pile_id)),
+		"daughter_attention": pile_internal_attention("satellite_1" if pile_id == "home" else "home")}
+	status["exploration"] = exploration_summary(pile_id)
+	return status
 
 
-func inspect_internal_pressure() -> Dictionary:
-	var attention: Dictionary = Pressure.attention(inward_status("home"))
+func pile_internal_attention(pile_id: String) -> Dictionary:
+	var attention: Dictionary = Pressure.attention(inward_status(pile_id))
+	if attention.is_empty(): return {}
+	attention["pile_id"] = pile_id
+	attention["title"] = "CHECK %s %s" % ["HOME" if pile_id == "home" else "DAUGHTER", attention.organ.to_upper().replace("_", " ")]
+	return attention
+
+
+func inspect_internal_pressure(pile_id: String = "home") -> Dictionary:
+	var attention: Dictionary = pile_internal_attention(pile_id)
 	if attention.is_empty(): return {"accepted": false, "reason": "Internal conditions are steady"}
+	inspect_pile(pile_id)
 	if _inward_view != null:
 		_inward_view.selected_id = attention.organ
 		_inward_view._process(0)
@@ -251,30 +456,48 @@ func inspect_internal_pressure() -> Dictionary:
 	return {"accepted": true, "reason": ""}
 
 
-func exploration_summary() -> Dictionary:
-	return {"target": simulation.run.exploration.target, "bias": simulation.run.exploration.bias,
-		"away": simulation.scouting.standing_count(), "priorities": simulation.run.exploration.priorities.duplicate()}
+func exploration_summary(pile_id: String = "home") -> Dictionary:
+	var policy: ExplorationState = simulation.run.exploration_for(pile_id)
+	if policy == null: return {}
+	var other: ExplorationState = simulation.run.daughter_exploration if pile_id == "home" else simulation.run.exploration
+	var pile: PileState=simulation.run.colony.piles[pile_id]
+	var standing: int=simulation.scouting.standing_count(pile_id)
+	var local: int=0
+	for agent: ScoutAgent in simulation.run.scouts.values():
+		if agent.origin_pile==pile_id: local+=1
+	var wait: String="off" if policy.target==0 else "target" if standing>=policy.target else "cap" if simulation.run.active_scout_count()>=simulation.scouting.config.active_cap else "care" if pile.workers_assignable<1 and pile.workers_available>0 else "labor" if pile.workers_assignable<1 else "spacing" if policy.cooldown_ticks>0 else "ready"
+	var priorities: Array[Dictionary]=[]
+	for id: String in policy.priorities:
+		var known: KnownNode=simulation.run.knowledge.nodes[id]
+		var awaiting: bool=false
+		for memory: ScoutMissionMemory in simulation.run.scout_missions.values():
+			if memory.origin_pile==pile_id and memory.target_knowledge_id==id and memory.completed_at()<0: awaiting=true
+		priorities.append({"id":id,"name":SourceMemory.display_name({"source_type":known.source_type,"category":known.definition_id,"memory_label":SourceCatalog.label(known.label_index)}),"awaiting":awaiting,"last_sent":policy.priority_last_sent.get(id,-1.0)})
+	return {"other_target":other.target,"target": policy.target, "bias": policy.bias,"wait":wait,"manual_away":local-standing,"shared_away":simulation.run.active_scout_count(),"priority_details":priorities,
+		"away": simulation.scouting.standing_count(pile_id), "priorities": policy.priorities.duplicate(),
+		"missing": simulation.run.missing_scouts(pile_id),
+		"cautious_routes": simulation.scouting.Caution.routes(simulation.run, pile_id).size()}
 
 
 func toggle_investigation_priority(knowledge_id: String) -> Dictionary:
-	var route: TrailRouteState = simulation.run.trails.find_route("home", knowledge_id)
+	var route: TrailRouteState = simulation.run.trails.find_route(inward_pile_id, knowledge_id)
 	var recovery: bool = route != null and (route.status == "depleted" or route.resume_on_report)
-	var enabled: bool = not route.resume_on_report if recovery else knowledge_id not in simulation.run.exploration.priorities
-	var accepted: bool = simulation.set_investigation_priority(knowledge_id, enabled)
+	var enabled: bool = not route.resume_on_report if recovery else knowledge_id not in simulation.run.exploration_for(inward_pile_id).priorities
+	var accepted: bool = simulation.set_investigation_priority(knowledge_id, enabled, inward_pile_id)
 	if accepted and recovery:
 		var watched: bool = simulation.trails.set_recovery_watch(route.id, enabled)
 		assert(watched)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error,
-		"standing_priority": true, "recovery_watch": recovery, "enabled": enabled, "exploration_off": simulation.run.exploration.target == 0}
+		"standing_priority": true, "recovery_watch": recovery, "enabled": enabled, "exploration_off": simulation.run.exploration_for(inward_pile_id).target == 0}
 
 
 func set_exploration(target: int) -> Dictionary:
-	var accepted: bool = simulation.set_exploration(target)
+	var accepted: bool = simulation.set_exploration(target, inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func set_exploration_bias(bearing: Variant) -> Dictionary:
-	var accepted: bool = simulation.set_exploration_bias(bearing)
+	var accepted: bool = simulation.set_exploration_bias(bearing, inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
@@ -285,18 +508,20 @@ func scout_mission_summaries(pile_id: String) -> Array[Dictionary]:
 			continue
 		var record: Dictionary = memory.to_dict()
 		record["age"] = simulation.run.simulation_time - memory.departed_at
-		record["away_seconds"] = record.age if memory.returned_at < 0.0 else memory.returned_at - memory.departed_at
+		record["away_seconds"] = record.age if memory.completed_at() < 0.0 else memory.completed_at() - memory.departed_at
+		record["awaiting"] = memory.completed_at() < 0.0
+		record["overdue"] = memory.completed_at() < 0.0 and memory.expected_at >= 0.0 and simulation.run.simulation_time >= memory.expected_at
 		result.append(record)
 	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		if (a.returned_at < 0.0) != (b.returned_at < 0.0):
-			return a.returned_at < 0.0
+		if a.awaiting != b.awaiting:
+			return a.awaiting
 		return a.departed_at > b.departed_at if a.departed_at != b.departed_at else a.id > b.id)
 	return result
 
 
 func honeydew_summary(pile_id: String) -> Dictionary:
 	var producer_knowledge_id: String = "known:" + HONEYDEW_CONFIG.source_id
-	if pile_id == "home" and simulation.run.knowledge.nodes.has(producer_knowledge_id):
+	if pile_id == "home" and simulation.run.knowledge.nodes.has(producer_knowledge_id) and (simulation.run.knowledge.nodes[producer_knowledge_id].source_type == "aphid_honeydew" or simulation.run.honeydew.relationship in ["exploited","tended"]):
 		return {"knowledge_id": producer_knowledge_id,
 			"relationship": simulation.run.honeydew.relationship,
 			"protection_workers": simulation.run.honeydew.protection_workers,
@@ -309,11 +534,17 @@ func inward_status(pile_id: String) -> Dictionary:
 		return {}
 	var pile: PileState = simulation.run.colony.piles[pile_id]
 	var brood: Array[Dictionary] = []
+	var care_plan: Dictionary = simulation.brood_care.plan(pile_id)
+	var care_source_name: String = ""
+	if care_plan.get("kind") == "gatherers":
+		var source_id: String = simulation.run.trails.routes[care_plan.route_id].destination_knowledge_id
+		for signal_data: PerceivedSignal in perception.project([simulation.run.knowledge.nodes[source_id]], pile.position, simulation.run.simulation_time):
+			care_source_name = SourceMemory.display_name(signal_data.to_dict())
 	for cohort: BroodCohort in pile.brood_cohorts:
 		brood.append(cohort.to_dict())
 	var trail_workers: int = 0
 	for route: TrailRouteState in simulation.run.trails.routes.values():
-		if route.origin_pile == pile_id:
+		if (simulation.run.supply_origin if route.purpose == "interpile" and not simulation.run.reinforcement.active() else route.origin_pile) == pile_id:
 			trail_workers += route.allocated_workers + simulation.run.trails.pending_losses(route.id)
 	var expected_total: int = pile.workers_total + simulation.run.pending_for_pile(pile_id)
 	var expected_adapted: int = pile.adapted_workers_total + simulation.run.pending_for_pile(pile_id, true)
@@ -324,18 +555,23 @@ func inward_status(pile_id: String) -> Dictionary:
 			continue
 		if trait_id in ["security", "tolerance"] and not pile.recognition_candidate:
 			continue
-		adaptation_options[trait_id] = {"available": AdaptationRules.can_select(pile, trait_id),
+		adaptation_options[trait_id] = {"available": AdaptationRules.can_queue(pile, trait_id),
 			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.genetics.established,
 			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)}
 	for trait_id: String in pile.genetics.established:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
-	return {"pile_id": pile_id, "queens": pile.queen_count,
+	return {"reinforcement":simulation.reinforcement.summary(), "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
+		"reproduction": simulation.reproduction.summary(pile_id),
+		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
+			"cap":simulation.humidity.CONFIG.care_cap,"suggestion":1,"gallery":pile.chambers.complete("ventilation_gallery"),
 			"carers": pile.humidity.carers, "larval_rate": pile.humidity.larval_rate(),
-			"water_used": pile.humidity.water_used_units / 100000.0},
+			"water_used": (pile.humidity.water_used_units + pile.temperature.water_used_units) / 100000.0},
 		"midden": midden_summary(pile_id),
+		"brood_health": simulation.brood_health.summary(pile_id),
+		"temperature": simulation.heat.summary(pile_id),
 		"workers_total": expected_total, "workers_available": pile.workers_available,
 		"brood": brood, "brood_matured_total": pile.brood_matured_total,
 		"brood_losses": pile.brood_lost_total, "guest": guest_summary(pile_id),
@@ -346,9 +582,11 @@ func inward_status(pile_id: String) -> Dictionary:
 		"chemistry_persistence": AdaptationRules.CHEMISTRY.persistence_multiplier,
 		"chemistry_extra_energy": AdaptationRules.CHEMISTRY.extra_travel_energy,
 		"recognition_experience": pile.recognition_experience,
+		"fighter_combat_weight":1.0 + AdaptationRules.FIGHTING.extra_combat_weight, "fighter_extra_food":AdaptationRules.FIGHTING.extra_larval_food,
 		"recognition_clearing_change": AdaptationRules.RECOGNITION.clearing_change,
 		"recognition_labor_change": AdaptationRules.RECOGNITION.protection_worker_change,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
+		"adaptation_queue": simulation.adaptation.queued_status(pile_id),
 		"adapted_workers": expected_adapted,
 		"adaptation_fraction": float(expected_adapted) / expected_total if expected_total > 0 else 0.0,
 		"adaptation_costs": AdaptationRules.COSTS.duplicate(),
@@ -356,8 +594,11 @@ func inward_status(pile_id: String) -> Dictionary:
 		"brood_batch_count": BROOD_CONFIG.starting_count,
 		"brood_production": simulation.brood.production_status(pile_id),
 		"brood_reserve": simulation.brood.remaining_food_reserve(pile).duplicate(),
+		"workers_assignable":pile.workers_assignable,
+		"brood_care": {"required":pile.brood_care_workers_required(), "held":mini(pile.workers_available,pile.brood_care_workers_required()), "missing":maxi(0,pile.brood_care_workers_required()-pile.workers_available), "relief":care_plan.duplicate(true), "source_name":care_source_name},
 		"nursery_state": pile.nursery_state, "nursery_brood_capacity": pile.nursery_brood_capacity(),
 		"nursery_occupied_space": pile.nursery_occupied_space(),
+		"worker_brood_space_free":pile.free_worker_brood_space(),"nursery_shared_occupied":pile.shared_nursery_occupied_space(),"alcove_capacity":pile.chambers.reproductive_spaces(),"chambers":simulation.chambers.summary(pile_id),
 		"nursery_care_capacity": pile.nursery_care_capacity(),
 		"nursery_max_care_capacity": pile.nursery_max_care_capacity(),
 		"nursery_progress": pile.nursery_progress_seconds,
@@ -375,13 +616,13 @@ func inward_status(pile_id: String) -> Dictionary:
 		"food_exchange_costs": FOOD_CONFIG.costs(),
 		"food_exchange_workers_required": FOOD_CONFIG.workers_required,
 		"food_exchange_food_multiplier": FOOD_CONFIG.developed_larval_food_multiplier,
-		"active_scouts": simulation.run.scouts.size(), "trail_workers": trail_workers,
+		"active_scouts": simulation.run.scouts.values().filter(func(agent: ScoutAgent) -> bool: return agent.origin_pile == pile_id).size(), "trail_workers": trail_workers,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale}
 
 
 func returned_losses(pile_id: String) -> int:
-	var total: int = simulation.run.journey_response.defense.reported_losses if pile_id == "home" else 0
+	var total: int = simulation.run.journey_response.defense.reported_for_pile(pile_id)
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile == pile_id:
 			total += route.reported_losses
@@ -396,6 +637,7 @@ func music_state(pile_id: String) -> MusicState:
 
 
 func quick_save() -> Dictionary:
+	if simulation.run.history.ended: return {"accepted":false,"reason":"Run ended; existing saved colony was kept"}
 	var accepted: bool = save_service.save(simulation.run)
 	return {"accepted": accepted, "reason": save_service.last_error}
 
@@ -408,12 +650,17 @@ func quick_load() -> Dictionary:
 
 
 func _refresh_loaded_views() -> void:
+	if _reports_view!=null: _reports_view.opened=false;_reports_view.page=0;_reports_view.status={}
+	if _review != null: _review.open({})
+	set_mode("outward" if mode == "review" else mode)
+	inward_pile_id = "home"
 	_discovery_notice.baseline(sensory_snapshot("home"))
 	_discovery_reports = 0
 	if _outward_view != null:
 		_outward_view.facing = 0.0
 		_outward_view.selected_id = ""
 		_outward_view.journey_open = false
+		_outward_view.approach_focus = false; _outward_view.rival_focus = false
 		_outward_view.sources_open = false
 		_outward_view.source_page = 0
 		_outward_view._pointer_kind = ""
@@ -421,17 +668,23 @@ func _refresh_loaded_views() -> void:
 		_outward_view.reset_mission_visuals()
 		_outward_view._process(0)
 	if _inward_view != null:
+		inward_pile_id="home"
 		_inward_view.selected_id = ""
 		_inward_view._focus_gains.clear()
 		_inward_view.web_selection = "foraging"
 		_inward_view.web_family = "foraging"
+		_inward_view.gathering.reset()
 		_inward_view._feedback = ""
+		_inward_view.chamber_controls.reset()
 		_inward_view._process(0)
+		_inward_view.effort_draft.opened=false
 	if _debug_view != null:
+		_debug_view.set_process_input(true)
 		_debug_view.snapshot_provider = simulation.run.to_dict
 		_debug_view.model.selected_id = "home"
 	if _audio_controller != null:
 		_audio_controller.restart_after_load()
+	if simulation.run.history.ended: _show_review()
 
 
 func _show_save_feedback(result: Dictionary, success: String) -> void:
@@ -441,7 +694,7 @@ func _show_save_feedback(result: Dictionary, success: String) -> void:
 
 
 func start_food_exchange() -> Dictionary:
-	var accepted: bool = simulation.start_food_exchange("home")
+	var accepted: bool = simulation.start_food_exchange(inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.food_exchange.last_error}
 
 
@@ -449,7 +702,13 @@ func midden_summary(pile_id: String) -> Dictionary:
 	if not simulation.run.colony.piles.has(pile_id):
 		return {}
 	var state: SanitationState = simulation.run.colony.piles[pile_id].midden
+	var pile: PileState=simulation.run.colony.piles[pile_id]
+	var expected: int=pile.workers_total+simulation.run.pending_for_pile(pile_id)
+	var generated: float=(expected*SANITATION_CONFIG.worker_quarters_per_tick+pile.nursery_occupied_space()*SANITATION_CONFIG.brood_quarters_per_tick)/4.0
+	var removal: int=SANITATION_CONFIG.removal_units_per_worker_tick*(SANITATION_CONFIG.developed_multiplier if state.state=="developed" else 1)
+	var suggestion: int=clampi(ceili(generated/removal)+(1 if state.burden_units>=SANITATION_CONFIG.strain_units else 0),1,SANITATION_CONFIG.cleaner_cap)
 	return {"revealed": state.revealed, "state": state.state,
+		"cap":SANITATION_CONFIG.cleaner_cap,"suggestion":suggestion,
 		"burden": float(state.burden_units) / SANITATION_CONFIG.units_per_quantity,
 		"cleaners": state.cleaners, "larval_rate": state.larval_rate(),
 		"progress": float(state.progress_ticks) / SANITATION_CONFIG.build_ticks,
@@ -458,18 +717,26 @@ func midden_summary(pile_id: String) -> Dictionary:
 
 
 func start_midden() -> Dictionary:
-	var accepted: bool = simulation.start_midden("home")
+	var accepted: bool = simulation.start_midden(inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.sanitation.last_error}
 
 
 func set_sanitation_workers(target: int) -> Dictionary:
-	var accepted: bool = simulation.set_sanitation_workers("home", target)
+	var accepted: bool = simulation.set_sanitation_workers(inward_pile_id, target)
 	return {"accepted": accepted, "reason": simulation.sanitation.last_error}
 
 
 func set_humidity_workers(target: int) -> Dictionary:
-	var accepted: bool = simulation.set_humidity_workers("home", target)
+	var accepted: bool = simulation.set_humidity_workers(inward_pile_id, target)
 	return {"accepted": accepted, "reason": simulation.humidity.last_error}
+
+func set_effort(kind: String, count: Variant) -> Dictionary:
+	var accepted: bool=false;var reason: String="Unknown staffing job"
+	match kind:
+		"climate": accepted=simulation.set_humidity_workers(inward_pile_id,count);reason=simulation.humidity.last_error
+		"cleanup": accepted=simulation.set_sanitation_workers(inward_pile_id,count);reason=simulation.sanitation.last_error
+		"exploration": accepted=simulation.set_exploration(count,inward_pile_id);reason=simulation.scouting.last_error
+	return {"accepted":accepted,"queued":accepted and kind=="exploration","reason":reason}
 
 
 func guest_summary(pile_id: String) -> Dictionary:
@@ -479,7 +746,7 @@ func guest_summary(pile_id: String) -> Dictionary:
 	return {"observation": state.observation, "reported_losses": state.encounter_losses,
 		"total_reported_losses": state.reported_losses,
 		"rejection_active": state.phase == "rejecting", "workers_required": simulation.guest.CONFIG.rejection_workers,
-		"workers_committed": simulation.run.colony.piles.home.workers.count("rejection:home")}
+		"workers_committed": maxi(0, simulation.run.colony.piles.home.workers.count("rejection:home"))}
 
 
 func set_guest_rejection(enabled: bool) -> Dictionary:
@@ -488,27 +755,56 @@ func set_guest_rejection(enabled: bool) -> Dictionary:
 
 
 func start_brood() -> Dictionary:
-	var accepted: bool = simulation.start_brood("home")
+	var accepted: bool = simulation.start_brood(inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.brood.last_error}
 
 
+func relieve_brood_care(plan: Dictionary) -> Dictionary:
+	if simulation.run.history.ended: return {"accepted":false,"reason":"This run has ended"}
+	var accepted: bool = simulation.brood_care.apply(inward_pile_id, plan)
+	return {"accepted":accepted, "reason":"Assignments changed; inspect care again" if not accepted else "Worker reassignment requested; care resumes when they are home"}
+
+
+func start_reproduction() -> Dictionary:
+	var accepted: bool = simulation.start_reproduction(inward_pile_id)
+	return {"accepted":accepted,"reason":simulation.reproduction.last_error}
+
+func toggle_reproductive_queue() -> Dictionary:
+	var pending: bool=simulation.run.colony.piles[inward_pile_id].investments.reproduction
+	var accepted: bool=simulation.queue_reproduction(inward_pile_id,not pending)
+	return {"accepted":accepted,"queued":accepted and not pending,"reason":simulation.investments.last_error}
+
+func prioritize_investment(kind: String) -> Dictionary:
+	var accepted: bool=simulation.prioritize_investment(inward_pile_id,kind)
+	return {"accepted":accepted,"queued":accepted,"reason":simulation.investments.last_error}
+
+func order_chamber(chamber_id: String, cancel: bool=false) -> Dictionary:
+	var accepted: bool=simulation.order_chamber(inward_pile_id,chamber_id,cancel)
+	return {"accepted":accepted,"queued":accepted and not cancel,"reason":simulation.chambers.last_error}
+
+
 func set_brood_intent(intent: String) -> Dictionary:
-	var accepted: bool = simulation.set_brood_intent("home", intent)
+	var accepted: bool = simulation.set_brood_intent(inward_pile_id, intent)
 	return {"accepted": accepted, "reason": simulation.brood.last_error}
 
 
 func start_adaptation(trait_id: String) -> Dictionary:
-	var accepted: bool = simulation.start_adaptation("home", trait_id)
+	var accepted: bool = simulation.start_adaptation(inward_pile_id, trait_id)
 	return {"accepted": accepted, "reason": simulation.adaptation.last_error}
 
 
+func queue_adaptation(trait_id: String) -> Dictionary:
+	var accepted: bool = simulation.queue_adaptation(inward_pile_id, trait_id)
+	return {"accepted": accepted, "queued":accepted and not trait_id.is_empty(), "reason": simulation.adaptation.last_error}
+
+
 func start_nursery_development() -> Dictionary:
-	var accepted: bool = simulation.start_nursery_development("home")
+	var accepted: bool = simulation.start_nursery_development(inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.nursery.last_error}
 
 
 func start_nursery_expansion() -> Dictionary:
-	var accepted: bool = simulation.start_nursery_expansion("home")
+	var accepted: bool = simulation.start_nursery_expansion(inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.nursery.last_error}
 
 
@@ -530,6 +826,7 @@ func set_honeydew_protection(enabled: bool) -> Dictionary:
 
 
 func start_honeydew_tending(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	if knowledge_id != "known:" + HONEYDEW_CONFIG.source_id or not simulation.run.knowledge.nodes.has(knowledge_id):
 		return {"accepted": false, "reason": "Honeydew source unknown"}
 	var accepted: bool = simulation.start_honeydew_tending("home")
@@ -537,6 +834,7 @@ func start_honeydew_tending(knowledge_id: String) -> Dictionary:
 
 
 func stop_honeydew_tending(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
 	if knowledge_id != "known:" + HONEYDEW_CONFIG.source_id or not simulation.run.knowledge.nodes.has(knowledge_id):
 		return {"accepted": false, "reason": "Honeydew source unknown"}
 	var accepted: bool = simulation.stop_honeydew_tending("home")
@@ -553,16 +851,21 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				if cohort.route_id == route.id and cohort.detour != null:
 					checking += 1
 			var pending: int = simulation.run.trails.pending_losses(route.id)
+			var settlers_away: bool = route.purpose=="interpile" and simulation.run.reinforcement.active()
+			var sent: int = WorkerReinforcementState.CONFIG.reinforcement_workers+WorkerReinforcementState.CONFIG.reinforcement_messengers
 			var status: String = route.status
 			if pending > 0 and status == "inactive":
 				status = "recalling" if route.desired_workers == 0 else "depleted" if route.reported_depleted else "active"
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
-				"desired_workers": route.desired_workers, "allocated_workers": route.allocated_workers + pending,
-				"active_workers": route.active_workers + pending, "checking_workers": checking, "status": status,
-				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at,
+				"waiting_workers":route.waiting_workers,
+				"desired_workers": sent if settlers_away else route.desired_workers, "allocated_workers": sent if settlers_away else route.allocated_workers + pending,
+				"purpose":route.purpose, "founding_intent":route.purpose in ["founding","interpile"] and simulation.run.founding.phase!="failed", "active_workers":sent if settlers_away else 0 if route.purpose=="founding" and simulation.run.founding.phase=="ready" else route.active_workers + pending, "checking_workers": checking, "status": status,
+				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at, "conflict_received_at":route.conflict_received_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
+				"impact_report":route.impact_report.duplicate(true), "surface_warning":simulation.journey_response._surface_warning(route.id),
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
 				"ambusher_addressed": journey_addressed(route),
+				"journey_alarm":journey_alarm(route),"conflict_serial":route.conflict_serial,
 				"attack_reports": route.attack_reports, "fighting_reports": route.fighting_reports,
 				"missing_workers": route.missing_workers, "last_witness_time": route.last_witness_time,
 				"energy_limited": route.energy_limited,
@@ -570,50 +873,198 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"recovery_ready": simulation.run.knowledge.recovery_report(route.destination_knowledge_id, route.last_empty_report_at),
 				"delivered_total": route.delivered_total,
 				"receipt": route.receipt.duplicate(true),
+				"nutrient_receipts":route.nutrient_receipts.duplicate(true),
 				"pheromone_strength": segment.pheromone_strength,
 				"route_familiarity": segment.route_familiarity})
 	summaries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.id < b.id)
 	return summaries
 
 func journey_addressed(route: TrailRouteState) -> bool:
+	var approach: Dictionary = simulation.run.journey_response.approach.reports.get(route.id,{})
+	if approach.get("outcome", "") == "found" and route.last_loss_time <= approach.get("received_at", 0.0): return true
 	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
 	return outcome.get("outcome","") == "secured" and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
 
+func journey_alarm(route: TrailRouteState) -> bool:
+	var approach: Dictionary = simulation.run.journey_response.approach.reports.get(route.id,{})
+	var approached_at: float = float(approach.get("received_at",0.0)) if approach.get("outcome", "") == "found" else 0.0
+	if route.conflict_report in ["contested","holding","resisted","reinforced"] and route.conflict_received_at >= approached_at: return true
+	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
+	var settled_at: float = maxf(float(outcome.get("received_at",0.0)),approached_at)
+	if route.conflict_report in ["secured","withdrew","dispersed"]: settled_at = maxf(settled_at,route.conflict_received_at)
+	return route.reported_losses > 0 and route.last_loss_time > settled_at
+
+
+func daughter_worker_reinforcement(recall: bool) -> Dictionary:
+	var accepted: bool=simulation.recall_daughter_workers() if recall else simulation.send_daughter_workers()
+	return {"accepted":accepted,"reason":simulation.reinforcement.last_error}
+
+
+func set_daughter_supply(enabled: bool) -> Dictionary:
+	var accepted: bool=simulation.set_daughter_supply(enabled,inward_pile_id)
+	return {"accepted":accepted,"reason":(simulation.supply if inward_pile_id == "home" else simulation.daughter_supply).last_error}
+
+
+func daughter_gathering_summary() -> Dictionary:
+	if not simulation.run.colony.piles.has("satellite_1"): return {}
+	var hints: Dictionary = {}
+	for id: String in simulation.run.knowledge.nodes: hints[id] = simulation.run.knowledge.temporal_hint(id)
+	var status: Dictionary = {"trails":trail_summaries("satellite_1"), "temporal_hints":hints, "honeydew":honeydew_summary("home")}
+	var signals: Array[Dictionary] = sensory_snapshot("satellite_1")
+	var sources: Dictionary = {}
+	for category: String in PileState.RESOURCE_IDS:
+		sources[category] = SourceMemory.entries(signals,status,category)
+		for entry: Dictionary in sources[category]: entry["scout"] = daughter_source_scout(entry.knowledge_id)
+	var pile: PileState=simulation.run.colony.piles.satellite_1
+	return {"sources":sources, "workers":simulation.trails.CONFIG.initial_workers, "workforce":pile.workers_total+simulation.run.pending_for_pile(pile.id),"available_workers":pile.workers_assignable, "time":simulation.run.simulation_time}
+
+
+func daughter_source_scout(knowledge_id: String) -> Dictionary:
+	for memory: Dictionary in scout_mission_summaries("satellite_1"):
+		if memory.get("target_knowledge_id", "") == knowledge_id:
+			return {"id":memory.id, "awaiting":memory.awaiting, "away_seconds":memory.away_seconds,
+				"overdue":memory.overdue, "returned_at":memory.returned_at, "missing_at":memory.missing_at}
+	return {}
+
+
+func daughter_gathering_command(knowledge_id: String, action: String) -> Dictionary:
+	if inward_pile_id != "satellite_1" or not simulation.run.colony.piles.has("satellite_1"):
+		return {"accepted":false,"reason":"Inspect the daughter to assign its gatherers"}
+	if not simulation.run.knowledge.nodes.has(knowledge_id) or simulation.run.knowledge.nodes[knowledge_id].definition_id not in PileState.RESOURCE_IDS:
+		return {"accepted":false,"reason":"Gatherers need a returned food or water memory"}
+	var route: TrailRouteState = simulation.run.trails.find_route("satellite_1",knowledge_id)
+	var accepted: bool = false
+	if action.begins_with("order_"):
+		var value: String=action.trim_prefix("order_")
+		if not value.is_valid_int(): return {"accepted":false,"reason":"Choose a whole worker target"}
+		return order_gathering(knowledge_id,int(value))
+	match action:
+		"scout":
+			if daughter_source_scout(knowledge_id).get("awaiting", false): return {"accepted":false,"reason":"A local scout is already awaiting return"}
+			accepted = simulation.investigate_known_source("satellite_1",knowledge_id)
+			return {"accepted":accepted,"reason":simulation.scouting.last_error}
+		"recall_scout":
+			var memory: Dictionary = daughter_source_scout(knowledge_id)
+			if not memory.get("awaiting",false): return {"accepted":false,"reason":"No local scout is awaiting return"}
+			accepted = simulation.recall_scout(memory.id)
+			return {"accepted":accepted,"reason":simulation.scouting.last_error}
+		"gather": accepted = simulation.create_trail("satellite_1",knowledge_id)
+		"add": accepted = route != null and route.purpose == "food" and simulation.set_trail_workers(route.id,route.desired_workers+simulation.trails.CONFIG.initial_workers)
+		"recheck": accepted = route != null and simulation.recheck_trail(route.id)
+		"stop": accepted = route != null and route.purpose == "food" and simulation.set_trail_workers(route.id,0)
+		_: return {"accepted":false,"reason":"Unknown gathering order"}
+	return {"accepted":accepted,"reason":"" if accepted else simulation.trails.last_error if route != null or action == "gather" else "No local gathering route"}
+
+
+func establish_daughter(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
+	var accepted: bool=simulation.establish_daughter(knowledge_id)
+	if accepted: inspect_pile("satellite_1")
+	return {"accepted":accepted,"reason":simulation.founding.last_error}
+
+
+func start_founding(knowledge_id: String) -> Dictionary:
+	if inward_pile_id != "home": return _home_order()
+	var accepted: bool=simulation.start_founding(knowledge_id)
+	return {"accepted":accepted,"reason":simulation.founding.last_error}
+
 
 func create_trail_for(knowledge_id: String) -> Dictionary:
-	var accepted: bool = simulation.create_trail("home", knowledge_id)
+	var accepted: bool = simulation.create_trail(inward_pile_id, knowledge_id)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
+
+func order_gathering(knowledge_id: String, count: Variant) -> Dictionary:
+	var route: TrailRouteState=simulation.run.trails.find_route(inward_pile_id,knowledge_id)
+	var accepted: bool=simulation.create_trail(inward_pile_id,knowledge_id,count) if route==null else simulation.set_trail_workers(route.id,count)
+	route=simulation.run.trails.find_route(inward_pile_id,knowledge_id)
+	return {"accepted":accepted,"queued":accepted and route!=null and route.waiting_workers>0,"reason":simulation.trails.last_error}
 
 
 func set_trail_target(route_id: String, target: int) -> Dictionary:
+	if not _owns_food_route(route_id): return {"accepted":false, "reason":"Trail belongs to another pile or job"}
 	var accepted: bool = simulation.set_trail_workers(route_id, target)
-	return {"accepted": accepted, "reason": simulation.trails.last_error}
+	if accepted and target == 0: simulation.journey_response.cancel_order(route_id)
+	return {"accepted": accepted, "queued":accepted and simulation.run.trails.routes[route_id].waiting_workers>0, "reason": simulation.trails.last_error}
 
 
 func recheck_trail(route_id: String) -> Dictionary:
+	if not _owns_food_route(route_id): return {"accepted":false, "reason":"Trail belongs to another pile or job"}
 	var accepted: bool = simulation.recheck_trail(route_id)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
 
 func respond_to_journey(action: String, route_id: String) -> Dictionary:
+	if simulation.run.history.ended: return {"accepted":false,"reason":"This run has ended"}
+	if not _owns_food_route(route_id): return {"accepted":false,"reason":"Journey belongs to another pile or job"}
 	var system: JourneyResponseSystem = simulation.journey_response
 	var accepted: bool = false
+	if action.begins_with("commit_") or action.begins_with("all_commit_"):
+		var parts: PackedStringArray = action.trim_prefix("all_").split("_")
+		if parts.size() != 3 or parts[1] not in ["clear", "hunt"] or not parts[2].is_valid_int() or not JourneyOrders.valid_target(int(parts[2])) or int(parts[2]) == 0: return {"accepted":false,"reason":"Choose a valid goal and worker count"}
+		accepted = system.commit_force(route_id, parts[1], int(parts[2]), action.begins_with("all_"))
+	elif action.begins_with("force_") or action.begins_with("all_force_"):
+		var count_text: String = action.trim_prefix("all_").trim_prefix("force_")
+		if not count_text.is_valid_int(): return {"accepted":false,"reason":"Choose a whole worker count"}
+		accepted = system.set_force(route_id, int(count_text), action.begins_with("all_"))
+	elif action.begins_with("gather_") or action.begins_with("all_gather_"):
+		var count_text: String = action.trim_prefix("all_").trim_prefix("gather_")
+		if not count_text.is_valid_int(): return {"accepted":false,"reason":"Choose a whole worker count"}
+		accepted = system.reinforce_gatherers(route_id, int(count_text), action.begins_with("all_"))
 	match action:
+		"goal_clear", "goal_hunt": accepted = system.set_goal(route_id, action.trim_prefix("goal_"))
+		"approach": accepted = system.investigate_approach(route_id)
 		"investigate": accepted = system.investigate(route_id)
 		"defend": accepted = system.defend(route_id)
-		"reinforce": accepted = system.reinforce(route_id)
+		"reinforce":
+			var known: Dictionary = system.summary(inward_pile_id)
+			if known.reinforcement_pending: return {"accepted":false,"reason":"Reinforcements already sent; await a returning messenger"}
+			accepted = system.set_force(route_id, int(known.workers) + system.CONFIG.reinforcement_workers)
 		"recall": accepted = system.recall() if simulation.run.journey_response.route_id == route_id else false
-	return {"accepted":accepted,"reason":system.last_error if not accepted else ""}
+		"cancel": system.cancel_order(route_id); accepted = true
+	return {"accepted":accepted,"queued":accepted and simulation.run.journey_response.orders.recruitment.has(route_id),"reason":system.last_error if not accepted else ""}
 
 
 func dispatch_facing(bearing: float) -> bool:
-	return simulation.dispatch_scout("home", bearing)
+	return simulation.dispatch_scout(inward_pile_id, bearing)
+
+
+func recall_scout(id: String) -> Dictionary:
+	var memory: ScoutMissionMemory = simulation.run.scout_missions.get(id)
+	if memory == null or memory.origin_pile != inward_pile_id: return {"accepted":false,"reason":"Scout belongs to another pile"}
+	var accepted: bool = simulation.recall_scout(id)
+	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func investigate_known_source(knowledge_id: String) -> Dictionary:
-	var accepted: bool = simulation.investigate_known_source("home", knowledge_id)
+	for memory: ScoutMissionMemory in simulation.run.scout_missions.values():
+		if memory.origin_pile == inward_pile_id and memory.target_knowledge_id == knowledge_id and memory.completed_at() < 0:
+			return {"accepted":false,"reason":"A local scout is already rechecking this memory"}
+	var accepted: bool = simulation.investigate_known_source(inward_pile_id, knowledge_id)
 	return {"accepted": accepted, "reason": simulation.scouting.last_error}
 
 
 func debug_is_open() -> bool:
 	return _debug_view != null and _debug_view.visible
+
+
+func end_run_review() -> bool:
+	if not simulation.end_run(): return false
+	_show_review()
+	return true
+
+
+func _show_review() -> void:
+	mode="review"
+	if _colony_controls != null: _colony_controls.opened=false
+	if _audio_settings != null: _audio_settings.opened=false
+	for view in [_outward_view,_inward_view]:
+		if view != null:
+			view.visible=false; view.set_process(false); view.set_process_unhandled_input(false)
+	if _debug_view != null:
+		_debug_view.visible=false; _debug_view.model.shown=false; _debug_view.set_process_input(false)
+	if _review != null: _review.open(simulation.review_snapshot())
+
+
+func review_new_colony() -> void:
+	var seed_value: int = int(Time.get_ticks_usec()%2147483646)+1
+	start_new_colony(seed_value,current_scenario())
