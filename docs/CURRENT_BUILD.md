@@ -1,6 +1,6 @@
 # Current build and gaps
 
-Baseline: gameplay through card 141; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
+Baseline: gameplay through card 142; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
 
 ## Implemented foundation
 
@@ -8,7 +8,7 @@ Baseline: gameplay through card 141; design reset through 138. The pre-reset gam
 | --- | --- | --- |
 | Runtime and saves | Godot 4.7.2 Compatibility, headless fixed ticks, seeded continuation, strict atomic saves, separate hidden reality/knowledge/presentation. | Packaged Windows build, migration policy for new schemas, measured final performance. |
 | Labor | Authoritative per-pile ledger, aggregate brood/travel, held brood care, capped scouts; explicit flexible Home/Daughter gathering targets, care-protected unsent queue and real recall. | Remaining ordinary staffing explanations where models permit them; source comparison and scout intent. |
-| Perception and scouts | Returned memories, standing exploration/rechecks, physical recall/missing settlement; shared cap eight; persistent delivered/local journal with saved read state, grouping and current competing needs. | Source comparison and clearer priorities; remaining content profiles. |
+| Perception and scouts | Returned memories, standing exploration/rechecks, physical recall/missing settlement; shared cap eight; persistent delivered/local journal; knowledge-based source comparisons and named priorities/local/shared effort waits. | Remaining content profiles and generalized multi-pile scouting. |
 | Resources | Three nutrient stores; physical gathering/energy/depletion/renewal; five immutable identities from close returned/harvested samples and stable A/B labels; generic legacy fallback. | Mixed yields and remaining concrete profiles/handling behavior; current identity definitions are not a complete mechanical food catalog. |
 | Routes | Separate route/segment types, scent/familiarity, aggregate cohorts, detours, actual alternate courses and incoming cargo. | Shared multi-segment connections and broader network traffic/closure; no automatic optimal-route planner. |
 | INWARD | Queen, Nursery, Food Exchange, Entrance, Midden, climate/refuse/food/care pressure; development and Nursery expansion. | Modular project/chamber definitions, reproductive scheduling and new organs defined by the catalog. |
@@ -24,7 +24,7 @@ Queen health/death/replacement, multiple daughters, moving predators, species-sp
 
 ## Latest actual verification
 
-[Card 141](tasks/141_flexible_gathering_orders.md) recorded 9,089 checks/zero failures, targeted 716/zero, clean import/Main and Home/Daughter headless gathering drawing. [140](tasks/140_reports_needs_and_feedback.md) recorded the prior 9,043/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks are explicitly deferred to the feature-complete systems beta.
+[Card 142](tasks/142_source_comparison_and_scout_intent.md) recorded 9,126 checks/zero failures in 84.09 seconds, targeted 813/zero, clean import/Main and standard/compact headless source/scouting drawing. [141](tasks/141_flexible_gathering_orders.md) recorded the prior 9,089/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks are explicitly deferred to the feature-complete systems beta.
 
 The player supplies manual visual feedback. No screen monitoring, desktop automation, paid testers or broad compute sweeps are authorized. The documentation reset does not rerun the engine or claim new gameplay evidence. Existing user audio imports/images/translations and saved slot are preserved.
 

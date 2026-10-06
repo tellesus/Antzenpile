@@ -452,7 +452,20 @@ func exploration_summary(pile_id: String = "home") -> Dictionary:
 	var policy: ExplorationState = simulation.run.exploration_for(pile_id)
 	if policy == null: return {}
 	var other: ExplorationState = simulation.run.daughter_exploration if pile_id == "home" else simulation.run.exploration
-	return {"other_target":other.target,"target": policy.target, "bias": policy.bias,
+	var pile: PileState=simulation.run.colony.piles[pile_id]
+	var standing: int=simulation.scouting.standing_count(pile_id)
+	var local: int=0
+	for agent: ScoutAgent in simulation.run.scouts.values():
+		if agent.origin_pile==pile_id: local+=1
+	var wait: String="off" if policy.target==0 else "target" if standing>=policy.target else "cap" if simulation.run.active_scout_count()>=simulation.scouting.config.active_cap else "care" if pile.workers_assignable<1 and pile.workers_available>0 else "labor" if pile.workers_assignable<1 else "spacing" if policy.cooldown_ticks>0 else "ready"
+	var priorities: Array[Dictionary]=[]
+	for id: String in policy.priorities:
+		var known: KnownNode=simulation.run.knowledge.nodes[id]
+		var awaiting: bool=false
+		for memory: ScoutMissionMemory in simulation.run.scout_missions.values():
+			if memory.origin_pile==pile_id and memory.target_knowledge_id==id and memory.completed_at()<0: awaiting=true
+		priorities.append({"id":id,"name":SourceMemory.display_name({"source_type":known.source_type,"category":known.definition_id,"memory_label":SourceCatalog.label(known.label_index)}),"awaiting":awaiting,"last_sent":policy.priority_last_sent.get(id,-1.0)})
+	return {"other_target":other.target,"target": policy.target, "bias": policy.bias,"wait":wait,"manual_away":local-standing,"shared_away":simulation.run.active_scout_count(),"priority_details":priorities,
 		"away": simulation.scouting.standing_count(pile_id), "priorities": policy.priorities.duplicate(),
 		"missing": simulation.run.missing_scouts(pile_id),
 		"cautious_routes": simulation.scouting.Caution.routes(simulation.run, pile_id).size()}

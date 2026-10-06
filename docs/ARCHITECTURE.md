@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 141. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 142. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 ## Ownership and dependency direction
 
@@ -41,6 +41,8 @@ GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance 
 Normal OUTWARD is a 2D sensory projection; INWARD is a functional network. Views send semantic callbacks and use detached approved snapshots. Source quantity/availability, enemy location/health, live combat casualties, candidate route geometry and private scout findings never enter normal UI. Current local air/weather and internal symptoms are permitted local observations.
 
 Expected population/carriers include owned unresolved exterior losses until reports/absence settlement. ConflictPopover uses route/local summaries only. Post-run physical history is separate and never backs the planned normal report journal. Ended runs reject gameplay commands; review cannot resume revealed play.
+
+142 SourceMemory sorts detached reported age/intake/order/alarm data with stable ID ties and numeric colony labels. Root projects standing/manual scout intent, shared expected slots and local labor/care/dispatch-spacing waits; no private phase/location/findings. Priority names use existing knowledge identities. Home/Daughter comparison layouts reserve actual compact bounds; sorting/paging is disposable attention without simulation mutation.
 
 ## Development toward modular 1.0
 

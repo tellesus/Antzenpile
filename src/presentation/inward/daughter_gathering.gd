@@ -9,28 +9,34 @@ var opened: bool=false
 var category: String="carbohydrate"
 var page: int=0
 var selected: String=""
+var sort_order: String="label"
 var draft:=preload("res://src/presentation/gathering_draft.gd").new()
 
 func reset() -> void:
- opened=false;category="carbohydrate";page=0;selected="";draft.opened=false
+ opened=false;category="carbohydrate";page=0;selected="";sort_order="label";draft.opened=false
 
 func panel(size: Vector2) -> Rect2:
- return Rect2(size.x-316,144,292,456)
+ var width: float=minf(680,size.x-48)
+ return Rect2((size.x-width)/2,144,width,minf(430,size.y-260))
 
 func rect(size: Vector2, action: String, index: int=0) -> Rect2:
- var x: float=size.x-300
+ var box: Rect2=panel(size);var x: float=box.position.x+16
+ var button_width: float=(box.size.x-56)/4
  match action:
-  "filter": return Rect2(x+index*88,206,84,44)
-  "row": return Rect2(x,258+index*58,260,54)
-  "page": return Rect2(x,374,260,44)
-  "order": return Rect2(x,430,156,44)
-  "stop": return Rect2(x+164,430,96,44)
-  "scout": return Rect2(x,482,260,44)
-  "back": return Rect2(x,538,260,44)
+  "filter": return Rect2(x+index*88,box.position.y+52,84,44)
+  "sort": return Rect2(x+264,box.position.y+52,164,44)
+  "page": return Rect2(x+436,box.position.y+52,box.size.x-468,44)
+  "row": return Rect2(x+index*((box.size.x-40)/2+8),box.position.y+110,(box.size.x-40)/2,108)
+  "order": return Rect2(x,box.end.y-60,button_width,44)
+  "stop": return Rect2(x+button_width+8,box.end.y-60,button_width,44)
+  "scout": return Rect2(x+2*(button_width+8),box.end.y-60,button_width,44)
+  "back": return Rect2(x+3*(button_width+8),box.end.y-60,button_width,44)
  return Rect2()
 
 func entries(status: Dictionary) -> Array:
- return status.get("sources",{}).get(category,[])
+ var list: Array=status.get("sources",{}).get(category,[]).duplicate(true)
+ Memory.sort_entries(list,sort_order)
+ return list
 
 func selected_entry(status: Dictionary) -> Dictionary:
  for entry: Dictionary in entries(status):
@@ -39,7 +45,7 @@ func selected_entry(status: Dictionary) -> Dictionary:
 
 func activate(view: Node2D, at: Vector2, status: Dictionary, command: Callable) -> bool:
  var size: Vector2=view.get_viewport_rect().size
- if not opened or not panel(size).has_point(at): return false
+ if not opened or not (draft.panel(size) if draft.opened else panel(size)).has_point(at): return false
  if draft.opened:
   var control: String=draft.command_at(at,size)
   if control=="gather_commit" and command.is_valid():
@@ -50,6 +56,7 @@ func activate(view: Node2D, at: Vector2, status: Dictionary, command: Callable) 
   else: draft.edit(control)
   return true
  if rect(size,"back").has_point(at): opened=false;return true
+ if rect(size,"sort").has_point(at): sort_order=Memory.next_sort(sort_order);page=0;selected="";return true
  for index: int in CATEGORIES.size():
   if rect(size,"filter",index).has_point(at): category=CATEGORIES[index];page=0;selected="";return true
  var list: Array=entries(status);var pages: int=maxi(1,ceili(list.size()/2.0))
@@ -84,7 +91,6 @@ func draw(view: Node2D, status: Dictionary) -> void:
  var box: Rect2=panel(size)
  Style.surface(view,box,Color("111921"));Style.surface(view,box,Color("41535a"),true)
  view._label(box.position+Vector2(16,31),"Daughter Gathering",Color("d9d3be"),20)
- view._label(box.position+Vector2(16,51),"Shared memories · availability uncertain",Color("a7b5b1"),12)
  for index: int in CATEGORIES.size():
   var at: Rect2=rect(size,"filter",index)
   Style.surface(view,at,Color("355059") if category==CATEGORIES[index] else Color("263038"))
@@ -95,16 +101,16 @@ func draw(view: Node2D, status: Dictionary) -> void:
   if page*2+index>=list.size(): continue
   var entry: Dictionary=list[page*2+index];var at: Rect2=rect(size,"row",index)
   Style.surface(view,at,Color("355059") if selected==entry.knowledge_id else Color("263038"))
-  view._label(at.position+Vector2(8,17),Memory.display_name(entry)+(" · ALARM" if entry.danger else ""),Color("dce5d9"),14)
-  view._label(at.position+Vector2(8,33),Copy.fit_line("%s · %s ago · %d workers" % [entry.state,Copy.duration(entry.age),entry.workers],ThemeDB.fallback_font,11,244),Color("a7b5b1"),11)
-  view._label(at.position+Vector2(8,48),Copy.fit_line(Memory.receipt_label(entry,status.get("time",0),"here"),ThemeDB.fallback_font,11,244),Color("a7b5b1"),11)
+  var lines: Array[String]=[Memory.display_name(entry)+(" · ALARM" if entry.danger else ""),"%s · %s ago" % [entry.state,Copy.duration(entry.age)],Memory.staffing_label(entry),Memory.receipt_label(entry,status.get("time",0),"here"),Memory.intake_label(entry)]
+  for line: int in lines.size(): view._label(at.position+Vector2(8,18+line*18),Copy.fit_line(lines[line],ThemeDB.fallback_font,12,at.size.x-16),Color("dce5d9") if line==0 else Color("a7b5b1"),12)
  if list.is_empty(): view._label(box.position+Vector2(16,135),"No returned " + Copy.resource(category)+" memories",Color("a7b5b1"),14)
  var at: Rect2=rect(size,"page");Style.surface(view,at,Color("263038"))
  view._label(at.get_center()+Vector2(0,5),"PAGE %d / %d · NEXT" % [page+1,pages],Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)
+ at=rect(size,"sort");Style.surface(view,at,Color("263038"));view._label(at.get_center()+Vector2(0,5),"SORT: "+Memory.SORT_NAMES[sort_order],Color("dce5d9"),11,HORIZONTAL_ALIGNMENT_CENTER)
  var chosen: Dictionary=selected_entry(status)
  if not chosen.is_empty():
   at=rect(size,"order");Style.surface(view,at,Color("39302b"))
-  var action: String=order(chosen);var count: int=status.get("workers",5)
+  var action: String=order(chosen)
   var title: String="RECHECK" if action=="recheck" else "CHOOSE WORKERS"
   view._label(at.get_center()+Vector2(0,-3),title,Color("e0c5b7"),12,HORIZONTAL_ALIGNMENT_CENTER)
   view._label(at.get_center()+Vector2(0,15),"Daughter + travel carbs" if action!="recheck" else "Same local gatherers",Color("c5b8b1"),11,HORIZONTAL_ALIGNMENT_CENTER)
@@ -113,11 +119,11 @@ func draw(view: Node2D, status: Dictionary) -> void:
    view._label(at.get_center()+Vector2(0,5),"RECALL",Color("e0c5b7"),12,HORIZONTAL_ALIGNMENT_CENTER)
   var scout: Dictionary=chosen.get("scout",{});var awaiting: bool=scout.get("awaiting",false)
   at=rect(size,"scout");Style.surface(view,at,Color("26383a"))
-  view._label(at.get_center()+Vector2(0,-3),"RECALL LOCAL SCOUT" if awaiting else "SEND 1 LOCAL SCOUT",Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)
-  var detail: String="1 daughter worker · shared scout cap"
+  view._label(at.get_center()+Vector2(0,-3),"RECALL SCOUT" if awaiting else "SEND 1 SCOUT",Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)
+  var detail: String="1 local ant · shared cap"
   if awaiting: detail=("Overdue" if scout.overdue else "Awaiting") + " · away " + Copy.duration(scout.away_seconds)
   elif scout.get("missing_at",-1)>=0: detail="Did not return · cause unknown"
   elif scout.get("returned_at",-1)>=0: detail="Scout returned " + Copy.duration(status.get("time",0)-scout.returned_at) + " ago"
-  view._label(at.get_center()+Vector2(0,15),detail,Color("a7b5b1"),11,HORIZONTAL_ALIGNMENT_CENTER)
+  view._label(at.get_center()+Vector2(0,15),Copy.fit_line(detail,ThemeDB.fallback_font,11,at.size.x-12),Color("a7b5b1"),11,HORIZONTAL_ALIGNMENT_CENTER)
  at=rect(size,"back");Style.surface(view,at,Color("263038"))
- view._label(at.get_center()+Vector2(0,5),"BACK TO FOOD EXCHANGE",Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)
+ view._label(at.get_center()+Vector2(0,5),"BACK",Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)

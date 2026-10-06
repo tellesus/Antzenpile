@@ -54,7 +54,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M1-C complete:** [141 flexible gathering commitments](tasks/141_flexible_gathering_orders.md), whole initial/edited targets, care-protected unsent staffing, explicit draft/ORDER and real recall at both piles. Full 9,089/0; import/Main/headless drawing passed. Casualty deficits never silently create replacement intent.
 
-**Next: [142 source comparison and scout intent](tasks/142_source_comparison_and_scout_intent.md).** Compare only known intake/age/order/risk and show standing exploration/priorities clearly; finish appropriate ordinary staffing before M2. The next INWARD systems pass is M2 and must include queued reproductive investment; do not replace it with toggling Auto Brood off. Player graphical/feel checks defer to the feature-complete systems beta (A88).
+**M1-D complete:** [142 source comparison and scout intent](tasks/142_source_comparison_and_scout_intent.md), knowledge-based sorts, historical intake/target/wait comparison, compact Home/Daughter browsers and named scout priorities/actual local waits. Full 9,126/0; import/Main/headless drawing passed. Existing binary aphid tending remains partial until producer effort is generalized; internal effort controls will be rounded out with M2 organs.
+
+**Next: M2 queued reproductive investment and priority**, using the now-established M1 orders/source/report foundations. Auto Brood must stay on; do not replace queueing with toggling it off. Then modular paid organs/yield bundles and remaining suitable staffing complete these foundations. Player graphical/feel checks defer to the feature-complete systems beta (A88).
 
 ## Release acceptance and cost discipline
 

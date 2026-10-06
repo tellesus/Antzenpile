@@ -26,6 +26,8 @@ var scout_recall_command: Callable
 var exploration_command: Callable
 var exploration_bias_command: Callable
 var exploration_open: bool = false
+var source_sort: String = "label"
+var priority_page: int = 0
 var pause_command: Callable
 var speed_command: Callable
 var founding_command: Callable
@@ -186,7 +188,7 @@ func _panel_at(at: Vector2) -> bool:
 
 
 func _sources_panel_rect() -> Rect2:
-	return Rect2(24, 148, 332, 442)
+	return Rect2(24, 148, 332, minf(460,get_viewport_rect().size.y-260))
 
 
 func _exploration_panel_rect() -> Rect2:
@@ -329,13 +331,20 @@ func _run_command(command: String) -> void:
 		source_page = 0
 		return
 	if command == "source_page":
-		source_page = (source_page + 1) % maxi(1, ceili(_source_entries().size() / 3.0))
+		source_page = (source_page + 1) % maxi(1, ceili(_source_entries().size() / float(_source_rows())))
+		return
+	if command == "source_sort":
+		source_sort=Memories.next_sort(source_sort);source_page=0
+		return
+	if command == "exploration_priorities":
+		priority_page=(priority_page+1)%maxi(1,ceili(_status.get("exploration",{}).get("priority_details",[]).size()/2.0))
 		return
 	if command.begins_with("source_entry_"):
+		gathering_draft.opened=false
 		journey_open = false
 		approach_focus = false; rival_focus = false
 		var entries: Array[Dictionary] = _source_entries()
-		var index: int = source_page * 3 + int(command.trim_prefix("source_entry_"))
+		var index: int = source_page * _source_rows() + int(command.trim_prefix("source_entry_"))
 		if index < entries.size():
 			selected_id = entries[index].id
 			if entries[index].bearing != null:
@@ -355,6 +364,7 @@ func _run_command(command: String) -> void:
 				activation.outcome(result)
 				if not result.get("accepted", false): _feedback = result.get("reason", "Internal attention unavailable")
 		"sources":
+			gathering_draft.opened=false
 			if _journey_attention(): selected_id = ""; journey_open = false; conflict.reset()
 			sources_open = not sources_open
 			exploration_open = false
@@ -413,6 +423,7 @@ func _run_command(command: String) -> void:
 			if command == "trail_cancel" and result.get("accepted", false):
 				_feedback = "Gathering stopped · travelers and carried cargo still return"
 		"scout":
+			gathering_draft.opened=false
 			sources_open = false
 			if exploration_command.is_valid():
 				exploration_open = not exploration_open
@@ -557,18 +568,19 @@ func _button_at(at: Vector2) -> String:
 	if not sources_open and not exploration_open and not _status.get("daughter_attention", {}).is_empty() and _button_rect("daughter_pressure").has_point(at):
 		return "daughter_pressure"
 	if sources_open and _sources_panel_rect().has_point(at):
+		if _source_sort_rect().has_point(at): return "source_sort"
 		for category: String in MEMORY_CATEGORIES:
 			if _source_filter_rect(category).has_point(at):
 				return "source_filter_" + category
 		var entries: Array[Dictionary] = _source_entries()
-		for index: int in 3:
-			if source_page * 3 + index < entries.size() and _source_row_rect(index).has_point(at):
+		for index: int in _source_rows():
+			if source_page * _source_rows() + index < entries.size() and _source_row_rect(index).has_point(at):
 				return "source_entry_" + str(index)
 		if _source_page_rect().has_point(at):
 			return "source_page"
 		return "source_panel"
 	if exploration_open:
-		for command: String in ["explore_0", "explore_2", "explore_5", "explore_8", "exploration_bias", "exploration_general"]:
+		for command: String in ["explore_0", "explore_2", "explore_5", "explore_8", "exploration_bias", "exploration_general","exploration_priorities"]:
 			if _exploration_rect(command).has_point(at):
 				return command
 	var mission: Dictionary = _selected_mission()
@@ -1160,7 +1172,7 @@ func _signal_color(category: String) -> Color:
 
 
 func _source_entries() -> Array[Dictionary]:
-	return Memories.entries(_signals, _status, source_category)
+	return Memories.entries(_signals, _status, source_category, source_sort)
 
 
 func _source_filter_rect(category: String) -> Rect2:
@@ -1168,11 +1180,14 @@ func _source_filter_rect(category: String) -> Rect2:
 
 
 func _source_row_rect(index: int) -> Rect2:
-	return Rect2(40, 244 + index * 94, 300, 88)
+	return Rect2(40, 294 + index * 108, 300, 100)
+
+func _source_rows() -> int: return 2 if _sources_panel_rect().size.y>=440 else 1
+func _source_sort_rect() -> Rect2: return Rect2(40,240,300,44)
 
 
 func _source_page_rect() -> Rect2:
-	return Rect2(40, 536, 300, 44)
+	return Rect2(40, _sources_panel_rect().end.y-64, 300, 44)
 
 
 func _draw_sources() -> void:
@@ -1183,26 +1198,28 @@ func _draw_sources() -> void:
 		UIStyle.surface(self, button, Color("31505a") if category == source_category else Color("18252b"))
 		_label(button.get_center() + Vector2(0, 6), "CARBS" if category == "carbohydrate" else "SITES" if category == "nest_site" else category.to_upper(), Art.color_for(category), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	var entries: Array[Dictionary] = _source_entries()
-	source_page = mini(source_page, maxi(0, ceili(entries.size() / 3.0) - 1))
-	for index: int in 3:
-		var offset: int = source_page * 3 + index
+	UIStyle.surface(self,_source_sort_rect(),Color("283b3f"))
+	_label(_source_sort_rect().get_center()+Vector2(0,5),"SORT: "+Memories.SORT_NAMES[source_sort],Color("d3dcd4"),13,HORIZONTAL_ALIGNMENT_CENTER)
+	source_page = mini(source_page, maxi(0, ceili(entries.size() / float(_source_rows())) - 1))
+	for index: int in _source_rows():
+		var offset: int = source_page * _source_rows() + index
 		if offset >= entries.size():
 			break
 		var entry: Dictionary = entries[offset]
 		var box: Rect2 = _source_row_rect(index)
 		UIStyle.surface(self, box, Color("30382f") if entry.id == selected_id else Color("182329"))
 		var title: String = Memories.display_name(entry)
-		_label(box.position + Vector2(10, 20), "%s · %s ago" % [title, Copy.duration(entry.age)], Color("d4c6a8"), 14)
-		_label(box.position + Vector2(10, 42), entry.state if entry.category == "nest_site" else "%s · %d gathering%s" % [entry.state, entry.workers, " · ALARM" if entry.danger else ""], Color("c48c7c") if entry.danger else Color("96aab0"), 14)
-		_label(box.position + Vector2(10, 61), Memories.receipt_label(entry, _status.get("time", 0.0), "here" if _daughter() else "home"), Color("96aab0"), 14)
-		_label(box.position + Vector2(10, 80), Memories.first_receipt_label(entry, _status.get("time", 0.0)), Color("96aab0"), 14)
+		var lines: Array[String]=["%s · %s ago" % [title,Copy.duration(entry.age)],entry.state+(" · ALARM" if entry.danger else ""),Memories.staffing_label(entry),Memories.receipt_label(entry,_status.get("time",0),"here" if _daughter() else "home"),Memories.intake_label(entry)]
+		if entry.category=="nest_site": lines=[lines[0],entry.state,"Safety and occupants unknown","Inspection does not start founding",""]
+		for line: int in lines.size(): _label(box.position+Vector2(10,18+line*18),Copy.fit_line(lines[line],_font,12,280),Color("c48c7c") if entry.danger and line==1 else Color("d4c6a8") if line==0 else Color("96aab0"),12)
 	if entries.is_empty():
 		_label(Vector2(40, 275), "No returned memory of a nest site" if source_category == "nest_site" else "No returned memory of this resource", Color("96aab0"), 14)
 	UIStyle.surface(self, _source_page_rect(), Color("18252b"))
-	_label(_source_page_rect().get_center() + Vector2(0, 6), "NEXT PAGE · %d / %d" % [source_page + 1, maxi(1, ceili(entries.size() / 3.0))], Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+	_label(_source_page_rect().get_center() + Vector2(0, 6), "NEXT PAGE · %d / %d" % [source_page + 1, maxi(1, ceili(entries.size() / float(_source_rows())))], Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _exploration_rect(command: String) -> Rect2:
+	if command=="exploration_priorities": return Rect2(240,154,76,44)
 	var index: int = ["explore_0", "explore_2", "explore_5", "explore_8"].find(command)
 	if index >= 0:
 		return Rect2(40 + index * 70, 220, 64, 44)
@@ -1212,7 +1229,7 @@ func _exploration_rect(command: String) -> Rect2:
 func _draw_exploration() -> void:
 	UIStyle.surface(self, _exploration_panel_rect(), Color("111921"))
 	var policy: Dictionary = _status.get("exploration", {"target": 0, "away": 0, "bias": null})
-	_label(Vector2(40, 177), "Exploration labor", Color("d3dcd4"), 20)
+	_label(Vector2(40, 177), "Exploration", Color("d3dcd4"), 20)
 	_label(Vector2(40, 203), "Target %d scouts · %d currently away" % [policy.target, policy.away], Color("a8b9b6"), 14)
 	for target: int in [0, 2, 5, 8]:
 		var box: Rect2 = _exploration_rect("explore_%d" % target)
@@ -1223,11 +1240,17 @@ func _draw_exploration() -> void:
 		UIStyle.surface(self, box, Color("283b3f"))
 		var title: String = "FAVOR THIS DIRECTION" if command == "exploration_bias" else "NO DIRECTIONAL BIAS" if policy.bias == null else "CLEAR DIRECTION · %03d°" % roundi(rad_to_deg(policy.bias))
 		_label(box.position + Vector2(137,29), title, Color("d3dcd4"), 13, HORIZONTAL_ALIGNMENT_CENTER)
-	_label(Vector2(40, 395), "%d source priorities share scout effort" % policy.get("priorities", []).size(), Color("a8b9b6"), 14)
-	_label(Vector2(40, 416), "Shared cap %d · other pile effort %d" % [_status.get("scout_cap",8),policy.get("other_target",0)], Color("a8b9b6"), 14)
-	_label(Vector2(40, 437), "Not returned: %d · cause unknown" % policy.missing if policy.get("missing", 0) > 0 else "Turning only changes your attention", Color("a8b9b6"), 14)
-	if policy.get("cautious_routes", 0) > 0:
-		_label(Vector2(40, 459), "General scouts favor safer ground", Color("c7b196"), 14)
+	var wait: String={"off":"Effort off · priorities remain queued","target":"Standing target met · await returns","cap":"Waiting for a shared scout slot","care":"Workers at home held for brood care","labor":"Waiting for free local workers","spacing":"Waiting for normal dispatch spacing","ready":"Next dispatch opportunity"}.get(policy.get("wait","off"),"Awaiting dispatch")
+	_label(Vector2(40,394),Copy.fit_line(wait,_font,12,274),Color("c7b196"),12)
+	_label(Vector2(40,414),"Shared %d/%d · manual here %d · other effort %d" % [policy.get("shared_away",0),_status.get("scout_cap",8),policy.get("manual_away",0),policy.get("other_target",0)],Color("a8b9b6"),11)
+	var priorities: Array=policy.get("priority_details",[])
+	priority_page=mini(priority_page,maxi(0,ceili(priorities.size()/2.0)-1))
+	_label(Vector2(40,434),"Rechecks alternate with search · %d priorities" % priorities.size(),Color("a8b9b6"),11)
+	for index: int in 2:
+		var offset: int=priority_page*2+index
+		var text: String="Turn to look; favor a direction to send" if priorities.is_empty() and index==0 else "" if offset>=priorities.size() else priorities[offset].name+ (" · awaiting" if priorities[offset].awaiting else " · queued" if policy.target==0 else " · recurring")
+		_label(Vector2(40,454+index*18),Copy.fit_line(text,_font,12,274),Color("a8b9b6"),12)
+	UIStyle.surface(self,_exploration_rect("exploration_priorities"),Color("283b3f"));_label(_exploration_rect("exploration_priorities").get_center()+Vector2(0,5),"LIST %d" % (priority_page+1),Color("d3dcd4"),12,HORIZONTAL_ALIGNMENT_CENTER)
 
 func _signal_title(category: String) -> String:
 	match category:
