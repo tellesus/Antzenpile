@@ -64,7 +64,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M2-D complete:** [146 mixed-food cargo and ripe fruit](tasks/146_mixed_food_cargo.md), captured yields/bulk, real single harvest/travel/return, nutrient receipts/grouping and multi-filter same route; Garden Edge fruit supplies C/W. Full 9,283/0; import/Main/headless drawing passed.
 
-**Next: [147 seeds/picnic food and cache gate](tasks/147_seeds_and_picnic_food.md)**, then M3 inherited adaptations. Player graphical/feel checks defer to the systems beta (A88).
+**M2-E complete:** [147 seeds/picnic food](tasks/147_seeds_and_picnic_food.md), actual finite heavy seeds and timed crumbs using captured C/P recipes, known carrying/fuel guard and old-world fallback. Full 9,300/0; import/Main/headless drawing passed. Cache gate found no current buffering decision, so CH-CACHE is excluded from release blockers.
+
+**M2 core is complete. Next: [148 trait definitions and Efficient Nurses](tasks/148_trait_definitions_and_efficient_nurses.md)**, followed by environmental/repair leaves. Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

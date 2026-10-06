@@ -1,6 +1,6 @@
 # Current state contracts
 
-Baseline: gameplay through 146. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
+Baseline: gameplay through 147. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
 
 ## Persistent envelope and run
 

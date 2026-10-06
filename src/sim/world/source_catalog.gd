@@ -6,7 +6,9 @@ const PROFILES: Dictionary = {
 	"insect_remains":preload("res://data/sources/insect_remains.tres"),
 	"hunted_arthropod":preload("res://data/sources/hunted_arthropod.tres"),
 	"rain_puddle":preload("res://data/sources/rain_puddle.tres"),
-	"ripe_fruit":preload("res://data/sources/ripe_fruit.tres")}
+	"ripe_fruit":preload("res://data/sources/ripe_fruit.tres"),
+	"cracked_seeds":preload("res://data/sources/cracked_seeds.tres"),
+	"picnic_crumbs":preload("res://data/sources/picnic_crumbs.tres")}
 
 static func accepts(id: Variant, resource_id: String) -> bool:
 	return id is String and (id.is_empty() or PROFILES.has(id) and PROFILES[id].resource_id == resource_id)

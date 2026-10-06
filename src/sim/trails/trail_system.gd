@@ -355,6 +355,11 @@ func _depart(route: TrailRouteState) -> void:
 			return
 		var available: float = pile.resources.carbohydrate
 		unpaid_energy_cost = roundf((energy_cost - available) * 100000.0) / 100000.0
+		var known_profile: SourceProfile=SourceCatalog.PROFILES.get(destination.source_type)
+		var known_bulk: float=known_profile.bulk if known_profile!=null else 1.0
+		var potential: float=worker_count*CONFIG.carry_per_worker*carry_multiplier/known_bulk*SourceCatalog.nutrients(destination.source_type,destination.definition_id).get("carbohydrate",0.0)
+		if potential+0.00001<unpaid_energy_cost:
+			route.energy_limited=true;return
 		if not pile.consume_resources({"carbohydrate": available}):
 			return
 	elif not pile.consume_resources({"carbohydrate": energy_cost}):

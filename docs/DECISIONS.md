@@ -33,4 +33,6 @@ The player authorizes continued implementation from the new roadmap without feed
 
 ## How decisions change
 
+M2 storage gate ([147](tasks/147_seeds_and_picnic_food.md)): current mixed/episodic arrivals have no store capacity or processing wait. No buffering decision is demonstrated; CH-CACHE stays out of 1.0 blockers without artificial caps/spoilage. Revisit only with evidence. This applies A87's explicit gated-content rule.
+
 Routine implementation/tuning follows the current definitions and bounded card. A choice changing a locked boundary or the agreed release foundation must be isolated and resolved with the player while independent work continues. Record accepted changes here and update the corresponding bible/catalog/roadmap together. Never treat a historical completed card's old limit or future recommendation as current authority.

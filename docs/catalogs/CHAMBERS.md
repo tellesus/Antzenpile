@@ -63,7 +63,7 @@ Verification: preparation preserves named living occupants under the supported h
 
 **Gated M2; historical storage gate retained.** Include only after an ordinary episodic/mixed-food run demonstrates an intake/reserve bottleneck with a useful chamber choice. A meaningful cache would buffer eligible arrived portions or improve explicitly limited processing; it would show what is buffered and what staffing changes. It cannot reveal remote source stock or secretly rescue unpaid travel.
 
-The current stores have no demonstrated capacity problem. Do not add a punitive cap/spoilage timer just to make this chamber necessary. If the evidence fails the gate, record the result and keep CH-CACHE out of 1.0's release blockers. Legacy deferred card 034 is evidence/history, not an unfinished command to implement blindly.
+Gate result [147](../tasks/147_seeds_and_picnic_food.md): actual mixed/episodic arrivals enter all stores directly, with no capacity or processing wait. There is no demonstrated buffering choice. **CH-CACHE is excluded from 1.0 release blockers.** Do not add caps/spoilage to manufacture need; revisit only after a demonstrated bottleneck. Legacy deferred 034 remains archive evidence.
 
 ## Capacity and recovery checks
 
