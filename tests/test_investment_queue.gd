@@ -13,6 +13,7 @@ func run(test: Object) -> bool:
 	game.advance(0.25);twin.advance(0.25)
 	test.check(pile.reproduction.phase=="egg" and pile.brood_intent=="grow" and pile.brood_cohorts.is_empty() and not pile.investments.reproduction and game.run.to_dict()==twin.run.to_dict(),"Eligible reproduction takes the next opportunity ahead of Auto Brood exactly once")
 	test.check(pile.resources.carbohydrate==stores.carbohydrate-12 and pile.workers.count("reproduction:home")==4,"Actual laying pays once and reserves its existing four nurses")
+	test.check(twin.restore_snapshot(snapshot(game)) and twin.run.to_dict()==game.run.to_dict(),"The first funded tick restores exactly without claiming eggs older than their laying date")
 	game.advance(0.25)
 	test.check(pile.brood_cohorts.size()==1 and pile.brood_intent=="grow","Ordinary automatic growth resumes into remaining supported space")
 	var paid: Dictionary=pile.reproduction.to_dict();ledger=pile.workers.to_dict();stores=pile.resources.duplicate()

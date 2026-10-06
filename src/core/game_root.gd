@@ -87,6 +87,7 @@ func _ready() -> void:
 		inward.brood_intent_command = set_brood_intent
 		inward.reproduction_command = toggle_reproductive_queue
 		inward.investment_priority_command = prioritize_investment
+		inward.chamber_command = order_chamber
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
 		inward.adaptation_command = queue_adaptation
@@ -250,10 +251,11 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies","investment"]:
+	if selected.kind in ["project","brood","trait","supplies","investment","chamber"]:
 		inspect_pile(selected.pile_id)
-		var organ: String="queen" if selected.kind=="investment" else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
+		var organ: String="nursery" if selected.kind=="chamber" else "queen" if selected.kind=="investment" else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
+		if selected.kind=="chamber" and _inward_view!=null: _inward_view.chamber_controls.opened=true;_inward_view.chamber_controls.selected=selected.subject_id
 		set_mode("inward")
 	else:
 		var knowledge_id: String=selected.subject_id if selected.kind=="source" else simulation.run.trails.routes[selected.subject_id].destination_knowledge_id
@@ -306,6 +308,7 @@ func inspect_pile(pile_id: String) -> bool:
 	if _inward_view!=null:
 		_inward_view.selected_id=""; _inward_view.queen_tab="workers"; _inward_view._feedback=""; _inward_view._process(0)
 		_inward_view.gathering.reset()
+		_inward_view.chamber_controls.reset()
 	return true
 
 
@@ -340,6 +343,7 @@ func inspect_outward_pile(pile_id: String) -> bool:
 		_inward_view.selected_id = ""
 		_inward_view.gathering.reset()
 	set_mode("outward")
+	if _inward_view!=null: _inward_view.chamber_controls.reset()
 	if _outward_view != null: _outward_view._process(0)
 	return true
 
@@ -590,6 +594,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"brood_care": {"required":pile.brood_care_workers_required(), "held":mini(pile.workers_available,pile.brood_care_workers_required()), "missing":maxi(0,pile.brood_care_workers_required()-pile.workers_available), "relief":care_plan.duplicate(true), "source_name":care_source_name},
 		"nursery_state": pile.nursery_state, "nursery_brood_capacity": pile.nursery_brood_capacity(),
 		"nursery_occupied_space": pile.nursery_occupied_space(),
+		"worker_brood_space_free":pile.free_worker_brood_space(),"nursery_shared_occupied":pile.shared_nursery_occupied_space(),"alcove_capacity":pile.chambers.reproductive_spaces(),"chambers":simulation.chambers.summary(pile_id),
 		"nursery_care_capacity": pile.nursery_care_capacity(),
 		"nursery_max_care_capacity": pile.nursery_max_care_capacity(),
 		"nursery_progress": pile.nursery_progress_seconds,
@@ -666,6 +671,7 @@ func _refresh_loaded_views() -> void:
 		_inward_view.web_family = "foraging"
 		_inward_view.gathering.reset()
 		_inward_view._feedback = ""
+		_inward_view.chamber_controls.reset()
 		_inward_view._process(0)
 	if _debug_view != null:
 		_debug_view.set_process_input(true)
@@ -752,6 +758,10 @@ func toggle_reproductive_queue() -> Dictionary:
 func prioritize_investment(kind: String) -> Dictionary:
 	var accepted: bool=simulation.prioritize_investment(inward_pile_id,kind)
 	return {"accepted":accepted,"queued":accepted,"reason":simulation.investments.last_error}
+
+func order_chamber(chamber_id: String, cancel: bool=false) -> Dictionary:
+	var accepted: bool=simulation.order_chamber(inward_pile_id,chamber_id,cancel)
+	return {"accepted":accepted,"queued":accepted and not cancel,"reason":simulation.chambers.last_error}
 
 
 func set_brood_intent(intent: String) -> Dictionary:

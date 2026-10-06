@@ -36,6 +36,7 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"order": text="Force order: %d total" % entry.amount if entry.amount>0 else "Force order canceled"
 		"gathering": text="Gathering target: %d total" % entry.amount if entry.amount>0 else "Gathering stopped · travelers return"
 		"investment": text={"none":"No special investment pending","adaptation":"Adaptation next · %d queued" % entry.amount,"reproduction":"Reproduction next · %d queued" % entry.amount,"adaptation_laid":"Paid adaptation brood laid","reproduction_laid":"Paid reproductive brood laid"}.get(entry.detail,"Investment updated")
+		"chamber": text=ChamberCatalog.DEFINITIONS[entry.subject_id].display_name+" · "+entry.detail
 	return pile_name(entry.pile_id)+" · "+text
 
 static func detail(entry: Dictionary, time: float) -> String:

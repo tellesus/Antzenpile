@@ -21,13 +21,13 @@ func blocker(pile: PileState, respect_priority: bool=true) -> String:
 	var structural: String=structural_blocker(pile)
 	if not structural.is_empty(): return structural
 	if respect_priority and not pile.queued_adaptation.is_empty() and pile.investments.first()!="reproduction": return "Queued adaptation owns the next brood slot"
-	if pile.nursery_brood_capacity()-pile.nursery_occupied_space()<CONFIG.space: return "Need %d free Nursery spaces" % CONFIG.space
+	if pile.free_reproductive_space()<CONFIG.space: return "Need %d free Nursery spaces" % CONFIG.space
 	if pile.workers_assignable<CONFIG.nurses: return "Need %d available reproductive nurses" % CONFIG.nurses
 	for id: String in PileState.RESOURCE_IDS:
 		if pile.resources[id]<CONFIG.costs()[id]: return "Need %.0f %s for reproductive laying" % [CONFIG.costs()[id],id]
 	return ""
 
-func start(pile_id: String, respect_priority: bool=true) -> bool:
+func start(pile_id: String, respect_priority: bool=true, scheduled: bool=false) -> bool:
 	if not _run.colony.piles.has(pile_id): last_error="Unknown pile"; return false
 	var pile: PileState = _run.colony.piles[pile_id]
 	last_error = blocker(pile,respect_priority)
@@ -41,7 +41,8 @@ func start(pile_id: String, respect_priority: bool=true) -> bool:
 	if not paid:
 		pile.workers.release(commitment,CONFIG.nurses); pile.workers.retire_commitment(commitment)
 		last_error="Could not fund reproductive laying"; return false
-	pile.reproduction.phase="egg"; pile.reproduction.laid_tick=_run.clock.tick_count
+	# Scheduled laying happens at the start of this fixed interval, before its aging.
+	pile.reproduction.phase="egg"; pile.reproduction.laid_tick=maxi(0,_run.clock.tick_count-(1 if scheduled else 0))
 	pile.reproduction.inherited_traits=pile.offspring_traits()
 	pile.investments.reproduction=false;pile.investments.remove("reproduction")
 	return true

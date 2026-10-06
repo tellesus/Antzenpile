@@ -31,7 +31,7 @@ func start_next(pile_id: String, automatic: bool=false) -> bool:
 	var pile: PileState=_run.colony.piles[pile_id]
 	var kind: String=next_eligible(pile) if automatic else pile.investments.first()
 	if kind.is_empty(): return _reject("No eligible special investment")
-	var accepted: bool=_reproduction.start(pile_id,false) if kind=="reproduction" else _adaptation.start_queued(pile_id,false)
+	var accepted: bool=_reproduction.start(pile_id,false,automatic) if kind=="reproduction" else _adaptation.start_queued(pile_id,false)
 	last_error=_reproduction.last_error if kind=="reproduction" else _adaptation.last_error
 	return accepted
 func summary(pile_id: String) -> Dictionary:

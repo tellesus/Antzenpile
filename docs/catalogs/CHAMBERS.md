@@ -37,7 +37,7 @@ Every organ uses the same context hierarchy: identity/pile → current function/
 
 ### CH-REPRODUCTIVE — Reproductive Alcove
 
-**Planned M2.** A paid Nursery extension that supplies a dedicated reproductive group space, so sustained worker laying does not require the player to catch an empty Nursery window. Start from one group-sized allocation (the current reproductive group uses eight spaces); the implementing card validates exact added capacity and project cost.
+**Implemented M2 in [144](../tasks/144_reproductive_alcove.md).** A paid Nursery extension supplies eight dedicated reproductive spaces alongside existing worker capacity. Authored provisional project: 24 carbohydrate/12 protein/8 water, four care-protected builders, 90 seconds. Queueing is free; funding pays once; cancel pending/developing work releases builders without refunding spent food; completed space stays locked. Saved independent pile projects and chronology validate atomically.
 
 The alcove adds physical occupancy capacity only after completion. Nurses, laying payment and feeding still come from the pile. An unbuilt alcove does not block queueing: the reproductive order can wait for existing eligible space. Existing eggs/larvae are never evicted to honor a queue. Queen controls remain the place to select reproductive intent; the alcove shows occupancy/care, avoiding duplicate purchase actions.
 

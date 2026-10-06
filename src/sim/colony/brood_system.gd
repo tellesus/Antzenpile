@@ -35,7 +35,7 @@ func _start_ordinary(pile_id: String) -> bool:
 	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty():
 		last_error = "Nursery already has brood"
 		return false
-	if pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pile.nursery_brood_capacity() - pile.nursery_occupied_space() < CONFIG.starting_count:
+	if pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pile.free_worker_brood_space() < CONFIG.starting_count:
 		last_error = "Nursery lacks brood space"
 		return false
 	var pending_brood: int = pile.nursery_occupied_space() + CONFIG.starting_count
@@ -75,7 +75,7 @@ func production_status(pile_id: String) -> Dictionary:
 	if not special.is_empty(): waiting = special
 	elif pile.brood_intent == "manual": waiting = "manual"
 	elif pile.queen_count < 1: waiting = "queen"
-	elif pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pending > pile.nursery_brood_capacity(): waiting = "space"
+	elif pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / CONFIG.starting_count or pile.free_worker_brood_space()<CONFIG.starting_count: waiting = "space"
 	elif pending-pile.reproduction.occupied_space() > pile.nursery_care_capacity(): waiting = "care"
 	elif pile.brood_started_total >= WorkerLedger.MAX_COUNT or pile.brood_matured_total > WorkerLedger.MAX_COUNT - pending or pile.workers_total > WorkerLedger.MAX_COUNT - pending: waiting = "population"
 	else:

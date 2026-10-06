@@ -1,9 +1,19 @@
 # 144 — A paid reproductive alcove
 
-Status: planned. M2-B/SYS-05/06/13/14, CH-REPRODUCTIVE.
+Status: complete. M2-B/SYS-05/06/13/14, CH-REPRODUCTIVE.
 
 Outcome: invest nutrition, four construction workers and time in one dedicated eight-space reproductive alcove, then raise a reproductive group alongside the existing worker Nursery capacity. Nurses/feeding/queue priority remain real. Inspect the organ and its independent project/occupancy at either pile; Queen still owns reproductive intent.
 
 Scope: immutable typed chamber definition/catalog, per-pile queued/funded/complete project state, ledger-owned construction, explicit cancellation without consumed-food refund and current local projection. First complete modular organ entry; preserve existing foundational chamber definitions/flags and their costs, with adapters instead of speculative universal effects. Project values are provisional (24 carbs/12 protein/8 water, four workers, 90 seconds). Dedicated space is only for one reproductive group, never free worker brood capacity or nurses.
 
 Verify actual payment/time/conservation, existing care/feeding, wait/cancel/lock, dedicated space versus ordinary capacity, both-pile ownership, old/corrupt saves and exact continuation at speeds, readable organ/Queen links and compact headless input/draw. Targeted then full/import/Main; graphical/feel checks defer to beta. Ventilation Gallery follows separately; cache remains gated.
+
+Implemented: immutable definition/catalog and per-pile typed queued/developing/complete project, real care-protected `organ:<pile>:<id>` construction ledger, prepaid nutrition, 90 seconds and one-time builder release. Cancel pending/developing work releases only workers and never refunds food; completed organs stay locked. Completed Alcove contributes eight exclusive reproductive spaces; worker Nursery capacity/care remains unchanged. Shared occupancy, laying gates, Nursery expansion and Queen/Nursery projection count the extra space once. Both piles own independent projects; Home-only reproductive capability remains until M4.
+
+CHAMBERS opens an enclosed standard/compact project context with selection, explicit queue/cancel, progress, payer requirements and occupancy. Local project changes persist in Reports and inspect the organ for free. Missing old state adds no project/capacity; ID/phase/worker/owner/pool/progress/future dates validate atomically. Funded project dates/progress are checked against the real clock.
+
+Dependency fix: automatic reproductive laying occurs at the start of the current fixed interval, before its aging. Its captured laying date now uses that interval boundary; a new first-funded-tick saved twin proves validity. This fixes the preceding queue card's one-tick dating offset without changing payment, stage rates or manual laying.
+
+Evidence: targeted **981/0**; full **9,208/0 in 88.93 seconds**; clean pinned headless import/Main120 and **14 chamber/Alcove/Queen/Nursery drawing callbacks**, standard/compact. Tests exercise construction payment/time, 16 worker + 8 reproductive spaces, ongoing care/nurses/feeding, cancellation, conservation-preserving bad pool counts/owner/clock/ID/orphan, legacy fallback, Daughter ownership, all four speeds and actual touch/mouse commands/layout. Documentation gate: 220 documents/867 local links, zero broken links/archive problems and all 46 content IDs mapped. Graphical/feel/audio acceptance deferred by A88; player assets/slot untouched. Logs ignored under `.godot/card144_*`.
+
+Changed groups: modular chamber definitions/project owner/state/clock validation; existing laying/care/space adapters and queued-laying date correction; normal project controls/local summaries/report navigation; meaningful chamber/save/input/speed regressions; current contracts/catalog/status. Handoff: Ventilation Gallery and continuous local staffing controls, then mixed-yield cargo/foods.

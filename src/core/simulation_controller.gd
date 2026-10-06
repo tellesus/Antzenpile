@@ -45,6 +45,7 @@ var reinforcement: WorkerReinforcementSystem
 var founding: FoundingSystem
 var reproduction: ReproductionSystem
 var investments: RefCounted
+var chambers: RefCounted
 var reports: ReportSystem
 
 
@@ -94,6 +95,7 @@ func _attach_run(next_run: RunState) -> void:
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
+	chambers=preload("res://src/sim/colony/chamber_system.gd").new(run)
 	sanitation = Sanitation.new(run)
 	humidity = Humidity.new(run)
 	rain = Rain.new(run)
@@ -262,6 +264,10 @@ func queue_reproduction(pile_id: String, enabled: Variant=true) -> bool:
 	if run.history.ended: return false
 	return investments.queue_reproduction(pile_id,enabled)
 
+func order_chamber(pile_id: String, chamber_id: Variant, cancel: bool=false) -> bool:
+	if run.history.ended: return false
+	return chambers.order(pile_id,chamber_id,cancel)
+
 func prioritize_investment(pile_id: String, kind: Variant) -> bool:
 	if run.history.ended: return false
 	return investments.prioritize(pile_id,kind)
@@ -289,6 +295,7 @@ func _tick(delta: float) -> void:
 	ecology.tick(delta)
 	food_exchange.tick(delta)
 	nursery.tick(delta)
+	chambers.tick()
 	sanitation.tick()
 	humidity.tick()
 	heat.tick()

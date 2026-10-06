@@ -8,6 +8,7 @@ var brood_health := BroodHealthState.new()
 var temperature := TemperatureState.new()
 var reproduction := ReproductionState.new()
 var investments := preload("res://src/sim/colony/investment_intent.gd").new()
+var chambers := preload("res://src/sim/colony/chamber_set.gd").new()
 
 const Ledger = preload("res://src/sim/colony/worker_ledger.gd")
 const Brood = preload("res://src/sim/colony/brood_cohort.gd")
@@ -73,6 +74,7 @@ func to_dict() -> Dictionary:
 		"brood_intent": brood_intent,
 		"queued_adaptation": queued_adaptation,
 		"investments":investments.to_dict(),
+		"chambers":chambers.to_dict(),
 		"adaptation_repertoire": adaptation_repertoire, "adapted_workers_total": adapted_workers_total,
 		"adapted_workers_lost": adapted_workers_lost,
 		"genetics": genetics.to_dict(),
@@ -103,6 +105,12 @@ func nursery_occupied_space() -> int:
 	for cohort: BroodCohort in brood_cohorts:
 		occupied += cohort.count
 	return occupied
+
+func shared_nursery_occupied_space() -> int:
+	return nursery_occupied_space()-mini(reproduction.occupied_space(),chambers.reproductive_spaces())
+func free_worker_brood_space() -> int: return nursery_brood_capacity()-shared_nursery_occupied_space()
+func free_reproductive_space() -> int:
+	return maxi(0,chambers.reproductive_spaces()-reproduction.occupied_space())+maxi(0,nursery_brood_capacity()-shared_nursery_occupied_space())
 
 
 func nursery_care_capacity() -> int:
@@ -276,6 +284,8 @@ func restore(data: Dictionary) -> bool:
 	var restored_nursery_progress: Variant = data.get("nursery_progress_seconds", 0.0)
 	if not restored_nursery_state in ["primitive", "developing", "developed"] or not typeof(restored_nursery_progress) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(restored_nursery_progress)) or restored_nursery_progress < 0.0:
 		return false
+	var restored_chambers:=preload("res://src/sim/colony/chamber_set.gd").new()
+	if not restored_chambers.restore(data.get("chambers",[]),restored,data.id,restored_nursery_state): return false
 	var expansion: Variant = data.get("nursery_expansion", {"state": "latent", "progress_seconds": 0.0})
 	if not expansion is Dictionary or not expansion.has_all(["state", "progress_seconds"]) or not expansion.state in ["latent", "available", "developing", "developed"]:
 		return false
@@ -399,7 +409,7 @@ func restore(data: Dictionary) -> bool:
 	if not investment_data is Dictionary or not restored_investments.restore(investment_data,restored_queue!="",int(data.queen_count),not founding_data.is_empty()): return false
 	var reproduction_data: Variant = data.get("reproduction",restored_reproduction.to_dict())
 	if not reproduction_data is Dictionary or not restored_reproduction.restore(reproduction_data,restored,data.id,restored_genetics.established,emerged,restored_nursery_state,data.food_exchange_state,int(data.queen_count)): return false
-	if occupied+restored_reproduction.occupied_space()>brood_limit: return false
+	if occupied+maxi(0,restored_reproduction.occupied_space()-restored_chambers.reproductive_spaces())>brood_limit: return false
 	var adaptation_commitment: String = "adaptation:" + data.id
 	var adaptation_record: Dictionary = restored.to_dict().commitments.get(adaptation_commitment, {})
 	if trials == 1:
@@ -466,6 +476,7 @@ func restore(data: Dictionary) -> bool:
 	brood_intent = restored_intent
 	queued_adaptation = restored_queue
 	investments=restored_investments
+	chambers=restored_chambers
 	adaptation_repertoire = repertoire
 	adapted_workers_total = int(adapted)
 	adapted_workers_lost = int(adapted_lost)

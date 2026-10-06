@@ -86,7 +86,7 @@ func start_expansion(pile_id: String) -> bool:
 
 func _tick_expansion(pile: PileState, delta: float) -> void:
 	if pile.nursery_state != "developed": return
-	if pile.nursery_expansion_state == "latent" and pile.brood_matured_total >= CONFIG.expansion_matured_required and pile.nursery_occupied_space() >= pile.nursery_brood_capacity():
+	if pile.nursery_expansion_state == "latent" and pile.brood_matured_total >= CONFIG.expansion_matured_required and pile.shared_nursery_occupied_space() >= pile.nursery_brood_capacity():
 		pile.nursery_expansion_state = "available"
 	if pile.nursery_expansion_state != "developing": return
 	pile.nursery_expansion_progress = minf(CONFIG.expansion_seconds, pile.nursery_expansion_progress + delta)

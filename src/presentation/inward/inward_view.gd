@@ -35,6 +35,8 @@ var brood_care_command: Callable
 var brood_intent_command: Callable
 var reproduction_command: Callable
 var investment_priority_command: Callable
+var chamber_controls:=preload("res://src/presentation/inward/chamber_controls.gd").new()
+var chamber_command: Callable
 var queen_tab: String = "workers"
 var activation := preload("res://src/presentation/activation_feedback.gd").new()
 var adaptation_command: Callable
@@ -88,6 +90,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if chamber_controls.activate(self,at,_status.get("chambers",[]),chamber_command): return true
+	if chamber_controls.opened:
+		for command: String in ["outward","pause","speed_1","speed_4","speed_16","speed_64"]:
+			if _button_rect(command).has_point(at): _run_command(command);return true
+		return true
 	if selected_id == "nursery" and _status.get("brood_care", {}).get("missing", 0) > 0 and Rect2(get_viewport_rect().size.x-316,144,292,388).has_point(at):
 		var relief: Dictionary = _status.brood_care.relief
 		if not relief.is_empty() and relief.get("kind") != "returning" and _brood_care_rect().has_point(at) and brood_care_command.is_valid():
@@ -464,7 +471,7 @@ func _queued_trait() -> String:
 func _can_lay_brood() -> bool:
 	if _status.get("investments",{}).get("next","")=="reproduction": return _status.investments.reproduction_wait.is_empty()
 	if not _queued_trait().is_empty(): return _status.get("adaptation_queue", {}).get("waiting", "") == "ready"
-	return _status.get("queens", 0) > 0 and _status.get("brood", []).size() < _status.get("nursery_brood_capacity", 0) / maxi(1, _status.get("brood_batch_count", 8)) and _status.get("nursery_brood_capacity", 0) - _status.get("nursery_occupied_space", 0) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
+	return _status.get("queens", 0) > 0 and _status.get("brood", []).size() < _status.get("nursery_brood_capacity", 0) / maxi(1, _status.get("brood_batch_count", 8)) and _status.get("worker_brood_space_free",_status.get("nursery_brood_capacity",0)-_status.get("nursery_occupied_space",0)) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
 
 
 func _draw() -> void:
@@ -480,6 +487,7 @@ func _draw() -> void:
 		_draw_hud(size)
 		_draw_context(size)
 		_draw_controls(size)
+		chamber_controls.draw(self,_status.get("chambers",[]))
 		activation.draw(self)
 		return
 	var centers: Dictionary = positions(size)
@@ -512,6 +520,7 @@ func _draw() -> void:
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
+	chamber_controls.draw(self,_status.get("chambers",[]))
 	activation.draw(self)
 
 
@@ -686,7 +695,7 @@ func _draw_context(size: Vector2) -> void:
 				return
 			_detail_line(box, 111, "Queens: %d · Local workers: %d" % [_status.queens,_status.workers_total])
 			_detail_line(box, 137, "%d free · %d held for brood care" % [_status.get("workers_assignable",_status.workers_available),_status.get("brood_care",{}).get("held",0)])
-			_detail_line(box, 157, "Nursery: %d / %d brood space" % [_status.nursery_occupied_space, _status.nursery_brood_capacity])
+			_detail_line(box, 157, "Nursery: %d / %d shared space" % [_status.get("nursery_shared_occupied",_status.nursery_occupied_space), _status.nursery_brood_capacity])
 			var production: Dictionary = _status.get("brood_production", {"intent":"manual", "waiting":"manual"})
 			_label(box.position + Vector2(16, 195), "Brood laying", Color("a9b9bc"), 15)
 			for intent: String in ["manual", "grow"]:
@@ -713,7 +722,9 @@ func _draw_context(size: Vector2) -> void:
 				count += cohort.count
 			count += _status.get("reproduction",{}).get("occupied_space",0)
 			var reproductive_space: int = _status.get("reproduction",{}).get("occupied_space",0)
-			_detail_line(box, 65, "Space: %d / %d · %d reproductive" % [count,_status.nursery_brood_capacity,reproductive_space] if reproductive_space>0 else "Brood space: %d / %d" % [count, _status.nursery_brood_capacity])
+			var shared: int=_status.get("nursery_shared_occupied",count)
+			var dedicated: int=mini(reproductive_space,_status.get("alcove_capacity",0))
+			_detail_line(box, 65, "Shared: %d/%d · alcove: %d/%d" % [shared,_status.nursery_brood_capacity,dedicated,_status.alcove_capacity] if _status.get("alcove_capacity",0)>0 else "Space: %d / %d · %d reproductive" % [count,_status.nursery_brood_capacity,reproductive_space] if reproductive_space>0 else "Brood space: %d / %d" % [count, _status.nursery_brood_capacity])
 			_detail_line(box, 91, "Worker care: %d / %d brood" % [_status.nursery_care_capacity,_status.nursery_max_care_capacity] if reproductive_space>0 else "Care supports %d / %d brood" % [_status.nursery_care_capacity, _status.nursery_max_care_capacity])
 			if not brood.is_empty():
 				var stages: String = "%s · %.0fs" % [brood[0].stage.capitalize(), brood[0].progress_seconds] if brood.size() == 1 else "2 cohorts: %s / %s" % [brood[0].stage, brood[1].stage]
@@ -914,6 +925,7 @@ func _draw_reproduction_context(box: Rect2) -> void:
 	var missing: Array=state.get("food_shortfalls",[])
 	var lines: Array[String]=[current,"%d spaces · %d nurses when laid" % [state.get("space",8),state.get("nurses",4)],"Lay: %.0f carbs · %.0f protein · %.0f water" % [costs.get("carbohydrate",12),costs.get("protein",12),costs.get("water",8)],"Queueing is free · larvae need feeding",next,wait if not wait.is_empty() else "Ready · next tick lays the queued group" if queued else "Auto Brood may stay on", "Paid group locked; cancel clears intent"]
 	if not missing.is_empty(): lines[3]="Current larvae need "+" / ".join(missing)
+	if _status.get("alcove_capacity",0)>0: lines[1]="Alcove: %d/%d spaces · nurses still needed" % [state.get("occupied_space",0),_status.alcove_capacity]
 	for index: int in lines.size(): _label(box.position+Vector2(16,111+index*19),Copy.fit_line(lines[index],_font,12,260),Color("a9b9bc"),12)
 	_draw_action(_reproduction_rect(),"CANCEL QUEUED GROUP" if queued else "QUEUE NEXT GROUP")
 	if _both_investments(): _draw_action(_priority_rect("reproduction"),"REPRODUCTIVES NEXT"+(" ✓" if intent.get("next","")=="reproduction" else ""))

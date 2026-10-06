@@ -44,7 +44,7 @@ func queued_status(pile_id: String) -> Dictionary:
 
 func laying_blocker(pile: PileState, trait_id: String) -> String:
 	if not AdaptationRules.can_select(pile, trait_id): return "trial" if pile.trial_cohort() != null else "unavailable"
-	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty() or pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / BROOD.starting_count or pile.nursery_brood_capacity() - pile.nursery_occupied_space() < BROOD.starting_count:
+	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty() or pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / BROOD.starting_count or pile.free_worker_brood_space() < BROOD.starting_count:
 		return "space"
 	if pile.workers_assignable < AdaptationRules.NURSES: return "nurses"
 	var pending: int = pile.nursery_occupied_space() + BROOD.starting_count

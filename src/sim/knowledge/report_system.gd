@@ -63,6 +63,11 @@ func capture(recording: bool = true) -> void:
 		_project(pile.id,"exchange",pile.food_exchange_state,"developed",time,recording)
 		_project(pile.id,"midden",pile.midden.state,"developed",time,recording)
 		_project(pile.id,"reproduction",pile.reproduction.phase,"ready",time,recording)
+		var chamber_ids: Array=ChamberCatalog.DEFINITIONS.keys();chamber_ids.sort()
+		for id: String in chamber_ids:
+			var phase: String=pile.chambers.projects[id].phase if pile.chambers.projects.has(id) else "unbuilt"
+			var key: String="chamber/"+pile.id+"/"+id;var previous: Variant=journal.seen.get(key)
+			if journal.changed(key,phase) and (phase!="unbuilt" or previous!=null and previous!="unbuilt"): journal.add("chamber",pile.id,id,time,time,"canceled" if phase=="unbuilt" else phase,0,0,recording)
 	if _run.founding.reported_tick>0:
 		var received: float=_run.founding.reported_tick*SimulationClock.TICK_INTERVAL
 		if _run.founding.phase in ["ready","failed","established"] and journal.changed("camp/"+_run.founding.route_id,str(received)+":"+_run.founding.phase): journal.add("camp","home",_run.founding.route_id,received,received,_run.founding.phase,0,0,recording)

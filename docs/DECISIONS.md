@@ -26,7 +26,7 @@ The player authorizes continued implementation from the new roadmap without feed
 ## Carried-forward player priorities
 
 - $0 budget and limited compute. Headless-only automated work, targeted scenarios plus affected final gates; no hired testers, computer-use or screen monitoring. Player supplies specific visual/audio/feel checks.
-- Reproduction queueing while Auto Brood stays on is required at the next INWARD systems/balance pass (M2/SYS-06). New priority/scheduling rules are planned; current immediate reproduction/queued adaptation remains the implementation until that card changes it.
+- Reproduction queueing while Auto Brood stays on is required at the next INWARD systems/balance pass (M2/SYS-06). Implemented in [143](tasks/143_reproductive_investment_queue.md), with saved priority/cancel and protected paid groups; [144](tasks/144_reproductive_alcove.md) adds dedicated space and validates first funded saves. Daughter generations/queen continuity remain M4.
 - The circle is accepted for now. Consistent activation feedback starts at the next interface pass (M1/SYS-13); further art/music work follows settled systems (M8).
 - Conflict recruitment keeps alerted trail → free nest → explicitly permitted other tasks, with real recall, held care, protected nurses/projects and deliberately reassigned reduced jobs.
 - Mobile production/device optimization and a fixed session-duration target remain tabled. Full reproductive lineage, network and ecology work is scoped by the new 1.0 book; larger Post 1.0 items are retained visibly.
