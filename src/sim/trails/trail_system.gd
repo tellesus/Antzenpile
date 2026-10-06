@@ -23,29 +23,29 @@ func _init(run_state: RunState, predator_system: PredatorSystem = null, rival_sy
 	_rival = rival_system if rival_system != null else RivalSystem.new(run_state)
 
 
-func create_route(origin_id: String, knowledge_id: String) -> bool:
+func create_route(origin_id: String, knowledge_id: String, count: Variant = CONFIG.initial_workers) -> bool:
 	if not _run.colony.piles.has(origin_id) or not _run.knowledge.nodes.has(knowledge_id):
 		return _reject("Destination is not known to this colony")
 	if _run.knowledge.nodes[knowledge_id].definition_id not in PileState.RESOURCE_IDS:
 		return _reject("Gatherers need a food or water source")
+	var pile: PileState = _run.colony.piles[origin_id]
+	if typeof(count)!=TYPE_INT or not WorkerLedger.valid_count(count) or count<1 or count>pile.workers_total+_run.pending_for_pile(origin_id): return _reject("Choose a whole target within this pile's known workforce")
 	var existing: TrailRouteState = _run.trails.find_route(origin_id, knowledge_id)
 	if existing != null:
 		if existing.status in ["inactive", "recalling"]:
-			return set_workers(existing.id, CONFIG.initial_workers)
+			return set_workers(existing.id, count)
 		return _reject("A route to this destination already exists")
-	var pile: PileState = _run.colony.piles[origin_id]
 	var estimate: Vector2 = _run.knowledge.nodes[knowledge_id].estimated_position
 	if not estimate.is_finite() or estimate == pile.position:
 		return _reject("Destination has no usable direction")
 	if _run.trails.next_route_id >= WorkerLedger.MAX_COUNT:
 		return _reject("Route ID unavailable")
-	if pile.workers_assignable < CONFIG.initial_workers:
-		return _reject("Not enough available workers")
+	var assigned: int=mini(int(count),pile.workers_assignable)
 	var id: String = "route_%d" % _run.trails.next_route_id
 	var commitment: String = "trail:" + id
-	if pile.workers.count(commitment) >= 0 or not pile.workers.create_commitment(commitment, "trail", id):
+	if pile.workers.count(commitment) >= 0 or assigned>0 and not pile.workers.create_commitment(commitment, "trail", id):
 		return _reject("Trail commitment unavailable")
-	if not pile.allocate_workers(commitment, CONFIG.initial_workers):
+	if assigned>0 and not pile.allocate_workers(commitment, assigned):
 		pile.workers.retire_commitment(commitment)
 		return _reject("Not enough available workers")
 	var route := Route.new()
@@ -54,9 +54,10 @@ func create_route(origin_id: String, knowledge_id: String) -> bool:
 	route.destination_knowledge_id = knowledge_id
 	route.estimated_destination = estimate
 	route.segment_id = "segment_%d" % _run.trails.next_route_id
-	route.desired_workers = CONFIG.initial_workers
-	route.allocated_workers = CONFIG.initial_workers
-	route.status = "active"
+	route.desired_workers = int(count)
+	route.waiting_workers = int(count)-assigned
+	route.allocated_workers = assigned
+	route.status = "active" if assigned>0 else "inactive"
 	var segment := Segment.new()
 	segment.id = route.segment_id
 	segment.route_id = route.id
@@ -81,22 +82,24 @@ func set_workers(route_id: String, target: Variant) -> bool:
 	var commitment: String = "trail:" + route.id
 	if route.purpose!="food": return _reject("Founding workers belong to their expedition")
 	var requested: int = int(target)
+	if requested>pile.workers_total+_run.pending_for_pile(pile.id): return _reject("Order exceeds this pile's known workforce")
 	var expected: int = route.allocated_workers + _run.trails.pending_losses(route.id)
 	if requested == route.desired_workers and requested <= expected:
+		route.waiting_workers=0
 		last_error = ""
 		return true
 	if requested > expected:
-		var needed: int = requested - expected
-		if pile.workers_assignable < needed:
-			return _reject("Not enough available workers")
-		if route.status == "inactive" and not pile.workers.create_commitment(commitment, "trail", route.id):
+		var needed: int = mini(requested - expected,pile.workers_assignable)
+		if needed>0 and route.allocated_workers==0 and pile.workers.count(commitment)<0 and not pile.workers.create_commitment(commitment, "trail", route.id):
 			return _reject("Trail commitment unavailable")
-		if not pile.allocate_workers(commitment, needed):
+		if needed>0 and not pile.allocate_workers(commitment, needed):
 			if route.status == "inactive":
 				pile.workers.retire_commitment(commitment)
 			return _reject("Could not allocate workers")
 		route.allocated_workers += needed
+		route.waiting_workers=requested-expected-needed
 	else:
+		route.waiting_workers=0
 		var releasable: int = mini(route.allocated_workers - requested, route.allocated_workers - route.active_workers)
 		if releasable > 0:
 			if not pile.workers.release(commitment, releasable):
@@ -138,6 +141,20 @@ func recheck(route_id: String) -> bool:
 	last_error = ""
 	return true
 
+func _fund_waiting(route: TrailRouteState) -> void:
+	if route.purpose!="food" or route.waiting_workers==0 or route.reported_depleted: return
+	var pile: PileState=_run.colony.piles[route.origin_pile]
+	var count: int=mini(route.waiting_workers,pile.workers_assignable)
+	if count==0: return
+	var commitment: String="trail:"+route.id
+	var created: bool=pile.workers.count(commitment)<0
+	if created and not pile.workers.create_commitment(commitment,"trail",route.id): return
+	if not pile.allocate_workers(commitment,count):
+		if created: pile.workers.retire_commitment(commitment)
+		return
+	route.allocated_workers+=count;route.waiting_workers-=count
+	route.status="active"
+
 
 func set_recovery_watch(route_id: String, enabled: bool) -> bool:
 	if not _run.trails.routes.has(route_id):
@@ -158,6 +175,7 @@ func tick(delta: float) -> void:
 	ids.sort()
 	for id: String in ids:
 		var route: TrailRouteState = _run.trails.routes[id]
+		_fund_waiting(route)
 		if route.resume_on_report and route.status == "depleted" and route.active_workers == 0 and route.reported_losses == 0 and route.foreign_reports == 0 and _run.knowledge.recovery_report(route.destination_knowledge_id, route.last_empty_report_at):
 			var resumed: bool = recheck(id)
 			assert(resumed)

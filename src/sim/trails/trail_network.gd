@@ -174,7 +174,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		for cohort: TransitCohort in restored_cohorts.values():
 			if cohort.route_id == route.id:
 				pending += cohort.lost_workers
-		if route.desired_workers > route.allocated_workers + pending + route.reported_losses or route.allocated_workers > WorkerLedger.MAX_COUNT - pending:
+		if route.desired_workers > route.allocated_workers + pending + route.reported_losses + route.waiting_workers or route.waiting_workers > maxi(0,route.desired_workers-route.allocated_workers-pending) or route.allocated_workers > WorkerLedger.MAX_COUNT - pending:
 			return false
 		var commitment: String = "trail:" + route.id
 		var payer: String = supply_origin if route.purpose == "interpile" else route.origin_pile

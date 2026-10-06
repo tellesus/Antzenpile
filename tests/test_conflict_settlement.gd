@@ -65,7 +65,9 @@ func run(test: Object) -> bool:
 	var event := InputEventMouseButton.new(); event.pressed = true; event.button_index = MOUSE_BUTTON_LEFT; event.position = view._conflict_rect("journey_close").get_center()
 	view._unhandled_input(event)
 	view.trail_create_command = root.create_trail_for
+	view.gather_order_command = root.order_gathering
 	view._pointer_press(view._trail_button_rect("trail_create").get_center(),"mouse")
+	view._run_command("gather_commit")
 	test.check(game.run.trails.routes.route_1.desired_workers == 5 and game.run.trails.routes.route_1.active_workers == 0, "Mouse recovery commits five real gatherers before their departure")
 	view._run_command("journey_avoid")
 	test.check(game.run.trails.routes.route_1.desired_workers == 0, "Recovery also permits continued route avoidance")

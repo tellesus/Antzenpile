@@ -21,6 +21,7 @@ static func entries(signals: Array[Dictionary], status: Dictionary, category: St
 			"source_type":signal_data.get("source_type",""),"memory_label":signal_data.get("memory_label",""),
 			"bearing": signal_data.get("bearing"), "age": signal_data.age, "state": state,
 			"workers": route.get("allocated_workers", 0),
+			"waiting_workers":route.get("waiting_workers",0),
 			"route_id": route.get("id", ""), "route_status": route.get("status", "none"), "desired_workers": route.get("desired_workers", 0),
 			"receipt": route.get("receipt", {}).duplicate(true),
 			"delivered_total": route.get("delivered_total", 0.0),

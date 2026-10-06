@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 139. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 141. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 ## Ownership and dependency direction
 
@@ -21,6 +21,8 @@ SimulationController attaches systems to one RunState and owns their fixed-tick 
 ## Worker/care and conflict contracts
 
 New work checks `PileState.workers_assignable`, not raw ledger availability; `allocate_workers` retains held brood care. Dedicated trial nurses are counted once. Every job target reduction goes through its owner; a view never edits a ledger or repairs a conservation failure.
+
+141 makes ordinary gathering an explicit whole target. TrailRoute owns a separate unsent `waiting_workers` count; stable route ticks fund that remainder only through care-protected local allocation. Zero-funded intent has no ledger pool. Reported depletion pauses further funding; cancellation clears waiting and recalls actual travelers. Desired minus surviving allocation is not an automatic replacement order after losses. Home and Daughter share a free staffing draft, with five as a suggestion.
 
 ConflictRecruitment owns route-keyed `response:<route>` other-kind reservations. It recalls the alerted food trail first, then reserves home labor; all-hands may reduce supported cancellable jobs. Travelers must physically return. Care, dedicated nurses, ongoing projects and settlers remain protected. A ready defense reservation transfers to the existing journey party. Rival reinforcement releases/reserves into ordinary gathering atomically. Cancellation releases reserved local labor and does not restore reduced jobs.
 

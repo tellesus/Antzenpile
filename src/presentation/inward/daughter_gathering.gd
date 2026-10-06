@@ -9,9 +9,10 @@ var opened: bool=false
 var category: String="carbohydrate"
 var page: int=0
 var selected: String=""
+var draft:=preload("res://src/presentation/gathering_draft.gd").new()
 
 func reset() -> void:
- opened=false;category="carbohydrate";page=0;selected=""
+ opened=false;category="carbohydrate";page=0;selected="";draft.opened=false
 
 func panel(size: Vector2) -> Rect2:
  return Rect2(size.x-316,144,292,456)
@@ -39,6 +40,15 @@ func selected_entry(status: Dictionary) -> Dictionary:
 func activate(view: Node2D, at: Vector2, status: Dictionary, command: Callable) -> bool:
  var size: Vector2=view.get_viewport_rect().size
  if not opened or not panel(size).has_point(at): return false
+ if draft.opened:
+  var control: String=draft.command_at(at,size)
+  if control=="gather_commit" and command.is_valid():
+   var result: Dictionary=command.call(draft.source,"order_%d" % draft.amount)
+   view.activation.outcome(result)
+   if result.get("accepted",false): draft.opened=false
+   view.show_feedback("Gathering order accepted · unsent ants wait" if result.get("accepted",false) else result.get("reason","Order unavailable"))
+  else: draft.edit(control)
+  return true
  if rect(size,"back").has_point(at): opened=false;return true
  for index: int in CATEGORIES.size():
   if rect(size,"filter",index).has_point(at): category=CATEGORIES[index];page=0;selected="";return true
@@ -50,11 +60,15 @@ func activate(view: Node2D, at: Vector2, status: Dictionary, command: Callable) 
  var entry: Dictionary=selected_entry(status)
  if entry.is_empty(): return true
  var action: String=""
- if rect(size,"stop").has_point(at) and not entry.route_id.is_empty() and entry.workers>0: action="stop"
+ if rect(size,"stop").has_point(at) and not entry.route_id.is_empty() and (entry.workers>0 or entry.desired_workers>0): action="stop"
  elif rect(size,"scout").has_point(at): action="recall_scout" if entry.get("scout",{}).get("awaiting",false) else "scout"
- elif rect(size,"order").has_point(at): action=order(entry)
+ elif rect(size,"order").has_point(at):
+  if order(entry)=="recheck": action="recheck"
+  else:
+   draft.begin(entry.knowledge_id,int(entry.desired_workers),int(status.get("workforce",1)));return true
  if not action.is_empty() and command.is_valid():
   var result: Dictionary=command.call(entry.knowledge_id,action)
+  view.activation.outcome(result)
   var titles: Dictionary={"gather":"Daughter gatherers assigned","add":"Daughter gatherers added","stop":"Daughter gatherers recalled","recheck":"Local trail recheck started","scout":"Local scout dispatched · await return","recall_scout":"Scout return requested"}
   view.show_feedback(titles[action] if result.get("accepted",false) else result.get("reason","Gathering unavailable"))
  return true
@@ -64,6 +78,9 @@ func order(entry: Dictionary) -> String:
 
 func draw(view: Node2D, status: Dictionary) -> void:
  var size: Vector2=view.get_viewport_rect().size
+ if draft.opened:
+  var entry: Dictionary=selected_entry(status)
+  draft.draw(view,size,Memory.display_name(entry),int(entry.get("workers",0)),int(status.get("available_workers",0)));return
  var box: Rect2=panel(size)
  Style.surface(view,box,Color("111921"));Style.surface(view,box,Color("41535a"),true)
  view._label(box.position+Vector2(16,31),"Daughter Gathering",Color("d9d3be"),20)
@@ -88,10 +105,10 @@ func draw(view: Node2D, status: Dictionary) -> void:
  if not chosen.is_empty():
   at=rect(size,"order");Style.surface(view,at,Color("39302b"))
   var action: String=order(chosen);var count: int=status.get("workers",5)
-  var title: String="RECHECK" if action=="recheck" else "ADD %d WORKERS" % count if action=="add" else "ASSIGN %d WORKERS" % count
+  var title: String="RECHECK" if action=="recheck" else "CHOOSE WORKERS"
   view._label(at.get_center()+Vector2(0,-3),title,Color("e0c5b7"),12,HORIZONTAL_ALIGNMENT_CENTER)
   view._label(at.get_center()+Vector2(0,15),"Daughter + travel carbs" if action!="recheck" else "Same local gatherers",Color("c5b8b1"),11,HORIZONTAL_ALIGNMENT_CENTER)
-  if chosen.workers>0:
+  if chosen.workers>0 or chosen.desired_workers>0:
    at=rect(size,"stop");Style.surface(view,at,Color("39302b"))
    view._label(at.get_center()+Vector2(0,5),"RECALL",Color("e0c5b7"),12,HORIZONTAL_ALIGNMENT_CENTER)
   var scout: Dictionary=chosen.get("scout",{});var awaiting: bool=scout.get("awaiting",false)

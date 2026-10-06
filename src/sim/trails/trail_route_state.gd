@@ -11,6 +11,7 @@ var destination_knowledge_id: String
 var estimated_destination: Vector2
 var segment_id: String
 var desired_workers: int = 0
+var waiting_workers: int = 0
 var allocated_workers: int = 0
 var active_workers: int = 0
 var status: String = "inactive"
@@ -44,6 +45,7 @@ func to_dict() -> Dictionary:
 		"destination_knowledge_id": destination_knowledge_id,
 		"estimated_destination": [estimated_destination.x, estimated_destination.y],
 		"segment_id": segment_id, "desired_workers": desired_workers,
+		"waiting_workers":waiting_workers,
 		"allocated_workers": allocated_workers, "active_workers": active_workers,
 		"status": status, "departure_cooldown_ticks": departure_cooldown_ticks,
 		"resume_on_report": resume_on_report, "last_empty_report_at": last_empty_report_at,
@@ -76,6 +78,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	for key: String in ["desired_workers", "allocated_workers", "active_workers"]:
 		if not WorkerLedger.valid_count(data[key]):
 			return false
+	var waiting: Variant=data.get("waiting_workers",0)
+	if not WorkerLedger.valid_count(waiting) or waiting>data.desired_workers or data.get("purpose","food")!="food" and waiting!=0: return false
 	if data.active_workers > data.allocated_workers:
 		return false
 	if not WorkerLedger.valid_count(data.departure_cooldown_ticks) or data.departure_cooldown_ticks > CONFIG.departure_interval_ticks or typeof(data.reported_depleted) != TYPE_BOOL:
@@ -148,6 +152,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	estimated_destination = endpoint
 	segment_id = data.segment_id
 	desired_workers = int(data.desired_workers)
+	waiting_workers = int(waiting)
 	allocated_workers = int(data.allocated_workers)
 	active_workers = int(data.active_workers)
 	status = data.status

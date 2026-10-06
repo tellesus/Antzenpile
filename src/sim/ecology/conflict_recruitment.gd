@@ -64,7 +64,9 @@ func _returning(entry: Dictionary) -> int:
 func _recall_trail(entry: Dictionary, route: TrailRouteState, wanted: int) -> void:
 	var expected: int = route.allocated_workers + _run.trails.pending_losses(route.id)
 	var draw: int = mini(wanted, expected)
-	if draw == 0: return
+	if draw == 0:
+		if route.waiting_workers>0: assert(jobs.gatherers.set_workers(route.id,0))
+		return
 	var target: int = mini(route.desired_workers, expected - draw)
 	assert(jobs.gatherers.set_workers(route.id, target))
 	entry.waiting[route.id] = target

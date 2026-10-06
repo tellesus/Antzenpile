@@ -51,6 +51,7 @@ func _ready() -> void:
 		outward.inspect_daughter_command = inspect_pile
 		outward.pile_command = inspect_outward_pile
 		outward.trail_create_command = create_trail_for
+		outward.gather_order_command = order_gathering
 		outward.trail_set_command = set_trail_target
 		outward.trail_recheck_command = recheck_trail
 		outward.investigate_command = focused_source_investigation
@@ -803,6 +804,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 			if pending > 0 and status == "inactive":
 				status = "recalling" if route.desired_workers == 0 else "depleted" if route.reported_depleted else "active"
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,
+				"waiting_workers":route.waiting_workers,
 				"desired_workers": sent if settlers_away else route.desired_workers, "allocated_workers": sent if settlers_away else route.allocated_workers + pending,
 				"purpose":route.purpose, "founding_intent":route.purpose in ["founding","interpile"] and simulation.run.founding.phase!="failed", "active_workers":sent if settlers_away else 0 if route.purpose=="founding" and simulation.run.founding.phase=="ready" else route.active_workers + pending, "checking_workers": checking, "status": status,
 				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at, "conflict_received_at":route.conflict_received_at,
@@ -859,7 +861,8 @@ func daughter_gathering_summary() -> Dictionary:
 	for category: String in PileState.RESOURCE_IDS:
 		sources[category] = SourceMemory.entries(signals,status,category)
 		for entry: Dictionary in sources[category]: entry["scout"] = daughter_source_scout(entry.knowledge_id)
-	return {"sources":sources, "workers":simulation.trails.CONFIG.initial_workers, "time":simulation.run.simulation_time}
+	var pile: PileState=simulation.run.colony.piles.satellite_1
+	return {"sources":sources, "workers":simulation.trails.CONFIG.initial_workers, "workforce":pile.workers_total+simulation.run.pending_for_pile(pile.id),"available_workers":pile.workers_assignable, "time":simulation.run.simulation_time}
 
 
 func daughter_source_scout(knowledge_id: String) -> Dictionary:
@@ -877,6 +880,10 @@ func daughter_gathering_command(knowledge_id: String, action: String) -> Diction
 		return {"accepted":false,"reason":"Gatherers need a returned food or water memory"}
 	var route: TrailRouteState = simulation.run.trails.find_route("satellite_1",knowledge_id)
 	var accepted: bool = false
+	if action.begins_with("order_"):
+		var value: String=action.trim_prefix("order_")
+		if not value.is_valid_int(): return {"accepted":false,"reason":"Choose a whole worker target"}
+		return order_gathering(knowledge_id,int(value))
 	match action:
 		"scout":
 			if daughter_source_scout(knowledge_id).get("awaiting", false): return {"accepted":false,"reason":"A local scout is already awaiting return"}
@@ -912,12 +919,18 @@ func create_trail_for(knowledge_id: String) -> Dictionary:
 	var accepted: bool = simulation.create_trail(inward_pile_id, knowledge_id)
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
+func order_gathering(knowledge_id: String, count: Variant) -> Dictionary:
+	var route: TrailRouteState=simulation.run.trails.find_route(inward_pile_id,knowledge_id)
+	var accepted: bool=simulation.create_trail(inward_pile_id,knowledge_id,count) if route==null else simulation.set_trail_workers(route.id,count)
+	route=simulation.run.trails.find_route(inward_pile_id,knowledge_id)
+	return {"accepted":accepted,"queued":accepted and route!=null and route.waiting_workers>0,"reason":simulation.trails.last_error}
+
 
 func set_trail_target(route_id: String, target: int) -> Dictionary:
 	if not _owns_food_route(route_id): return {"accepted":false, "reason":"Trail belongs to another pile or job"}
 	var accepted: bool = simulation.set_trail_workers(route_id, target)
 	if accepted and target == 0: simulation.journey_response.cancel_order(route_id)
-	return {"accepted": accepted, "reason": simulation.trails.last_error}
+	return {"accepted": accepted, "queued":accepted and simulation.run.trails.routes[route_id].waiting_workers>0, "reason": simulation.trails.last_error}
 
 
 func recheck_trail(route_id: String) -> Dictionary:

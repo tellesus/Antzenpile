@@ -24,6 +24,8 @@ World nodes have physical ID, definition ID, position, activity/quantity and aut
 
 TrailRoute owns purpose/origin/destination, desired/allocated/active labor, receipts/depletion/loss/conflict knowledge. TrailSegment owns physical geometry/exposure and scent/familiarity. TransitCohort owns actual travelers, captured profiles/cargo/energy/contamination, causal loss and delivered evidence. Return/cancel cannot duplicate commitment or erase carried cargo. Installed alternate courses require paid returned establishment.
 
+141 optionally saves food-route `waiting_workers`: an integral unsent part of explicit intent, bounded by desired minus expected assigned labor (including unresolved losses). Non-food routes must have zero waiting. Old saves default to zero without inventing casualty replacement. An inactive route may have a positive queued target and no trail commitment; funding creates the real pool. Targets remain bounded by known local workforce. Gathering target changes also enter the semantic journal.
+
 Current purposes include food/founding/interpile with owner-specific rules. Food cohorts cannot borrow expedition labor. Home/Daughter supplies and Home settlers are mutually exclusive on the shared connection. One paid founder activates one daughter through a real ledger/trait transfer; arbitrary site/pile networks are future schema work.
 
 ## Response and recruitment

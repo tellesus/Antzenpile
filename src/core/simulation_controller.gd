@@ -17,6 +17,7 @@ const Guest = preload("res://src/sim/ecology/guest_system.gd")
 const Rival = preload("res://src/sim/ecology/rival_system.gd")
 const Predator = preload("res://src/sim/ecology/predator_system.gd")
 const Ecology = preload("res://src/sim/ecology/ecology_system.gd")
+const TRAIL_CONFIG=preload("res://data/trails/default_trails.tres")
 var run: RunState
 var scouting: RefCounted
 var trails: RefCounted
@@ -148,9 +149,9 @@ func set_time_scale(value: int) -> bool:
 	return run.clock.set_time_scale(value)
 
 
-func create_trail(origin_id: String, knowledge_id: String) -> bool:
+func create_trail(origin_id: String, knowledge_id: String, count: Variant = TRAIL_CONFIG.initial_workers) -> bool:
 	if run.history.ended: return false
-	return trails.create_route(origin_id, knowledge_id)
+	return trails.create_route(origin_id, knowledge_id,count)
 
 
 func set_trail_workers(route_id: String, target: Variant) -> bool:

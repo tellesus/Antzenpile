@@ -3,7 +3,7 @@ extends RefCounted
 ## Bounded semantic records of delivered/local facts; never physical replay data.
 const LIMIT: int = 192
 const SEEN_LIMIT: int = 512
-const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order"]
+const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering"]
 var initialized: bool = false
 var since: float = 0.0
 var next_id: int = 1
@@ -115,4 +115,5 @@ static func _valid_entry(entry: Variant, colony: ColonyState, knowledge: Knowled
 		"camp": return entry.detail in ["ready","failed","established"]
 		"dispatch": return entry.detail in ["investigate","defend"] and WorkerLedger.valid_count(entry.amount)
 		"order": return entry.detail in ["clear","hunt"] and WorkerLedger.valid_count(entry.amount)
+		"gathering": return entry.detail=="target" and WorkerLedger.valid_count(entry.amount)
 	return false

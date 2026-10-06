@@ -34,6 +34,7 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"supplies": text="Supplies returned from trip to "+pile_name(entry.subject_id)
 		"dispatch": text="%d ants dispatched: %s" % [entry.amount,"survey" if entry.detail=="investigate" else "defense"]
 		"order": text="Force order: %d total" % entry.amount if entry.amount>0 else "Force order canceled"
+		"gathering": text="Gathering target: %d total" % entry.amount if entry.amount>0 else "Gathering stopped · travelers return"
 	return pile_name(entry.pile_id)+" · "+text
 
 static func detail(entry: Dictionary, time: float) -> String:

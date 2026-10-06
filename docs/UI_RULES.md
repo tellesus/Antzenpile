@@ -14,6 +14,8 @@ Mouse/touch share semantic command paths. Preserve touch-sized targets, readable
 
 Inspecting, selecting a trait, opening history and browsing are free attention. Queue/order/recall are distinct; simulation revalidates ownership/costs/care. Unavailable actions should retain a reason rather than silently disappearing. Real travel, paid costs, required groups and current reserves are explained.
 
+141 adds a shared Home/Daughter gathering draft: ±1/±5, suggested five, explicit ORDER and BACK. Opening/editing is free; target, assigned and queued labor remain distinct. Queued work uses only future free local labor, with carers held; recall/cancel clears unsent intent and waits for real travelers. Losing gatherers does not silently replace them. Drafts clear on source/pile/load attention changes and fit standard/compact controls.
+
 ## Implemented conflict surface
 
 Journey Alarm or returned threat opens a circular pop-over with Send/Reinforce, Retreat/Cancel, Investigate and Another Approach. Staffing is a free draft until ORDER. Initial Clear/Hunt is chosen before dispatch; reinforcement adds to known sent workers, while rival response adds gatherers. Whole counts are bounded by known local labor; suggestions do not guarantee victory. All Hands defaults off, protects care and may leave other jobs reduced.

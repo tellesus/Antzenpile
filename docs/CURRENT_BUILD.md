@@ -1,13 +1,13 @@
 # Current build and gaps
 
-Baseline: gameplay through card 140; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
+Baseline: gameplay through card 141; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
 
 ## Implemented foundation
 
 | Family | What works now | Principal 1.0 gap |
 | --- | --- | --- |
 | Runtime and saves | Godot 4.7.2 Compatibility, headless fixed ticks, seeded continuation, strict atomic saves, separate hidden reality/knowledge/presentation. | Packaged Windows build, migration policy for new schemas, measured final performance. |
-| Labor | Authoritative per-pile ledger, aggregate brood/travel, held brood care, capped individual scouts. | Consistent flexible staffing/order explanations outside conflict; common waiting/cancel/report presentation. |
+| Labor | Authoritative per-pile ledger, aggregate brood/travel, held brood care, capped scouts; explicit flexible Home/Daughter gathering targets, care-protected unsent queue and real recall. | Remaining ordinary staffing explanations where models permit them; source comparison and scout intent. |
 | Perception and scouts | Returned memories, standing exploration/rechecks, physical recall/missing settlement; shared cap eight; persistent delivered/local journal with saved read state, grouping and current competing needs. | Source comparison and clearer priorities; remaining content profiles. |
 | Resources | Three nutrient stores; physical gathering/energy/depletion/renewal; five immutable identities from close returned/harvested samples and stable A/B labels; generic legacy fallback. | Mixed yields and remaining concrete profiles/handling behavior; current identity definitions are not a complete mechanical food catalog. |
 | Routes | Separate route/segment types, scent/familiarity, aggregate cohorts, detours, actual alternate courses and incoming cargo. | Shared multi-segment connections and broader network traffic/closure; no automatic optimal-route planner. |
@@ -24,7 +24,7 @@ Queen health/death/replacement, multiple daughters, moving predators, species-sp
 
 ## Latest actual verification
 
-[Card 140](tasks/140_reports_needs_and_feedback.md) recorded 9,043 checks/zero failures, targeted 702/zero, clean import/Main and headless report/menu/activation drawing. [139](tasks/139_returned_resource_identity.md) previously recorded 8,805/zero. [136](archive/pre_1_0/tasks/136_direct_conflict_response.md) recorded the preceding 8,784 checks. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks are now explicitly deferred to the feature-complete systems beta.
+[Card 141](tasks/141_flexible_gathering_orders.md) recorded 9,089 checks/zero failures, targeted 716/zero, clean import/Main and Home/Daughter headless gathering drawing. [140](tasks/140_reports_needs_and_feedback.md) recorded the prior 9,043/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks are explicitly deferred to the feature-complete systems beta.
 
 The player supplies manual visual feedback. No screen monitoring, desktop automation, paid testers or broad compute sweeps are authorized. The documentation reset does not rerun the engine or claim new gameplay evidence. Existing user audio imports/images/translations and saved slot are preserved.
 

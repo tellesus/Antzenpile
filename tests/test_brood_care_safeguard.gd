@@ -33,7 +33,10 @@ func run(test: Object) -> bool:
 	var pile: PileState = game.run.colony.piles.home
 	test.check(game.set_trail_workers("route_1",38) and pile.workers_available == 2 and pile.workers_assignable == 0, "Gathering may use every free worker while preserving two real carers")
 	var before: Dictionary = game.run.to_dict()
-	test.check(not game.set_trail_workers("route_1",39) and not game.dispatch_scout("home",0.0) and not game.start_nursery_development("home") and game.run.to_dict() == before, "Trail, scout and chamber orders cannot take the last carers or partially spend")
+	test.check(not game.dispatch_scout("home",0.0) and not game.start_nursery_development("home") and game.run.to_dict() == before, "Scout and chamber orders cannot take the last carers or partially spend")
+	var pools: Dictionary = pile.workers.to_dict()
+	var stores: Dictionary = pile.resources.duplicate(true)
+	test.check(game.set_trail_workers("route_1",39) and game.run.trails.routes.route_1.waiting_workers == 1 and pile.workers.to_dict() == pools and pile.resources == stores and pile.workers_available == 2, "Unfunded gathering waits without spending resources or protected care")
 	game.scouting.set_effort(8)
 	var twin := Controller.new()
 	test.check(twin.restore_snapshot(snapshot(game)), "Saturated care-protected commitments restore without a new saved pool")

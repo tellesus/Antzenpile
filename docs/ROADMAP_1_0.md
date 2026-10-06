@@ -52,7 +52,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M1-B complete:** [140 reports/needs/feedback](tasks/140_reports_needs_and_feedback.md), a bounded delivered/local journal, grouped receipts, saved read state, free navigation, simultaneous needs and common control cues. Final full 9,043/0, import/Main/headless drawing passed.
 
-**Next: M1-C ordinary gathering orders, source comparison and scout intent.** Remove the mandatory initial five-worker batch from ordinary gathering; expose chosen whole targets, a provisional suggestion, known waiting/recall and remaining care. Compare only known intake/age/order/risk and show standing exploration/priorities clearly. Preserve explicit replacement after reported casualties and real travel. The next INWARD systems pass is M2 and must include queued reproductive investment; do not replace it with toggling Auto Brood off. Player graphical/feel checks defer to the feature-complete systems beta (A88).
+**M1-C complete:** [141 flexible gathering commitments](tasks/141_flexible_gathering_orders.md), whole initial/edited targets, care-protected unsent staffing, explicit draft/ORDER and real recall at both piles. Full 9,089/0; import/Main/headless drawing passed. Casualty deficits never silently create replacement intent.
+
+**Next: [142 source comparison and scout intent](tasks/142_source_comparison_and_scout_intent.md).** Compare only known intake/age/order/risk and show standing exploration/priorities clearly; finish appropriate ordinary staffing before M2. The next INWARD systems pass is M2 and must include queued reproductive investment; do not replace it with toggling Auto Brood off. Player graphical/feel checks defer to the feature-complete systems beta (A88).
 
 ## Release acceptance and cost discipline
 

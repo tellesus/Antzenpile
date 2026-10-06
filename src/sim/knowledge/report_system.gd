@@ -21,6 +21,7 @@ func capture(recording: bool = true) -> void:
 	var route_ids: Array=_run.trails.routes.keys();route_ids.sort()
 	for route_id: String in route_ids:
 		var route: TrailRouteState=_run.trails.routes[route_id]
+		if route.purpose=="food" and journal.changed("gathering/"+route.id,route.desired_workers): journal.add("gathering",route.origin_pile,route.id,time,time,"target",route.desired_workers,0,recording)
 		if not route.receipt.is_empty() and journal.changed("intake/"+route.id,route.receipt.last_at) and route.purpose=="food":
 			journal.add("intake",route.origin_pile,route.id,route.receipt.last_at,route.receipt.last_at,_run.knowledge.nodes[route.destination_knowledge_id].definition_id,route.receipt.last_amount,route.receipt.last_amount,recording)
 		var previous: int=int(journal.seen.get("loss/"+route.id,0))

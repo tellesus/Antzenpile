@@ -33,6 +33,8 @@ var establish_command: Callable
 var pile_command: Callable
 var inspect_daughter_command: Callable
 var trail_create_command: Callable
+var gather_order_command: Callable
+var gathering_draft:=preload("res://src/presentation/gathering_draft.gd").new()
 var trail_set_command: Callable
 var trail_recheck_command: Callable
 var investigate_command: Callable
@@ -92,6 +94,7 @@ func _process(delta: float) -> void:
 
 
 func reset_mission_visuals() -> void:
+	gathering_draft.opened=false
 	conflict.reset()
 	_seen_missions.clear()
 	_missions_baselined = false
@@ -191,6 +194,7 @@ func _exploration_panel_rect() -> Rect2:
 
 
 func _context_panel_rect() -> Rect2:
+	if gathering_draft.opened: return gathering_draft.panel(get_viewport_rect().size)
 	if _journey_attention(): return conflict.layout(get_viewport_rect().size).bounds
 	var height: float = 448 if _journey_attention() else 292 if not _selected_mission().is_empty() else 344 + _evidence_offset()
 	if _selected_signal().get("category")=="nest_site": height=400
@@ -218,6 +222,7 @@ func _pointer_release(at: Vector2, kind: String) -> void:
 				picked = marker.id; journey_open = true; sources_open = false; exploration_open = false
 				break
 		selected_id = picked if not picked.is_empty() else ScoutTrace.pick(_mission_traces, at, selected_id)
+		gathering_draft.opened=false
 		conflict.reset()
 		approach_focus = false; rival_focus = false
 	_pointer_kind = ""
@@ -232,6 +237,8 @@ func turn_pixels(delta_x: float, width: float) -> void:
 
 
 func _run_command(command: String) -> void:
+	if command.begins_with("gather_") or command=="trail_create":
+		_run_gathering_command(command);return
 	if command.begins_with("conflict_") or command.begins_with("draft_"):
 		_run_conflict_command(command)
 		return
@@ -450,6 +457,20 @@ func _conflict_route() -> Dictionary:
 			break
 	return route
 
+func _run_gathering_command(command: String) -> void:
+	var selected: Dictionary=_selected_signal()
+	if selected.is_empty() or selected.category not in ["carbohydrate","protein","water"]: return
+	var route: Dictionary=_selected_route(selected)
+	if command in ["trail_create","gather_edit"]:
+		gathering_draft.begin(selected.source_knowledge_id,int(route.get("desired_workers",0)),int(_status.get("workers_total",1)))
+	elif command=="gather_commit":
+		if not gather_order_command.is_valid() or gathering_draft.source!=selected.source_knowledge_id: show_feedback("Gathering order unavailable",true);return
+		var result: Dictionary=gather_order_command.call(gathering_draft.source,gathering_draft.amount)
+		activation.outcome(result)
+		if result.get("accepted",false): gathering_draft.opened=false
+		show_feedback("Gathering order accepted · waiting labor stays queued" if result.get("accepted",false) else result.get("reason","Order unavailable"),not result.get("accepted",false))
+	else: gathering_draft.edit(command)
+
 
 func _run_conflict_command(command: String) -> void:
 	var route: Dictionary = _conflict_route()
@@ -527,6 +548,9 @@ func _button_rect(command: String) -> Rect2:
 
 
 func _button_at(at: Vector2) -> String:
+	if gathering_draft.opened:
+		var gather_command: String=gathering_draft.command_at(at,get_viewport_rect().size)
+		if not gather_command.is_empty(): return gather_command
 	if not sources_open and not exploration_open and not _status.get("other_pile", "").is_empty() and _button_rect("pile").has_point(at): return "pile"
 	if not _status.get("internal_attention", {}).is_empty() and _button_rect("internal_pressure").has_point(at):
 		return "internal_pressure"
@@ -579,14 +603,16 @@ func _button_at(at: Vector2) -> String:
 			return "investigate"
 		var route: Dictionary = _selected_route(_selected_signal())
 		var contextual: Array[String] = []
-		if route.is_empty() or route.status in ["inactive", "recalling"]:
+		if not route.is_empty() and route.get("waiting_workers",0)>0:
+			contextual.append_array(["gather_edit","trail_cancel"])
+		elif route.is_empty() or route.status in ["inactive", "recalling"]:
 			contextual.append("trail_create")
 		elif route.status == "depleted":
 			if route.active_workers == 0:
 				contextual.append("trail_recheck")
 			contextual.append("trail_cancel")
 		else:
-			contextual.append_array(["trail_less", "trail_more", "trail_cancel"])
+			contextual.append_array(["gather_edit", "trail_cancel"])
 		for command: String in contextual:
 			if _trail_button_rect(command).has_point(at):
 				return command
@@ -810,6 +836,10 @@ func _draw_context(size: Vector2) -> void:
 	var selected: Dictionary = _selected_signal()
 	if selected.is_empty():
 		return
+	if gathering_draft.opened:
+		if gathering_draft.source!=selected.source_knowledge_id: gathering_draft.opened=false
+		else:
+			gathering_draft.draw(self,size,Memories.display_name(selected),int(_selected_route(selected).get("allocated_workers",0)),int(_status.get("available_workers",0)));return
 	if _journey_attention(): _draw_journey_context(size); return
 	var box: Rect2 = _context_panel_rect()
 	UIStyle.surface(self, box, Color("111921"))
@@ -853,17 +883,20 @@ func _draw_context(size: Vector2) -> void:
 	var route: Dictionary = _selected_route(selected)
 	if route.is_empty() or route.status == "inactive":
 		var idle_text: String = "Trail: no workers committed" if route.is_empty() or _scent_label(route) == "absent" and float(route.get("route_familiarity", 0.0)) < 0.1 else "No workers · scent " + _scent_label(route)
+		if route.get("waiting_workers",0)>0: idle_text="Target %d · %d waiting for labor" % [route.desired_workers,route.waiting_workers]
 		_label(body.position + Vector2(16, 165), idle_text, Color("a8b8bd"), 15)
 		_label(body.position + Vector2(16, 187), "%s %s: %.1f" % [_status.get("pile_name","Home"), Copy.resource(selected.category), _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 15)
-		_draw_trail_button("trail_create", "ASSIGN 5 GATHERERS")
+		if route.get("waiting_workers",0)>0:
+			_draw_trail_button("gather_edit","CHOOSE WORKERS");_draw_trail_button("trail_cancel","CANCEL ORDER")
+		else: _draw_trail_button("trail_create", "CHOOSE GATHERERS")
 	elif route.status == "recalling":
 		_label(body.position + Vector2(16, 165), "Recalling: %d workers away" % route.active_workers, Color("a8b8bd"), 15)
 		_label(body.position + Vector2(16, 187), "Scent %s · Delivered %.1f" % [_scent_label(route), route.delivered_total], Color("8fa1a8"), 15)
-		_draw_trail_button("trail_create", "ASSIGN 5 GATHERERS")
+		_draw_trail_button("trail_create", "CHOOSE GATHERERS")
 	else:
 		var route_note: String = _recovery_note(route) if route.status == "depleted" else "Waiting for carbohydrate" if route.get("energy_limited", false) else "Trail scent: " + _scent_label(route)
 		_label(body.position + Vector2(16, 165), route_note, Color("a8b8bd"), 15)
-		_label(body.position + Vector2(16, 185), "Gatherers: %d target · %d assigned" % [route.desired_workers, route.allocated_workers], Color("8fa1a8"), 15)
+		_label(body.position + Vector2(16, 185), "Target %d · %d assigned · %d wait" % [route.desired_workers, route.allocated_workers,route.get("waiting_workers",0)], Color("8fa1a8"), 13)
 		var traffic: String = "%d travelling · %d checking" % [route.active_workers, route.checking_workers] if route.get("checking_workers", 0) > 0 else "%d gatherers away" % route.active_workers
 		_label(body.position + Vector2(16, 205), traffic, Color("8fa1a8"), 15)
 		_label(body.position + Vector2(16, 225), "Delivered %.1f %s total" % [route.delivered_total, Copy.resource(selected.category)], Color("8fa1a8"), 15)
@@ -871,8 +904,7 @@ func _draw_context(size: Vector2) -> void:
 			if route.active_workers == 0:
 				_draw_trail_button("trail_recheck", _recheck_title(route))
 		else:
-			_draw_trail_button("trail_less", "− 1")
-			_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
+			_draw_trail_button("gather_edit", "CHOOSE WORKERS")
 		_draw_trail_button("trail_cancel", "RECALL")
 	var scout_available: bool = _status.has("exploration") or _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
@@ -891,6 +923,7 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 	_label(body.position + Vector2(16, 162), relation_text, Color("d6b98c"), 13)
 	var route: Dictionary = _selected_route(selected)
 	var route_text: String = "Gatherers carry these carbs home" if route.is_empty() or route.status == "inactive" else "Trail recalling · %d away" % route.active_workers if route.status == "recalling" else _recovery_note(route) if route.status == "depleted" else "Gatherers: %d assigned · %d away" % [route.allocated_workers, route.active_workers]
+	if route.get("waiting_workers",0)>0: route_text="%d assigned · %d waiting for labor" % [route.allocated_workers,route.waiting_workers]
 	_label(body.position + Vector2(16, 184), route_text, Color("a8b8bd"), 15)
 	var labor_text: String = "%d attendants boost output" % int(_status.honeydew.protection_workers) if relationship == "tended" else "%d attendants can boost output" % required
 	_label(body.position + Vector2(16, 201), labor_text, Color("8fa1a8"), 15)
@@ -899,15 +932,16 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 		var can_start: bool = relationship == "tended" or available >= required
 		UIStyle.surface(self, protect_box, Color("3d3328") if can_start else Color("202326"))
 		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "WITHDRAW ATTENDANTS" if relationship == "tended" else "ASSIGN APHID ATTENDANTS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
-	if route.is_empty() or route.status in ["inactive", "recalling"]:
-		_draw_trail_button("trail_create", "ASSIGN 5 GATHERERS" if route.is_empty() or route.status == "inactive" else "ASSIGN 5 GATHERERS")
+	if route.get("waiting_workers",0)>0:
+		_draw_trail_button("gather_edit","CHOOSE WORKERS");_draw_trail_button("trail_cancel","CANCEL ORDER")
+	elif route.is_empty() or route.status in ["inactive", "recalling"]:
+		_draw_trail_button("trail_create", "CHOOSE GATHERERS")
 	elif route.status == "depleted":
 		if route.active_workers == 0:
 			_draw_trail_button("trail_recheck", _recheck_title(route))
 		_draw_trail_button("trail_cancel", "RECALL")
 	else:
-		_draw_trail_button("trail_less", "− 1")
-		_draw_trail_button("trail_more", "+ 4" if route.get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate else "+ 1")
+		_draw_trail_button("gather_edit","CHOOSE WORKERS")
 		_draw_trail_button("trail_cancel", "RECALL")
 	var scout_available: bool = _status.has("exploration") or available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
@@ -1058,6 +1092,7 @@ func _trail_button_rect(command: String) -> Rect2:
 	var y: float = 398.0 if _is_honeydew(_selected_signal()) else 380.0
 	y += _evidence_offset()
 	match command:
+		"gather_edit": return Rect2(x,y,136,44)
 		"trail_create": return Rect2(x, y, 260, 44)
 		"trail_recheck": return Rect2(x, y, 136, 44)
 		"trail_less": return Rect2(x, y, 64, 44)
@@ -1093,7 +1128,7 @@ func _draw_trail_button(command: String, title: String) -> void:
 		var contested: bool = _selected_route(_selected_signal()).get("foreign_reports", 0) >= SWARM_CONFIG.reports_to_escalate
 		title = "+4" if contested else "+1"
 		detail = "contest" if contested else "gatherer"
-	elif command == "trail_create": detail = Copy.local_shortage(_status, {}, 5)
+	elif command == "trail_create": detail = "5 suggested · choose before ordering"
 	UIStyle.surface(self, box, Color("263b3c"))
 	_label(box.position + Vector2(box.size.x * 0.5, 29 if detail.is_empty() else 17), title, Color("d5ded8"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	if not detail.is_empty(): _label(box.position + Vector2(box.size.x * 0.5, 36), detail, Color("a8b8bd"), 13 if command == "trail_create" else 12, HORIZONTAL_ALIGNMENT_CENTER)
