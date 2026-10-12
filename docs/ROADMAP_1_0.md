@@ -66,7 +66,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M2-E complete:** [147 seeds/picnic food](tasks/147_seeds_and_picnic_food.md), actual finite heavy seeds and timed crumbs using captured C/P recipes, known carrying/fuel guard and old-world fallback. Full 9,300/0; import/Main/headless drawing passed. Cache gate found no current buffering decision, so CH-CACHE is excluded from release blockers.
 
-**M2 core is complete. Next: [148 trait definitions and Efficient Nurses](tasks/148_trait_definitions_and_efficient_nurses.md)**, followed by environmental/repair leaves. Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
+**M3-A complete:** [148 trait definitions and Efficient Nurses](tasks/148_trait_definitions_and_efficient_nurses.md), seven immutable entries, actual care expression/feeding tradeoff, observed eligibility and family/cost/queue/expression presentation. Full 9,323/0; import/Main/headless drawing passed.
+
+**M2 core complete; next: [149 environmental brood traits](tasks/149_environmental_brood_traits.md)**, then Trail Repair/M4 queens. Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

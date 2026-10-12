@@ -194,7 +194,7 @@ func activate_at(at: Vector2) -> bool:
 		queue_redraw()
 		return true
 	if selected_id == "adaptation" and _status.get("adaptation_options", {}).has("fighter") and _web_family_rect().has_point(at):
-		web_family = "recognition" if web_family == "foraging" and _status.get("adaptation_options", {}).has("security") else "combat" if web_family in ["foraging", "recognition"] else "foraging"
+		web_family = Web.next_family(_status,web_family)
 		web_selection = "foraging"
 		return true
 	if selected_id == "adaptation" and web_selection == "honeydew" and _status.get("honeydew", {}).get("relationship", "unknown") in ["exploited", "tended"] and _honeydew_rect().has_point(at):
@@ -208,7 +208,7 @@ func activate_at(at: Vector2) -> bool:
 	if selected_id == "guest" and guest.get("reported_losses", 0) > 0 and guest.get("observation", "") != "purged" and _guest_rect().has_point(at):
 		_run_command("guest_rejection")
 		return true
-	if selected_id == "adaptation" and web_selection in ["lean", "load", "persistent", "security", "tolerance", "fighter"] and _can_choose_adaptation():
+	if selected_id == "adaptation" and web_selection in TraitCatalog.IDS and _can_choose_adaptation():
 		if _both_investments() and _priority_rect("adaptation").has_point(at): _prioritize("adaptation");return true
 		if _adaptation_rect(web_selection).has_point(at):
 			_run_command("cancel_adaptation" if _queued_trait() == web_selection else "adaptation_" + web_selection)
@@ -305,7 +305,7 @@ func _run_command(command: String) -> void:
 				activation.outcome(result)
 				_feedback = "New brood started" if result.get("accepted", false) else result.get("reason", "Brood unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
-		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance", "adaptation_fighter", "cancel_adaptation":
+		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance", "adaptation_fighter", "adaptation_efficient_nurses", "cancel_adaptation":
 			if adaptation_command.is_valid():
 				var result: Dictionary = adaptation_command.call("" if command == "cancel_adaptation" else command.trim_prefix("adaptation_"))
 				activation.outcome(result)
@@ -497,7 +497,7 @@ func _draw() -> void:
 		_label(_web_back_rect().position + Vector2(98, 29), "COLONY NETWORK", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		if _status.get("adaptation_options", {}).has("fighter"):
 			UIStyle.surface(self, _web_family_rect(), Color("28212f"))
-			_label(_web_family_rect().position + Vector2(110, 29), "OTHER TRAITS" if web_family == "combat" else "INSPECT RECOGNITION" if web_family == "foraging" and _status.get("adaptation_options", {}).has("security") else "INSPECT COMBAT", Color("d3c5df"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+			_label(_web_family_rect().position + Vector2(110, 29), "INSPECT "+Web.next_family(_status,web_family).to_upper(), Color("d3c5df"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		_draw_hud(size)
 		_draw_context(size)
 		_draw_controls(size)
@@ -678,7 +678,7 @@ func _draw_context(size: Vector2) -> void:
 	if web and web_selection == "honeydew":
 		_draw_relationship_context(box)
 		return
-	if web and web_selection in ["lean", "load", "persistent", "security", "tolerance", "fighter"]:
+	if web and web_selection in TraitCatalog.IDS:
 		_draw_genetic_context(box)
 		return
 	match selected_id:
@@ -879,7 +879,7 @@ func _draw_context(size: Vector2) -> void:
 			if observation in ["loss", "foreign"]:
 				_draw_action(_guest_rect(), "STOP REJECTION" if guest.get("rejection_active", false) else "ASSIGN %d TO REJECTION" % guest.workers_required, "" if guest.get("rejection_active", false) else Copy.local_shortage(_status, {}, guest.workers_required), Color("39323e"))
 		"adaptation":
-			_detail_line(box, 65, "Combat tradeoffs · overview" if web_family == "combat" else "Security / tolerance · overview" if web_family == "recognition" else "Colony repertoire · overview")
+			_detail_line(box, 65, web_family.capitalize()+" tradeoffs · overview")
 			_detail_line(box, 91, "Select a trait to inspect its tradeoff")
 			_detail_line(box, 117, "Queue its next brood in this panel")
 			if not _status.adaptation_trial.is_empty():
@@ -952,29 +952,9 @@ func _draw_reproduction_context(box: Rect2) -> void:
 func _draw_genetic_context(box: Rect2) -> void:
 	_detail_line(box, 65, Web.title(web_selection))
 	_detail_line(box, 91, Web.trait_state(_status, web_selection))
-	var benefits: String = ""
-	var tradeoff: String = ""
-	match web_selection:
-		"lean":
-			benefits = "Up to 30% less travel energy"
-			tradeoff = "Up to 15% less carrying"
-		"load":
-			benefits = "Up to 30% more carrying"
-			tradeoff = "Up to 20% more travel energy"
-		"fighter":
-			benefits = "Up to %.1fx combat contribution" % _status.get("fighter_combat_weight",2.0)
-			tradeoff = "Larvae need %.0f%% more food" % (_status.get("fighter_extra_food",0.4)*100)
-		"persistent":
-			benefits = "Up to %.0fx scent persistence" % _status.get("chemistry_persistence", 2.0)
-			tradeoff = "Up to %.0f%% more trail food" % (_status.get("chemistry_extra_energy", 0.2) * 100)
-		"security":
-			benefits = "Up to %.0f%% less clearing time" % (_status.get("recognition_clearing_change", 0.4) * 100)
-			tradeoff = "Up to %d extra tending workers" % _status.get("recognition_labor_change", 2)
-		"tolerance":
-			benefits = "Up to %d fewer tending workers" % _status.get("recognition_labor_change", 2)
-			tradeoff = "Up to %.0f%% more clearing time" % (_status.get("recognition_clearing_change", 0.4) * 100)
-	_detail_line(box, 125, benefits)
-	_detail_line(box, 151, tradeoff)
+	var definition: TraitDefinition=TraitCatalog.DEFINITIONS[web_selection]
+	_detail_line(box,125,definition.benefit)
+	_detail_line(box,151,definition.tradeoff)
 	if _can_choose_adaptation():
 		var costs: Dictionary = _status.get("adaptation_options", {}).get(web_selection, {}).get("costs", _status.adaptation_costs)
 		_detail_line(box, 185, "%.0f carbs · %.0f protein · %.0f water" % [costs.carbohydrate, costs.protein, costs.water])

@@ -1,6 +1,6 @@
 # Current build and gaps
 
-Baseline: gameplay through card 147; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
+Baseline: gameplay through card 148; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
 
 ## Implemented foundation
 
@@ -13,7 +13,7 @@ Baseline: gameplay through card 147; design reset through 138. The pre-reset gam
 | Routes | Separate route/segment types, scent/familiarity, aggregate cohorts, detours, actual alternate courses and incoming cargo. | Shared multi-segment connections and broader network traffic/closure; no automatic optimal-route planner. |
 | INWARD | Queen, Nursery, Food Exchange, Entrance, Midden, local care/health; development/expansion; modular paid projects, Reproductive Alcove and staffed Ventilation Gallery. | Refuge/broader organ/network entries; mixed-yield Food Exchange. |
 | Brood/reproductives | Auto/manual worker brood; saved reproductive/adaptation priority with Auto Brood on; Alcove space; paid Home groups and physical first founding. | Daughter reproductives; queen health/replacement and generational continuity. |
-| Adaptation | Six trait IDs: lean/load, persistent chemistry, security/tolerance and fighter; disjoint phenotype accounting, future-brood expression, founder inheritance. | Definition-driven ten-trait 1.0 catalog, new care/environment branches, reproductive-lineage web at more piles. |
+| Adaptation | Seven definition-driven traits, including Efficient Nurses; disjoint phenotypes, captured inheritance, actual care expression and nutrition tradeoff. | Heat/Moisture Resilience, Rapid Trail Repair and reproductive-lineage web at more piles. |
 | Network | Home plus exactly one `satellite_1`; local daughter jobs/scouts/gathering/defense; exclusive two-way supplies and Home settlers. | Multiple sites/piles, founding from daughters, paid migration/queen relocation, isolation/evacuation/abandonment. |
 | Conflict | Stationary ambusher, independent rival foraging/counter-recruitment, physical messengers, Clear/Hunt, finite remains, retreat, alternate approach. | Moving predator and network/nest hazard responses; more general encounter/content definitions. |
 | Conflict controls | Direct circle, flexible recruitment, protected care/real travel; shared tap/outcome cues now cover views/menus/reports/review. | Further visual feel stays deferred to beta; ordinary staffing remains next. |
@@ -24,7 +24,7 @@ Queen health/death/replacement, multiple daughters, moving predators, species-sp
 
 ## Latest actual verification
 
-[Card 147](tasks/147_seeds_and_picnic_food.md) recorded 9,300 checks/zero failures, targeted 1,265/zero, clean import/Main and standard/compact headless seed/filter drawing. [146](tasks/146_mixed_food_cargo.md) recorded the prior 9,283/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the systems beta.
+[Card 148](tasks/148_trait_definitions_and_efficient_nurses.md) recorded 9,323 checks/zero failures, targeted 1,212/zero, clean import/Main and standard/compact headless Care/queue/expression drawing. [147](tasks/147_seeds_and_picnic_food.md) recorded the prior 9,300/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the systems beta.
 
 The player supplies manual visual feedback. No screen monitoring, desktop automation, paid testers or broad compute sweeps are authorized. The documentation reset does not rerun the engine or claim new gameplay evidence. Existing user audio imports/images/translations and saved slot are preserved.
 

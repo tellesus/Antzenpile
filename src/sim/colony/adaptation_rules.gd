@@ -2,7 +2,7 @@ class_name AdaptationRules
 extends RefCounted
 ## Authored first-web choice; aggregate effects apply only to newly emerged workers.
 
-const TRAITS: Array[String] = ["lean", "load", "persistent", "security", "tolerance", "fighter"]
+const TRAITS: Array[String] = TraitCatalog.IDS
 const FIGHTING = preload("res://data/adaptation/strong_mandibles.tres")
 const CHEMISTRY = preload("res://data/adaptation/persistent_chemistry.tres")
 const RECOGNITION = preload("res://data/adaptation/recognition.tres")
@@ -15,7 +15,7 @@ static func valid_trait(id: String) -> bool:
 
 
 static func costs(id: String) -> Dictionary:
-	return FIGHTING.costs() if id == "fighter" else RECOGNITION.costs() if id in ["security", "tolerance"] else CHEMISTRY.costs() if id == "persistent" else COSTS.duplicate()
+	return TraitCatalog.DEFINITIONS[id].costs() if TraitCatalog.DEFINITIONS.has(id) else COSTS.duplicate()
 
 
 static func compatible(traits: Array[String]) -> bool:
@@ -29,10 +29,10 @@ static func can_select(pile: PileState, id: String) -> bool:
 static func can_queue(pile: PileState, id: String) -> bool:
 	var trial: BroodCohort = pile.trial_cohort()
 	return queue_eligible(id, pile.queen_count, pile.genetics.established, pile.chemistry_candidate,
-		pile.recognition_candidate, trial.adaptation_id if trial != null else "")
+		pile.recognition_candidate, trial.adaptation_id if trial != null else "",pile.care_candidate)
 
 
-static func queue_eligible(id: String, queens: int, established: Array[String], chemistry: bool, recognition: bool, locked: String) -> bool:
+static func queue_eligible(id: String, queens: int, established: Array[String], chemistry: bool, recognition: bool, locked: String, care: bool=false) -> bool:
 	if not valid_trait(id) or queens < 1 or id in established or id == locked:
 		return false
 	var future_traits: Array[String] = established.duplicate()
@@ -41,6 +41,7 @@ static func queue_eligible(id: String, queens: int, established: Array[String], 
 	if not compatible(future_traits): return false
 	if id in ["security", "tolerance"]:
 		return recognition
+	if id=="efficient_nurses": return care
 	return chemistry if id == "persistent" else true
 
 
@@ -60,8 +61,8 @@ static func evidence_losses(share: float) -> int:
 
 
 static func energy_multiplier(id: String, fraction: float) -> float:
-	return 1.0 - 0.3 * fraction if id == "lean" else 1.0 + 0.2 * fraction if id == "load" else 1.0
+	return 1.0+TraitCatalog.DEFINITIONS[id].energy_change*fraction if TraitCatalog.DEFINITIONS.has(id) else 1.0
 
 
 static func carry_multiplier(id: String, fraction: float) -> float:
-	return 1.0 - 0.15 * fraction if id == "lean" else 1.0 + 0.3 * fraction if id == "load" else 1.0
+	return 1.0+TraitCatalog.DEFINITIONS[id].carry_change*fraction if TraitCatalog.DEFINITIONS.has(id) else 1.0

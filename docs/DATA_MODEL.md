@@ -1,6 +1,6 @@
 # Current state contracts
 
-Baseline: gameplay through 147. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
+Baseline: gameplay through 148. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
 
 ## Persistent envelope and run
 
@@ -9,6 +9,8 @@ RunState snapshot version is **5**. SaveService envelope format is `antzenpile-r
 The run owns scenario/seed, fixed clock, separate simulation/genetic RNG state, world, piles/ledgers, scouts/missions, observations/knowledge, routes/segments/cohorts, ecology/weather/health/founding/supply/reinforcement/response and bounded private history. Optional historical fields have explicit validated defaults; unsupported versions fail honestly. Saved worlds are restored, not recreated from the newest scenario definition.
 
 ## Authoritative accounting
+
+148 adds optional `care_pressure_seen`/`care_candidate` booleans. Candidate requires seen local pressure and supported emergence/import history; established/queued/laid Efficient Nurses requires eligibility unless inherited from a founder queen. Old absence stays false. `efficient_nurses` is a valid phenotype ID; living carrier share changes care reserve/capacity, never worker totals. Inherited bundles capture new larval food costs; legacy reproductive feeding for existing six traits remains unchanged. Registry definitions are immutable and are not serialized as mutable run effects.
 
 - WorkerLedger owns living/available/lost and commitments. Per-job/route/cohort totals reconcile with it; they are not extra workers. Actual cross-ledger migration increments transfer history, not deaths. Population conservation accounts for real emergence/loss/migration.
 - PileState has three nutrient stores (`carbohydrate`, `protein`, `water`), aggregate brood, current queen count, reproduction, development, health and genetics. There is no current concrete food inventory, generalized queen record or reproduction queue.

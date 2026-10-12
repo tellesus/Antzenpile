@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 147. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 148. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 ## Ownership and dependency direction
 
@@ -41,6 +41,8 @@ GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance 
 145 adds Ventilation Gallery under that owner, with a bounded regulation-step hook after completion. Humidity and Heat still own distinct actual water debits; no new operating pool or passive immunity. EffortDraft exposes whole climate/cleanup/scout ranges through existing care-protected setters. Suggestions use approved local/known summaries; editing is unsaved attention, not a universal allocator.
 
 146 SourceProfile supplies immutable per-portion yields/bulk. Transit captures a sparse three-nutrient recipe at harvest, withdraws portions once and settles/deposits at physical return; no recipe/world lookup at arrival. Bulk/loss/messenger paths preserve actual payload/dose and evidence. Routes own optional per-nutrient receipts alongside legacy primary totals; approved SourceMemory filters/Reports use actual receipts and known type roles, never live source stock. Garden Edge's first fruit entry uses these rules; generic old worlds/cargo remain unit-primary.
+
+148 introduces immutable TraitDefinition/Catalog for seven implemented leaves, with explicit family-specific care/feeding hooks rather than an effect interpreter. Existing queue/phenotype/emergence/travel ownership remains. Care evidence is locally observed workload/shortage plus supported emergence; actual living carriers improve derived care ratio with safe whole-worker rounding. Captured inheriting brood pays nutrition costs. Definitions drive costs/labels/web details; six legacy effects/exclusions/reproductive feeding are preserved.
 
 ## Information and presentation
 

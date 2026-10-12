@@ -28,7 +28,7 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"defense": text=Memory.defense_label({"goal":entry.detail.get_slice(":",0),"outcome":entry.detail.get_slice(":",1)})
 		"approach": text={"found":"Alternate course established","danger":"Danger on alternate course","unconfirmed":"Alternate course unconfirmed"}.get(entry.detail,"Approach returned")
 		"brood": text="%d workers emerged" % entry.amount if entry.detail=="emerged" else "%d brood losses observed" % entry.amount
-		"trait": text="Inherited trait established: "+entry.subject_id.capitalize()
+		"trait": text="Inherited trait established: "+TraitCatalog.DEFINITIONS[entry.subject_id].title
 		"project": text="Reproductives ready" if entry.subject_id=="queen" else entry.subject_id.capitalize().replace("_"," ")+" "+entry.detail
 		"camp": text="Founding camp "+entry.detail
 		"supplies": text="Supplies returned from trip to "+pile_name(entry.subject_id)

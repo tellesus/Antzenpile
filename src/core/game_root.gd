@@ -551,11 +551,13 @@ func inward_status(pile_id: String) -> Dictionary:
 	var genetic_summary: Array[Dictionary] = []
 	var adaptation_options: Dictionary = {}
 	for trait_id: String in AdaptationRules.TRAITS:
+		if trait_id=="efficient_nurses" and not pile.care_pressure_seen and trait_id not in pile.genetics.established: continue
 		if trait_id == "persistent" and not pile.chemistry_candidate:
 			continue
 		if trait_id in ["security", "tolerance"] and not pile.recognition_candidate:
 			continue
 		adaptation_options[trait_id] = {"available": AdaptationRules.can_queue(pile, trait_id),
+			"family":TraitCatalog.DEFINITIONS[trait_id].family,"benefit":TraitCatalog.DEFINITIONS[trait_id].benefit,"tradeoff":TraitCatalog.DEFINITIONS[trait_id].tradeoff,"evidence":TraitCatalog.DEFINITIONS[trait_id].evidence,
 			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.genetics.established,
 			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)}
 	for trait_id: String in pile.genetics.established:
@@ -587,6 +589,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"recognition_labor_change": AdaptationRules.RECOGNITION.protection_worker_change,
 		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
 		"adaptation_queue": simulation.adaptation.queued_status(pile_id),
+		"care_pressure_seen":pile.care_pressure_seen,"care_candidate":pile.care_candidate,"care_multiplier":pile.care_multiplier(),
 		"adapted_workers": expected_adapted,
 		"adaptation_fraction": float(expected_adapted) / expected_total if expected_total > 0 else 0.0,
 		"adaptation_costs": AdaptationRules.COSTS.duplicate(),

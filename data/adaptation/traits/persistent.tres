@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/trait_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+benefit = "Up to twice the scent persistence"
+carbohydrate = 14
+evidence = "Returned wet-trail experience and surviving brood"
+family = "chemistry"
+id = "persistent"
+protein = 16
+title = "Persistent Trail Chemistry"
+tradeoff = "Up to 20% more trail food"
+water = 8

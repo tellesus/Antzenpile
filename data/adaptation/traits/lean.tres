@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/trait_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+benefit = "Up to 30% less travel energy"
+carry_change = -0.15
+energy_change = -0.3
+family = "foraging"
+id = "lean"
+title = "Lean Foragers"
+tradeoff = "Up to 15% less carrying"

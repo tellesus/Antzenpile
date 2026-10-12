@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/trait_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+benefit = "Up to two fewer tending workers"
+carbohydrate = 14
+evidence = "Observed foreignness and surviving brood"
+family = "recognition"
+id = "tolerance"
+protein = 16
+short_title = "Flexible recognition"
+title = "Flexible Recognition Envelope"
+tradeoff = "Up to 40% more clearing time"
+water = 8

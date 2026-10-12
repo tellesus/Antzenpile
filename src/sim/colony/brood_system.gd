@@ -89,14 +89,14 @@ func production_status(pile_id: String) -> Dictionary:
 
 func remaining_food_reserve(pile: PileState) -> Dictionary:
 	# Intrinsic remaining larval demand, not a forecast of routes/weather/deliveries.
-	var ant_seconds: float = CONFIG.starting_count * CONFIG.larva_seconds * (1.0 + AdaptationRules.FIGHTING.extra_larval_food if "fighter" in pile.offspring_traits() else 1.0)
+	var ant_seconds: float = CONFIG.starting_count * CONFIG.larva_seconds * TraitCatalog.food_multiplier(pile.offspring_traits())
 	for cohort: BroodCohort in pile.brood_cohorts:
-		var feeding: float = 1.0 + AdaptationRules.FIGHTING.extra_larval_food if "fighter" in cohort.inherited_traits else 1.0
+		var feeding: float = TraitCatalog.food_multiplier(cohort.inherited_traits)
 		if cohort.stage == "egg": ant_seconds += cohort.count * CONFIG.larva_seconds * feeding
 		elif cohort.stage == "larva": ant_seconds += cohort.count * (CONFIG.larva_seconds - cohort.progress_seconds) * feeding
 	var reproductive: ReproductionState = pile.reproduction
-	if reproductive.phase=="egg": ant_seconds+=reproductive.CONFIG.space*reproductive.CONFIG.larva_ticks*SimulationClock.TICK_INTERVAL
-	elif reproductive.phase=="larva": ant_seconds+=reproductive.CONFIG.space*(reproductive.CONFIG.larva_ticks*SimulationClock.TICK_INTERVAL-reproductive.progress_quarters*SimulationClock.TICK_INTERVAL/4.0)
+	if reproductive.phase=="egg": ant_seconds+=reproductive.CONFIG.space*reproductive.CONFIG.larva_ticks*SimulationClock.TICK_INTERVAL*TraitCatalog.reproductive_food_multiplier(reproductive.inherited_traits)
+	elif reproductive.phase=="larva": ant_seconds+=reproductive.CONFIG.space*(reproductive.CONFIG.larva_ticks*SimulationClock.TICK_INTERVAL-reproductive.progress_quarters*SimulationClock.TICK_INTERVAL/4.0)*TraitCatalog.reproductive_food_multiplier(reproductive.inherited_traits)
 	var multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0
 	return {"carbohydrate": ant_seconds * CONFIG.carbohydrate_per_larva_second * multiplier,
 		"protein": ant_seconds * CONFIG.protein_per_larva_second * multiplier,
@@ -135,6 +135,7 @@ func tick(delta: float) -> void:
 		# Dedicated reproductive nurses support their own equivalent-space group.
 		var occupied: int = pile.nursery_occupied_space()-pile.reproduction.occupied_space()
 		var care_fraction: float = minf(1.0, float(pile.nursery_care_capacity()) / occupied) if occupied > 0 else 1.0
+		if occupied>=CONFIG.starting_count*2 or occupied>0 and care_fraction<1: pile.care_pressure_seen=true
 		for cohort: BroodCohort in pile.brood_cohorts.duplicate():
 			_advance(pile, cohort, delta, care_fraction)
 		if not _investments.next_eligible(pile).is_empty():
@@ -153,7 +154,7 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 	var effective_delta: float = delta * (environment_rate if cohort.stage == "larva" else 1.0)
 	if cohort.stage == "larva":
 		var food_multiplier: float = FOOD_CONFIG.developed_larval_food_multiplier if pile.food_exchange_state == "developed" else 1.0
-		if "fighter" in cohort.inherited_traits: food_multiplier *= 1.0 + AdaptationRules.FIGHTING.extra_larval_food
+		food_multiplier*=TraitCatalog.food_multiplier(cohort.inherited_traits)
 		var costs: Dictionary = {"carbohydrate": cohort.count * CONFIG.carbohydrate_per_larva_second * effective_delta * food_multiplier,
 			"protein": cohort.count * CONFIG.protein_per_larva_second * effective_delta * food_multiplier,
 			"water": cohort.count * CONFIG.water_per_larva_second * effective_delta * food_multiplier}

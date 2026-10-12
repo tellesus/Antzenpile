@@ -36,6 +36,8 @@ var rain_trace_observed: bool = false
 var chemistry_candidate: bool = false
 var recognition_experience: bool = false
 var recognition_candidate: bool = false
+var care_pressure_seen: bool=false
+var care_candidate: bool=false
 var nursery_state: String = "primitive"
 var nursery_progress_seconds: float = 0.0
 var nursery_expansion_state: String = "latent"
@@ -52,7 +54,7 @@ var workers_assignable: int:
 
 func brood_care_workers_required(extra_brood: int = 0) -> int:
 	var occupied: int = nursery_occupied_space() - reproduction.occupied_space() + extra_brood
-	var required: int = ceili(float(occupied * BROOD_CONFIG.available_carers_required) / BROOD_CONFIG.primitive_nursery_care_capacity)
+	var required: int = ceili(float(occupied * BROOD_CONFIG.available_carers_required) / (BROOD_CONFIG.primitive_nursery_care_capacity*care_multiplier()))
 	return maxi(0, required - (AdaptationRules.NURSES if trial_cohort() != null else 0))
 
 
@@ -80,6 +82,7 @@ func to_dict() -> Dictionary:
 		"genetics": genetics.to_dict(),
 		"rain_trace_observed": rain_trace_observed, "chemistry_candidate": chemistry_candidate,
 		"recognition_experience": recognition_experience, "recognition_candidate": recognition_candidate,
+		"care_pressure_seen":care_pressure_seen,"care_candidate":care_candidate,
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"nursery_expansion": {"state": nursery_expansion_state, "progress_seconds": nursery_expansion_progress},
 		"food_exchange_state": food_exchange_state, "food_toxicity": food_toxicity.to_dict(),
@@ -115,7 +118,11 @@ func free_reproductive_space() -> int:
 
 func nursery_care_capacity() -> int:
 	var carers: int = workers_available + (AdaptationRules.NURSES if trial_cohort() != null else 0)
-	return mini(nursery_max_care_capacity(), floori(float(carers * BROOD_CONFIG.primitive_nursery_care_capacity) / BROOD_CONFIG.available_carers_required))
+	return mini(nursery_max_care_capacity(), floori(float(carers * BROOD_CONFIG.primitive_nursery_care_capacity)*care_multiplier() / BROOD_CONFIG.available_carers_required))
+
+func care_multiplier() -> float:
+	var share: float=float(genetics.count_trait("efficient_nurses"))/workers_total if workers_total>0 else 0.0
+	return 1.0+TraitCatalog.DEFINITIONS.efficient_nurses.care_gain*share
 
 
 func trial_cohort() -> BroodCohort:
@@ -209,6 +216,7 @@ func move_workers_to(destination: PileState, pool: String, amount: int) -> bool:
 
 
 func register_emergence(cohort: BroodCohort) -> void:
+	if care_pressure_seen and cohort.care>=1.0: care_candidate=true
 	genetics.emerge(cohort.inherited_traits, cohort.count, cohort.adaptation_id if cohort.adaptation_trial else "")
 	if cohort.adaptation_trial and cohort.adaptation_id in ["lean", "load"]:
 		adaptation_repertoire = cohort.adaptation_id
@@ -332,6 +340,8 @@ func restore(data: Dictionary) -> bool:
 	var candidate: Variant = data.get("chemistry_candidate", false)
 	var recognition_seen: Variant = data.get("recognition_experience", false)
 	var recognition_available: Variant = data.get("recognition_candidate", false)
+	var care_seen: Variant=data.get("care_pressure_seen",false);var care_available: Variant=data.get("care_candidate",false)
+	if not care_seen is bool or not care_available is bool or care_available and (not care_seen or emerged+restored.transferred_in<1): return false
 	if typeof(recognition_seen) != TYPE_BOOL or typeof(recognition_available) != TYPE_BOOL or (recognition_available and (not recognition_seen or emerged+restored.transferred_in < 1)):
 		return false
 	if typeof(rain_observed) != TYPE_BOOL or typeof(candidate) != TYPE_BOOL or (candidate and (not rain_observed or emerged+restored.transferred_in < 1)):
@@ -358,6 +368,7 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if ("security" in restored_genetics.established or "tolerance" in restored_genetics.established) and not recognition_available:
 		return false
+	if "efficient_nurses" in restored_genetics.established and not care_available and "efficient_nurses" not in founder_traits: return false
 	if brood_lost == 0:
 		var profiles: Array = restored_genetics.living.keys()
 		for key: String in restored_genetics.lost:
@@ -379,6 +390,7 @@ func restore(data: Dictionary) -> bool:
 				return false
 			if cohort.adaptation_id == "persistent" and not candidate:
 				return false
+			if cohort.adaptation_id=="efficient_nurses" and not care_available: return false
 			if cohort.adaptation_id in ["security", "tolerance"] and (not recognition_available or "security" in restored_genetics.established or "tolerance" in restored_genetics.established):
 				return false
 			var trial_traits: Array[String] = restored_genetics.established.duplicate()
@@ -401,7 +413,7 @@ func restore(data: Dictionary) -> bool:
 	if trials > 1:
 		return false
 	var restored_queue: Variant = data.get("queued_adaptation", "")
-	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), restored_genetics.established, candidate, recognition_available, locked_trait)):
+	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), restored_genetics.established, candidate, recognition_available, locked_trait,care_available)):
 		return false
 	var restored_reproduction := ReproductionState.new()
 	var restored_investments:=preload("res://src/sim/colony/investment_intent.gd").new()
@@ -485,6 +497,7 @@ func restore(data: Dictionary) -> bool:
 	chemistry_candidate = candidate
 	recognition_experience = recognition_seen
 	recognition_candidate = recognition_available
+	care_pressure_seen=care_seen;care_candidate=care_available
 	nursery_state = restored_nursery_state
 	nursery_expansion_state = expansion.state
 	nursery_expansion_progress = float(expansion.progress_seconds)

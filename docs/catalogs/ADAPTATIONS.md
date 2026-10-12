@@ -1,6 +1,6 @@
 # Adaptation web and trait catalog
 
-Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Six traits exist; four new traits are planned. This is a biology-inspired composite species, not a literal genetics model.
+Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Seven definition-driven traits exist through [148](../tasks/148_trait_definitions_and_efficient_nurses.md); three new leaves remain planned. This is a composite species, not literal genetics.
 
 ## Rules family
 
@@ -53,6 +53,8 @@ Do not homogenize these into one “+efficiency” statistic. Recognition affect
 ### New 1.0 traits — concrete hooks, uncalibrated magnitudes
 
 **AT-NURSES — Efficient Nurses (Care).** Adult carriers improve the existing brood-care ratio at their pile. The reserve still rounds safely and retains at least the biologically required caregiver presence; trial/reproductive nurses count once. Tradeoff: greater larval feeding cost for inheriting cohorts, paid again as this lineage raises further workers. Eligibility uses observed care pressure and supported brood emergence, not remote truth. Verify useful labor relief versus extra nutrition and mixed-carrier rounding; zero carers never become sufficient.
+
+Implemented [148](../tasks/148_trait_definitions_and_efficient_nurses.md), runtime `efficient_nurses`: full expression care throughput +50%, inherited larval food +20%; 12C/12P/6W/two nurses/eight trial brood, provisional. Local demanding workload/shortage plus supported emergence reveals eligibility. Existing adults stay unchanged; reserve rounds conservatively and zero carers never suffice.
 
 **AT-HEAT — Heat Resilience (Environment).** Newly laid inheriting brood tolerates a somewhat wider warm Nursery band. It still needs water, care and regulation and can still fail under severe heat. Tradeoff: slower baseline development in comfortable conditions, giving a clear reason not to choose it everywhere. Evidence is local warm-brood strain followed by surviving brood/reproductive progression. Verify captured cohorts under warm and comfortable conditions; never retrofit active brood or grant global outdoor immunity.
 

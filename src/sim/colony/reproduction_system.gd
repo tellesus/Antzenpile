@@ -59,7 +59,7 @@ func tick() -> void:
 			var rate: float = minf(pile.temperature.larval_rate(),minf(pile.brood_health.larval_rate(),minf(pile.midden.larval_rate(),pile.humidity.larval_rate())))
 			quarters=roundi(rate*4)
 			var seconds: float = SimulationClock.TICK_INTERVAL * quarters / 4.0
-			var multiplier: float = FOOD.developed_larval_food_multiplier
+			var multiplier: float = FOOD.developed_larval_food_multiplier*TraitCatalog.reproductive_food_multiplier(state.inherited_traits)
 			var costs: Dictionary = {"carbohydrate":CONFIG.space*BROOD.carbohydrate_per_larva_second*seconds*multiplier,"protein":CONFIG.space*BROOD.protein_per_larva_second*seconds*multiplier,"water":CONFIG.space*BROOD.water_per_larva_second*seconds*multiplier}
 			if not pile.consume_resources(costs):
 				for resource: String in PileState.RESOURCE_IDS:
