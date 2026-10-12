@@ -54,7 +54,7 @@ func capture(recording: bool = true) -> void:
 		var pile: PileState=_run.colony.piles[pile_id]
 		var queen_status: String=QueenSystem.new(_run).summary(pile.id).status
 		var queen_previous: Variant=journal.seen.get("queen/"+pile.id)
-		if journal.changed("queen/"+pile.id,queen_status) and (queen_status in ["weakened","lost","replacing"] or queen_previous in ["weakened","lost","replacing"]): journal.add("queen",pile.id,pile.id,time,time,queen_status,pile.queen.generation,0,recording)
+		if journal.changed("queen/"+pile.id,queen_status) and (queen_status in ["weakened","lost","replacing","relocating","relocated"] or queen_previous in ["weakened","lost","replacing","relocating","relocated"]): journal.add("queen",pile.id,pile.id,time,time,queen_status,pile.queen.generation,0,recording)
 		if journal.changed("investment/"+pile.id,",".join(pile.investments.priority)+"/"+pile.queued_adaptation): journal.add("investment",pile.id,pile.id,time,time,pile.investments.first() if not pile.investments.priority.is_empty() else "none",pile.investments.priority.size(),0,recording)
 		if pile.reproduction.phase!="none" and journal.changed("investment/"+pile.id+"/laid",pile.reproduction.laid_tick): journal.add("investment",pile.id,pile.id,time,time,"reproduction_laid",0,0,recording)
 		var trial: BroodCohort=pile.trial_cohort()
@@ -91,6 +91,11 @@ func capture(recording: bool = true) -> void:
 			if migration.trips_reported>0 and journal.changed("migration/"+origin+"/"+connection.route_id,migration.last_reported_tick):
 				var received: float=migration.last_reported_tick*SimulationClock.TICK_INTERVAL
 				journal.add("migration",origin,connection.target(origin),received,received,"returned",migration.last_settled,migration.reported_workers(),recording)
+
+			var queen_transport: QueenTransportState=connection.queens[origin]
+			if queen_transport.movement.trips_reported>0 and journal.changed("relocation/"+origin+"/"+connection.route_id,queen_transport.movement.last_reported_tick):
+				var received: float=queen_transport.movement.last_reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("relocation",origin,connection.target(origin),received,received,"delivered" if queen_transport.current().arrived_tick>0 else queen_transport.current().reason if not queen_transport.current().reason.is_empty() else "returned",queen_transport.movement.last_settled,queen_transport.movement.reported_arrivals(),recording)
 
 func _project(pile: String, key: String, value: String, complete: String, time: float, recording: bool) -> void:
 	if _run.reports.changed(key+"/"+pile,value) and value==complete:

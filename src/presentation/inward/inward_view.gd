@@ -1064,7 +1064,9 @@ func _queen_replace_rect() -> Rect2:
 func _draw_queen_continuity(box: Rect2) -> void:
 	var state: Dictionary=_status.get("queen_condition",{})
 	var causes: Array=state.get("causes",[])
-	var lines: Array[String]=["Queen: "+str(state.get("status","steady")).capitalize(),"Condition %.0f%% · generation %d" % [state.get("condition",100),state.get("generation",0)],"Needs: "+" / ".join(causes) if not causes.is_empty() else "No severe local strain observed","Carer/sec: .001C · .0004P · .001W"]
+	var lines: Array[String]=["Queen: "+str(state.get("status","steady")).capitalize(),("Last seen %.0f%% · generation %d" if state.get("departed",false) else "Condition %.0f%% · generation %d") % [state.get("condition",100),state.get("generation",0)],"Needs: "+" / ".join(causes) if not causes.is_empty() else "No severe local strain observed","Carer/sec: .001C · .0004P · .001W"]
+	if state.get("status","")=="relocated":lines[1]="No laying mother in this nest"
+	if state.get("departed",false):lines[2]="Travel care prepaid; funded brood stays local"
 	for index: int in lines.size():
 		_label(box.position+Vector2(16,111+index*26),Copy.fit_line(lines[index],_font,12,260),Color("a9b9bc"),12)
 	for target: int in [0,1,2]:

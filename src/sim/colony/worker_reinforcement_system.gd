@@ -31,7 +31,7 @@ func blocker(count: int=CONFIG.reinforcement_workers) -> String:
  if h.workers_assignable<required:return "Need %d available %s workers" % [required,h.display_title()]
  if h.resources.carbohydrate<_cost(count):return "Need %.2f %s travel carbs" % [_cost(count),h.display_title()]
  if _state().trips_started>=WorkerLedger.MAX_COUNT or _state().moved_workers>WorkerLedger.MAX_COUNT-count or h.workers.transferred_out>WorkerLedger.MAX_COUNT-count or d.workers_total>WorkerLedger.MAX_COUNT-count or d.workers.transferred_in>WorkerLedger.MAX_COUNT-count:return "Worker transfer history or capacity is full"
- var traits: Array[String]=d.genetics.established.duplicate()
+ var traits: Array[String]=d.planned_trait_union()
  for profile: String in h.genetics.migration_plan(count,h.workers_total):
   for trait_id: String in GeneticRepertoire.traits_for(profile):
    if trait_id not in traits:traits.append(trait_id)
@@ -71,12 +71,7 @@ func tick() -> void:
  if state.elapsed_ticks<TRAILS.leg_ticks(h.position.distance_to(d.position)):return
  state.elapsed_ticks=0
  if state.phase=="outbound":
-  var previous: Dictionary=h.genetics.exported.duplicate()
-  if h.move_workers_to(d,"trail:"+_connection().route_id,state.settlers,state.party_profiles if state.profiles_captured else {}):
-   state.settled=true;state.arrivals+=1;state.moved_workers+=state.settlers
-   for profile: String in h.genetics.exported:
-    var amount: int=h.genetics.exported[profile]-previous.get(profile,0)
-    if amount>0:state.moved_profiles[profile]=state.moved_profiles.get(profile,0)+amount
+  _settle()
   state.phase="returning";_sync(_route())
  else:_return_home()
 func _return_home() -> void:
@@ -92,3 +87,13 @@ func summary(count: int=CONFIG.reinforcement_workers) -> Dictionary:
  if _connection()==null or not _connection().migrations.has(_source_id):return {}
  var state: WorkerReinforcementState=_state()
  return {"away":state.active(),"source_id":_source_id,"source_name":_source().display_title(),"destination_id":_target().id,"destination_name":_target().display_title(),"route_id":_connection().route_id,"sent":state.settlers+CONFIG.reinforcement_messengers if state.active() else 0,"settlers":state.settlers if state.active() else count,"messengers":CONFIG.reinforcement_messengers,"age":(_run.clock.tick_count-state.departed_tick)*SimulationClock.TICK_INTERVAL if state.active() else 0.0,"reports":state.trips_reported,"reported_workers":state.reported_workers(),"last_settled":state.last_settled,"report_age":(_run.clock.tick_count-state.last_reported_tick)*SimulationClock.TICK_INTERVAL if state.trips_reported>0 else 0.0,"blocker":blocker(count) if not state.active() else "","cost":_cost(count)}
+
+func _settle() -> bool:
+ var state: WorkerReinforcementState=_state();var h: PileState=_source();var d: PileState=_target()
+ var previous: Dictionary=h.genetics.exported.duplicate()
+ if not h.move_workers_to(d,"trail:"+_connection().route_id,state.settlers,state.party_profiles if state.profiles_captured else {}):return false
+ state.settled=true;state.arrivals+=1;state.moved_workers+=state.settlers
+ for profile: String in h.genetics.exported:
+  var amount: int=h.genetics.exported[profile]-previous.get(profile,0)
+  if amount>0:state.moved_profiles[profile]=state.moved_profiles.get(profile,0)+amount
+ return true

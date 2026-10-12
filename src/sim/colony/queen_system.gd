@@ -28,6 +28,7 @@ func causes(pile: PileState) -> Array[String]:
 	return result
 
 func replacement_blocker(pile: PileState) -> String:
+	if _run.queen_slot_reserved(pile.id):return "Queen journey reserves this nest; await its return"
 	if pile.queen.count>0: return "Support the living laying queen"
 	if pile.queen.replacing(): return "Replacement group is already committed"
 	if pile.reproduction.phase!="ready": return "A raised young queen and two males are required"
@@ -71,10 +72,12 @@ func tick() -> void:
 		if state.replacing():
 			state.replacement_progress+=1
 			if state.replacement_progress>=CONFIG.replacement_ticks:
+				if not state.arrival_record.is_empty() and not state.previous_mothers.any(func(value: Dictionary)->bool:return value.identity==state.queen_id(id)):state.previous_mothers.append(state.mother(id))
 				state.parent_identity=state.replacement_group.get("parent_queen_id","") if not state.replacement_group.get("parent_queen_id","").is_empty() else state.queen_id(id)
 				state.generation=int(state.replacement_group.parent_generation)+1 if not state.replacement_group.get("parent_queen_id","").is_empty() else state.generation+1
 				state.identity="queen:"+id+":raised:"+str(state.replacement_group.laid_tick)
 				state.inherited_traits.assign(state.replacement_group.inherited_traits)
+				state.arrival_record.clear()
 				state.count=1;state.condition=CONFIG.maximum_condition
 				_release_replacement(pile)
 			continue
@@ -90,5 +93,6 @@ func tick() -> void:
 
 func summary(pile_id: String) -> Dictionary:
 	var pile: PileState=_run.colony.piles[pile_id];var state: QueenState=pile.queen
-	return {"identity":state.queen_id(pile_id),"generation":state.generation,"condition":state.condition/10000.0,"carers":state.carers,"causes":causes(pile),"status":"replacing" if state.replacing() else "lost" if state.count==0 else "weakened" if state.condition<CONFIG.warning_condition else "supported" if state.carers>0 else "steady","replacement_progress":float(state.replacement_progress)/CONFIG.replacement_ticks,"replacement_costs":CONFIG.replacement_costs(),"replacement_nurses":CONFIG.replacement_nurses,"replacement_blocker":replacement_blocker(pile),"captured_traits":state.inherited_traits.duplicate()}
+	var departed: Dictionary=_run.departed_queen(pile_id,state.queen_id(pile_id))
+	return {"identity":state.queen_id(pile_id),"generation":state.generation,"departed":not departed.is_empty(),"condition":float(departed.condition if not departed.is_empty() else state.condition)/10000.0,"carers":state.carers,"causes":causes(pile),"status":"replacing" if state.replacing() else "relocating" if not departed.is_empty() and state.count==0 else "relocated" if state.count==0 and _run.queen_was_relocated(pile_id,state.queen_id(pile_id)) else "lost" if state.count==0 else "weakened" if state.condition<CONFIG.warning_condition else "supported" if state.carers>0 else "steady","replacement_progress":float(state.replacement_progress)/CONFIG.replacement_ticks,"replacement_costs":CONFIG.replacement_costs(),"replacement_nurses":CONFIG.replacement_nurses,"replacement_blocker":replacement_blocker(pile),"captured_traits":state.inherited_traits.duplicate()}
 func _reject(reason: String) -> bool: last_error=reason;return false

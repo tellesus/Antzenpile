@@ -348,7 +348,7 @@ func restore(data: Dictionary) -> bool:
 	var restored_trails := Trails.new()
 	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, active_supply, restored_reinforcement, restored_supply_origin, restored_extra_foundings.values(),restored_connections):
 		return false
-	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement,restored_connections): return false
+	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement,restored_connections) or not _valid_queen_transports(restored_colony,restored_connections): return false
 	# A paid young queen has one current body owner; founding history is not stock.
 	var reproductive_bodies: Dictionary={}
 	for pile: PileState in restored_colony.piles.values():
@@ -691,9 +691,10 @@ static func _valid_foundations(colony_state: ColonyState, camps: Array[FoundingS
 	else:
 		for connection: ConnectionTrafficState in connections.values():
 			for source_id: String in connection.migrations:
-				var target_id: String=connection.target(source_id);var migration: WorkerReinforcementState=connection.migrations[source_id]
-				incoming[target_id]=incoming.get(target_id,0)+migration.moved_workers;outgoing[source_id]=outgoing.get(source_id,0)+migration.moved_workers
-				_profile_sum(gene_in,target_id,migration.moved_profiles);_profile_sum(gene_out,source_id,migration.moved_profiles)
+				var target_id: String=connection.target(source_id)
+				for migration: WorkerReinforcementState in [connection.migrations[source_id],connection.queens[source_id].movement]:
+					incoming[target_id]=incoming.get(target_id,0)+migration.moved_workers;outgoing[source_id]=outgoing.get(source_id,0)+migration.moved_workers
+					_profile_sum(gene_in,target_id,migration.moved_profiles);_profile_sum(gene_out,source_id,migration.moved_profiles)
 	for pile: PileState in colony_state.piles.values():
 		if pile.id=="home" and not pile.foundation.is_empty() or pile.id!="home" and not established.has(pile.id):return false
 		if pile.workers.transferred_in!=incoming.get(pile.id,0) or pile.workers.transferred_out!=outgoing.get(pile.id,0) or pile.genetics.imported!=gene_in.get(pile.id,{}) or pile.genetics.exported!=gene_out.get(pile.id,{}):return false
@@ -729,3 +730,78 @@ func connection_for(route_id: String) -> ConnectionTrafficState:
 func connection_payer(route: TrailRouteState) -> String:
 	var connection: ConnectionTrafficState=connection_for(route.id) if route.purpose=="interpile" else null
 	return connection.payer_id if connection!=null else route.origin_pile
+
+func queen_slot_reserved(pile_id: String) -> bool:
+	for connection: ConnectionTrafficState in all_connections():
+		if pile_id not in [connection.parent_id,connection.child_id]:continue
+		for transport: QueenTransportState in connection.queens.values():
+			if transport.active():return true
+	return false
+
+func queen_was_relocated(pile_id: String, queen_id: String) -> bool:
+	for connection: ConnectionTrafficState in all_connections():
+		if not connection.queens.has(pile_id):continue
+		var transport: QueenTransportState=connection.queens[pile_id]
+		for record: Dictionary in transport.manifests:
+			if record.reported_tick>0 and record.arrived_tick>0 and record.body.identity==queen_id:return true
+	return false
+
+static func _valid_queen_transports(colony_state: ColonyState, connections: Dictionary) -> bool:
+	var bodies: Dictionary={};var slots: Dictionary={};var historical: Dictionary={};var departing: Dictionary={}
+	for pile: PileState in colony_state.piles.values():
+		if pile.queen.count>0:bodies[pile.queen.queen_id(pile.id)]=true
+	for connection: ConnectionTrafficState in connections.values():
+		for source_id: String in connection.queens:
+			var target_id: String=connection.target(source_id);var transport: QueenTransportState=connection.queens[source_id]
+			if transport.active():
+				departing[source_id]=true
+				for id: String in [source_id,target_id]:
+					if slots.has(id):return false
+					slots[id]=true
+				if colony_state.piles[source_id].queen.count!=0 or colony_state.piles[source_id].queen.replacing() or colony_state.piles[target_id].queen.replacing():return false
+				if not transport.body.is_empty():
+					var source: QueenState=colony_state.piles[source_id].queen
+					if bodies.has(transport.body.identity) or source.queen_id(source_id)!=transport.body.identity or source.generation!=transport.body.generation or source.inherited_traits!=transport.body.inherited_traits or source.parent_identity!=transport.body.parent_identity:return false
+					bodies[transport.body.identity]=true
+				elif colony_state.piles[target_id].queen.queen_id(target_id)!=transport.current().body.identity:return false
+			for record: Dictionary in transport.manifests:
+				if record.arrived_tick==0:continue
+				if not historical.has(target_id):historical[target_id]=[]
+				historical[target_id].append(record.previous_mother)
+				historical[target_id].append({"identity":record.body.identity,"generation":record.body.generation,"inherited_traits":record.body.inherited_traits})
+	for pile: PileState in colony_state.piles.values():
+		var queen: QueenState=pile.queen
+		if queen.in_transit!=departing.has(pile.id):return false
+		for mother_record: Dictionary in queen.previous_mothers:
+			var proved: bool=false
+			for former: Dictionary in historical.get(pile.id,[]):
+				if former.identity!=mother_record.identity or former.generation!=mother_record.generation:continue
+				proved=true
+				for trait_id: String in former.inherited_traits:
+					if trait_id not in mother_record.inherited_traits:proved=false
+				for trait_id: String in mother_record.inherited_traits:
+					if trait_id not in former.inherited_traits and trait_id not in pile.genetics.established:proved=false
+				if proved:break
+			if not proved:return false
+		if queen.arrival_record.is_empty():continue
+		var ref: Dictionary=queen.arrival_record
+		if not connections.has(ref.route_id):return false
+		var connection: ConnectionTrafficState=connections[ref.route_id]
+		if connection.target(ref.source_id)!=pile.id:return false
+		var transport: QueenTransportState=connection.queens[ref.source_id]
+		if ref.index>=transport.manifests.size():return false
+		var record: Dictionary=transport.manifests[ref.index]
+		if record.arrived_tick==0 or record.body.identity!=queen.queen_id(pile.id) or record.body.parent_identity!=queen.parent_identity or record.body.generation!=queen.generation:return false
+		for trait_id: String in record.body.inherited_traits:
+			if trait_id not in queen.inherited_traits:return false
+		for trait_id: String in queen.inherited_traits:
+			if trait_id not in record.body.inherited_traits and trait_id not in pile.genetics.established:return false
+		if not AdaptationRules.compatible(PileState._merged_traits(pile.planned_trait_union(),queen.inherited_traits)):return false
+	return true
+
+func departed_queen(pile_id: String, queen_id: String) -> Dictionary:
+	for connection: ConnectionTrafficState in all_connections():
+		if not connection.queens.has(pile_id):continue
+		var transport: QueenTransportState=connection.queens[pile_id]
+		if transport.active() and transport.current().body.identity==queen_id:return transport.current().body.duplicate(true)
+	return {}

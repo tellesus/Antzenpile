@@ -50,7 +50,7 @@ static func attention(status: Dictionary) -> Dictionary:
 static func needs(status: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary]=[];var ongoing: Dictionary={}
 	var queen: Dictionary=status.get("queen_condition",{})
-	if queen.get("status","") in ["weakened","lost","replacing"]:
+	if queen.get("status","") in ["weakened","lost","replacing","relocated"]:
 		result.append({"organ":"queen","causes":["QUEEN "+str(queen.status).to_upper()],"title":"CHECK QUEEN CONTINUITY"})
 	var causes: Array[String] = nursery_causes(status)
 	var guest: Dictionary = status.get("guest", {})

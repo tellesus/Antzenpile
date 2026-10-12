@@ -863,7 +863,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 			var pending: int = simulation.run.trails.pending_losses(route.id)
 			var camp: FoundingState=simulation.run.camp_for_route(route.id)
 			var connection: ConnectionTrafficState=simulation.run.connection_for(route.id) if route.purpose=="interpile" else null
-			var migration: WorkerReinforcementState=connection.migrations[connection.payer_id] if connection!=null else null
+			var migration: WorkerReinforcementState=(connection.queens[connection.payer_id].movement if connection.queens[connection.payer_id].active() else connection.migrations[connection.payer_id]) if connection!=null else null
 			var settlers_away: bool=migration!=null and migration.active()
 			var sent: int=migration.settlers+WorkerReinforcementState.CONFIG.reinforcement_messengers if settlers_away else 0
 			var status: String = route.status

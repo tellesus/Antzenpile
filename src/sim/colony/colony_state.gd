@@ -44,8 +44,9 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 		if not value is Dictionary or not pile.restore(value) or restored.has(pile.id) or not bounds.has_point(pile.position):
 			return false
 		var queen_id: String=pile.queen.queen_id(pile.id)
-		if queen_ids.has(queen_id): return false
-		queen_ids[queen_id]=true
+		if pile.queen.count>0:
+			if queen_ids.has(queen_id): return false
+			queen_ids[queen_id]=true
 		restored[pile.id] = pile
 	if not restored.has("home") or restored.home.position != home_position:
 		return false

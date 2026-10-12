@@ -50,7 +50,7 @@ func _start_ordinary(pile_id: String) -> bool:
 	cohort.id = "brood_%d" % pile.brood_started_total
 	cohort.parent_queen_id=pile.queen.queen_id(pile.id);cohort.parent_generation=pile.queen.generation
 	cohort.inherited_traits = pile.offspring_traits()
-	cohort.adaptation_id = pile.adaptation_repertoire if pile.adaptation_repertoire in cohort.inherited_traits else ""
+	cohort.adaptation_id = "lean" if "lean" in cohort.inherited_traits else "load" if "load" in cohort.inherited_traits else ""
 	cohort.repair_comparison = pile.repair_experience and not pile.repair_candidate
 	cohort.rain_comparison = pile.rain_trace_observed and not pile.chemistry_candidate
 	cohort.recognition_comparison = pile.recognition_experience and not pile.recognition_candidate

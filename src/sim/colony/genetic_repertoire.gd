@@ -41,9 +41,9 @@ func count_profiles(dead: bool = false) -> int:
 
 
 func emerge(traits: Array[String], count: int, trial_id: String) -> void:
-	if trial_id != "" and trial_id not in established:
-		established.append(trial_id)
-		established.sort()
+	for trait_id: String in traits:
+		if trait_id not in established:established.append(trait_id)
+	established.sort()
 	var key: String = profile(traits)
 	if key != "":
 		living[key] = living.get(key, 0) + count

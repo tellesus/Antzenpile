@@ -3,7 +3,7 @@ extends RefCounted
 ## Bounded semantic records of delivered/local facts; never physical replay data.
 const LIMIT: int = 192
 const SEEN_LIMIT: int = 512
-const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration"]
+const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation"]
 var initialized: bool = false
 var since: float = 0.0
 var next_id: int = 1
@@ -103,10 +103,11 @@ static func _valid_entry(entry: Variant, colony: ColonyState, knowledge: Knowled
 		"trait": return entry.subject_id in AdaptationRules.TRAITS and entry.detail=="established" and entry.subject_id in colony.piles[entry.pile_id].genetics.established
 		"project": return entry.subject_id in ["nursery","food_exchange","midden","queen"] and entry.detail in ["developed","expanded","ready"]
 		"brood": return entry.subject_id==entry.pile_id and entry.detail in ["emerged","lost"] and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total)
+		"relocation": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail in ["delivered","returned","landing","escorts"] and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total)
 		"migration": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail=="returned" and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total) and entry.amount<=entry.total
 		"supplies": return colony.piles.has(entry.subject_id) and entry.detail=="returned"
 		"investment": return entry.subject_id==entry.pile_id and entry.detail in ["none","adaptation","reproduction","adaptation_laid","reproduction_laid"] and entry.amount in [0.0,1.0,2.0]
-		"queen": return entry.subject_id==entry.pile_id and entry.detail in ["weakened","lost","replacing","steady","supported"]
+		"queen": return entry.subject_id==entry.pile_id and entry.detail in ["weakened","lost","replacing","steady","supported","relocating","relocated"]
 		"chamber": return entry.subject_id in ChamberCatalog.DEFINITIONS and entry.detail in ["queued","developing","complete","canceled"]
 	if not trails.routes.has(entry.subject_id) or trails.routes[entry.subject_id].origin_pile!=entry.pile_id: return false
 	match entry.kind:

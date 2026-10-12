@@ -64,7 +64,7 @@ func restore(data: Dictionary, colony: ColonyState, tick: int, world: WorldState
 	if data.route_id.is_empty() or data.leg_ticks<1 or data.departed_tick>tick: return false
 	var parent: PileState=colony.piles[origin]
 	var group:=ReproductionState.new()
-	if not group.restore(data.reproductive_group,WorkerLedger.new(),origin,parent.genetics.established,parent.brood_matured_total,parent.nursery_state,parent.food_exchange_state,parent.queen_count) or group.phase!="ready": return false
+	if not group.restore(data.reproductive_group,WorkerLedger.new(),origin,parent.known_lineage_traits(),parent.brood_matured_total,parent.nursery_state,parent.food_exchange_state,parent.queen_count) or group.phase!="ready": return false
 	if group.laid_tick+group.CONFIG.egg_ticks+group.CONFIG.larva_ticks+group.CONFIG.pupa_ticks>data.departed_tick: return false
 	var minimum: int=data.elapsed_ticks
 	if data.phase=="outbound":

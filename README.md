@@ -8,7 +8,7 @@ The prototype supports returned scout memories, eight concrete source identities
 
 Paid Reproductive Alcove provides dedicated group space; Ventilation Gallery improves staffed regulation while retaining water use. Whole climate/cleanup/scout effort is editable with suggestions; presets remain. Fruit, heavy seeds and episodic crumbs use captured mixed-nutrient cargo. Care, Environment and Chemistry web families offer actual inherited tradeoffs; a Food Cache remains excluded after its gate found no buffering need.
 
-Latest runtime gate: **9,697 headless checks, zero failures**, clean import/Main and standard/compact headless input/drawing. This is a systems prototype, not a release candidate. Local queen viability/care/replacement, daughter reproductive investment and queen-owned inherited bundles now work. Additional named piles and daughter-origin founding now work. Portable queen/brood rescue, dew/seep, moving ecology and refuge are planned, not implemented. Mixed food and all ten traits now work; integrated balance follows the remaining systems. The player defers graphical/feel/audio checks to the systems beta. See [Current Build](docs/CURRENT_BUILD.md).
+Latest runtime gate: **9,763 headless checks, zero failures**, clean import/Main and standard/compact headless input/drawing. This is a systems prototype, not a release candidate. Local queen viability/care/replacement, daughter reproductive investment and queen-owned inherited bundles now work. Additional named piles, daughter-origin founding and paid laying-queen relocation now work. Brood/store rescue, dew/seep, moving ecology and refuge are planned, not implemented. Mixed food and all ten traits now work; integrated balance follows the remaining systems. The player defers graphical/feel/audio checks to the systems beta. See [Current Build](docs/CURRENT_BUILD.md).
 
 ## Current design and implementation order
 
@@ -37,7 +37,7 @@ The test runner returns nonzero on failures. For ordinary play run the project e
 - OUTWARD: drag to turn attention, tap traces/alarms for contexts. Exploration sets standing scout effort; Favor This Direction changes search intent. Remembered Sources browses returned memories.
 - INWARD/Tab: inspect the abstract functional network. Queen offers Auto/manual worker brood and queued reproductive investment with next-priority controls; adaptation choices queue for future brood.
 - Conflict: choose workers/goal in the free draft, then ORDER. Investigate, retreat and alternate approach remain direct actions. Recalled workers/cargo travel home; All Hands can leave other jobs reduced.
-- ENTRANCE → MANAGE CONNECTIONS: choose an adjacent nest, supplies or whole worker settlers, then ORDER. Each link has one shared traffic slot; stopped parties physically return and report.
+- ENTRANCE → MANAGE CONNECTIONS: choose an adjacent nest, supplies, whole worker settlers or a supported queen relocation, then ORDER. Each link has one shared traffic slot; stopped parties physically return and report.
 - Space pauses; 1/2/3/4 select 1×/4×/16×/64×. Sound controls music and information cues separately. Help describes current controls.
 - Save/Load or Ctrl+S/Ctrl+L use `user://saves/slot_1.json`; loading resets attention while restoring simulation. End Run/Review does not overwrite that slot. Revealed review cannot resume ordinary play.
 - F3 development debug truth is unavailable in release/headless play. Normal UI never presents a physical map, live enemy strength or unseen resource stock.
