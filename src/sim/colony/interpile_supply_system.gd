@@ -3,29 +3,39 @@ extends RefCounted
 const CONFIG=preload("res://data/resources/default_interpile_supply.tres")
 const TRAILS=preload("res://data/trails/default_trails.tres")
 var _source_id: String = "home"
+var _route_id: String=""
 var _run: RunState
 var last_error: String=""
-func _init(run_state: RunState, source_id: String = "home") -> void: _run=run_state; _source_id=source_id
-func _state() -> InterpileSupplyState: return _run.supply if _source_id == "home" else _run.daughter_supply
-func _other() -> InterpileSupplyState: return _run.daughter_supply if _source_id == "home" else _run.supply
+func _init(run_state: RunState, source_id: String = "home", route_id: String="") -> void: _run=run_state; _source_id=source_id;_route_id=route_id
+func _connection() -> ConnectionTrafficState: return _run.connection_for(_route_id if not _route_id.is_empty() else _run.founding.route_id)
+func _state() -> InterpileSupplyState:
+ var connection: ConnectionTrafficState=_connection()
+ return connection.supplies[_source_id] if connection!=null else _run.supply if _source_id=="home" else _run.daughter_supply
+func _other() -> InterpileSupplyState: return _connection().supplies[_connection().target(_source_id)]
 func _source() -> PileState: return _run.colony.piles[_source_id]
-func _target() -> PileState: return _run.colony.piles.satellite_1 if _source_id == "home" else _run.colony.piles.home
-func _name() -> String: return "Home" if _source_id == "home" else "Daughter"
+func _target() -> PileState: return _run.colony.piles[_connection().target(_source_id)]
+func _name() -> String: return _source().display_title()
+func _route() -> TrailRouteState: return _run.trails.routes[_connection().route_id]
+func _migration_active() -> bool:
+ for state: WorkerReinforcementState in _connection().migrations.values():
+  if state.active():return true
+ return false
 func set_enabled(value: Variant) -> bool:
  if not value is bool: return _reject("Supply intent must be on or off")
- if _run.founding.phase!="established" or not _run.colony.piles.has("satellite_1"): return _reject("Establish a reported daughter pile first")
+ if _connection()==null or not _connection().supplies.has(_source_id): return _reject("Establish a reported daughter pile first")
  var state: InterpileSupplyState=_state()
  if value and _other().phase != "none": return _reject("Other supply direction assigned; stop it and await return")
- if _run.reinforcement.active(): return _reject("Wait for the worker reinforcement party to return")
+ if _migration_active(): return _reject("Wait for the worker reinforcement party to return")
  if value==state.enabled: return _reject("Supply intent already set")
- var route: TrailRouteState=_run.trails.routes[_run.founding.route_id]
+ var route: TrailRouteState=_route()
  var home: PileState=_source()
  if value and state.phase=="none":
   if home.workers_assignable<CONFIG.workers: return _reject("Need %d available %s supply workers" % [CONFIG.workers,_name()])
   if not home.workers.create_commitment("trail:"+route.id,"trail",route.id): return _reject("Supply commitment unavailable")
   var allocated: bool=home.allocate_workers("trail:"+route.id,CONFIG.workers); assert(allocated)
   route.allocated_workers=CONFIG.workers;state.phase="waiting"
- _run.supply_origin = _source_id
+ _connection().payer_id=_source_id
+ if _connection().legacy:_run.supply_origin = _source_id
  route.delivered_total=state.delivered_total();route.receipt=state.receipt()
  state.enabled=value;route.desired_workers=CONFIG.workers if value else 0
  route.status="active" if value else "recalling"
@@ -34,7 +44,7 @@ func set_enabled(value: Variant) -> bool:
 func _reject(reason: String) -> bool: last_error=reason;return false
 func _plan() -> Dictionary:
  var home: PileState=_source()
- var route: TrailRouteState=_run.trails.routes[_run.founding.route_id]
+ var route: TrailRouteState=_route()
  var segment: TrailSegmentState=_run.trails.segments[route.segment_id]
  var fraction: float=home.adaptation_fraction()
  var energy: float=snappedf(AdaptationRules.energy_multiplier(home.adaptation_repertoire,fraction),0.00001)
@@ -53,7 +63,7 @@ func _food_blocker(plan: Dictionary) -> String:
 func tick() -> void:
  var state: InterpileSupplyState=_state()
  if state.phase=="none": return
- var route: TrailRouteState=_run.trails.routes[_run.founding.route_id]
+ var route: TrailRouteState=_route()
  var home: PileState=_source()
  if state.phase=="waiting":
   var plan: Dictionary=_plan()
@@ -91,14 +101,15 @@ func _release(route: TrailRouteState) -> void:
  route.allocated_workers=0;route.active_workers=0;route.status="inactive"
  _state().phase="none"
 func summary() -> Dictionary:
- if _run.founding.phase!="established": return {}
+ if _connection()==null or not _connection().supplies.has(_source_id): return {}
  var state: InterpileSupplyState=_state()
- var result: Dictionary={"source_id":_source_id,"source_name":_name(),"destination_name":"Daughter" if _source_id == "home" else "Home", "enabled":state.enabled,"status":"away" if state.travelling() else state.phase,"workers":state.assigned(),"workers_required":CONFIG.workers,"trips_reported":state.trips_reported,"last_payload":state.last_payload.duplicate(),"reported_total":state.delivered_total()}
+ var result: Dictionary={"source_id":_source_id,"source_name":_name(),"destination_id":_target().id,"destination_name":_target().display_title(),"route_id":_connection().route_id, "enabled":state.enabled,"status":"away" if state.travelling() else state.phase,"workers":state.assigned(),"workers_required":CONFIG.workers,"trips_reported":state.trips_reported,"last_payload":state.last_payload.duplicate(),"reported_total":state.delivered_total()}
+ result.costs=_plan().costs
  if state.travelling():
   result.age=(_run.clock.tick_count-state.departed_tick)*SimulationClock.TICK_INTERVAL
  elif state.phase=="waiting": result.blocker=_food_blocker(_plan())
  else: result.blocker="Need %d available %s workers" % [CONFIG.workers,_name()] if _source().workers_assignable<CONFIG.workers else ""
  if state.trips_reported>0: result.report_age=(_run.clock.tick_count-state.last_reported_tick)*SimulationClock.TICK_INTERVAL
  if _other().phase != "none": result.blocker="Other direction assigned; stop it and await return"
- if _run.reinforcement.active():result.blocker="Worker party away; await return"
+ if _migration_active():result.blocker="Worker party away; await return"
  return result

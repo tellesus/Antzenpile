@@ -205,3 +205,5 @@ Ship a reproducible pinned-engine Windows export, clear launch/control/save inst
 | Private history → post-run review | Never a source for normal gameplay reports or forecasts; revealed state closes that play path. |
 
 For every implementation card, specify its catalog/system IDs, visible benefit, dependencies, exact owned state/command changes, invariants/migration, known waiting/failure/recovery and targeted verification. A rule family earns reuse through one complete working entry before bulk content is added. Update Current Build and technical contracts only after actual verification; update the roadmap's completed milestone status with evidence.
+
+155 implements direct two-way supplies and whole worker migration on each established adjacent link, using one shared route/segment and exclusive traffic slot, real costs/travel, captured adult bundles and delayed receipts. The first paid-job owners remain aliases. Coordinated multi-hop delivery, queen/brood rescue and isolation/abandonment remain M5 planned work.

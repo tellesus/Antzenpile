@@ -18,8 +18,8 @@ const NODES: Array[String] = ["queen", "nursery", "food_exchange", "entrance", "
 var status_provider: Callable
 var pile_command: Callable
 var pressure_command: Callable
-var supply_command: Callable
-var reinforcement_command: Callable
+var connection_command: Callable
+var connection_controls:=preload("res://src/presentation/inward/connection_controls.gd").new()
 var mode_command: Callable
 var pause_command: Callable
 var speed_command: Callable
@@ -69,6 +69,7 @@ func show_feedback(message: String) -> void:
 func _process(delta: float) -> void:
 	if status_provider.is_valid():
 		_status = status_provider.call()
+	connection_controls.sync(_status.get("connections",[]),_status.get("pile_id","home"))
 	if not _status.get("paused", false):
 		_animation_time = fposmod(_animation_time + minf(delta, 0.1), 3600.0)
 	# UI attention remains responsive on pause; gameplay decoration stays frozen.
@@ -94,6 +95,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if connection_controls.activate(self,at,_status.get("connections",[]),connection_command):return true
 	if effort_draft.opened:
 		var effort_action: String=effort_draft.action_at(get_viewport_rect().size,at)
 		if not effort_action.is_empty(): effort_draft.activate(self,get_viewport_rect().size,effort_action,effort_command);return true
@@ -116,25 +118,11 @@ func activate_at(at: Vector2) -> bool:
 			activation.outcome(result)
 			show_feedback(result.get("reason", "Care reassignment unavailable"))
 		return true
-	if selected_id=="entrance" and not _status.get("reinforcement",{}).is_empty() and _reinforcement_rect().has_point(at):
-		if reinforcement_command.is_valid():
-			var recall: bool=_status.reinforcement.away
-			var result: Dictionary=reinforcement_command.call(recall)
-			activation.outcome(result)
-			show_feedback(("Return requested; settled workers stay" if recall else "8 settlers and 1 messenger dispatched") if result.get("accepted",false) else result.get("reason","Reinforcement unavailable"))
-		return true
 	if selected_id == "food_exchange" and _status.get("daughter",false):
 		if gathering.activate(self,at,_status.get("gathering",{}),gathering_command): return true
 		if not gathering.opened and _gather_link_rect().has_point(at): gathering.opened=true;return true
-	if selected_id=="entrance" and not _status.get("supply",{}).is_empty() and _supply_rect().has_point(at):
-		if supply_command.is_valid():
-			var enable: bool=not _status.supply.enabled
-			var result: Dictionary=supply_command.call(enable)
-			activation.outcome(result)
-			show_feedback(("Supply workers assigned" if enable else "Stop after current trip requested" if _status.supply.status=="away" else "Idle supply workers released") if result.get("accepted",false) else result.get("reason","Supply unavailable"))
-		return true
 	if selected_id=="food_exchange" and _status.get("daughter",false) and not Pressure.food_sources_needed(_status).is_empty() and _supply_link_rect().has_point(at):
-		if pile_command.is_valid(): pile_command.call("home")
+		connection_controls.opened=true
 		selected_id="entrance"; queue_redraw(); return true
 	if _status.get("daughter_available",false) and _pile_rect().has_point(at):
 		var target: String = _status.get("other_pile","home" if _status.get("daughter",false) else "satellite_1")
@@ -366,14 +354,6 @@ static func _organ_hit(at: Vector2, center: Vector2, radii: Vector2) -> bool:
 	return ((at-center)/radii).length_squared() <= 1.0
 
 
-func _reinforcement_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x-300,558,260,44)
-
-
-func _supply_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x-300,430,260,44)
-
-
 func _supply_link_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x-300,532,260,44)
 
@@ -516,6 +496,7 @@ func _draw() -> void:
 		_draw_controls(size)
 		chamber_controls.draw(self,_status.get("chambers",[]))
 		if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
+		connection_controls.draw(self,_status.get("connections",[]))
 		activation.draw(self)
 		return
 	var centers: Dictionary = positions(size)
@@ -549,6 +530,7 @@ func _draw() -> void:
 	_draw_controls(size)
 	chamber_controls.draw(self,_status.get("chambers",[]))
 	if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
+	connection_controls.draw(self,_status.get("connections",[]))
 	activation.draw(self)
 
 
@@ -678,7 +660,7 @@ func _draw_context(size: Vector2) -> void:
 	var food_attention: bool = selected_id == "food_exchange" and not Pressure.food_sources_needed(_status).is_empty()
 	var food_losses: Dictionary = _status.get("food_sharing",{})
 	var recent_food_losses: bool = food_losses.get("recent",false)
-	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292,466 if selected_id=="entrance" and not _status.get("reinforcement",{}).is_empty() else  (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses and _status.food_exchange_state != "developed" else 388 if food_attention or selected_id == "queen" or selected_id=="food_exchange" and _status.get("daughter",false) or selected_id=="entrance" and not _status.get("supply",{}).is_empty() else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
+	var box := Rect2(Vector2(size.x - 316, 144), Vector2(292,310 if selected_id=="entrance" else  (466 if expansion_action else 400) if selected_id == "nursery" else 466 if selected_id == "food_exchange" and recent_food_losses and _status.food_exchange_state != "developed" else 388 if food_attention or selected_id == "queen" or selected_id=="food_exchange" and _status.get("daughter",false) or selected_id=="entrance" and not _status.get("supply",{}).is_empty() else 344 if selected_id == "adaptation" else 340 if selected_id == "midden" else 284))
 	if selected_id == "food_exchange" and _status.get("daughter",false): box.size.y = 444 if food_attention else 388
 	if selected_id == "nursery" and _guest_attention(): box.size.y = 526
 	if selected_id=="queen" and queen_tab=="reproduction": box.size.y=340
@@ -864,7 +846,7 @@ func _draw_context(size: Vector2) -> void:
 					_label(box.position + Vector2(16, 300), "Last short: " + Pressure.food_names(_status), Color("c7ad98"), 15)
 					_label(box.position + Vector2(16, 316), "Needs supplies from Home" if _status.get("daughter",false) else "Browse returned sources", Color("8fa1a8"), 15)
 				if _status.get("daughter",false):
-					_draw_action(_supply_link_rect(),"INSPECT HOME SUPPORT")
+					_draw_action(_supply_link_rect(),"INSPECT CONNECTION SUPPORT")
 				for resource_id: String in ([] if _status.get("daughter",false) else Pressure.food_sources_needed(_status)):
 					var button: Rect2 = _food_source_rect(resource_id)
 					UIStyle.surface(self, button, Color("263038"))
@@ -875,10 +857,13 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 65, "%d free · %d held for brood care" % [_status.get("workers_assignable",_status.workers_available),_status.get("brood_care",{}).get("held",0)])
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
 			_detail_line(box, 117, "Trail workers: %d" % _status.trail_workers)
-			if not _status.get("supply",{}).is_empty(): _draw_supply_context(box)
-			elif _status.get("daughter",false):
-				_label(box.position+Vector2(16,163),"Supplies use the Home–Daughter link",Color("8fa1a8"),12)
-				_label(box.position+Vector2(16,187),"This nest gathers and grows locally",Color("8fa1a8"),12)
+			var links: Array=_status.get("connections",[])
+			if not links.is_empty():
+				_draw_action(connection_controls.button(size),"MANAGE CONNECTIONS")
+				_detail_line(box,211,"%d adjacent connections" % links.size())
+				_label(box.position+Vector2(16,239),"Choose payer, recipient and supplies / workers",Color("8fa1a8"),12)
+				_label(box.position+Vector2(16,265),"Selection is free; ORDER funds actual travel",Color("8fa1a8"),12)
+
 		"guest":
 			var guest: Dictionary = _status.get("guest", {})
 			var observation: String = guest.get("observation", "")
@@ -921,30 +906,6 @@ func _draw_context(size: Vector2) -> void:
 			elif _status.get("recognition_experience", false) and not _status.get("adaptation_options", {}).has("security"):
 				_detail_line(box, 249, "Foreign / partner chemistry observed")
 				_detail_line(box, 275, "New brood may reveal variation")
-
-
-func _draw_supply_context(box: Rect2) -> void:
-	var supply: Dictionary=_status.supply
-	_detail_line(box,145,"%s → %s supplies" % [supply.get("source_name","Home"),supply.get("destination_name","Daughter")])
-	_detail_line(box,173,"%d %s workers assigned" % [supply.workers,supply.get("source_name","Home")] if supply.workers>0 else "Assign %d %s workers" % [supply.workers_required,supply.get("source_name","Home")])
-	var message: String="Deliveries are off" if supply.status=="none" else "Waiting at " + supply.get("source_name","Home") if supply.status=="waiting" else "Party away · "+Copy.duration(supply.age)
-	_detail_line(box,197,message)
-	_label(box.position+Vector2(16,219),"Current trip finishes before release" if not supply.enabled and supply.status=="away" else supply.get("blocker","") if not supply.get("blocker","").is_empty() else "Pack: 4 carbs / 2 protein / 2 water + traits",Color("8fa1a8"),12)
-	_label(box.position+Vector2(16,249),"Reports: %d · last %s ago" % [supply.trips_reported,Copy.duration(supply.report_age)] if supply.trips_reported>0 else "No delivery report yet",Color("a9b9bc"),14)
-	if supply.trips_reported>0:
-		var packet: Dictionary=supply.last_payload
-		_label(box.position+Vector2(16,273),"Last: %.1f carbs / %.1f protein / %.1f water" % [packet.carbohydrate,packet.protein,packet.water],Color("8fa1a8"),12)
-	_draw_reinforcement_context(box)
-	_draw_action(_supply_rect(),"STOP AFTER TRIP" if supply.enabled else "RESUME SUPPLIES" if supply.status=="away" else "ASSIGN 8 SUPPLY WORKERS",supply.get("blocker","") if supply.status=="none" else "")
-
-
-func _draw_reinforcement_context(box: Rect2) -> void:
-	var state: Dictionary=_status.get("reinforcement",{})
-	if state.is_empty(): return
-	_detail_line(box,351,"Home → Daughter worker settlers")
-	_label(box.position+Vector2(16,374),"9 sent · away "+Copy.duration(state.age) if state.away else "%d workers settled · reported" % state.reported_workers,Color("a9b9bc"),13)
-	_label(box.position+Vector2(16,395),"Settled workers stay; messenger returns" if state.away else "Last: %d settled · %s ago" % [state.last_settled,Copy.duration(state.report_age)] if state.reports>0 else "8 settlers stay; 1 messenger returns",Color("8fa1a8"),12)
-	_draw_action(_reinforcement_rect(),"REQUEST PARTY RETURN" if state.away else "SEND 8 WORKER SETTLERS","Settled workers remain at Daughter" if state.away else state.blocker if not state.blocker.is_empty() else "9 Home workers + %.2f travel carbs" % state.cost)
 
 
 func _draw_reproduction_context(box: Rect2) -> void:

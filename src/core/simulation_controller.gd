@@ -307,9 +307,9 @@ func _tick(delta: float) -> void:
 	brood.tick(delta)
 	reproduction.tick()
 	founding.tick()
-	supply.tick()
-	daughter_supply.tick()
-	reinforcement.tick()
+	for connection: ConnectionTrafficState in run.all_connections():
+		for id: String in [connection.parent_id,connection.child_id]:InterpileSupplySystem.new(run,id,connection.route_id).tick()
+		for id: String in [connection.parent_id,connection.child_id]:WorkerReinforcementSystem.new(run,id,connection.route_id).tick()
 	food_toxicity.tick(delta)
 	reports.capture()
 	run.history.record(run)
@@ -333,3 +333,24 @@ func set_queen_care(pile_id: String, target: Variant) -> bool:
 func replace_queen(pile_id: String, cancel: bool=false) -> bool:
 	if run.history.ended: return false
 	return queens.cancel_replacement(pile_id) if cancel else queens.start_replacement(pile_id)
+
+func connection_order(route_id: String, source_id: String, action: String, count: int=8) -> Dictionary:
+	if run.history.ended:return {"accepted":false,"reason":"Run has ended"}
+	var connection: ConnectionTrafficState=run.connection_for(route_id)
+	if connection==null or connection.target(source_id).is_empty():return {"accepted":false,"reason":"Choose an established adjacent connection"}
+	var accepted: bool=false;var reason: String="Unknown connection order"
+	if action in ["supply","stop_supply"]:
+		var system:=InterpileSupplySystem.new(run,source_id,route_id)
+		accepted=system.set_enabled(action=="supply");reason=system.last_error
+	elif action in ["migrate","recall"]:
+		var system:=WorkerReinforcementSystem.new(run,source_id,route_id)
+		accepted=system.start(count) if action=="migrate" else system.recall();reason=system.last_error
+	return {"accepted":accepted,"reason":reason}
+
+func connection_summaries(pile_id: String, settlers: int=8) -> Array[Dictionary]:
+	var result: Array[Dictionary]=[]
+	for connection: ConnectionTrafficState in run.all_connections():
+		if connection.target(pile_id).is_empty():continue
+		var owner: String=connection.payer_id
+		result.append({"id":connection.route_id,"source_id":pile_id,"source_name":run.colony.piles[pile_id].display_title(),"destination_id":connection.target(pile_id),"destination_name":run.colony.piles[connection.target(pile_id)].display_title(),"payer_id":owner,"payer_name":run.colony.piles[owner].display_title(),"busy":connection.busy(),"supply":InterpileSupplySystem.new(run,pile_id,connection.route_id).summary(),"migration":WorkerReinforcementSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_supply":InterpileSupplySystem.new(run,owner,connection.route_id).summary(),"assigned_migration":WorkerReinforcementSystem.new(run,owner,connection.route_id).summary(settlers),"available":run.colony.piles[pile_id].workers_assignable})
+	return result

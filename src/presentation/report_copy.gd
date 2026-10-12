@@ -33,6 +33,7 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"trait": text="Inherited trait established: "+TraitCatalog.DEFINITIONS[entry.subject_id].title
 		"project": text="Reproductives ready" if entry.subject_id=="queen" else entry.subject_id.capitalize().replace("_"," ")+" "+entry.detail
 		"camp": text="Founding camp "+entry.detail
+		"migration": text="Messenger returned: %d workers settled at %s" % [entry.amount,pile_name(entry.subject_id)]
 		"supplies": text="Supplies returned from trip to "+pile_name(entry.subject_id)
 		"dispatch": text="%d ants dispatched: %s" % [entry.amount,"survey" if entry.detail=="investigate" else "defense"]
 		"order": text="Force order: %d total" % entry.amount if entry.amount>0 else "Force order canceled"

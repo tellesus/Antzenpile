@@ -70,8 +70,7 @@ func _ready() -> void:
 		inward.status_provider = focused_inward_status
 		inward.pile_command = inspect_pile
 		inward.pressure_command = inspect_internal_pressure
-		inward.supply_command = set_daughter_supply
-		inward.reinforcement_command = daughter_worker_reinforcement
+		inward.connection_command = connection_order
 		inward.gathering_command = daughter_gathering_command
 		inward.mode_command = set_mode.bind("outward")
 		inward.pause_command = simulation.toggle_pause
@@ -550,7 +549,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		brood.append(cohort.to_dict())
 	var trail_workers: int = 0
 	for route: TrailRouteState in simulation.run.trails.routes.values():
-		if (simulation.run.supply_origin if route.id==simulation.run.founding.route_id and route.purpose == "interpile" and not simulation.run.reinforcement.active() else route.origin_pile) == pile_id:
+		if simulation.run.connection_payer(route) == pile_id:
 			trail_workers += route.allocated_workers + simulation.run.trails.pending_losses(route.id)
 	var expected_total: int = pile.workers_total + simulation.run.pending_for_pile(pile_id)
 	var expected_adapted: int = pile.adapted_workers_total + simulation.run.pending_for_pile(pile_id, true)
@@ -572,7 +571,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
-	return {"reinforcement":simulation.reinforcement.summary() if pile_id in ["home","satellite_1"] else {}, "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary() if pile_id in ["home","satellite_1"] else {}, "pile_name":pile_title(pile_id),"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.size()>1, "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
+	return {"connections":simulation.connection_summaries(pile_id,_inward_view.connection_controls.settlers if _inward_view!=null else 8),"reinforcement":simulation.reinforcement.summary() if pile_id in ["home","satellite_1"] else {}, "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary() if pile_id in ["home","satellite_1"] else {}, "pile_name":pile_title(pile_id),"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.size()>1, "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
 		"local_site":{"profile":pile.foundation.get("site_profile",""),"cues":SiteCatalog.for_pile(pile).cues},"queen_condition":simulation.queens.summary(pile_id),"reproduction": simulation.reproduction.summary(pile_id),
 		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
@@ -863,8 +862,10 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 					checking += 1
 			var pending: int = simulation.run.trails.pending_losses(route.id)
 			var camp: FoundingState=simulation.run.camp_for_route(route.id)
-			var settlers_away: bool = route.id==simulation.run.founding.route_id and route.purpose=="interpile" and simulation.run.reinforcement.active()
-			var sent: int = WorkerReinforcementState.CONFIG.reinforcement_workers+WorkerReinforcementState.CONFIG.reinforcement_messengers
+			var connection: ConnectionTrafficState=simulation.run.connection_for(route.id) if route.purpose=="interpile" else null
+			var migration: WorkerReinforcementState=connection.migrations[connection.payer_id] if connection!=null else null
+			var settlers_away: bool=migration!=null and migration.active()
+			var sent: int=migration.settlers+WorkerReinforcementState.CONFIG.reinforcement_messengers if settlers_away else 0
 			var status: String = route.status
 			if pending > 0 and status == "inactive":
 				status = "recalling" if route.desired_workers == 0 else "depleted" if route.reported_depleted else "active"
@@ -1095,3 +1096,6 @@ func next_pile_id(current: String) -> String:
 	return ids[(ids.find(current)+1)%ids.size()]
 func pile_title(id: String) -> String:
 	return simulation.run.colony.piles[id].display_title() if simulation.run.colony.piles.has(id) else ""
+
+func connection_order(route_id: String, source_id: String, action: String, count: int=8) -> Dictionary:
+	return simulation.connection_order(route_id,source_id,action,count)

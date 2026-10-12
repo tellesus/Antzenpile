@@ -27,6 +27,7 @@ var daughter_supply := InterpileSupplyState.new()
 var supply_origin: String = "home"
 var reinforcement := WorkerReinforcementState.new()
 var founding := FoundingState.new()
+var connection_traffic: Dictionary[String,ConnectionTrafficState]={}
 var extra_foundings: Dictionary[String,FoundingState]={}
 var extra_exploration: Dictionary[String,ExplorationState]={}
 var exploration: ExplorationState = Exploration.new()
@@ -97,13 +98,14 @@ func to_dict() -> Dictionary:
 	ids.sort()
 	for id: String in ids:
 		delivered.append(delivered_observations[id].to_dict())
-	var camps: Array[Dictionary]=[];var policies: Dictionary={}
+	var camps: Array[Dictionary]=[];var policies: Dictionary={};var traffic: Dictionary={}
+	for connection: ConnectionTrafficState in all_connections():traffic[connection.route_id]=connection.to_dict()
 	ids=extra_foundings.keys();ids.sort()
 	for id: String in ids: camps.append(extra_foundings[id].to_dict())
 	ids=extra_exploration.keys();ids.sort()
 	for id: String in ids: policies[id]=extra_exploration[id].to_dict()
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
-	return {"extra_foundings":camps,"extra_exploration":policies,"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
+	return {"connection_traffic":traffic,"extra_foundings":camps,"extra_exploration":policies,"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"daughter_supply":daughter_supply.to_dict(), "supply_origin":supply_origin,
@@ -330,10 +332,23 @@ func restore(data: Dictionary) -> bool:
 	var reinforcement_data: Variant=data.get("reinforcement",restored_reinforcement.to_dict())
 	if not reinforcement_data is Dictionary or not restored_reinforcement.restore(reinforcement_data,restored_colony,restored_founding,restored_supply,restored_clock.tick_count): return false
 	if restored_reinforcement.active() and (restored_daughter_supply.phase != "none" or restored_supply_origin != "home"): return false
+	var restored_connections: Dictionary[String,ConnectionTrafficState]={}
+	for camp: FoundingState in restored_camps:
+		if camp.phase!="established":continue
+		var connection:=ConnectionTrafficState.new(camp)
+		if camp==restored_founding:
+			connection.legacy=true;connection.payer_id=restored_supply_origin
+			connection.supplies["home"]=restored_supply;connection.supplies["satellite_1"]=restored_daughter_supply;connection.migrations["home"]=restored_reinforcement
+		restored_connections[camp.route_id]=connection
+	var traffic_data: Variant=data.get("connection_traffic",{})
+	if not traffic_data is Dictionary:return false
+	if data.has("connection_traffic") and (traffic_data.size()!=restored_connections.size() or not traffic_data.has_all(restored_connections.keys())):return false
+	for id: String in traffic_data:
+		if not traffic_data[id] is Dictionary or not restored_connections[id].restore(traffic_data[id],restored_colony,_camp_from(restored_camps,id),restored_clock.tick_count):return false
 	var restored_trails := Trails.new()
-	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, active_supply, restored_reinforcement, restored_supply_origin, restored_extra_foundings.values()):
+	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, active_supply, restored_reinforcement, restored_supply_origin, restored_extra_foundings.values(),restored_connections):
 		return false
-	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement): return false
+	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement,restored_connections): return false
 	# A paid young queen has one current body owner; founding history is not stock.
 	var reproductive_bodies: Dictionary={}
 	for pile: PileState in restored_colony.piles.values():
@@ -568,6 +583,7 @@ func restore(data: Dictionary) -> bool:
 	supply_origin = restored_supply_origin
 	founding = restored_founding
 	extra_foundings=restored_extra_foundings
+	connection_traffic=restored_connections
 	extra_exploration=restored_extra_exploration
 	trails = restored_trails
 	rain = restored_rain
@@ -631,7 +647,7 @@ func other_exploration_target(pile_id: String) -> int:
 static func _profile_sum(into: Dictionary, pile_id: String, profiles: Dictionary) -> void:
 	if not into.has(pile_id):into[pile_id]={}
 	for key: String in profiles:into[pile_id][key]=into[pile_id].get(key,0)+profiles[key]
-static func _valid_foundations(colony_state: ColonyState, camps: Array[FoundingState], network: TrailNetwork, tick: int, reinforcements: WorkerReinforcementState) -> bool:
+static func _valid_foundations(colony_state: ColonyState, camps: Array[FoundingState], network: TrailNetwork, tick: int, reinforcements: WorkerReinforcementState, connections: Dictionary={}) -> bool:
 	var established: Dictionary={};var destinations: Dictionary={};var sites: Dictionary={};var active_origins: Dictionary={}
 	var incoming: Dictionary={};var outgoing: Dictionary={};var gene_in: Dictionary={};var gene_out: Dictionary={}
 	for camp: FoundingState in camps:
@@ -668,10 +684,16 @@ static func _valid_foundations(colony_state: ColonyState, camps: Array[FoundingS
 		incoming[child.id]=incoming.get(child.id,0)+FoundingState.CONFIG.workers-1
 		outgoing[parent.id]=outgoing.get(parent.id,0)+FoundingState.CONFIG.workers-1
 		_profile_sum(gene_in,child.id,camp.settler_profiles);_profile_sum(gene_out,parent.id,camp.settler_profiles)
-	if reinforcements.arrivals>0:
-		incoming["satellite_1"]=incoming.get("satellite_1",0)+reinforcements.arrivals*WorkerReinforcementState.CONFIG.reinforcement_workers
-		outgoing["home"]=outgoing.get("home",0)+reinforcements.arrivals*WorkerReinforcementState.CONFIG.reinforcement_workers
+	if connections.is_empty():
+		incoming["satellite_1"]=incoming.get("satellite_1",0)+reinforcements.moved_workers
+		outgoing["home"]=outgoing.get("home",0)+reinforcements.moved_workers
 		_profile_sum(gene_in,"satellite_1",reinforcements.moved_profiles);_profile_sum(gene_out,"home",reinforcements.moved_profiles)
+	else:
+		for connection: ConnectionTrafficState in connections.values():
+			for source_id: String in connection.migrations:
+				var target_id: String=connection.target(source_id);var migration: WorkerReinforcementState=connection.migrations[source_id]
+				incoming[target_id]=incoming.get(target_id,0)+migration.moved_workers;outgoing[source_id]=outgoing.get(source_id,0)+migration.moved_workers
+				_profile_sum(gene_in,target_id,migration.moved_profiles);_profile_sum(gene_out,source_id,migration.moved_profiles)
 	for pile: PileState in colony_state.piles.values():
 		if pile.id=="home" and not pile.foundation.is_empty() or pile.id!="home" and not established.has(pile.id):return false
 		if pile.workers.transferred_in!=incoming.get(pile.id,0) or pile.workers.transferred_out!=outgoing.get(pile.id,0) or pile.genetics.imported!=gene_in.get(pile.id,{}) or pile.genetics.exported!=gene_out.get(pile.id,{}):return false
@@ -681,3 +703,29 @@ func camp_for_route(route_id: String) -> FoundingState:
 	for camp: FoundingState in all_foundings():
 		if camp.phase!="none" and camp.route_id==route_id:return camp
 	return null
+
+static func _camp_from(camps: Array[FoundingState], route_id: String) -> FoundingState:
+	for camp: FoundingState in camps:
+		if camp.route_id==route_id:return camp
+	return null
+
+func all_connections() -> Array[ConnectionTrafficState]:
+	var result: Array[ConnectionTrafficState]=[]
+	for camp: FoundingState in all_foundings():
+		if camp.phase!="established":continue
+		if not connection_traffic.has(camp.route_id):connection_traffic[camp.route_id]=ConnectionTrafficState.new(camp)
+		var connection: ConnectionTrafficState=connection_traffic[camp.route_id]
+		if camp==founding:
+			connection.legacy=true;connection.payer_id=supply_origin
+			connection.supplies["home"]=supply;connection.supplies["satellite_1"]=daughter_supply;connection.migrations["home"]=reinforcement
+		result.append(connection)
+	return result
+
+func connection_for(route_id: String) -> ConnectionTrafficState:
+	for connection: ConnectionTrafficState in all_connections():
+		if connection.route_id==route_id:return connection
+	return null
+
+func connection_payer(route: TrailRouteState) -> String:
+	var connection: ConnectionTrafficState=connection_for(route.id) if route.purpose=="interpile" else null
+	return connection.payer_id if connection!=null else route.origin_pile

@@ -201,10 +201,12 @@ func lose_workers(pool: String, amount: Variant, adapted_amount: Variant, reason
 	return true
 
 
-func move_workers_to(destination: PileState, pool: String, amount: int) -> bool:
+func move_workers_to(destination: PileState, pool: String, amount: int, captured: Dictionary[String,int]={}) -> bool:
 	if destination==null or destination==self or amount<=0 or workers.count(pool)<amount: return false
-	var plan: Dictionary[String,int]=genetics.migration_plan(amount,workers_total)
+	var plan: Dictionary[String,int]=genetics.migration_plan(amount,workers_total) if captured.is_empty() else captured.duplicate()
 	if genetics.migration_count(plan)!=amount: return false
+	for key: String in plan:
+		if plan[key]>(workers_total-genetics.count_profiles() if key.is_empty() else genetics.living.get(key,0)):return false
 	var combined: Array[String]=destination.genetics.established.duplicate()
 	for key: String in plan:
 		for trait_id: String in GeneticRepertoire.traits_for(key):

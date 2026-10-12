@@ -72,9 +72,9 @@ func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tic
  if units.carbohydrate!=2*units.protein or units.water!=units.protein: return false
  if data.trips_started==0 and data.departed_tick!=0: return false
  if data.phase!="none" or data.trips_started>0:
-  if founding.phase!="established" or not colony.piles.has("satellite_1"): return false
-  var parent: PileState=colony.piles[source_id]; var daughter: PileState=colony.piles.satellite_1
-  var leg: int=TRAILS.leg_ticks(colony.piles.home.position.distance_to(daughter.position))
+  if founding.phase!="established" or not colony.piles.has(founding.destination_pile) or source_id not in [founding.origin_pile,founding.destination_pile]: return false
+  var parent: PileState=colony.piles[source_id]; var daughter: PileState=colony.piles[founding.destination_pile]
+  var leg: int=TRAILS.leg_ticks(colony.piles[founding.origin_pile].position.distance_to(daughter.position))
   if data.trips_reported>floori(float(tick-daughter.foundation.founded_tick)/(2*leg)) or data.trips_started>1+floori(float(tick-daughter.foundation.founded_tick)/(2*leg)): return false
   if data.trips_started>0 and data.departed_tick<daughter.foundation.founded_tick+2*leg*(data.trips_started-1): return false
   if away:

@@ -80,11 +80,17 @@ func capture(recording: bool = true) -> void:
 		if camp.reported_tick<=0:continue
 		var received: float=camp.reported_tick*SimulationClock.TICK_INTERVAL
 		if camp.phase in ["ready","failed","established"] and journal.changed("camp/"+camp.route_id,str(received)+":"+camp.phase):journal.add("camp",camp.origin_pile,camp.route_id,received,received,camp.phase,0,0,recording)
-	for origin: String in ["home","satellite_1"]:
-		var supply: InterpileSupplyState=_run.supply if origin=="home" else _run.daughter_supply
-		if supply.trips_reported>0 and journal.changed("supplies/"+origin,supply.last_reported_tick):
-			var received: float=supply.last_reported_tick*SimulationClock.TICK_INTERVAL
-			journal.add("supplies",origin,"satellite_1" if origin=="home" else "home",received,received,"returned",supply.receipt().last_amount,0,recording)
+	for connection: ConnectionTrafficState in _run.all_connections():
+		for origin: String in [connection.parent_id,connection.child_id]:
+			var supply: InterpileSupplyState=connection.supplies[origin]
+			var key: String="supplies/"+origin+("" if connection.legacy else "/"+connection.route_id)
+			if supply.trips_reported>0 and journal.changed(key,supply.last_reported_tick):
+				var received: float=supply.last_reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("supplies",origin,connection.target(origin),received,received,"returned",supply.receipt().last_amount,0,recording)
+			var migration: WorkerReinforcementState=connection.migrations[origin]
+			if migration.trips_reported>0 and journal.changed("migration/"+origin+"/"+connection.route_id,migration.last_reported_tick):
+				var received: float=migration.last_reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("migration",origin,connection.target(origin),received,received,"returned",migration.last_settled,migration.reported_workers(),recording)
 
 func _project(pile: String, key: String, value: String, complete: String, time: float, recording: bool) -> void:
 	if _run.reports.changed(key+"/"+pile,value) and value==complete:
