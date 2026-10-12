@@ -8,20 +8,21 @@ var payer_id: String
 var supplies: Dictionary[String,InterpileSupplyState]={}
 var migrations: Dictionary[String,WorkerReinforcementState]={}
 var queens: Dictionary[String,QueenTransportState]={}
+var broods: Dictionary[String,BroodTransportState]={}
 var legacy: bool=false
 
 func _init(camp: FoundingState=null) -> void:
 	if camp==null:return
 	route_id=camp.route_id;parent_id=camp.origin_pile;child_id=camp.destination_pile;payer_id=parent_id
 	for id: String in [parent_id,child_id]:
-		supplies[id]=InterpileSupplyState.new();migrations[id]=WorkerReinforcementState.new();queens[id]=QueenTransportState.new()
+		supplies[id]=InterpileSupplyState.new();migrations[id]=WorkerReinforcementState.new();queens[id]=QueenTransportState.new();broods[id]=BroodTransportState.new()
 
 func target(source_id: String) -> String:
 	return child_id if source_id==parent_id else parent_id if source_id==child_id else ""
 
 func busy() -> bool:
 	for id: String in supplies:
-		if supplies[id].phase!="none" or migrations[id].active() or queens[id].active():return true
+		if supplies[id].phase!="none" or migrations[id].active() or queens[id].active() or broods[id].active():return true
 	return false
 
 func valid_route(route: TrailRouteState) -> bool:
@@ -31,20 +32,24 @@ func valid_route(route: TrailRouteState) -> bool:
 		if supplies[id].phase!="none":jobs+=1
 		if migrations[id].active():jobs+=1
 		if queens[id].active():jobs+=1
-		if id!=payer_id and (supplies[id].phase!="none" or migrations[id].active() or queens[id].active()):return false
+		if broods[id].active():jobs+=1
+		if id!=payer_id and (supplies[id].phase!="none" or migrations[id].active() or queens[id].active() or broods[id].active()):return false
 	if jobs>1:return false
+	if broods[payer_id].active():return broods[payer_id].movement.valid_route(route,supplies[payer_id])
 	if queens[payer_id].active():return queens[payer_id].movement.valid_route(route,supplies[payer_id])
 	return migrations[payer_id].valid_route(route,supplies[payer_id]) if migrations[payer_id].active() else supplies[payer_id].valid_route(route)
 
 func to_dict() -> Dictionary:
 	# The original three owners remain canonical root aliases, never duplicated.
+	var brood_records: Dictionary={parent_id:broods[parent_id].to_dict(),child_id:broods[child_id].to_dict()}
 	var queen_records: Dictionary={parent_id:queens[parent_id].to_dict(),child_id:queens[child_id].to_dict()}
-	if legacy:return {"queens":queen_records,"migrations":{child_id:migrations[child_id].to_dict()}}
-	return {"queens":queen_records,"payer_id":payer_id,"supplies":{parent_id:supplies[parent_id].to_dict(),child_id:supplies[child_id].to_dict()},"migrations":{parent_id:migrations[parent_id].to_dict(),child_id:migrations[child_id].to_dict()}}
+	if legacy:return {"broods":brood_records,"queens":queen_records,"migrations":{child_id:migrations[child_id].to_dict()}}
+	return {"broods":brood_records,"queens":queen_records,"payer_id":payer_id,"supplies":{parent_id:supplies[parent_id].to_dict(),child_id:supplies[child_id].to_dict()},"migrations":{parent_id:migrations[parent_id].to_dict(),child_id:migrations[child_id].to_dict()}}
 
 func restore(data: Dictionary, colony: ColonyState, camp: FoundingState, tick: int) -> bool:
 	data=data.duplicate(true)
 	if not data.has("queens"):data.queens={parent_id:queens[parent_id].to_dict(),child_id:queens[child_id].to_dict()}
+	if not data.has("broods"):data.broods={parent_id:broods[parent_id].to_dict(),child_id:broods[child_id].to_dict()}
 	var expected: Array=to_dict().keys()
 	if data.size()!=expected.size() or not data.has_all(expected) or not data.migrations is Dictionary:return false
 	var ids: Array[String]=[child_id]
@@ -60,4 +65,7 @@ func restore(data: Dictionary, colony: ColonyState, camp: FoundingState, tick: i
 	if not data.queens is Dictionary or data.queens.size()!=2 or not data.queens.has_all([parent_id,child_id]):return false
 	for id: String in [parent_id,child_id]:
 		if not queens[id].restore(data.queens[id],self,colony,camp,tick) or (not queens[id].source_id.is_empty() and queens[id].source_id!=id):return false
+	if not data.broods is Dictionary or data.broods.size()!=2 or not data.broods.has_all([parent_id,child_id]):return false
+	for id: String in [parent_id,child_id]:
+		if not broods[id].restore(data.broods[id],self,colony,camp,tick) or (not broods[id].source_id.is_empty() and broods[id].source_id!=id):return false
 	return true

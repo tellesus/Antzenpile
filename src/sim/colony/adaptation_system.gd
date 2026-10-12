@@ -41,8 +41,9 @@ func queued_status(pile_id: String) -> Dictionary:
 
 
 func laying_blocker(pile: PileState, trait_id: String) -> String:
+	if not pile.brood_reserved_trial.is_empty():return "trial"
 	if not AdaptationRules.can_select(pile, trait_id): return "trial" if pile.trial_cohort() != null else "unavailable"
-	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty() or pile.brood_cohorts.size() >= pile.nursery_brood_capacity() / BROOD.starting_count or pile.free_worker_brood_space() < BROOD.starting_count:
+	if pile.nursery_state != "developed" and not pile.brood_cohorts.is_empty() or pile.brood_cohorts.size()+pile.brood_reserved_groups>=pile.nursery_brood_capacity()/BROOD.starting_count or pile.free_worker_brood_space() < BROOD.starting_count:
 		return "space"
 	if pile.workers_assignable < AdaptationRules.NURSES: return "nurses"
 	var pending: int = pile.nursery_occupied_space() + BROOD.starting_count
@@ -88,6 +89,7 @@ func start(pile_id: String, trait_id: String, respect_priority: bool=true) -> bo
 	var cohort := BroodCohort.new()
 	pile.brood_started_total += 1
 	cohort.id = "brood_%d" % pile.brood_started_total
+	cohort.origin_pile=pile.id
 	cohort.adaptation_id = trait_id
 	cohort.adaptation_trial = true
 	cohort.parent_queen_id=pile.queen.queen_id(pile.id);cohort.parent_generation=pile.queen.generation

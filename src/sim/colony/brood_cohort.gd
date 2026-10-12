@@ -4,6 +4,9 @@ extends RefCounted
 
 const CONFIG = preload("res://data/resources/default_brood.tres")
 const RESOURCE_IDS: Array[String] = ["carbohydrate", "protein", "water"]
+var origin_pile: String=""
+var transport_count: int=0
+var inherited_lost: int=0
 var id: String = "brood_1"
 var stage: String = "egg"
 var count: int = CONFIG.starting_count
@@ -28,7 +31,7 @@ static func next_id(matured_total: int, active_count: int = 0) -> String:
 
 
 func to_dict() -> Dictionary:
-	return {"id": id, "stage": stage, "count": count, "lost_count": lost_count, "progress_seconds": progress_seconds,
+	return {"origin_pile":origin_pile,"transport_count":transport_count,"inherited_lost":inherited_lost,"id": id, "stage": stage, "count": count, "lost_count": lost_count, "progress_seconds": progress_seconds,
 		"nutrition": nutrition, "care": care,
 		"nutrition_shortfalls": nutrition_shortfalls.duplicate(),
 		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial,
@@ -40,6 +43,10 @@ func restore(data: Dictionary) -> bool:
 	if not data.has_all(["id", "stage", "count", "progress_seconds", "nutrition", "care"]):
 		return false
 	var lost: Variant = data.get("lost_count", 0)
+	var origin: Variant=data.get("origin_pile","");var moves: Variant=data.get("transport_count",0);var previous_loss: Variant=data.get("inherited_lost",0)
+	if not origin is String or (not origin.is_empty() and not PileState.valid_id(origin)) or not WorkerLedger.valid_count(moves) or not WorkerLedger.valid_count(previous_loss):return false
+	if not WorkerLedger.valid_count(lost):return false
+	if moves>0 and origin.is_empty() or previous_loss>lost or moves==0 and previous_loss!=0:return false
 	if not data.id is String or not data.id.begins_with("brood_") or not data.stage in ["egg", "larva", "pupa"] or not WorkerLedger.valid_count(data.count) or not WorkerLedger.valid_count(lost) or data.count < 1 or data.count + lost != CONFIG.starting_count:
 		return false
 	for key: String in ["progress_seconds", "nutrition", "care"]:
@@ -83,6 +90,7 @@ func restore(data: Dictionary) -> bool:
 	var exposure: Variant = data.get("environment_exposure",[])
 	if not BroodEnvironment.valid_exposure(exposure) or data.stage=="egg" and not exposure.is_empty(): return false
 	environment_exposure.assign(exposure)
+	origin_pile=origin;transport_count=int(moves);inherited_lost=int(previous_loss)
 	id = data.id
 	stage = data.stage
 	count = int(data.count)
@@ -97,3 +105,9 @@ func restore(data: Dictionary) -> bool:
 	rain_comparison = data.get("rain_comparison", false)
 	recognition_comparison = data.get("recognition_comparison", false)
 	return true
+
+func uid(owner_id: String) -> String:return (origin_pile if not origin_pile.is_empty() else owner_id)+":"+id
+func mother_record() -> Dictionary:
+	var traits: Array[String]=inherited_traits.duplicate()
+	if adaptation_trial:traits.erase(adaptation_id)
+	return {"identity":parent_queen_id,"generation":parent_generation,"inherited_traits":traits}

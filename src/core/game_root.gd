@@ -246,7 +246,7 @@ func inspect_need(pile_id: String, organ: String) -> Dictionary:
 	inspect_pile(pile_id)
 	if _inward_view!=null:
 		_inward_view.selected_id=organ
-		if organ=="queen" and simulation.queens.summary(pile_id).status in ["weakened","lost","replacing"]: _inward_view.queen_tab="continuity"
+		if organ=="queen" and simulation.queens.summary(pile_id).status in ["weakened","lost","replacing","relocated"]: _inward_view.queen_tab="continuity"
 		_inward_view._process(0)
 	if _reports_view!=null: _reports_view.opened=false
 	set_mode("inward")
@@ -257,10 +257,15 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies","investment","chamber","queen"]:
+	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","investment","chamber","queen"]:
 		inspect_pile(selected.pile_id)
 		var organ: String="nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
+		if selected.kind in ["supplies","migration","relocation","brood_rescue"] and _inward_view!=null:
+			_inward_view.connection_controls.opened=true
+			_inward_view.connection_controls.purpose="workers" if selected.kind=="migration" else "queen" if selected.kind=="relocation" else "brood" if selected.kind=="brood_rescue" else "supplies"
+			for entry: Dictionary in simulation.connection_summaries(selected.pile_id):
+				if entry.destination_id==selected.subject_id:_inward_view.connection_controls.selected=entry.id
 		if selected.kind=="chamber" and _inward_view!=null: _inward_view.chamber_controls.opened=true;_inward_view.chamber_controls.selected=selected.subject_id
 		if selected.kind=="queen" and _inward_view!=null: _inward_view.queen_tab="continuity"
 		set_mode("inward")
@@ -424,7 +429,7 @@ func outward_status(pile_id: String) -> Dictionary:
 		"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),
 		"founding":camps,"home_air": simulation.heat.home_air(),
 		"available_workers": simulation.run.colony.piles[pile_id].workers_assignable,
-		"workers_total":simulation.run.colony.piles[pile_id].workers_total + simulation.run.pending_for_pile(pile_id),
+		"workers_total":simulation.run.colony.piles[pile_id].workers_total + simulation.run.pending_for_pile(pile_id)+simulation.run.unreported_transfers(pile_id),
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
@@ -551,27 +556,28 @@ func inward_status(pile_id: String) -> Dictionary:
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if simulation.run.connection_payer(route) == pile_id:
 			trail_workers += route.allocated_workers + simulation.run.trails.pending_losses(route.id)
-	var expected_total: int = pile.workers_total + simulation.run.pending_for_pile(pile_id)
-	var expected_adapted: int = pile.adapted_workers_total + simulation.run.pending_for_pile(pile_id, true)
+	trail_workers+=simulation.run.unreported_transfers(pile_id)
+	var expected_total: int = pile.workers_total + simulation.run.pending_for_pile(pile_id)+simulation.run.unreported_transfers(pile_id)
+	var expected_adapted: int = pile.adapted_workers_total + simulation.run.pending_for_pile(pile_id, true)+simulation.run.unreported_transfers(pile_id,pile.adaptation_repertoire)
 	var genetic_summary: Array[Dictionary] = []
 	var adaptation_options: Dictionary = {}
 	for trait_id: String in AdaptationRules.TRAITS:
-		if trait_id=="rapid_repair" and not pile.repair_experience and trait_id not in pile.genetics.established: continue
-		if trait_id in BroodEnvironment.TRAITS and trait_id not in pile.environment.seen and trait_id not in pile.genetics.established: continue
-		if trait_id=="efficient_nurses" and not pile.care_pressure_seen and trait_id not in pile.genetics.established: continue
-		if trait_id == "persistent" and not pile.chemistry_candidate:
+		if trait_id=="rapid_repair" and not pile.repair_experience and trait_id not in pile.genetics.established and trait_id not in pile.offspring_traits(): continue
+		if trait_id in BroodEnvironment.TRAITS and trait_id not in pile.environment.seen and trait_id not in pile.genetics.established and trait_id not in pile.offspring_traits(): continue
+		if trait_id=="efficient_nurses" and not pile.care_pressure_seen and trait_id not in pile.genetics.established and trait_id not in pile.offspring_traits(): continue
+		if trait_id == "persistent" and not pile.chemistry_candidate and trait_id not in pile.genetics.established and trait_id not in pile.offspring_traits():
 			continue
-		if trait_id in ["security", "tolerance"] and not pile.recognition_candidate:
+		if trait_id in ["security", "tolerance"] and not pile.recognition_candidate and trait_id not in pile.genetics.established and trait_id not in pile.offspring_traits():
 			continue
 		adaptation_options[trait_id] = {"available": AdaptationRules.can_queue(pile, trait_id),
 			"family":TraitCatalog.DEFINITIONS[trait_id].family,"benefit":TraitCatalog.DEFINITIONS[trait_id].benefit,"tradeoff":TraitCatalog.DEFINITIONS[trait_id].tradeoff,"evidence":TraitCatalog.DEFINITIONS[trait_id].evidence,
 			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.offspring_traits(),
-			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)}
+			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)+simulation.run.unreported_transfers(pile_id,trait_id)}
 	for trait_id: String in pile.genetics.established:
-		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)
+		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)+simulation.run.unreported_transfers(pile_id,trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
-	return {"connections":simulation.connection_summaries(pile_id,_inward_view.connection_controls.settlers if _inward_view!=null else 8),"reinforcement":simulation.reinforcement.summary() if pile_id in ["home","satellite_1"] else {}, "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary() if pile_id in ["home","satellite_1"] else {}, "pile_name":pile_title(pile_id),"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.size()>1, "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
+	return {"connections":simulation.connection_summaries(pile_id,_inward_view.connection_controls.settlers if _inward_view!=null else 8,_inward_view.connection_controls.cohort_uid if _inward_view!=null else ""),"reinforcement":simulation.reinforcement.summary() if pile_id in ["home","satellite_1"] else {}, "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary() if pile_id in ["home","satellite_1"] else {}, "pile_name":pile_title(pile_id),"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.size()>1, "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
 		"local_site":{"profile":pile.foundation.get("site_profile",""),"cues":SiteCatalog.for_pile(pile).cues},"queen_condition":simulation.queens.summary(pile_id),"reproduction": simulation.reproduction.summary(pile_id),
 		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
@@ -582,7 +588,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"brood_health": simulation.brood_health.summary(pile_id),
 		"temperature": simulation.heat.summary(pile_id),
 		"workers_total": expected_total, "workers_available": pile.workers_available,
-		"brood": brood, "brood_matured_total": pile.brood_matured_total,
+		"brood_transport":{"groups":pile.brood_reserved_groups,"reserved":pile.brood_reserved_space,"trial":pile.brood_reserved_trial},"brood": brood, "brood_matured_total": pile.brood_matured_total,
 		"brood_losses": pile.brood_lost_total, "guest": guest_summary(pile_id),
 		"honeydew": honeydew_summary(pile_id),
 		"adaptation_repertoire": pile.adaptation_repertoire,
@@ -594,7 +600,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"fighter_combat_weight":1.0 + AdaptationRules.FIGHTING.extra_combat_weight, "fighter_extra_food":AdaptationRules.FIGHTING.extra_larval_food,
 		"recognition_clearing_change": AdaptationRules.RECOGNITION.clearing_change,
 		"recognition_labor_change": AdaptationRules.RECOGNITION.protection_worker_change,
-		"adaptation_trial": pile.trial_cohort().to_dict() if pile.trial_cohort() != null else {},
+		"adaptation_trial":moving_trial_summary(pile),
 		"adaptation_queue": simulation.adaptation.queued_status(pile_id),
 		"care_pressure_seen":pile.care_pressure_seen,"care_candidate":pile.care_candidate,"care_multiplier":pile.care_multiplier(),
 		"adapted_workers": expected_adapted,
@@ -713,7 +719,7 @@ func midden_summary(pile_id: String) -> Dictionary:
 		return {}
 	var state: SanitationState = simulation.run.colony.piles[pile_id].midden
 	var pile: PileState=simulation.run.colony.piles[pile_id]
-	var expected: int=pile.workers_total+simulation.run.pending_for_pile(pile_id)
+	var expected: int=pile.workers_total+simulation.run.pending_for_pile(pile_id)+simulation.run.unreported_transfers(pile_id)
 	var generated: float=(expected*SANITATION_CONFIG.worker_quarters_per_tick+pile.nursery_occupied_space()*SANITATION_CONFIG.brood_quarters_per_tick)/4.0
 	var removal: int=SANITATION_CONFIG.removal_units_per_worker_tick*(SANITATION_CONFIG.developed_multiplier if state.state=="developed" else 1)
 	var suggestion: int=clampi(ceili(generated/removal)+(1 if state.burden_units>=SANITATION_CONFIG.strain_units else 0),1,SANITATION_CONFIG.cleaner_cap)
@@ -863,7 +869,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 			var pending: int = simulation.run.trails.pending_losses(route.id)
 			var camp: FoundingState=simulation.run.camp_for_route(route.id)
 			var connection: ConnectionTrafficState=simulation.run.connection_for(route.id) if route.purpose=="interpile" else null
-			var migration: WorkerReinforcementState=(connection.queens[connection.payer_id].movement if connection.queens[connection.payer_id].active() else connection.migrations[connection.payer_id]) if connection!=null else null
+			var migration: WorkerReinforcementState=(connection.broods[connection.payer_id].movement if connection.broods[connection.payer_id].active() else connection.queens[connection.payer_id].movement if connection.queens[connection.payer_id].active() else connection.migrations[connection.payer_id]) if connection!=null else null
 			var settlers_away: bool=migration!=null and migration.active()
 			var sent: int=migration.settlers+WorkerReinforcementState.CONFIG.reinforcement_messengers if settlers_away else 0
 			var status: String = route.status
@@ -930,7 +936,7 @@ func daughter_gathering_summary() -> Dictionary:
 		sources[category] = SourceMemory.entries(signals,status,category)
 		for entry: Dictionary in sources[category]: entry["scout"] = daughter_source_scout(entry.knowledge_id)
 	var pile: PileState=simulation.run.colony.piles[pile_id]
-	return {"sources":sources, "workers":simulation.trails.CONFIG.initial_workers, "workforce":pile.workers_total+simulation.run.pending_for_pile(pile.id),"available_workers":pile.workers_assignable, "time":simulation.run.simulation_time}
+	return {"sources":sources, "workers":simulation.trails.CONFIG.initial_workers, "workforce":pile.workers_total+simulation.run.pending_for_pile(pile.id)+simulation.run.unreported_transfers(pile.id),"available_workers":pile.workers_assignable, "time":simulation.run.simulation_time}
 
 
 func daughter_source_scout(knowledge_id: String) -> Dictionary:
@@ -1097,5 +1103,17 @@ func next_pile_id(current: String) -> String:
 func pile_title(id: String) -> String:
 	return simulation.run.colony.piles[id].display_title() if simulation.run.colony.piles.has(id) else ""
 
-func connection_order(route_id: String, source_id: String, action: String, count: int=8) -> Dictionary:
-	return simulation.connection_order(route_id,source_id,action,count)
+func connection_order(route_id: String, source_id: String, action: String, count: int=8, cohort_uid: String="") -> Dictionary:
+	return simulation.connection_order(route_id,source_id,action,count,cohort_uid)
+
+func moving_trial_summary(pile: PileState) -> Dictionary:
+	if pile.trial_cohort()!=null:return pile.trial_cohort().to_dict()
+	for connection: ConnectionTrafficState in simulation.run.all_connections():
+		for source_id: String in connection.broods:
+			var transport: BroodTransportState=connection.broods[source_id]
+			if not transport.active() or not transport.current().body.adaptation_trial:continue
+			if source_id==pile.id or connection.target(source_id)==pile.id and not transport.movement.settled:
+				var result: Dictionary=transport.current().body.duplicate(true)
+				result.transport_wait="report" if source_id==pile.id else "incoming"
+				return result
+	return {}

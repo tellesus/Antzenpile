@@ -478,7 +478,7 @@ func _queued_trait() -> String:
 func _can_lay_brood() -> bool:
 	if _status.get("investments",{}).get("next","")=="reproduction": return _status.investments.reproduction_wait.is_empty()
 	if not _queued_trait().is_empty(): return _status.get("adaptation_queue", {}).get("waiting", "") == "ready"
-	return _status.get("queens", 0) > 0 and _status.get("brood", []).size() < _status.get("nursery_brood_capacity", 0) / maxi(1, _status.get("brood_batch_count", 8)) and _status.get("worker_brood_space_free",_status.get("nursery_brood_capacity",0)-_status.get("nursery_occupied_space",0)) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
+	return _status.get("queens", 0) > 0 and _status.get("brood",[]).size()+int(_status.get("brood_transport",{}).get("groups",0))<_status.get("nursery_brood_capacity",0)/maxi(1,_status.get("brood_batch_count",8)) and _status.get("worker_brood_space_free",_status.get("nursery_brood_capacity",0)-_status.get("nursery_occupied_space",0)) >= _status.get("brood_batch_count", 0) and (_status.get("brood", []).is_empty() or _status.get("nursery_state", "") == "developed")
 
 
 func _draw() -> void:
@@ -760,6 +760,8 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box,117,"Reproductive brood · inspect Queen")
 				_detail_line(box,143,"Last short: "+Pressure.food_names(_status) if not Pressure.food_shortages(_status).is_empty() else "Four reproductive nurses committed")
 			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)] if _status.get("brood_health", {}).get("losses", 0) == 0 else "%d lost · %d during health strain" % [_status.get("brood_losses", 0), _status.brood_health.losses])
+			var promised: int=int(_status.get("brood_transport",{}).get("reserved",0))
+			if promised>0:_label(box.position+Vector2(16,209),"%d spaces promised for brood transport" % promised,Color("c2b58f"),12)
 			var care: Dictionary = _status.get("brood_care", {})
 			if care.get("missing", 0) > 0:
 				_detail_line(box, 162, "Care paused · need %d workers home" % care.missing)
@@ -886,7 +888,7 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 117, "Queue its next brood in this panel")
 			if not _status.adaptation_trial.is_empty():
 				_detail_line(box, 163, "Laid: " + Web.short_title(_status.adaptation_trial.adaptation_id))
-				_detail_line(box, 189, "Locked · %s brood" % _status.adaptation_trial.stage.capitalize())
+				_detail_line(box, 189, "Locked · await brood report" if _status.adaptation_trial.get("transport_wait","")=="report" else "Locked · incoming paid brood" if _status.adaptation_trial.get("transport_wait","")=="incoming" else "Locked · %s brood" % _status.adaptation_trial.stage.capitalize())
 				_detail_line(box, 215, "Surviving adults express the trait")
 			elif not _status.get("genetic_repertoire", []).is_empty():
 				_detail_line(box, 163, "%d known adult traits" % _status.get("genetic_repertoire", []).size())

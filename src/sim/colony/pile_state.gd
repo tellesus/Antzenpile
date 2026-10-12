@@ -40,6 +40,13 @@ var brood_cohorts: Array[BroodCohort] = []
 var brood_matured_total: int = 0
 var brood_started_total: int = 1
 var brood_lost_total: int = 0
+var brood_transferred_in: int=0
+var brood_transferred_out: int=0
+var brood_reserved_groups: int=0
+var brood_reserved_space: int=0
+var brood_reserved_trial: String=""
+var brood_reserved_traits: Array[String]=[]
+var brood_lineages: Dictionary[String,Array]={}
 var brood_intent: String = "manual"
 var queued_adaptation: String = ""
 var adaptation_repertoire: String = ""
@@ -84,12 +91,14 @@ func allocate_workers(commitment: String, amount: Variant) -> bool:
 func to_dict() -> Dictionary:
 	var brood_records: Array[Dictionary] = []
 	for cohort: BroodCohort in brood_cohorts:
-		brood_records.append(cohort.to_dict())
+		var body_record: Dictionary=cohort.to_dict()
+		if body_record.origin_pile.is_empty():body_record.origin_pile=id
+		brood_records.append(body_record)
 	var record: Dictionary={"display_name":display_title(),"id": id, "position": [position.x, position.y], "queen_count": queen_count,
 		"queen":queen.to_dict(id),"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
 		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
-		"brood_intent": brood_intent,
+		"brood_transferred_in":brood_transferred_in,"brood_transferred_out":brood_transferred_out,"brood_reserved_groups":brood_reserved_groups,"brood_reserved_space":brood_reserved_space,"brood_reserved_trial":brood_reserved_trial,"brood_reserved_traits":brood_reserved_traits.duplicate(),"brood_lineages":brood_lineages.duplicate(true),"brood_intent": brood_intent,
 		"queued_adaptation": queued_adaptation,
 		"investments":investments.to_dict(),
 		"chambers":chambers.to_dict(),
@@ -127,9 +136,9 @@ func nursery_occupied_space() -> int:
 
 func shared_nursery_occupied_space() -> int:
 	return nursery_occupied_space()-mini(reproduction.occupied_space(),chambers.reproductive_spaces())
-func free_worker_brood_space() -> int: return nursery_brood_capacity()-shared_nursery_occupied_space()
+func free_worker_brood_space() -> int: return nursery_brood_capacity()-shared_nursery_occupied_space()-brood_reserved_space
 func free_reproductive_space() -> int:
-	return maxi(0,chambers.reproductive_spaces()-reproduction.occupied_space())+maxi(0,nursery_brood_capacity()-shared_nursery_occupied_space())
+	return maxi(0,chambers.reproductive_spaces()-reproduction.occupied_space())+maxi(0,nursery_brood_capacity()-shared_nursery_occupied_space()-brood_reserved_space)
 
 
 func nursery_care_capacity() -> int:
@@ -236,7 +245,7 @@ func move_workers_to(destination: PileState, pool: String, amount: int, captured
 func register_emergence(cohort: BroodCohort) -> void:
 	if care_pressure_seen and cohort.care>=1.0: care_candidate=true
 	genetics.emerge(cohort.inherited_traits, cohort.count, cohort.adaptation_id if cohort.adaptation_trial else "")
-	if cohort.adaptation_trial and queen.count>0 and (cohort.parent_queen_id.is_empty() or cohort.parent_queen_id==queen.queen_id(id)) and cohort.adaptation_id not in queen.inherited_traits:
+	if cohort.adaptation_trial and queen.count>0 and ((cohort.parent_queen_id.is_empty() and cohort.transport_count==0) or cohort.parent_queen_id==queen.queen_id(id)) and cohort.adaptation_id not in queen.inherited_traits:
 		queen.inherited_traits.append(cohort.adaptation_id);queen.inherited_traits.sort()
 	if cohort.adaptation_id in ["lean", "load"]:
 		adaptation_repertoire = cohort.adaptation_id
@@ -345,18 +354,36 @@ func restore(data: Dictionary) -> bool:
 	var active_losses: int = 0
 	for cohort: BroodCohort in restored_brood:
 		occupied += cohort.count
-		active_losses += cohort.lost_count
+		active_losses += cohort.lost_count-cohort.inherited_lost
 		var suffix: String = cohort.id.trim_prefix("brood_")
-		if cohort.id != "brood_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or suffix.to_int() > total_started or cohort_ids.has(cohort.id):
+		if cohort.id != "brood_" + suffix or not suffix.is_valid_int() or str(suffix.to_int()) != suffix or suffix.to_int() < 1 or (suffix.to_int() > total_started and (cohort.origin_pile.is_empty() or cohort.origin_pile==data.id)) or cohort_ids.has(cohort.uid(data.id)):
 			return false
-		cohort_ids[cohort.id] = true
-	if emerged + int(brood_lost) + occupied != total_started * BROOD_CONFIG.starting_count or active_losses > brood_lost:
+		cohort_ids[cohort.uid(data.id)] = true
+	var reserved_groups: Variant=data.get("brood_reserved_groups",0)
+	if not Ledger.valid_count(reserved_groups):return false
+	var incoming_brood: Variant=data.get("brood_transferred_in",0);var outgoing_brood: Variant=data.get("brood_transferred_out",0);var reserved_brood: Variant=data.get("brood_reserved_space",0)
+	if not Ledger.valid_count(incoming_brood) or not Ledger.valid_count(outgoing_brood) or not Ledger.valid_count(reserved_brood):return false
+	var reserved_trial: Variant=data.get("brood_reserved_trial","");var reserved_traits: Variant=data.get("brood_reserved_traits",[]);var received_lineages: Variant=data.get("brood_lineages",{})
+	if not reserved_trial is String or (not reserved_trial.is_empty() and not AdaptationRules.valid_trait(reserved_trial)) or not reserved_traits is Array or not received_lineages is Dictionary:return false
+	var parsed_reserved: Array[String]=[];var parsed_lineages: Dictionary[String,Array]={}
+	for value: Variant in reserved_traits:
+		if not value is String or not AdaptationRules.valid_trait(value) or value in parsed_reserved:return false
+		parsed_reserved.append(value)
+	for key: Variant in received_lineages:
+		if not key is String or key.length()>160 or not received_lineages[key] is Array:return false
+		var bundle: Array[String]=[]
+		for value: Variant in received_lineages[key]:
+			if not value is String or not AdaptationRules.valid_trait(value) or value in bundle:return false
+			bundle.append(value)
+		if not AdaptationRules.compatible(bundle):return false
+		parsed_lineages[key]=bundle
+	if emerged + int(brood_lost) + occupied != total_started * BROOD_CONFIG.starting_count+int(incoming_brood)-int(outgoing_brood) or active_losses > brood_lost:
 		return false
 	var brood_limit: int = BROOD_CONFIG.developed_nursery_brood_capacity if restored_nursery_state == "developed" else BROOD_CONFIG.primitive_nursery_brood_capacity
 	if expansion.state == "developed": brood_limit = NURSERY_CONFIG.expansion_capacity
-	if occupied > brood_limit:
+	if occupied > brood_limit or restored_brood.size()+int(reserved_groups)>brood_limit/BROOD_CONFIG.starting_count:
 		return false
-	if restored_nursery_state != "developed" and not restored_brood.is_empty() and restored_brood[0].id != "brood_%d" % total_started:
+	if restored_nursery_state != "developed" and not restored_brood.is_empty() and incoming_brood==0 and outgoing_brood==0 and (restored_brood.size()>1 or restored_brood[0].id!="brood_%d" % total_started):
 		return false
 	var repertoire: Variant = data.get("adaptation_repertoire", "")
 	var rain_observed: Variant = data.get("rain_trace_observed", false)
@@ -383,7 +410,7 @@ func restore(data: Dictionary) -> bool:
 	if not repertoire is String or not (repertoire == "" or AdaptationRules.valid_trait(repertoire)) or not Ledger.valid_count(adapted) or not Ledger.valid_count(adapted_lost) or adapted > restored.total or adapted_lost > restored.lost_total or adapted+adapted_lost>emerged+restored.transferred_in:
 		return false
 	var lifetime_adapted: int = int(adapted) + int(adapted_lost)
-	if brood_lost == 0 and restored.transferred_in==0 and restored.transferred_out==0 and lifetime_adapted % BROOD_CONFIG.starting_count != 0:
+	if brood_lost == 0 and incoming_brood==0 and outgoing_brood==0 and restored.transferred_in==0 and restored.transferred_out==0 and lifetime_adapted % BROOD_CONFIG.starting_count != 0:
 		return false
 	if (repertoire == "") != (lifetime_adapted == 0) and repertoire not in founder_traits and restored.transferred_out==0:
 		return false
@@ -400,6 +427,9 @@ func restore(data: Dictionary) -> bool:
 			if not value is String or not AdaptationRules.valid_trait(value):return false
 			if value not in incoming_traits:incoming_traits.append(value)
 	var lineage_basis: Array[String]=founder_traits.duplicate()
+	for bundle: Array in parsed_lineages.values():
+		for trait_id: String in bundle:
+			if trait_id not in incoming_traits:incoming_traits.append(trait_id)
 	for trait_id: String in incoming_traits:
 		if trait_id not in lineage_basis:lineage_basis.append(trait_id)
 	var genetic_data: Variant = data.get("genetics", {"established": [] if repertoire == "" else [repertoire], "living": {} if adapted == 0 else {repertoire: adapted}, "lost": {} if adapted_lost == 0 else {repertoire: adapted_lost}})
@@ -423,7 +453,7 @@ func restore(data: Dictionary) -> bool:
 	for trait_id: String in BroodEnvironment.TRAITS:
 		if trait_id in restored_genetics.established and trait_id not in restored_environment.candidates and trait_id not in inherited_environment: return false
 	if "rapid_repair" in restored_genetics.established and not repair_available and "rapid_repair" not in lineage_basis and restored_genetics.migration_count(restored_genetics.imported,"rapid_repair")==0: return false
-	if brood_lost == 0:
+	if brood_lost == 0 and incoming_brood==0 and outgoing_brood==0:
 		var profiles: Array = restored_genetics.living.keys()
 		for key: String in restored_genetics.lost:
 			if key not in profiles:
@@ -454,18 +484,18 @@ func restore(data: Dictionary) -> bool:
 		if cohort.adaptation_trial:
 			trials += 1
 			locked_trait = cohort.adaptation_id
-			if cohort.adaptation_id in maternal_traits and (cohort.parent_queen_id.is_empty() or cohort.parent_queen_id==current_parent):
+			if cohort.transport_count==0 and cohort.adaptation_id in maternal_traits and (cohort.parent_queen_id.is_empty() or cohort.parent_queen_id==current_parent):
 				return false
-			if cohort.adaptation_id == "persistent" and not candidate:
+			if cohort.adaptation_id == "persistent" and not candidate and cohort.transport_count==0:
 				return false
-			if cohort.adaptation_id=="rapid_repair" and not repair_available: return false
-			if cohort.adaptation_id in BroodEnvironment.TRAITS and cohort.adaptation_id not in restored_environment.candidates: return false
-			if cohort.adaptation_id=="efficient_nurses" and not care_available: return false
-			if cohort.adaptation_id in ["security", "tolerance"] and not recognition_available:
+			if cohort.adaptation_id=="rapid_repair" and not repair_available and cohort.transport_count==0: return false
+			if cohort.adaptation_id in BroodEnvironment.TRAITS and cohort.adaptation_id not in restored_environment.candidates and cohort.transport_count==0: return false
+			if cohort.adaptation_id=="efficient_nurses" and not care_available and cohort.transport_count==0: return false
+			if cohort.adaptation_id in ["security", "tolerance"] and not recognition_available and cohort.transport_count==0:
 				return false
 			var trial_traits: Array[String] = (restored_genetics.established if cohort.parent_queen_id.is_empty() else maternal_traits).duplicate()
 			trial_traits.append(cohort.adaptation_id)
-			if (cohort.parent_queen_id.is_empty() or cohort.parent_queen_id==current_parent) and GeneticRepertoire.profile(cohort.inherited_traits) != GeneticRepertoire.profile(trial_traits):
+			if cohort.transport_count==0 and (cohort.parent_queen_id.is_empty() or cohort.parent_queen_id==current_parent) and GeneticRepertoire.profile(cohort.inherited_traits) != GeneticRepertoire.profile(trial_traits):
 				return false
 		for trait_id: String in cohort.inherited_traits:
 			if trait_id not in restored_genetics.established and trait_id not in incoming_traits and not (cohort.adaptation_trial and trait_id == cohort.adaptation_id):
@@ -478,9 +508,12 @@ func restore(data: Dictionary) -> bool:
 		return false
 	var restored_queue: Variant = data.get("queued_adaptation", "")
 	if restored_queue is String and not restored_queue.is_empty():
-		var coexist: Array[String]=restored_genetics.established.duplicate();coexist.append(restored_queue)
+		var coexist: Array[String]=_merged_traits(restored_genetics.established,parsed_reserved)
+		coexist=_merged_traits(coexist,maternal_traits)
+		for cohort: BroodCohort in restored_brood:coexist=_merged_traits(coexist,cohort.inherited_traits)
+		coexist.append(restored_queue)
 		if not AdaptationRules.compatible(coexist): return false
-	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), maternal_traits, candidate, recognition_available, locked_trait,care_available,restored_environment.candidates,repair_available)):
+	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), maternal_traits, candidate or "persistent" in restored_genetics.established, recognition_available or "security" in restored_genetics.established or "tolerance" in restored_genetics.established, locked_trait if not locked_trait.is_empty() else reserved_trial,care_available or "efficient_nurses" in restored_genetics.established,_merged_traits(restored_environment.candidates,restored_genetics.established),repair_available or "rapid_repair" in restored_genetics.established)):
 		return false
 	var restored_reproduction := ReproductionState.new()
 	var restored_investments:=preload("res://src/sim/colony/investment_intent.gd").new()
@@ -561,6 +594,7 @@ func restore(data: Dictionary) -> bool:
 	brood_matured_total = int(data.brood_matured_total)
 	brood_started_total = int(started)
 	brood_lost_total = int(brood_lost)
+	brood_transferred_in=int(incoming_brood);brood_transferred_out=int(outgoing_brood);brood_reserved_groups=int(reserved_groups);brood_reserved_space=int(reserved_brood);brood_reserved_trial=reserved_trial;brood_reserved_traits=parsed_reserved;brood_lineages=parsed_lineages
 	brood_intent = restored_intent
 	queued_adaptation = restored_queue
 	investments=restored_investments
@@ -598,7 +632,7 @@ static func typed_traits(values: Array) -> Array[String]:
 	result.assign(values);return result
 
 func planned_trait_union() -> Array[String]:
-	var result: Array[String]=genetics.established.duplicate()
+	var result: Array[String]=_merged_traits(genetics.established,brood_reserved_traits)
 	if queen.count>0 or queen.in_transit:result=_merged_traits(result,queen.inherited_traits)
 	for cohort: BroodCohort in brood_cohorts:result=_merged_traits(result,cohort.inherited_traits)
 	if reproduction.phase!="none":result=_merged_traits(result,reproduction.inherited_traits)

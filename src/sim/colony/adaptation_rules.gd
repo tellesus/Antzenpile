@@ -23,16 +23,16 @@ static func compatible(traits: Array[String]) -> bool:
 
 
 static func can_select(pile: PileState, id: String) -> bool:
-	return pile.trial_cohort() == null and can_queue(pile, id)
+	return pile.trial_cohort() == null and pile.brood_reserved_trial.is_empty() and can_queue(pile, id)
 
 
 static func can_queue(pile: PileState, id: String) -> bool:
 	var trial: BroodCohort = pile.trial_cohort()
-	var coexist: Array[String]=pile.genetics.established.duplicate()
+	var coexist: Array[String]=pile.planned_trait_union()
 	coexist.append(id)
 	if not compatible(coexist): return false
-	return queue_eligible(id, pile.queen_count, pile.offspring_traits(), pile.chemistry_candidate,
-		pile.recognition_candidate, trial.adaptation_id if trial != null else "",pile.care_candidate,pile.environment.candidates,pile.repair_candidate)
+	return queue_eligible(id, pile.queen_count, pile.offspring_traits(), pile.chemistry_candidate or "persistent" in pile.genetics.established,
+		pile.recognition_candidate or "security" in pile.genetics.established or "tolerance" in pile.genetics.established, trial.adaptation_id if trial != null else pile.brood_reserved_trial,pile.care_candidate or "efficient_nurses" in pile.genetics.established,PileState._merged_traits(pile.environment.candidates,pile.genetics.established),pile.repair_candidate or "rapid_repair" in pile.genetics.established)
 
 
 static func queue_eligible(id: String, queens: int, established: Array[String], chemistry: bool, recognition: bool, locked: String, care: bool=false, environment: Array[String]=[], repair: bool=false) -> bool:

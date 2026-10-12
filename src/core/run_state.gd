@@ -348,7 +348,7 @@ func restore(data: Dictionary) -> bool:
 	var restored_trails := Trails.new()
 	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, active_supply, restored_reinforcement, restored_supply_origin, restored_extra_foundings.values(),restored_connections):
 		return false
-	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement,restored_connections) or not _valid_queen_transports(restored_colony,restored_connections): return false
+	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement,restored_connections) or not _valid_queen_transports(restored_colony,restored_connections) or not _valid_brood_transports(restored_colony,restored_connections): return false
 	# A paid young queen has one current body owner; founding history is not stock.
 	var reproductive_bodies: Dictionary={}
 	for pile: PileState in restored_colony.piles.values():
@@ -692,7 +692,7 @@ static func _valid_foundations(colony_state: ColonyState, camps: Array[FoundingS
 		for connection: ConnectionTrafficState in connections.values():
 			for source_id: String in connection.migrations:
 				var target_id: String=connection.target(source_id)
-				for migration: WorkerReinforcementState in [connection.migrations[source_id],connection.queens[source_id].movement]:
+				for migration: WorkerReinforcementState in [connection.migrations[source_id],connection.queens[source_id].movement,connection.broods[source_id].movement]:
 					incoming[target_id]=incoming.get(target_id,0)+migration.moved_workers;outgoing[source_id]=outgoing.get(source_id,0)+migration.moved_workers
 					_profile_sum(gene_in,target_id,migration.moved_profiles);_profile_sum(gene_out,source_id,migration.moved_profiles)
 	for pile: PileState in colony_state.piles.values():
@@ -769,6 +769,15 @@ static func _valid_queen_transports(colony_state: ColonyState, connections: Dict
 				if not historical.has(target_id):historical[target_id]=[]
 				historical[target_id].append(record.previous_mother)
 				historical[target_id].append({"identity":record.body.identity,"generation":record.body.generation,"inherited_traits":record.body.inherited_traits})
+	for connection: ConnectionTrafficState in connections.values():
+		for source_id: String in connection.broods:
+			for record: Dictionary in connection.broods[source_id].manifests:
+				var receiver: String=connection.target(source_id) if record.arrived_tick>0 else source_id if record.reported_tick>0 else ""
+				if receiver.is_empty():continue
+				var cohort:=BroodCohort.new();var parsed: bool=cohort.restore(record.body);assert(parsed)
+				if cohort.parent_queen_id.is_empty():continue
+				if not historical.has(receiver):historical[receiver]=[]
+				historical[receiver].append(cohort.mother_record())
 	for pile: PileState in colony_state.piles.values():
 		var queen: QueenState=pile.queen
 		if queen.in_transit!=departing.has(pile.id):return false
@@ -805,3 +814,98 @@ func departed_queen(pile_id: String, queen_id: String) -> Dictionary:
 		var transport: QueenTransportState=connection.queens[pile_id]
 		if transport.active() and transport.current().body.identity==queen_id:return transport.current().body.duplicate(true)
 	return {}
+
+func refresh_brood_reservations() -> void:
+	for pile: PileState in colony.piles.values():
+		pile.brood_reserved_groups=0;pile.brood_reserved_space=0;pile.brood_reserved_trial="";pile.brood_reserved_traits.clear()
+	var plans: Dictionary=_brood_reservations(connection_traffic)
+	for id: String in plans:
+		var pile: PileState=colony.piles[id];var plan: Dictionary=plans[id]
+		pile.brood_reserved_groups=plan.groups;pile.brood_reserved_space=plan.space;pile.brood_reserved_trial=plan.trial;pile.brood_reserved_traits.assign(plan.traits)
+
+static func _brood_reservations(connections: Dictionary) -> Dictionary:
+	var result: Dictionary={}
+	for connection: ConnectionTrafficState in connections.values():
+		for source_id: String in connection.broods:
+			var transport: BroodTransportState=connection.broods[source_id]
+			if not transport.active():continue
+			var record: Dictionary=transport.current().body
+			var receivers: Array[String]=[source_id]
+			if not transport.movement.settled:receivers.append(connection.target(source_id))
+			for id: String in receivers:
+				if not result.has(id):result[id]={"groups":0,"space":0,"trial":"","traits":[]}
+				result[id].groups+=1;result[id].space+=int(record.count)
+				if record.adaptation_trial:
+					if not result[id].trial.is_empty():result[id].trial="invalid"
+					else:result[id].trial=record.adaptation_id
+				for trait_id: String in record.inherited_traits:
+					if trait_id not in result[id].traits:result[id].traits.append(trait_id)
+	for plan: Dictionary in result.values():plan.traits.sort()
+	return result
+
+static func _valid_brood_transports(colony_state: ColonyState, connections: Dictionary) -> bool:
+	var incoming: Dictionary={};var outgoing: Dictionary={};var received: Dictionary={};var records_by_body: Dictionary={};var bodies: Dictionary={}
+	var reservations: Dictionary=_brood_reservations(connections)
+	for pile: PileState in colony_state.piles.values():
+		var expected: Dictionary=reservations.get(pile.id,{"groups":0,"space":0,"trial":"","traits":[]})
+		if pile.brood_reserved_groups!=expected.groups or pile.brood_reserved_space!=expected.space or pile.brood_reserved_trial!=expected.trial or pile.brood_reserved_traits!=expected.traits:return false
+		if expected.trial=="invalid" or not expected.trial.is_empty() and pile.trial_cohort()!=null:return false
+		for cohort: BroodCohort in pile.brood_cohorts:
+			var uid: String=cohort.uid(pile.id);var origin: String=cohort.origin_pile if not cohort.origin_pile.is_empty() else pile.id
+			if bodies.has(uid) or not colony_state.piles.has(origin) or int(cohort.id.trim_prefix("brood_"))>colony_state.piles[origin].brood_started_total:return false
+			if cohort.transport_count==0 and origin!=pile.id:return false
+			bodies[uid]={"owner":pile.id,"moves":cohort.transport_count,"traits":cohort.inherited_traits,"count":cohort.count}
+	for connection: ConnectionTrafficState in connections.values():
+		for source_id: String in connection.broods:
+			var transport: BroodTransportState=connection.broods[source_id]
+			for record: Dictionary in transport.manifests:
+				var cohort:=BroodCohort.new();var parsed: bool=cohort.restore(record.body);assert(parsed)
+				var uid: String=cohort.uid(source_id)
+				if not colony_state.piles.has(cohort.origin_pile) or int(cohort.id.trim_prefix("brood_"))>colony_state.piles[cohort.origin_pile].brood_started_total:return false
+				if not records_by_body.has(uid):records_by_body[uid]=[]
+				records_by_body[uid].append({"record":record,"target":connection.target(source_id)})
+				outgoing[source_id]=outgoing.get(source_id,0)+cohort.count
+				var recipient: String=connection.target(source_id) if record.arrived_tick>0 else source_id if record.reported_tick>0 else ""
+				if not recipient.is_empty():
+					incoming[recipient]=incoming.get(recipient,0)+cohort.count
+					if not received.has(recipient):received[recipient]={}
+					received[recipient][uid]=cohort.inherited_traits.duplicate()
+			if not transport.body.is_empty():
+				var cohort:=BroodCohort.new();var parsed: bool=cohort.restore(transport.body);assert(parsed)
+				var uid: String=cohort.uid(source_id)
+				if bodies.has(uid):return false
+				bodies[uid]={"owner":"transit","moves":cohort.transport_count,"traits":cohort.inherited_traits,"count":cohort.count}
+	for uid: String in records_by_body:
+		var records: Array=records_by_body[uid];records.sort_custom(func(a: Dictionary,b: Dictionary)->bool:return a.record.departed_tick<b.record.departed_tick)
+		var previous_owner: String=uid.get_slice(":",0);var ready: int=0;var previous_count: int=BroodCohort.CONFIG.starting_count
+		var immutable: Array[String]=["origin_pile","id","parent_queen_id","parent_generation","adaptation_id","adaptation_trial","inherited_traits","rain_comparison","recognition_comparison","repair_comparison"]
+		var first: Dictionary=records[0].record.body
+		for index: int in records.size():
+			var entry: Dictionary=records[index];var record: Dictionary=entry.record;var body: Dictionary=record.body
+			if int(body.transport_count)!=index+1 or record.source_id!=previous_owner or record.departed_tick<ready or body.count>previous_count:return false
+			for key: String in immutable:
+				if body[key]!=first[key]:return false
+			previous_count=int(body.count)
+			previous_owner=entry.target if record.arrived_tick>0 else record.source_id if record.reported_tick>0 else "transit"
+			ready=int(record.arrived_tick if record.arrived_tick>0 else record.reported_tick)
+		if bodies.has(uid):
+			var current_body: Dictionary=bodies[uid]
+			if current_body.owner!=previous_owner or current_body.moves!=records.size() or current_body.traits!=first.inherited_traits or current_body.count>previous_count:return false
+		elif previous_owner=="transit":return false
+	for uid: String in bodies:
+		if bodies[uid].moves>0 and not records_by_body.has(uid):return false
+	for pile: PileState in colony_state.piles.values():
+		if pile.brood_transferred_in!=incoming.get(pile.id,0) or pile.brood_transferred_out!=outgoing.get(pile.id,0) or pile.brood_lineages!=received.get(pile.id,{}):return false
+	return true
+
+func unreported_transfers(pile_id: String, trait_id: String="*") -> int:
+	var total: int=0
+	for connection: ConnectionTrafficState in all_connections():
+		if not connection.migrations.has(pile_id):continue
+		for movement: WorkerReinforcementState in [connection.migrations[pile_id],connection.queens[pile_id].movement,connection.broods[pile_id].movement]:
+			if not movement.active() or not movement.settled:continue
+			if trait_id=="*":total+=movement.settlers
+			else:
+				for key: String in movement.party_profiles:
+					if trait_id in GeneticRepertoire.traits_for(key):total+=movement.party_profiles[key]
+	return total
