@@ -551,6 +551,7 @@ func inward_status(pile_id: String) -> Dictionary:
 	var genetic_summary: Array[Dictionary] = []
 	var adaptation_options: Dictionary = {}
 	for trait_id: String in AdaptationRules.TRAITS:
+		if trait_id=="rapid_repair" and not pile.repair_experience and trait_id not in pile.genetics.established: continue
 		if trait_id in BroodEnvironment.TRAITS and trait_id not in pile.environment.seen and trait_id not in pile.genetics.established: continue
 		if trait_id=="efficient_nurses" and not pile.care_pressure_seen and trait_id not in pile.genetics.established: continue
 		if trait_id == "persistent" and not pile.chemistry_candidate:
@@ -581,7 +582,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"honeydew": honeydew_summary(pile_id),
 		"adaptation_repertoire": pile.adaptation_repertoire,
 		"genetic_repertoire": genetic_summary,
-		"environment_candidates":pile.environment.candidates.duplicate(),"adaptation_options": adaptation_options, "wet_trail_experience": pile.rain_trace_observed,
+		"repair_candidate":pile.repair_candidate,"environment_candidates":pile.environment.candidates.duplicate(),"adaptation_options": adaptation_options, "wet_trail_experience": pile.rain_trace_observed,
 		"chemistry_persistence": AdaptationRules.CHEMISTRY.persistence_multiplier,
 		"chemistry_extra_energy": AdaptationRules.CHEMISTRY.extra_travel_energy,
 		"recognition_experience": pile.recognition_experience,

@@ -4,11 +4,11 @@ A colony-scale strategy/4X game about learning an uncertain world, investing liv
 
 ## Current build
 
-The prototype supports returned scout memories, five concrete source identities, remembered-source comparisons, named standing exploration/rechecks, flexible gathering/queued staffing and real recall, brood/care/development, six inherited traits, first daughter founding/local work and two-way paid supplies. A retained delivered/local report journal exposes simultaneous needs. Reproductive and adaptation investment queues have saved next priority; Auto Brood can stay on. Journey Alarm opens direct circular controls with alerted trail → free nest → explicit All Hands recruitment. Aphid honeydew is introduced as sugary aphid droplets. Voluntary End Run opens a separate sampled physical history.
+The prototype supports returned scout memories, eight concrete source identities, remembered-source comparisons, named standing exploration/rechecks, flexible gathering/queued staffing and real recall, brood/care/development, ten inherited traits, first daughter founding/local work and two-way paid supplies. A retained delivered/local report journal exposes simultaneous needs. Reproductive and adaptation investment queues have saved next priority; Auto Brood can stay on. Journey Alarm opens direct circular controls with alerted trail → free nest → explicit All Hands recruitment. Aphid honeydew is introduced as sugary aphid droplets. Voluntary End Run opens a separate sampled physical history.
 
-Paid Reproductive Alcove provides dedicated group space; Ventilation Gallery improves staffed regulation while retaining water use. Whole climate/cleanup/scout effort is editable with suggestions; presets remain.
+Paid Reproductive Alcove provides dedicated group space; Ventilation Gallery improves staffed regulation while retaining water use. Whole climate/cleanup/scout effort is editable with suggestions; presets remain. Fruit, heavy seeds and episodic crumbs use captured mixed-nutrient cargo. Care, Environment and Chemistry web families offer actual inherited tradeoffs; a Food Cache remains excluded after its gate found no buffering need.
 
-Latest runtime gate: **9,249 headless checks, zero failures**, clean import/Main and standard/compact headless input/drawing. This is a systems prototype, not a release candidate. Multiple daughters, queen replacement/generations, mixed yields/remaining sources and remaining chambers/traits are planned, not implemented. The player defers graphical/feel/audio checks to the systems beta. See [Current Build](docs/CURRENT_BUILD.md).
+Latest runtime gate: **9,414 headless checks, zero failures**, clean import/Main and standard/compact headless input/drawing. This is a systems prototype, not a release candidate. Multiple daughters, queen replacement/generations, dew/seep, moving ecology and refuge are planned, not implemented. Mixed food and all ten traits now work; integrated balance follows the remaining systems. The player defers graphical/feel/audio checks to the systems beta. See [Current Build](docs/CURRENT_BUILD.md).
 
 ## Current design and implementation order
 
@@ -35,7 +35,7 @@ The test runner returns nonzero on failures. For ordinary play run the project e
 ## Basic controls and saves
 
 - OUTWARD: drag to turn attention, tap traces/alarms for contexts. Exploration sets standing scout effort; Favor This Direction changes search intent. Remembered Sources browses returned memories.
-- INWARD/Tab: inspect the abstract functional network. Queen offers Auto/manual worker brood and immediate reproductive investment when supported; adaptation choices queue for future brood.
+- INWARD/Tab: inspect the abstract functional network. Queen offers Auto/manual worker brood and queued reproductive investment with next-priority controls; adaptation choices queue for future brood.
 - Conflict: choose workers/goal in the free draft, then ORDER. Investigate, retreat and alternate approach remain direct actions. Recalled workers/cargo travel home; All Hands can leave other jobs reduced.
 - Space pauses; 1/2/3/4 select 1×/4×/16×/64×. Sound controls music and information cues separately. Help describes current controls.
 - Save/Load or Ctrl+S/Ctrl+L use `user://saves/slot_1.json`; loading resets attention while restoring simulation. End Run/Review does not overwrite that slot. Revealed review cannot resume ordinary play.

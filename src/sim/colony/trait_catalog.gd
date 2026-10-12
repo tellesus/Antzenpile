@@ -1,6 +1,6 @@
 class_name TraitCatalog
 extends RefCounted
-const IDS: Array[String]=["lean","load","persistent","security","tolerance","fighter","efficient_nurses","heat_resilience","moisture_resilience"]
+const IDS: Array[String]=["lean","load","persistent","security","tolerance","fighter","efficient_nurses","heat_resilience","moisture_resilience","rapid_repair"]
 const DEFINITIONS: Dictionary={
 	"lean":preload("res://data/adaptation/traits/lean.tres"),
 	"load":preload("res://data/adaptation/traits/load.tres"),
@@ -10,7 +10,8 @@ const DEFINITIONS: Dictionary={
 	"fighter":preload("res://data/adaptation/traits/fighter.tres"),
 	"efficient_nurses":preload("res://data/adaptation/traits/efficient_nurses.tres"),
 	"heat_resilience":preload("res://data/adaptation/traits/heat_resilience.tres"),
-	"moisture_resilience":preload("res://data/adaptation/traits/moisture_resilience.tres")}
+	"moisture_resilience":preload("res://data/adaptation/traits/moisture_resilience.tres"),
+	"rapid_repair":preload("res://data/adaptation/traits/rapid_repair.tres")}
 static func food_multiplier(traits: Array[String]) -> float:
 	var result: float=1
 	for id: String in traits:

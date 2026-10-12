@@ -19,4 +19,7 @@ extends Resource
 @export var warm_relief: float=0
 @export var dry_relief: float=0
 @export var comfortable_rate: float=1
+@export var repair_gain: float=0
+@export var worn_scent_threshold: float=0.5
+@export var repair_food: float=0
 func costs() -> Dictionary: return {"carbohydrate":carbohydrate,"protein":protein,"water":water}

@@ -18,6 +18,7 @@ var inherited_traits: Array[String] = []
 var rain_comparison: bool = false
 var recognition_comparison: bool = false
 var environment_exposure: Array[String] = []
+var repair_comparison: bool = false
 
 
 static func next_id(matured_total: int, active_count: int = 0) -> String:
@@ -30,7 +31,7 @@ func to_dict() -> Dictionary:
 		"nutrition_shortfalls": nutrition_shortfalls.duplicate(),
 		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial,
 		"inherited_traits": inherited_traits.duplicate(), "rain_comparison": rain_comparison,
-		"recognition_comparison": recognition_comparison,"environment_exposure":environment_exposure.duplicate()}
+		"recognition_comparison": recognition_comparison,"environment_exposure":environment_exposure.duplicate(),"repair_comparison":repair_comparison}
 
 
 func restore(data: Dictionary) -> bool:
@@ -72,6 +73,8 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if typeof(data.get("recognition_comparison", false)) != TYPE_BOOL:
 		return false
+	if not data.get("repair_comparison",false) is bool: return false
+	repair_comparison=data.get("repair_comparison",false)
 	var exposure: Variant = data.get("environment_exposure",[])
 	if not BroodEnvironment.valid_exposure(exposure) or data.stage=="egg" and not exposure.is_empty(): return false
 	environment_exposure.assign(exposure)

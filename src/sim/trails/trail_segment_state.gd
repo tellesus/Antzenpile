@@ -154,7 +154,10 @@ func restore(data: Dictionary, bounds: Rect2) -> bool:
 	return true
 
 
-func reinforce_chemistry(amount: float, fraction: float) -> void:
+func reinforce_chemistry(amount: float, fraction: float, repair: float=0.0) -> void:
+	var definition: TraitDefinition=TraitCatalog.DEFINITIONS.rapid_repair
+	if traffic>0 and pheromone_strength<definition.worn_scent_threshold:
+		amount*=1.0+definition.repair_gain*clampf(repair,0.0,1.0)
 	# Blend incoming secretion before saturation; repeated returns cannot turn
 	# baseline chemistry durable without contributing expressed workers.
 	var total: float = pheromone_strength + amount

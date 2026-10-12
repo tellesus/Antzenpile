@@ -1,6 +1,6 @@
 # Adaptation web and trait catalog
 
-Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Nine definition-driven traits exist through [149](../tasks/149_environmental_brood_traits.md); Rapid Trail Repair remains planned. This is a composite species, not literal genetics.
+Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Ten definition-driven traits exist through [150](../tasks/150_rapid_trail_repair.md); broader reproductive-lineage integration remains M4. This is a composite species, not literal genetics.
 
 ## Rules family
 
@@ -62,9 +62,9 @@ Implemented [148](../tasks/148_trait_definitions_and_efficient_nurses.md), runti
 
 149 magnitudes: warm larval penalty halved, severe heat unchanged, comfortable heat-lineage larval development ×0.9; dry penalty halved, moisture-lineage larval carbohydrate ×1.2. The slowest independent pressure wins and rate never exceeds one. Evidence is exposure of worker/reproductive larvae followed by that cohort surviving to pupation. Each trial costs 14C/16P/8W, two nurses and eight spaces; values remain provisional.
 
-**AT-REPAIR — Rapid Trail Repair (Chemistry).** Expressed traveling workers lay a stronger replacement contribution where an existing scent corridor is worn or rain-disturbed. It changes deposition, not route familiarity or the decay half-life of old scent. Tradeoff: increased journey food demand. Evidence comes from returned disrupted-trail experience and surviving brood progression. Verify rebuilding versus extra energy; no instant new path, autonomous reroute or hidden weather forecast. It may coexist with Persistent Chemistry; combined food demand and scent strength have authored bounds.
+**AT-REPAIR — Rapid Trail Repair (Chemistry), implemented 150.** Expressed traveling workers lay a stronger replacement contribution where an existing scent corridor is worn or rain-disturbed. It changes deposition, not route familiarity or the decay half-life of old scent. Tradeoff: increased journey food demand. Evidence comes from returned disrupted-trail experience and surviving brood progression. Verify rebuilding versus extra energy; no instant new path, autonomous reroute or hidden weather forecast. It may coexist with Persistent Chemistry; combined food demand and scent strength have authored bounds.
 
-Efficient Nurses and both environment traits are implemented; Rapid Trail Repair remains planned M3. Authored magnitudes stay provisional until integrated comparisons. Tuning is not permission to invent another currency or ant caste.
+150 magnitudes: +50% fresh deposition at full captured carrier share on an already trafficked corridor below 0.5 scent; +15% journey food for repair carriers. Persistent and repair surcharges add within 1.35×, before independent foraging effects; all scent stays capped at one. Living return delivers exposure; a later worker/reproductive comparison earns eligibility at pupation. Trial costs 14C/16P/8W, two nurses/eight brood. All ten M3 entries are implemented. Authored magnitudes stay provisional until integrated comparisons. Tuning is not permission to invent another currency or ant caste.
 
 ## Presentation and verification
 

@@ -29,10 +29,10 @@ static func can_select(pile: PileState, id: String) -> bool:
 static func can_queue(pile: PileState, id: String) -> bool:
 	var trial: BroodCohort = pile.trial_cohort()
 	return queue_eligible(id, pile.queen_count, pile.genetics.established, pile.chemistry_candidate,
-		pile.recognition_candidate, trial.adaptation_id if trial != null else "",pile.care_candidate,pile.environment.candidates)
+		pile.recognition_candidate, trial.adaptation_id if trial != null else "",pile.care_candidate,pile.environment.candidates,pile.repair_candidate)
 
 
-static func queue_eligible(id: String, queens: int, established: Array[String], chemistry: bool, recognition: bool, locked: String, care: bool=false, environment: Array[String]=[]) -> bool:
+static func queue_eligible(id: String, queens: int, established: Array[String], chemistry: bool, recognition: bool, locked: String, care: bool=false, environment: Array[String]=[], repair: bool=false) -> bool:
 	if not valid_trait(id) or queens < 1 or id in established or id == locked:
 		return false
 	var future_traits: Array[String] = established.duplicate()
@@ -41,6 +41,7 @@ static func queue_eligible(id: String, queens: int, established: Array[String], 
 	if not compatible(future_traits): return false
 	if id in ["security", "tolerance"]:
 		return recognition
+	if id=="rapid_repair": return repair
 	if id in BroodEnvironment.TRAITS: return id in environment
 	if id=="efficient_nurses": return care
 	return chemistry if id == "persistent" else true
@@ -67,3 +68,6 @@ static func energy_multiplier(id: String, fraction: float) -> float:
 
 static func carry_multiplier(id: String, fraction: float) -> float:
 	return 1.0+TraitCatalog.DEFINITIONS[id].carry_change*fraction if TraitCatalog.DEFINITIONS.has(id) else 1.0
+
+static func chemistry_food_multiplier(persistence: float, repair: float) -> float:
+	return minf(1.35, 1.0 + CHEMISTRY.extra_travel_energy * persistence + TraitCatalog.DEFINITIONS.rapid_repair.repair_food * repair)

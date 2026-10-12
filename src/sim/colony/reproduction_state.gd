@@ -7,6 +7,7 @@ var phase: String = "none"
 var progress_quarters: int = 0
 var progress_remainder: int = 0
 var environment_exposure: Array[String] = []
+var repair_comparison: bool = false
 
 var laid_tick: int = 0
 var inherited_traits: Array[String] = []
@@ -19,10 +20,10 @@ func active() -> bool: return phase in ["egg","larva","pupa"]
 func occupied_space() -> int: return CONFIG.space if active() else 0
 
 func to_dict() -> Dictionary:
-	return {"phase":phase,"progress_quarters":progress_quarters,"progress_remainder":progress_remainder,"environment_exposure":environment_exposure.duplicate(),"laid_tick":laid_tick,"inherited_traits":inherited_traits.duplicate(),"food_shortfalls":food_shortfalls.duplicate()}
+	return {"phase":phase,"progress_quarters":progress_quarters,"progress_remainder":progress_remainder,"environment_exposure":environment_exposure.duplicate(),"repair_comparison":repair_comparison,"laid_tick":laid_tick,"inherited_traits":inherited_traits.duplicate(),"food_shortfalls":food_shortfalls.duplicate()}
 
 func restore(data: Dictionary, ledger: WorkerLedger, pile_id: String, established: Array[String], matured: int, nursery_state: String, food_state: String, queens: int) -> bool:
-	if data.size()!=5+int(data.has("progress_remainder"))+int(data.has("environment_exposure")) or not data.has_all(["phase","progress_quarters","laid_tick","inherited_traits","food_shortfalls"]): return false
+	if data.size()!=5+int(data.has("progress_remainder"))+int(data.has("environment_exposure"))+int(data.has("repair_comparison")) or not data.has_all(["phase","progress_quarters","laid_tick","inherited_traits","food_shortfalls"]): return false
 	if not data.phase is String or data.phase not in ["none","egg","larva","pupa","ready"] or not WorkerLedger.valid_count(data.progress_quarters) or not WorkerLedger.valid_count(data.laid_tick): return false
 	if not data.inherited_traits is Array or not data.food_shortfalls is Array: return false
 	var traits: Array[String] = []
@@ -33,6 +34,8 @@ func restore(data: Dictionary, ledger: WorkerLedger, pile_id: String, establishe
 	for value: Variant in data.food_shortfalls:
 		if not value is String or value not in ["carbohydrate","protein","water"] or value in shortfalls: return false
 		shortfalls.append(value)
+	var comparison: Variant=data.get("repair_comparison",false)
+	if not comparison is bool or data.phase=="none" and comparison: return false
 	var remainder: Variant = data.get("progress_remainder",0)
 	var exposure: Variant = data.get("environment_exposure",[])
 	if not WorkerLedger.valid_count(remainder) or remainder>=20 or not BroodEnvironment.valid_exposure(exposure): return false
@@ -49,6 +52,7 @@ func restore(data: Dictionary, ledger: WorkerLedger, pile_id: String, establishe
 	if ongoing:
 		if record.get("kind")!="internal" or record.get("owner_id")!=pile_id or record.get("count")!=CONFIG.nurses: return false
 	elif not record.is_empty(): return false
+	repair_comparison=comparison
 	progress_remainder=int(remainder); environment_exposure.assign(exposure)
 	phase = data.phase; progress_quarters = int(data.progress_quarters); laid_tick = int(data.laid_tick)
 	inherited_traits = traits; food_shortfalls = shortfalls

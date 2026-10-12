@@ -22,6 +22,8 @@ var energy_multiplier: float = 1.0
 var carry_multiplier: float = 1.0
 var combat_multiplier: float = 1.0
 var chemistry_fraction: float = 0.0
+var repair_fraction: float = 0.0
+var repair_exposure: bool = false
 var lost_workers: int = 0
 var adapted_lost_workers: int = 0
 var lost_profiles: Dictionary[String, int] = {}
@@ -52,7 +54,7 @@ func to_dict() -> Dictionary:
 		"cargo_source_type":cargo_source_type,"cargo_yields":cargo_yields.duplicate(),"cargo_bulk":cargo_bulk,
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
-		"combat_multiplier":combat_multiplier, "chemistry_fraction": chemistry_fraction,
+		"repair_fraction":repair_fraction,"repair_exposure":repair_exposure,"combat_multiplier":combat_multiplier, "chemistry_fraction": chemistry_fraction,
 		"lost_workers": lost_workers, "adapted_lost_workers": adapted_lost_workers,
 		"lost_profiles": lost_profiles.duplicate(),
 		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
@@ -96,6 +98,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	var carry: Variant = data.get("carry_multiplier", 1.0)
 	var combat: Variant = data.get("combat_multiplier", 1.0)
 	if not typeof(combat) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(combat)) or combat < 1 or combat > 1 + AdaptationRules.FIGHTING.extra_combat_weight: return false
+	var repair: Variant=data.get("repair_fraction",0.0);var repair_seen: Variant=data.get("repair_exposure",false)
+	if not typeof(repair) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(repair)) or repair<0 or repair>1 or not repair_seen is bool or data.worker_count==0 and repair_seen: return false
 	var chemistry: Variant = data.get("chemistry_fraction", 0.0)
 	if not typeof(chemistry) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(chemistry)) or chemistry < 0.0 or chemistry > 1.0:
 		return false
@@ -186,6 +190,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	energy_multiplier = float(energy)
 	carry_multiplier = float(carry)
 	combat_multiplier = float(combat)
+	repair_fraction=snappedf(float(repair),0.00001);repair_exposure=repair_seen
 	chemistry_fraction = snappedf(float(chemistry), 0.00001)
 	lost_workers = int(losses)
 	adapted_lost_workers = int(adapted_losses)

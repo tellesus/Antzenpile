@@ -50,6 +50,7 @@ func _start_ordinary(pile_id: String) -> bool:
 	cohort.id = "brood_%d" % pile.brood_started_total
 	cohort.inherited_traits = pile.offspring_traits()
 	cohort.adaptation_id = pile.adaptation_repertoire if pile.adaptation_repertoire in cohort.inherited_traits else ""
+	cohort.repair_comparison = pile.repair_experience and not pile.repair_candidate
 	cohort.rain_comparison = pile.rain_trace_observed and not pile.chemistry_candidate
 	cohort.recognition_comparison = pile.recognition_experience and not pile.recognition_candidate
 	pile.brood_cohorts.append(cohort)
@@ -179,6 +180,7 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 		"larva":
 			cohort.stage = "pupa"
 			pile.environment.survived(cohort.environment_exposure)
+			if cohort.repair_comparison: pile.repair_candidate=true
 		"pupa":
 			if pile.workers.add_living_workers("available", cohort.count, "Brood emerged at " + pile.id):
 				if cohort.adaptation_trial:

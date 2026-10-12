@@ -39,6 +39,8 @@ var recognition_experience: bool = false
 var recognition_candidate: bool = false
 var care_pressure_seen: bool=false
 var care_candidate: bool=false
+var repair_experience: bool=false
+var repair_candidate: bool=false
 var nursery_state: String = "primitive"
 var nursery_progress_seconds: float = 0.0
 var nursery_expansion_state: String = "latent"
@@ -83,7 +85,7 @@ func to_dict() -> Dictionary:
 		"genetics": genetics.to_dict(),
 		"rain_trace_observed": rain_trace_observed, "chemistry_candidate": chemistry_candidate,
 		"recognition_experience": recognition_experience, "recognition_candidate": recognition_candidate,
-		"care_pressure_seen":care_pressure_seen,"care_candidate":care_candidate,"environment":environment.to_dict(),
+		"repair_experience":repair_experience,"repair_candidate":repair_candidate,"care_pressure_seen":care_pressure_seen,"care_candidate":care_candidate,"environment":environment.to_dict(),
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"nursery_expansion": {"state": nursery_expansion_state, "progress_seconds": nursery_expansion_progress},
 		"food_exchange_state": food_exchange_state, "food_toxicity": food_toxicity.to_dict(),
@@ -346,6 +348,10 @@ func restore(data: Dictionary) -> bool:
 	for cohort: BroodCohort in restored_brood:
 		for exposure: String in cohort.environment_exposure:
 			if exposure not in restored_environment.seen: return false
+	var repair_seen: Variant=data.get("repair_experience",false);var repair_available: Variant=data.get("repair_candidate",false)
+	if not repair_seen is bool or not repair_available is bool or repair_available and not repair_seen: return false
+	for cohort: BroodCohort in restored_brood:
+		if cohort.repair_comparison and not repair_seen: return false
 	var care_seen: Variant=data.get("care_pressure_seen",false);var care_available: Variant=data.get("care_candidate",false)
 	if not care_seen is bool or not care_available is bool or care_available and (not care_seen or emerged+restored.transferred_in<1): return false
 	if typeof(recognition_seen) != TYPE_BOOL or typeof(recognition_available) != TYPE_BOOL or (recognition_available and (not recognition_seen or emerged+restored.transferred_in < 1)):
@@ -381,6 +387,7 @@ func restore(data: Dictionary) -> bool:
 			if trait_id not in inherited_environment: inherited_environment.append(trait_id)
 	for trait_id: String in BroodEnvironment.TRAITS:
 		if trait_id in restored_genetics.established and trait_id not in restored_environment.candidates and trait_id not in inherited_environment: return false
+	if "rapid_repair" in restored_genetics.established and not repair_available and "rapid_repair" not in founder_traits and restored_genetics.migration_count(restored_genetics.imported,"rapid_repair")==0: return false
 	if brood_lost == 0:
 		var profiles: Array = restored_genetics.living.keys()
 		for key: String in restored_genetics.lost:
@@ -402,6 +409,7 @@ func restore(data: Dictionary) -> bool:
 				return false
 			if cohort.adaptation_id == "persistent" and not candidate:
 				return false
+			if cohort.adaptation_id=="rapid_repair" and not repair_available: return false
 			if cohort.adaptation_id in BroodEnvironment.TRAITS and cohort.adaptation_id not in restored_environment.candidates: return false
 			if cohort.adaptation_id=="efficient_nurses" and not care_available: return false
 			if cohort.adaptation_id in ["security", "tolerance"] and (not recognition_available or "security" in restored_genetics.established or "tolerance" in restored_genetics.established):
@@ -426,7 +434,7 @@ func restore(data: Dictionary) -> bool:
 	if trials > 1:
 		return false
 	var restored_queue: Variant = data.get("queued_adaptation", "")
-	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), restored_genetics.established, candidate, recognition_available, locked_trait,care_available,restored_environment.candidates)):
+	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), restored_genetics.established, candidate, recognition_available, locked_trait,care_available,restored_environment.candidates,repair_available)):
 		return false
 	var restored_reproduction := ReproductionState.new()
 	var restored_investments:=preload("res://src/sim/colony/investment_intent.gd").new()
@@ -434,6 +442,7 @@ func restore(data: Dictionary) -> bool:
 	if not investment_data is Dictionary or not restored_investments.restore(investment_data,restored_queue!="",int(data.queen_count),not founding_data.is_empty()): return false
 	var reproduction_data: Variant = data.get("reproduction",restored_reproduction.to_dict())
 	if not reproduction_data is Dictionary or not restored_reproduction.restore(reproduction_data,restored,data.id,restored_genetics.established,emerged,restored_nursery_state,data.food_exchange_state,int(data.queen_count)): return false
+	if restored_reproduction.repair_comparison and not repair_seen: return false
 	for exposure: String in restored_reproduction.environment_exposure:
 		if exposure not in restored_environment.seen: return false
 	if occupied+maxi(0,restored_reproduction.occupied_space()-restored_chambers.reproductive_spaces())>brood_limit: return false
@@ -514,6 +523,7 @@ func restore(data: Dictionary) -> bool:
 	recognition_candidate = recognition_available
 	care_pressure_seen=care_seen;care_candidate=care_available
 	environment=restored_environment
+	repair_experience=repair_seen;repair_candidate=repair_available
 	nursery_state = restored_nursery_state
 	nursery_expansion_state = expansion.state
 	nursery_expansion_progress = float(expansion.progress_seconds)

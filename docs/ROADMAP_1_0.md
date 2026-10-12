@@ -12,7 +12,7 @@ Windows desktop comes first. Keep touch-sized controls. Mobile, a fixed session-
 
 ## Milestone order
 
-M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 is in progress with reproductive queue/priority complete; M3–M9 remain planned. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
+M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
 
 | Milestone | Player outcome and required scope | Dependencies | Exit evidence |
 | --- | --- | --- | --- |
@@ -70,7 +70,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M3-B complete:** [149 environmental brood traits](tasks/149_environmental_brood_traits.md), local larval exposure/surviving pupation, inherited moderate-heat/dry relief with developmental/carbohydrate costs, exact reproductive progression and Environment family. Full 9,377/0; import/Main/headless drawing passed.
 
-**M2 core complete; next: Rapid Trail Repair**, then M4 queens. Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
+**M3-C complete:** [150 Rapid Trail Repair](tasks/150_rapid_trail_repair.md), returned weak-corridor evidence and later pupation, captured carrier deposition/fuel cost, bounded combined chemistry and a distinct free Chemistry family. Full 9,414/0; import/Main/headless drawing passed.
+
+**M2 core/M3 content complete; next: M4 queen viability and reproductive continuity.** Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

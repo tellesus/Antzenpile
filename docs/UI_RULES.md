@@ -1,8 +1,10 @@
 # Current UI contracts and development boundaries
 
-Baseline: gameplay through 149. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Five identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
+Baseline: gameplay through 150. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Eight identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
 
 149 reveals Environment only after local larval strain or inherited lineage. A revealed leaf explains that exposed larvae must survive to pupation; heat/dry benefit, recurring cost, queue/paid lock and adult carrier count remain distinct. Environmental effects follow the laid brood, not current adult share. Family navigation remains free.
+
+150 exposes Rapid Trail Repair after returned corridor experience, with the subsequent brood-pupation requirement. Chemistry is a separate free family for Persistent Chemistry/Repair; each leaf appears only with justified evidence/inheritance. Benefits, actual carriers, food cost and queue/paid locks use the same contextual panel. Foraging/partner presentation remains separate.
 
 ## Views and evidence
 

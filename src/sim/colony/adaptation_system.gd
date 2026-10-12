@@ -96,6 +96,7 @@ func start(pile_id: String, trait_id: String, respect_priority: bool=true) -> bo
 	cohort.inherited_traits = pile.genetics.established.duplicate()
 	cohort.inherited_traits.append(trait_id)
 	cohort.inherited_traits.sort()
+	cohort.repair_comparison = pile.repair_experience and not pile.repair_candidate
 	cohort.rain_comparison = pile.rain_trace_observed and not pile.chemistry_candidate
 	cohort.recognition_comparison = pile.recognition_experience and not pile.recognition_candidate
 	pile.brood_cohorts.append(cohort)

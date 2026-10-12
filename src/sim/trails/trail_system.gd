@@ -185,6 +185,8 @@ func tick(delta: float) -> void:
 	for id: String in ids:
 		var cohort: TransitCohort = _run.trails.cohorts[id]
 		var route: TrailRouteState = _run.trails.routes[cohort.route_id]
+		var segment: TrailSegmentState=_run.trails.segments[route.segment_id]
+		if cohort.worker_count>0 and segment.traffic>0 and (segment.pheromone_strength<TraitCatalog.DEFINITIONS.rapid_repair.worn_scent_threshold or _run.rain.phase=="raining" and segment.exposure>=RainSystem.CONFIG.exposed_min_exposure): cohort.repair_exposure=true
 		if surface_impact != null: surface_impact.encounter(cohort)
 		if cohort.detour != null:
 			if cohort.detour.tick(_run.world, _run.rng, _run.simulation_time):
@@ -264,6 +266,7 @@ func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) ->
 	if cohort.payload == 0.0:
 		cohort.clear_cargo()
 	if cohort.worker_count == 0:
+		cohort.repair_exposure=false
 		cohort.impact_witness_at = 0.0
 		cohort.witnessed_attack = false
 		cohort.witnessed_fighting = false
@@ -344,7 +347,8 @@ func _depart(route: TrailRouteState) -> void:
 	var energy_multiplier: float = roundf(AdaptationRules.energy_multiplier(pile.adaptation_repertoire, fraction) * 100000.0) / 100000.0
 	var carry_multiplier: float = roundf(AdaptationRules.carry_multiplier(pile.adaptation_repertoire, fraction) * 100000.0) / 100000.0
 	var chemistry: float = snappedf(pile.chemistry_fraction(), 0.00001)
-	var energy_cost: float = CONFIG.round_trip_energy_cost(worker_count, length, terrain_cost) * energy_multiplier * (1.0 + AdaptationRules.CHEMISTRY.extra_travel_energy * chemistry)
+	var repair: float=snappedf(float(pile.genetics.count_trait("rapid_repair"))/pile.workers_total if pile.workers_total>0 else 0.0,0.00001)
+	var energy_cost: float = CONFIG.round_trip_energy_cost(worker_count, length, terrain_cost) * energy_multiplier * AdaptationRules.chemistry_food_multiplier(chemistry,repair)
 	var unpaid_energy_cost: float = 0.0
 	if pile.resources.carbohydrate < energy_cost:
 		# A carbohydrate trip can replenish an exhausted pile. Pay the available reserve
@@ -373,6 +377,7 @@ func _depart(route: TrailRouteState) -> void:
 	cohort.carry_multiplier = carry_multiplier
 	cohort.combat_multiplier = pile.combat_multiplier()
 	cohort.chemistry_fraction = chemistry
+	cohort.repair_fraction = repair
 	cohort.remaining_ticks = _leg_ticks(route)
 	_run.trails.cohorts[cohort.id] = cohort
 	_run.trails.next_cohort_id += 1
@@ -463,6 +468,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 			if cohort.witnessed_attack or cohort.witnessed_fighting:
 				route.last_witness_time = _run.simulation_time
 	var source_id: String = _run.knowledge.nodes[route.destination_knowledge_id].source_node_id
+	if cohort.worker_count>0 and cohort.repair_exposure: pile.repair_experience=true
 	if cohort.worker_count > 0 and cohort.reports_source_outcome:
 		var recorded: bool = _run.knowledge.record_outcome(source_id, cohort.payload > 0.0, _run.simulation_time, "trail")
 		assert(recorded)
@@ -484,7 +490,7 @@ func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 			route.receipt.last_amount = recorded_amount
 		route.delivered_total = roundf((route.delivered_total + net_payload) * 100000.0) / 100000.0
 		var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-		segment.reinforce_chemistry(cohort.worker_count * CONFIG.pheromone_per_returning_worker, cohort.chemistry_fraction)
+		segment.reinforce_chemistry(cohort.worker_count * CONFIG.pheromone_per_returning_worker, cohort.chemistry_fraction, cohort.repair_fraction)
 		if _run.rain.phase == "raining" and segment.exposure >= RainSystem.CONFIG.exposed_min_exposure:
 			pile.rain_trace_observed = true
 		segment.route_familiarity = snappedf(clampf(segment.route_familiarity + cohort.worker_count * CONFIG.familiarity_per_returning_worker, 0.0, 1.0), 0.0000000001)

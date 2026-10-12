@@ -305,7 +305,7 @@ func _run_command(command: String) -> void:
 				activation.outcome(result)
 				_feedback = "New brood started" if result.get("accepted", false) else result.get("reason", "Brood unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
-		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance", "adaptation_fighter", "adaptation_efficient_nurses", "adaptation_heat_resilience", "adaptation_moisture_resilience", "cancel_adaptation":
+		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance", "adaptation_fighter", "adaptation_efficient_nurses", "adaptation_heat_resilience", "adaptation_moisture_resilience", "adaptation_rapid_repair", "cancel_adaptation":
 			if adaptation_command.is_valid():
 				var result: Dictionary = adaptation_command.call("" if command == "cancel_adaptation" else command.trim_prefix("adaptation_"))
 				activation.outcome(result)
@@ -982,7 +982,7 @@ func _draw_genetic_context(box: Rect2) -> void:
 		_detail_line(box, 247, "Effects follow each laid brood" if web_selection in BroodEnvironment.TRAITS else "Effects scale with adult carriers")
 	else:
 		_detail_line(box, 185, "Exclusive branch already chosen" if Web.trait_state(_status, web_selection) == "Other branch chosen" else "Trait not available")
-		_detail_line(box, 211, definition.evidence if web_selection in BroodEnvironment.TRAITS else "Laid and inherited traits stay fixed")
+		_detail_line(box, 211, definition.evidence if web_selection in BroodEnvironment.TRAITS or web_selection=="rapid_repair" else "Laid and inherited traits stay fixed")
 	if web_selection in ["security", "tolerance"] and not _can_choose_adaptation():
 		_detail_line(box, 302, "Associates Nursery harm sooner" if web_selection == "security" else "Associates Nursery harm later")
 		_detail_line(box, 326, "Reassign tenders for new staffing")

@@ -44,6 +44,7 @@ func start(pile_id: String, respect_priority: bool=true, scheduled: bool=false) 
 	# Scheduled laying happens at the start of this fixed interval, before its aging.
 	pile.reproduction.phase="egg"; pile.reproduction.laid_tick=maxi(0,_run.clock.tick_count-(1 if scheduled else 0))
 	pile.reproduction.inherited_traits=pile.offspring_traits()
+	pile.reproduction.repair_comparison=pile.repair_experience and not pile.repair_candidate
 	pile.investments.reproduction=false;pile.investments.remove("reproduction")
 	return true
 
@@ -75,6 +76,7 @@ func tick() -> void:
 		elif state.phase=="larva":
 			state.phase="pupa"
 			pile.environment.survived(state.environment_exposure)
+			if state.repair_comparison: pile.repair_candidate=true
 		else:
 			state.phase="ready"
 			var commitment: String = "reproduction:"+id
