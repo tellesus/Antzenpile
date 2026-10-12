@@ -28,7 +28,10 @@ static func can_select(pile: PileState, id: String) -> bool:
 
 static func can_queue(pile: PileState, id: String) -> bool:
 	var trial: BroodCohort = pile.trial_cohort()
-	return queue_eligible(id, pile.queen_count, pile.genetics.established, pile.chemistry_candidate,
+	var coexist: Array[String]=pile.genetics.established.duplicate()
+	coexist.append(id)
+	if not compatible(coexist): return false
+	return queue_eligible(id, pile.queen_count, pile.offspring_traits(), pile.chemistry_candidate,
 		pile.recognition_candidate, trial.adaptation_id if trial != null else "",pile.care_candidate,pile.environment.candidates,pile.repair_candidate)
 
 

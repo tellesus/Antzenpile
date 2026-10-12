@@ -71,7 +71,8 @@ func tick() -> void:
 		if state.replacing():
 			state.replacement_progress+=1
 			if state.replacement_progress>=CONFIG.replacement_ticks:
-				state.parent_identity=state.queen_id(id);state.generation+=1
+				state.parent_identity=state.replacement_group.get("parent_queen_id","") if not state.replacement_group.get("parent_queen_id","").is_empty() else state.queen_id(id)
+				state.generation=int(state.replacement_group.parent_generation)+1 if not state.replacement_group.get("parent_queen_id","").is_empty() else state.generation+1
 				state.identity="queen:"+id+":raised:"+str(state.replacement_group.laid_tick)
 				state.inherited_traits.assign(state.replacement_group.inherited_traits)
 				state.count=1;state.condition=CONFIG.maximum_condition

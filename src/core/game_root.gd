@@ -566,7 +566,7 @@ func inward_status(pile_id: String) -> Dictionary:
 			continue
 		adaptation_options[trait_id] = {"available": AdaptationRules.can_queue(pile, trait_id),
 			"family":TraitCatalog.DEFINITIONS[trait_id].family,"benefit":TraitCatalog.DEFINITIONS[trait_id].benefit,"tradeoff":TraitCatalog.DEFINITIONS[trait_id].tradeoff,"evidence":TraitCatalog.DEFINITIONS[trait_id].evidence,
-			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.genetics.established,
+			"costs": AdaptationRules.costs(trait_id), "inherited": trait_id in pile.offspring_traits(),
 			"expressed": pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)}
 	for trait_id: String in pile.genetics.established:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)

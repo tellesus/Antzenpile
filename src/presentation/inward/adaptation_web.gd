@@ -54,6 +54,12 @@ static func trait_state(status: Dictionary, id: String) -> String:
 		return "Queued · next brood"
 	if status.get("adaptation_trial", {}).get("adaptation_id", "") == id:
 		return "Growing trial brood"
+	if id in ["lean","load"] and status.get("adaptation_options",{}).has(id):
+		var option: Dictionary=status.adaptation_options[id]
+		if option.get("inherited",false): return "Inherited · %d adult carriers" % option.get("expressed",0)
+		var other: String="load" if id=="lean" else "lean"
+		if status.adaptation_options.get(other,{}).get("inherited",false) or status.get("adaptation_trial",{}).get("adaptation_id","")==other: return "Other branch chosen"
+		if option.get("available",false): return "Available · queue maternal brood"
 	if id in ["persistent", "security", "tolerance", "fighter","efficient_nurses","heat_resilience","moisture_resilience","rapid_repair"]:
 		var option: Dictionary = status.get("adaptation_options", {}).get(id, {})
 		if option.get("inherited", false):
@@ -134,7 +140,7 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 		var boundary: PackedVector2Array = Art.membrane(at, 28, phase * 0.18 + at.x * 0.01, 0.72 if ecological else 1.0)
 		view.draw_colored_polygon(boundary, Color(color, 0.07))
 		view.draw_polyline(boundary.slice(1, 27), Color(color, 0.48), 1.2, true)
-		if state.begins_with("Inherited"):
+		if state.begins_with("Inherited") or state.begins_with("Queen lineage"):
 			view.draw_circle(at, 18.0, Color(color, 0.15))
 		elif state == "Growing trial brood":
 			view.draw_arc(at, 33.0, -PI * 0.5, PI * 0.8, 24, Color(color, 0.72), 1.5, true)

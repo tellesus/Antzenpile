@@ -14,7 +14,6 @@ func queue_choice(pile_id: String, trait_id: Variant) -> bool:
 	if not _run.colony.piles.has(pile_id) or not trait_id is String:
 		return _reject("Unknown pile or adaptation")
 	var pile: PileState = _run.colony.piles[pile_id]
-	if not pile.foundation.is_empty(): return _reject("Daughter lineage selection is not yet available")
 	if trait_id != "" and not AdaptationRules.can_queue(pile, trait_id):
 		return _reject("Adaptation already locked, inherited or unavailable")
 	pile.queued_adaptation = trait_id
@@ -27,7 +26,6 @@ func queue_choice(pile_id: String, trait_id: Variant) -> bool:
 func start_queued(pile_id: String, respect_priority: bool=true) -> bool:
 	if not _run.colony.piles.has(pile_id): return _reject("Unknown pile")
 	var pile: PileState = _run.colony.piles[pile_id]
-	if not pile.foundation.is_empty(): return _reject("Daughter lineage selection is not yet available")
 	if pile.queued_adaptation.is_empty(): return _reject("No adaptation queued")
 	if not start(pile_id, pile.queued_adaptation,respect_priority): return false
 	pile.queued_adaptation = ""
@@ -62,7 +60,6 @@ func start(pile_id: String, trait_id: String, respect_priority: bool=true) -> bo
 	if not _run.colony.piles.has(pile_id):
 		return _reject("Unknown pile")
 	var pile: PileState = _run.colony.piles[pile_id]
-	if not pile.foundation.is_empty(): return _reject("Daughter lineage selection is not yet available")
 	if respect_priority and pile.investments.first()=="reproduction": return _reject("Queued reproduction has priority")
 	if not pile.queued_adaptation.is_empty() and pile.queued_adaptation != trait_id:
 		return _reject("Another adaptation is queued for the next brood")
@@ -93,7 +90,8 @@ func start(pile_id: String, trait_id: String, respect_priority: bool=true) -> bo
 	cohort.id = "brood_%d" % pile.brood_started_total
 	cohort.adaptation_id = trait_id
 	cohort.adaptation_trial = true
-	cohort.inherited_traits = pile.genetics.established.duplicate()
+	cohort.parent_queen_id=pile.queen.queen_id(pile.id);cohort.parent_generation=pile.queen.generation
+	cohort.inherited_traits = pile.offspring_traits()
 	cohort.inherited_traits.append(trait_id)
 	cohort.inherited_traits.sort()
 	cohort.repair_comparison = pile.repair_experience and not pile.repair_candidate

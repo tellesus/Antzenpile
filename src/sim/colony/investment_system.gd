@@ -10,7 +10,6 @@ func _init(run: RunState, adaptation: RefCounted, reproduction: ReproductionSyst
 func queue_reproduction(pile_id: String, enabled: Variant) -> bool:
 	if not _run.colony.piles.has(pile_id) or not enabled is bool: return _reject("Unknown pile or reproductive intent")
 	var pile: PileState=_run.colony.piles[pile_id]
-	if not pile.foundation.is_empty(): return _reject("Daughter reproductive generations are not yet available")
 	if enabled and pile.queen_count<1: return _reject("No queen can lay reproductive brood")
 	pile.investments.reproduction=enabled
 	if enabled: pile.investments.add("reproduction")

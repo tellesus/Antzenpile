@@ -117,7 +117,7 @@ The web separates revealed possibilities, queued intent, laid trial, established
 
 ### SYS-08 Queen viability and lineages
 
-**Purpose:** continue the colony beyond one founding queen while making loss consequential. Planned M4. Current queens are counts/captured founder traits, not a complete viability/replacement model.
+**Purpose:** continue the colony beyond one founding queen while making loss consequential. Local viability/care/replacement, maternal bundles and daughter reproductive investment are implemented in [151](tasks/151_queen_viability_and_replacement.md) and [152](tasks/152_maternal_lineage_and_daughter_reproduction.md). Portable queens and later-generation founding follow M5.
 
 Use aggregate queen records with identity, owned pile or transport party, supported condition, fertility/reproductive stage and inherited bundle. Local nutrition/condition can threaten viability; no arbitrary short lifespan timer is introduced to force an ending. Supporting/raising/replacing a queen spends actual resources, nurses, space and time.
 

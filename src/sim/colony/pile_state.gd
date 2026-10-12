@@ -102,7 +102,7 @@ func to_dict() -> Dictionary:
 
 func offspring_traits() -> Array[String]:
 	var result: Array[String]=[]
-	result.assign(foundation.queen_traits if not foundation.is_empty() else genetics.established)
+	result.assign(queen.inherited_traits)
 	return result
 
 
@@ -226,6 +226,8 @@ func move_workers_to(destination: PileState, pool: String, amount: int) -> bool:
 func register_emergence(cohort: BroodCohort) -> void:
 	if care_pressure_seen and cohort.care>=1.0: care_candidate=true
 	genetics.emerge(cohort.inherited_traits, cohort.count, cohort.adaptation_id if cohort.adaptation_trial else "")
+	if cohort.adaptation_trial and queen.count>0 and (cohort.parent_queen_id.is_empty() or cohort.parent_queen_id==queen.queen_id(id)) and cohort.adaptation_id not in queen.inherited_traits:
+		queen.inherited_traits.append(cohort.adaptation_id);queen.inherited_traits.sort()
 	if cohort.adaptation_trial and cohort.adaptation_id in ["lean", "load"]:
 		adaptation_repertoire = cohort.adaptation_id
 	adapted_workers_total = genetics.count_trait(adaptation_repertoire)
@@ -385,7 +387,7 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if ("security" in restored_genetics.established or "tolerance" in restored_genetics.established) and not recognition_available:
 		return false
-	if "efficient_nurses" in restored_genetics.established and not care_available and "efficient_nurses" not in founder_traits: return false
+	if "efficient_nurses" in restored_genetics.established and not care_available and "efficient_nurses" not in founder_traits and restored_genetics.migration_count(restored_genetics.imported,"efficient_nurses")==0: return false
 	var inherited_environment: Array[String] = founder_traits.duplicate()
 	for profile: String in restored_genetics.imported:
 		for trait_id: String in GeneticRepertoire.traits_for(profile):
@@ -404,24 +406,38 @@ func restore(data: Dictionary) -> bool:
 		for key: String in profiles:
 			if (restored_genetics.living.get(key, 0) + restored_genetics.lost.get(key, 0)+restored_genetics.exported.get(key,0)-restored_genetics.imported.get(key,0)) % BROOD_CONFIG.starting_count != 0:
 				return false
+	var legacy_lineage: Array[String]=founder_traits if not founding_data.is_empty() else restored_genetics.established
+	var lineage_value: Variant=QueenState.lineage_traits(data.get("queen",{}),legacy_lineage)
+	if not lineage_value is Array: return false
+	var maternal_traits: Array[String]=[]
+	for value: Variant in lineage_value:
+		if not value is String or value not in restored_genetics.established or value in maternal_traits: return false
+		maternal_traits.append(value)
+	if not AdaptationRules.compatible(maternal_traits): return false
+	var parent_value: Variant=data.get("queen",{}).get("identity","queen:"+data.id+":founder")
+	var generation_value: Variant=data.get("queen",{}).get("generation",0)
+	if not parent_value is String or not Ledger.valid_count(generation_value): return false
+	var current_parent: String=parent_value
+	var current_generation: int=int(generation_value)
 	var trials: int = 0
 	var locked_trait: String = ""
 	for cohort: BroodCohort in restored_brood:
+		if not cohort.parent_queen_id.is_empty() and (cohort.parent_generation>current_generation or (cohort.parent_generation==current_generation)!=(cohort.parent_queen_id==current_parent)): return false
 		if cohort.adaptation_trial:
 			trials += 1
 			locked_trait = cohort.adaptation_id
-			if cohort.adaptation_id in restored_genetics.established or (cohort.adaptation_id in ["lean", "load"] and repertoire != ""):
+			if cohort.adaptation_id in maternal_traits and (cohort.parent_queen_id.is_empty() or cohort.parent_queen_id==current_parent):
 				return false
 			if cohort.adaptation_id == "persistent" and not candidate:
 				return false
 			if cohort.adaptation_id=="rapid_repair" and not repair_available: return false
 			if cohort.adaptation_id in BroodEnvironment.TRAITS and cohort.adaptation_id not in restored_environment.candidates: return false
 			if cohort.adaptation_id=="efficient_nurses" and not care_available: return false
-			if cohort.adaptation_id in ["security", "tolerance"] and (not recognition_available or "security" in restored_genetics.established or "tolerance" in restored_genetics.established):
+			if cohort.adaptation_id in ["security", "tolerance"] and not recognition_available:
 				return false
-			var trial_traits: Array[String] = restored_genetics.established.duplicate()
+			var trial_traits: Array[String] = (restored_genetics.established if cohort.parent_queen_id.is_empty() else maternal_traits).duplicate()
 			trial_traits.append(cohort.adaptation_id)
-			if GeneticRepertoire.profile(cohort.inherited_traits) != GeneticRepertoire.profile(trial_traits):
+			if (cohort.parent_queen_id.is_empty() or cohort.parent_queen_id==current_parent) and GeneticRepertoire.profile(cohort.inherited_traits) != GeneticRepertoire.profile(trial_traits):
 				return false
 		elif cohort.adaptation_id != "" and cohort.adaptation_id != repertoire:
 			return false
@@ -432,14 +448,13 @@ func restore(data: Dictionary) -> bool:
 			return false
 		if cohort.recognition_comparison and not recognition_seen:
 			return false
-	if not founding_data.is_empty():
-		if trials>0 or data.get("queued_adaptation", "")!="" or data.get("reproduction", {}).get("phase", "none")!="none": return false
-		for cohort: BroodCohort in restored_brood:
-			if cohort.inherited_traits!=founder_traits: return false
 	if trials > 1:
 		return false
 	var restored_queue: Variant = data.get("queued_adaptation", "")
-	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), restored_genetics.established, candidate, recognition_available, locked_trait,care_available,restored_environment.candidates,repair_available)):
+	if restored_queue is String and not restored_queue.is_empty():
+		var coexist: Array[String]=restored_genetics.established.duplicate();coexist.append(restored_queue)
+		if not AdaptationRules.compatible(coexist): return false
+	if not restored_queue is String or (restored_queue != "" and not AdaptationRules.queue_eligible(restored_queue, int(data.queen_count), maternal_traits, candidate, recognition_available, locked_trait,care_available,restored_environment.candidates,repair_available)):
 		return false
 	var restored_reproduction := ReproductionState.new()
 	var restored_investments:=preload("res://src/sim/colony/investment_intent.gd").new()
@@ -447,13 +462,15 @@ func restore(data: Dictionary) -> bool:
 	if not investment_data is Dictionary or not restored_investments.restore(investment_data,restored_queue!="",int(data.queen_count),not founding_data.is_empty()): return false
 	var reproduction_data: Variant = data.get("reproduction",restored_reproduction.to_dict())
 	if not reproduction_data is Dictionary or not restored_reproduction.restore(reproduction_data,restored,data.id,restored_genetics.established,emerged,restored_nursery_state,data.food_exchange_state,int(data.queen_count)): return false
+	if not restored_reproduction.parent_queen_id.is_empty() and (restored_reproduction.parent_generation>current_generation or (restored_reproduction.parent_generation==current_generation)!=(restored_reproduction.parent_queen_id==current_parent)): return false
 	if restored_reproduction.repair_comparison and not repair_seen: return false
 	for exposure: String in restored_reproduction.environment_exposure:
 		if exposure not in restored_environment.seen: return false
 	if occupied+maxi(0,restored_reproduction.occupied_space()-restored_chambers.reproductive_spaces())>brood_limit: return false
 	var restored_queen:=QueenState.new()
 	restored_queen.count=int(data.queen_count);restored_queen.condition=restored_queen.CONFIG.maximum_condition if data.queen_count>0 else 0
-	if not restored_queen.restore(data.get("queen",restored_queen.to_dict(data.id)),data.id,int(data.queen_count),restored,restored_genetics.established,emerged,restored_nursery_state,data.food_exchange_state,restored_reproduction): return false
+	restored_queen.inherited_traits=maternal_traits.duplicate()
+	if not restored_queen.restore(data.get("queen",restored_queen.to_dict(data.id)),data.id,int(data.queen_count),restored,restored_genetics.established,emerged,restored_nursery_state,data.food_exchange_state,restored_reproduction,legacy_lineage): return false
 	var adaptation_commitment: String = "adaptation:" + data.id
 	var adaptation_record: Dictionary = restored.to_dict().commitments.get(adaptation_commitment, {})
 	if trials == 1:

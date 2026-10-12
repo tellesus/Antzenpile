@@ -9,7 +9,6 @@ var last_error: String = ""
 func _init(run_state: RunState) -> void: _run=run_state
 
 func structural_blocker(pile: PileState) -> String:
-	if not pile.foundation.is_empty(): return "Daughter reproductive generations are not yet available"
 	if pile.id=="home" and _run.founding.phase not in ["none","failed","established"]: return "Founding group is committed away from Home"
 	if pile.reproduction.phase!="none": return "A reproductive group is already growing or ready"
 	if pile.queen_count<1: return "No queen can lay reproductive brood"
@@ -43,6 +42,7 @@ func start(pile_id: String, respect_priority: bool=true, scheduled: bool=false) 
 		last_error="Could not fund reproductive laying"; return false
 	# Scheduled laying happens at the start of this fixed interval, before its aging.
 	pile.reproduction.phase="egg"; pile.reproduction.laid_tick=maxi(0,_run.clock.tick_count-(1 if scheduled else 0))
+	pile.reproduction.parent_queen_id=pile.queen.queen_id(pile_id);pile.reproduction.parent_generation=pile.queen.generation
 	pile.reproduction.inherited_traits=pile.offspring_traits()
 	pile.reproduction.repair_comparison=pile.repair_experience and not pile.repair_candidate
 	pile.investments.reproduction=false;pile.investments.remove("reproduction")

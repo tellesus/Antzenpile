@@ -34,7 +34,7 @@ func run(test: Object) -> bool:
  test.check(game.start_brood("satellite_1") and parent.brood_cohorts.is_empty(),"Daughter lays its own local worker cohort")
  test.check(exact(game,1200),"Daughter eggs and food-limited larvae restore and continue exactly")
  test.check(daughter.brood_cohorts[0].stage=="larva" and not daughter.brood_cohorts[0].nutrition_shortfalls.is_empty() and daughter.brood_matured_total==0,"Carried food is spent locally; unfed brood stalls rather than creates workers")
- test.check(not game.queue_adaptation("satellite_1","lean") and not game.start_reproduction("satellite_1"),"Simplified daughter cannot select an unimplemented lineage or reproductive generation")
+ test.check(game.queue_adaptation("satellite_1","lean") and not game.start_reproduction("satellite_1"),"Daughter may queue maternal adaptation while paid reproduction still requires mature supported growth")
  for gate: String in ["incoming","profile","foundation","clock","lineage","route","orphan"]:
   var forged: Dictionary=game.run.to_dict()
   match gate:

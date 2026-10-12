@@ -67,6 +67,11 @@ func establish(knowledge_id: String) -> bool:
 	var traits: Array[String]=[]; traits.assign(state.reproductive_group.inherited_traits)
 	daughter.foundation={"parent_id":"home","route_id":route.id,"queen_traits":traits,"founded_tick":_run.clock.tick_count}
 	daughter.genetics.established=traits.duplicate()
+	daughter.queen.inherited_traits=traits.duplicate()
+	if not state.reproductive_group.get("parent_queen_id","").is_empty():
+		daughter.queen.identity="queen:home:raised:"+str(state.reproductive_group.laid_tick)
+		daughter.queen.parent_identity=state.reproductive_group.parent_queen_id
+		daughter.queen.generation=int(state.reproductive_group.parent_generation)+1
 	# Experienced settlers bring the colony's existing knowledge, not live exterior truth.
 	daughter.rain_trace_observed=parent.rain_trace_observed; daughter.chemistry_candidate=parent.chemistry_candidate
 	daughter.recognition_experience=parent.recognition_experience; daughter.recognition_candidate=parent.recognition_candidate

@@ -15,6 +15,6 @@ func restore(data: Dictionary, adaptation: bool, queens: int, daughter: bool) ->
 	for kind: Variant in data.priority:
 		if not kind is String or kind not in ["adaptation","reproduction"] or kind in restored: return false
 		restored.append(kind)
-	if ("adaptation" in restored)!=adaptation or ("reproduction" in restored)!=data.reproduction or data.reproduction and (queens<1 or daughter): return false
+	if ("adaptation" in restored)!=adaptation or ("reproduction" in restored)!=data.reproduction or data.reproduction and queens<1: return false
 	reproduction=data.reproduction;priority=restored
 	return true

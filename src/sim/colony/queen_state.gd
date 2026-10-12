@@ -17,10 +17,10 @@ func queen_id(pile_id: String) -> String:
 	return identity if not identity.is_empty() else "queen:"+pile_id+":founder"
 func replacing() -> bool: return not replacement_group.is_empty()
 func to_dict(pile_id: String) -> Dictionary:
-	return {"count":count,"identity":queen_id(pile_id),"parent_identity":parent_identity,"generation":generation,"condition":condition,"carers":carers,"inherited_traits":inherited_traits.duplicate(),"replacement_group":replacement_group.duplicate(true),"replacement_progress":replacement_progress,"replacement_started":replacement_started}
+	return {"lineage_version":1,"count":count,"identity":queen_id(pile_id),"parent_identity":parent_identity,"generation":generation,"condition":condition,"carers":carers,"inherited_traits":inherited_traits.duplicate(),"replacement_group":replacement_group.duplicate(true),"replacement_progress":replacement_progress,"replacement_started":replacement_started}
 
-func restore(data: Variant, pile_id: String, queens: int, ledger: WorkerLedger, established: Array[String], matured: int, nursery: String, food: String, reproduction: ReproductionState) -> bool:
-	if not data is Dictionary or data.size()!=10 or not data.has_all(to_dict(pile_id).keys()): return false
+func restore(data: Variant, pile_id: String, queens: int, ledger: WorkerLedger, established: Array[String], matured: int, nursery: String, food: String, reproduction: ReproductionState, legacy_traits: Array[String]=[]) -> bool:
+	if not data is Dictionary or data.size()!=10+int(data.has("lineage_version")) or not data.has_all(["count","identity","parent_identity","generation","condition","carers","inherited_traits","replacement_group","replacement_progress","replacement_started"]): return false
 	for key: String in ["count","generation","condition","carers","replacement_progress","replacement_started"]:
 		if not WorkerLedger.valid_count(data[key]): return false
 	if data.count!=queens or data.condition>CONFIG.maximum_condition or (data.count>0)!=(data.condition>0) or data.carers>CONFIG.care_cap or data.count==0 and data.carers>0: return false
@@ -28,8 +28,10 @@ func restore(data: Variant, pile_id: String, queens: int, ledger: WorkerLedger, 
 		if not data[key] is String or data[key].length()>160: return false
 	if not data.identity.begins_with("queen:") or (data.generation==0)!=(data.parent_identity=="") or data.identity==data.parent_identity: return false
 	if not data.inherited_traits is Array or not data.replacement_group is Dictionary: return false
+	var bundle: Variant=lineage_traits(data,legacy_traits)
+	if bundle==null: return false
 	var traits: Array[String]=[]
-	for value: Variant in data.inherited_traits:
+	for value: Variant in bundle:
 		if not value is String or value not in established or value in traits: return false
 		traits.append(value)
 	if not AdaptationRules.compatible(traits): return false
@@ -49,3 +51,12 @@ func restore(data: Variant, pile_id: String, queens: int, ledger: WorkerLedger, 
 	condition=int(data.condition);carers=int(data.carers);inherited_traits=traits
 	replacement_group=restored_group;replacement_progress=int(data.replacement_progress);replacement_started=int(data.replacement_started)
 	return true
+
+static func lineage_traits(data: Variant, legacy_traits: Array[String]) -> Variant:
+	if not data is Dictionary: return null
+	if data.has("lineage_version"):
+		if not typeof(data.lineage_version) in [TYPE_INT,TYPE_FLOAT] or data.lineage_version!=1 or not data.get("inherited_traits") is Array: return null
+		return data.inherited_traits.duplicate()
+	# Older replacement records already captured their paid group's lineage.
+	if data.has("generation") and not WorkerLedger.valid_count(data.generation): return null
+	return data.inherited_traits.duplicate() if data.get("generation",0)>0 and data.get("inherited_traits") is Array else legacy_traits.duplicate()

@@ -1,6 +1,6 @@
 # Adaptation web and trait catalog
 
-Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Ten definition-driven traits exist through [150](../tasks/150_rapid_trail_repair.md); broader reproductive-lineage integration remains M4. This is a composite species, not literal genetics.
+Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Ten definition-driven traits exist through [150](../tasks/150_rapid_trail_repair.md); maternal-lineage and daughter investment integrated in [152](../tasks/152_maternal_lineage_and_daughter_reproduction.md); broader piles follow M5. This is a composite species, not literal genetics.
 
 ## Rules family
 
@@ -8,7 +8,7 @@ A trait is an inherited tradeoff with an evidence/eligibility rule, trial invest
 
 Larval physiology/food costs may apply to a newly laid inheriting cohort when explicitly declared. That does not retroactively modify older brood. Adult effects use actual living carriers, with current expected-carrier presentation including unreturned casualties. Traveling cohorts/parties capture their relevant traits at departure and combine them only when workers physically join.
 
-Preserve Home's accepted worker-trial establishment proxy through its migration. Fertile reproductive groups capture a parent lineage; young queens carry that bundle into their eventual pile and offspring. Daughters gain the same limited trial/queue rules through a paid, explicit lineage path in M4. They must not inherit a trait merely because unrelated immigrant workers express it. No individual genomes, genetic drift or latent-trait reselection in 1.0.
+Home's accepted worker-trial proxy is explicitly migrated to queen-owned bundles in 152. Fertile reproductive groups capture a parent lineage; young queens carry that bundle into their eventual pile and offspring. Daughters share the limited paid maternal trial/queue rules after 152. A supported trial updates only its still-present laying mother; old paid trials under a successor yield adult carriers without rewriting her bundle. They must not inherit a trait merely because unrelated immigrant workers express it. No individual genomes, genetic drift or latent-trait reselection in 1.0.
 
 ### Definition template
 

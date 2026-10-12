@@ -315,6 +315,21 @@ func restore(data: Dictionary) -> bool:
 		var migrants: int=FoundingState.CONFIG.workers-1+restored_reinforcement.arrivals*WorkerReinforcementState.CONFIG.reinforcement_workers
 		if parent.workers.transferred_out!=migrants or daughter.workers.transferred_in!=migrants or daughter.workers.transferred_out!=0: return false
 		if daughter.genetics.imported!=parent.genetics.exported: return false
+	# A paid young queen has one current body owner; founding history is not stock.
+	var reproductive_bodies: Dictionary={}
+	for pile: PileState in restored_colony.piles.values():
+		reproductive_bodies[pile.queen.queen_id(pile.id)]=true
+	for pile: PileState in restored_colony.piles.values():
+		var groups: Array[Dictionary]=[]
+		if pile.reproduction.phase!="none": groups.append(pile.reproduction.to_dict())
+		if pile.queen.replacing(): groups.append(pile.queen.replacement_group)
+		for group: Dictionary in groups:
+			var identity: String="queen:"+pile.id+":raised:"+str(int(group.laid_tick))
+			if reproductive_bodies.has(identity): return false
+			reproductive_bodies[identity]=true
+	if restored_founding.phase in ["outbound","settling","messenger","returning","ready"]:
+		var identity: String="queen:home:raised:"+str(int(restored_founding.reproductive_group.laid_tick))
+		if reproductive_bodies.has(identity): return false
 	for agent: ScoutAgent in restored_scouts.values():
 		for route_id: String in agent.avoid_routes:
 			if not restored_trails.routes.has(route_id) or restored_trails.routes[route_id].origin_pile != agent.origin_pile or restored_trails.routes[route_id].reported_losses < 1:

@@ -357,7 +357,6 @@ static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, mid
 	if guest_visible and _organ_hit(at, positions(size).guest, Vector2(66,54)):
 		return "guest"
 	for id: String in NODES:
-		if daughter and id=="adaptation": continue
 		if _organ_hit(at, positions(size)[id], Chambers.hit_radii(id)):
 			return id
 	return ""
@@ -525,7 +524,7 @@ func _draw() -> void:
 	draw_texture_rect(SUBSTRATE,field,false,Color(1,1,1,0.80))
 	for pair: Array in [["queen", "nursery"], ["nursery", "food_exchange"], ["food_exchange", "entrance"], ["entrance", "queen"]]:
 		_draw_flow(centers[pair[0]], centers[pair[1]], pair[0] == "nursery" or pair[0] == "entrance")
-	for id: String in ([] if _status.get("daughter",false) else ["queen", "nursery"]):
+	for id: String in ["queen", "nursery"]:
 		_draw_flow(centers[id], centers["adaptation"], false, Color("b79bcc"))
 	if _status.get("midden", {}).get("revealed", false):
 		_draw_flow(centers.entrance, centers.midden, false)
@@ -533,7 +532,6 @@ func _draw() -> void:
 		_draw_flow(centers.guest, centers.nursery, false, Color("b79bcc"))
 
 	var visible_ids: Array[String] = NODES.duplicate()
-	if _status.get("daughter",false): visible_ids.erase("adaptation")
 	if _status.get("midden", {}).get("revealed", false): visible_ids.append("midden")
 	if not _status.get("guest", {}).is_empty(): visible_ids.append("guest")
 	for id: String in visible_ids:
@@ -747,7 +745,7 @@ func _draw_context(size: Vector2) -> void:
 			elif production.waiting=="reproduction": _label(box.position+Vector2(16,273),"Next: reproductive group",Color("d9c5a5"),15)
 			var next_wait: String=Web.queue_wait(_status) if production.waiting=="adaptation" else _status.get("investments",{}).get("reproduction_wait","") if production.waiting=="reproduction" else "Auto checks food, care and space."
 			_label(box.position + Vector2(16, 294),Copy.fit_line(next_wait,_font,13,260), Color("8fa1a8"), 13)
-			_label(box.position + Vector2(16, 313), "Special investment has priority." if production.waiting in ["adaptation","reproduction"] else "Brood inherits the founding queen." if _status.get("daughter",false) else "Manual brood still needs feeding.", Color("8fa1a8"), 13)
+			_label(box.position + Vector2(16, 313), "Special investment has priority." if production.waiting in ["adaptation","reproduction"] else "Brood inherits its laying queen." if _status.get("daughter",false) else "Manual brood still needs feeding.", Color("8fa1a8"), 13)
 			_draw_brood_button()
 		"nursery":
 			var brood: Array = _status.brood
@@ -903,9 +901,9 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 189, "Locked · %s brood" % _status.adaptation_trial.stage.capitalize())
 				_detail_line(box, 215, "Surviving adults express the trait")
 			elif not _status.get("genetic_repertoire", []).is_empty():
-				_detail_line(box, 163, "%d inherited traits" % _status.get("genetic_repertoire", []).size())
+				_detail_line(box, 163, "%d known adult traits" % _status.get("genetic_repertoire", []).size())
 				_detail_line(box, 189, "Inspect each leaf for adult expression")
-				_detail_line(box, 215, "Future brood inherits established traits")
+				_detail_line(box, 215, "Queen lineage governs future brood")
 			else:
 				_detail_line(box, 163, "One focused brood trial at a time")
 				_detail_line(box, 189, "Genes require food, nurses and brood")
@@ -1092,7 +1090,7 @@ func _label(at: Vector2, value: String, color: Color, font_size: int, align: Hor
 
 func _queen_tabs() -> Array[String]:
 	var tabs: Array[String]=["workers"]
-	if not _status.get("daughter",false): tabs.append("reproduction")
+	tabs.append("reproduction")
 	tabs.append("continuity")
 	return tabs
 func _queen_care_rect(target: int) -> Rect2:

@@ -82,6 +82,10 @@ func run(test: Object) -> bool:
 	trial.adaptation_trial = {}
 	trial.adaptation_repertoire = "lean"
 	trial.adapted_workers = 7
+	trial.adaptation_options.lean.inherited=true
+	trial.adaptation_options.lean.expressed=7
+	trial.adaptation_options.lean.available=false
+	trial.adaptation_options.load.available=false
 	test.check(Web.trait_state(trial, "lean") == "Inherited · 7 adult carriers" and Web.trait_state(trial, "load") == "Other branch chosen", "Partial surviving expression is visible without inventing new traits")
 	root._inward_view = view
 	root.save_service = Save.new("res://.godot/tests/web_attention.json")

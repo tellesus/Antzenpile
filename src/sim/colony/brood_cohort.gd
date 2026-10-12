@@ -15,6 +15,8 @@ var nutrition_shortfalls: Array[String] = []
 var adaptation_id: String = ""
 var adaptation_trial: bool = false
 var inherited_traits: Array[String] = []
+var parent_queen_id: String = ""
+var parent_generation: int = 0
 var rain_comparison: bool = false
 var recognition_comparison: bool = false
 var environment_exposure: Array[String] = []
@@ -30,7 +32,7 @@ func to_dict() -> Dictionary:
 		"nutrition": nutrition, "care": care,
 		"nutrition_shortfalls": nutrition_shortfalls.duplicate(),
 		"adaptation_id": adaptation_id, "adaptation_trial": adaptation_trial,
-		"inherited_traits": inherited_traits.duplicate(), "rain_comparison": rain_comparison,
+		"parent_queen_id":parent_queen_id,"parent_generation":parent_generation,"inherited_traits":inherited_traits.duplicate(), "rain_comparison": rain_comparison,
 		"recognition_comparison": recognition_comparison,"environment_exposure":environment_exposure.duplicate(),"repair_comparison":repair_comparison}
 
 
@@ -45,6 +47,9 @@ func restore(data: Dictionary) -> bool:
 			return false
 	if data.progress_seconds >= CONFIG.stage_seconds(data.stage) or data.nutrition > 1.0 or data.care > 1.0:
 		return false
+	var parent_id: Variant=data.get("parent_queen_id","");var generation: Variant=data.get("parent_generation",0)
+	if not parent_id is String or parent_id.length()>160 or (not parent_id.is_empty() and not parent_id.begins_with("queen:")) or not WorkerLedger.valid_count(generation): return false
+	parent_queen_id=parent_id;parent_generation=int(generation)
 	var shortfalls: Variant = data.get("nutrition_shortfalls", [])
 	if not shortfalls is Array: return false
 	var parsed_shortfalls: Array[String] = []
