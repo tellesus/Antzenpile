@@ -145,7 +145,7 @@ func _draw() -> void:
 		if selected_id==node.id: draw_arc(at,14,0,TAU,24,Color.WHITE,1,true)
 	for pile: Dictionary in frame.piles:
 		var at: Vector2 = _at(pile.position)
-		draw_circle(at,8,Color("edd49d")); _label(at+Vector2(13,4),"Home" if pile.id=="home" else "Daughter",13,Color("edd49d"))
+		draw_circle(at,8,Color("edd49d")); _label(at+Vector2(13,4),ReportCopy.pile_name(pile.id),13,Color("edd49d"))
 	for scout: Dictionary in frame.scouts: draw_circle(_at(scout.position),2,Color("e5e8e0"))
 	if frame.rain: _label(rect.position+Vector2(12,24),"RAIN",15,Color("68baca"))
 	var side: Vector2 = Vector2(rect.end.x+32,126)

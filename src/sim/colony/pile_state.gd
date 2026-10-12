@@ -20,6 +20,14 @@ const NURSERY_CONFIG = preload("res://data/resources/default_nursery_development
 const RESOURCE_IDS: Array[String] = ["carbohydrate", "protein", "water"]
 var foundation: Dictionary = {}
 var id: String = "home"
+var display_name: String=""
+static func valid_id(value: Variant) -> bool:
+	if not value is String: return false
+	if value=="home": return true
+	var suffix: String=value.trim_prefix("satellite_")
+	return value=="satellite_"+suffix and suffix.is_valid_int() and str(suffix.to_int())==suffix and suffix.to_int()>0 and suffix.to_int()<WorkerLedger.MAX_COUNT
+func display_title() -> String:
+	return display_name if not display_name.is_empty() else "Home" if id=="home" else "Daughter" if id=="satellite_1" else "Nest "+id.trim_prefix("satellite_")
 var position: Vector2 = Vector2(20, 20)
 var queen_count: int:
 	get: return queen.count
@@ -77,7 +85,7 @@ func to_dict() -> Dictionary:
 	var brood_records: Array[Dictionary] = []
 	for cohort: BroodCohort in brood_cohorts:
 		brood_records.append(cohort.to_dict())
-	var record: Dictionary={"id": id, "position": [position.x, position.y], "queen_count": queen_count,
+	var record: Dictionary={"display_name":display_title(),"id": id, "position": [position.x, position.y], "queen_count": queen_count,
 		"queen":queen.to_dict(id),"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
 		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
@@ -265,10 +273,12 @@ func consume_resources(costs: Dictionary) -> bool:
 
 
 func restore(data: Dictionary) -> bool:
-	if not data.has_all(["id", "position", "queen_count", "workers", "resources", "brood_cohorts", "brood_matured_total", "food_exchange_state", "food_exchange_progress_seconds"]) or not data.id is String or data.id.is_empty() or not Ledger.valid_count(data.queen_count) or not data.food_exchange_state in ["primitive", "developing", "developed"]:
+	if not data.has_all(["id", "position", "queen_count", "workers", "resources", "brood_cohorts", "brood_matured_total", "food_exchange_state", "food_exchange_progress_seconds"]) or not valid_id(data.id) or not Ledger.valid_count(data.queen_count) or not data.food_exchange_state in ["primitive", "developing", "developed"]:
 		return false
 	if not typeof(data.food_exchange_progress_seconds) in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(data.food_exchange_progress_seconds)) or data.food_exchange_progress_seconds < 0.0:
 		return false
+	var title: Variant=data.get("display_name","Home" if data.id=="home" else "Daughter" if data.id=="satellite_1" else "Nest "+data.id.trim_prefix("satellite_"))
+	if not title is String or title.strip_edges().is_empty() or title.length()>48: return false
 	var restored_intent: Variant = data.get("brood_intent", "manual")
 	if not restored_intent is String or restored_intent not in ["manual", "grow"]: return false
 	if not data.position is Array or data.position.size() != 2 or not data.workers is Dictionary:
@@ -280,7 +290,7 @@ func restore(data: Dictionary) -> bool:
 	if not founding_data is Dictionary: return false
 	var founder_traits: Array[String]=[]
 	if not founding_data.is_empty():
-		if data.id!="satellite_1" or founding_data.size()!=4+int(founding_data.has("site_profile")) or not founding_data.has_all(["parent_id","route_id","queen_traits","founded_tick"]) or founding_data.parent_id!="home" or not founding_data.route_id is String or founding_data.route_id.is_empty() or not WorkerLedger.valid_count(founding_data.founded_tick) or not founding_data.queen_traits is Array: return false
+		if data.id=="home" or founding_data.size()!=4+int(founding_data.has("site_profile")) or not founding_data.has_all(["parent_id","route_id","queen_traits","founded_tick"]) or not valid_id(founding_data.parent_id) or founding_data.parent_id==data.id or not founding_data.route_id is String or founding_data.route_id.is_empty() or not WorkerLedger.valid_count(founding_data.founded_tick) or not founding_data.queen_traits is Array: return false
 		if not SiteCatalog.accepts(founding_data.get("site_profile",""),"nest_site"): return false
 		for trait_id: Variant in founding_data.queen_traits:
 			if not trait_id is String or not AdaptationRules.valid_trait(trait_id) or trait_id in founder_traits: return false
@@ -527,6 +537,7 @@ func restore(data: Dictionary) -> bool:
 	humidity = restored_humidity
 	food_toxicity = restored_toxicity
 	id = data.id
+	display_name=title
 	position = Vector2(data.position[0], data.position[1])
 	queen = restored_queen
 	workers = restored

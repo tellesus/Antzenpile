@@ -65,20 +65,27 @@ func to_dict() -> Dictionary:
 		"routes": route_records, "segments": segment_records, "cohorts": cohort_records}
 
 
-func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float, founding: FoundingState = null, supply: InterpileSupplyState = null, reinforcement: WorkerReinforcementState = null, supply_origin: String = "home") -> bool:
+func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, world: WorldState, time: float, founding: FoundingState = null, supply: InterpileSupplyState = null, reinforcement: WorkerReinforcementState = null, supply_origin: String = "home", extra_camps: Array=[]) -> bool:
 	if not data.has_all(["next_route_id", "next_cohort_id", "routes", "segments", "cohorts"]) or not WorkerLedger.valid_count(data.next_route_id) or data.next_route_id < 1 or not WorkerLedger.valid_count(data.next_cohort_id) or data.next_cohort_id < 1 or not data.routes is Array or not data.segments is Array or not data.cohorts is Array:
 		return false
 	var restored_routes: Dictionary[String, TrailRouteState] = {}
 	var restored_segments: Dictionary[String, TrailSegmentState] = {}
 	var restored_cohorts: Dictionary[String, TransitCohort] = {}
 	var pairs: Dictionary[String, bool] = {}
+	var camp_owners: Dictionary={}
+	if founding!=null and founding.phase!="none":camp_owners[founding.route_id]=founding
+	for camp: FoundingState in extra_camps:
+		if camp_owners.has(camp.route_id):return false
+		camp_owners[camp.route_id]=camp
 	for record: Variant in data.routes:
 		var route := Route.new()
 		if not record is Dictionary or not route.restore(record, colony, knowledge, world.bounds) or restored_routes.has(route.id) or route.last_loss_time > time or route.last_foreign_time > time or route.conflict_observed_at > time or route.conflict_received_at > time or route.last_empty_report_at > time:
 			return false
 		if route.purpose in ["founding","interpile"]:
-			if founding==null or knowledge.nodes[route.destination_knowledge_id].definition_id!="nest_site" or not founding.valid_route(route): return false
-			if route.purpose=="interpile":
+			if not camp_owners.has(route.id) or knowledge.nodes[route.destination_knowledge_id].definition_id!="nest_site" or not camp_owners[route.id].valid_route(route): return false
+			if route.purpose=="interpile" and (founding==null or route.id!=founding.route_id):
+				if route.status!="inactive" or route.allocated_workers!=0 or route.active_workers!=0 or route.desired_workers!=0 or route.delivered_total!=0 or not route.receipt.is_empty():return false
+			elif route.purpose=="interpile":
 				if supply==null: return false
 				if reinforcement!=null and reinforcement.active():
 					if not reinforcement.valid_route(route,supply): return false
@@ -180,7 +187,7 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 		if route.desired_workers > route.allocated_workers + pending + route.reported_losses + route.waiting_workers or route.waiting_workers > maxi(0,route.desired_workers-route.allocated_workers-pending) or route.allocated_workers > WorkerLedger.MAX_COUNT - pending:
 			return false
 		var commitment: String = "trail:" + route.id
-		var payer: String = supply_origin if route.purpose == "interpile" else route.origin_pile
+		var payer: String = supply_origin if route.purpose == "interpile" and founding!=null and route.id==founding.route_id else route.origin_pile
 		var ledger: WorkerLedger = colony.piles[payer].workers
 		if route.status != "inactive":
 			var record: Dictionary = ledger.to_dict().commitments.get(commitment, {})
@@ -201,15 +208,15 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 			var entry: Dictionary = pile.workers.to_dict().commitments[id]
 			if entry.kind == "trail" or id.begins_with("trail:"):
 				var route_id: String = id.trim_prefix("trail:")
-				if id != "trail:" + route_id or not restored_routes.has(route_id) or (supply_origin if restored_routes[route_id].purpose == "interpile" else restored_routes[route_id].origin_pile) != pile.id or restored_routes[route_id].status == "inactive" or entry.kind != "trail" or entry.owner_id != route_id:
+				if id != "trail:" + route_id or not restored_routes.has(route_id) or (supply_origin if restored_routes[route_id].purpose == "interpile" and founding!=null and route_id==founding.route_id else restored_routes[route_id].origin_pile) != pile.id or restored_routes[route_id].status == "inactive" or entry.kind != "trail" or entry.owner_id != route_id:
 					return false
-	if founding!=null and founding.phase!="none":
-		if not restored_routes.has(founding.route_id): return false
-		var owned: TrailRouteState=restored_routes[founding.route_id]
-		if founding.leg_ticks!=CONFIG.leg_ticks(owned.estimated_destination.distance_to(colony.piles.home.position)): return false
+	for camp: FoundingState in camp_owners.values():
+		if not restored_routes.has(camp.route_id):return false
+		var owned: TrailRouteState=restored_routes[camp.route_id]
+		if camp.leg_ticks!=CONFIG.leg_ticks(owned.estimated_destination.distance_to(colony.piles[camp.origin_pile].position)):return false
 	# Rebuild owned multi-resource receipts from integer cargo history, avoiding JSON sum rounding.
 	for route: TrailRouteState in restored_routes.values():
-		if route.purpose=="interpile":
+		if route.purpose=="interpile" and founding!=null and route.id==founding.route_id:
 			route.receipt=supply.receipt(); route.delivered_total=supply.delivered_total()
 	routes = restored_routes
 	segments = restored_segments

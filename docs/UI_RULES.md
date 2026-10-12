@@ -1,6 +1,6 @@
 # Current UI contracts and development boundaries
 
-Baseline: gameplay through 153. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Eight identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
+Baseline: gameplay through 154. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Eight identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
 
 149 reveals Environment only after local larval strain or inherited lineage. A revealed leaf explains that exposed larvae must survive to pupation; heat/dry benefit, recurring cost, queue/paid lock and adult carrier count remain distinct. Environmental effects follow the laid brood, not current adult share. Family navigation remains free.
 
@@ -11,6 +11,8 @@ Baseline: gameplay through 153. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-commu
 152 gives Daughter the same free Brood/Reproduce/Continuity tabs and Adaptation Web as Home. Costs/queues remain local and paid groups locked. Maternal inherited status is distinct from known adult carrier expression: immigrants can contribute now while a maternal trial is still available. Overview names known adult traits; current queen lineage governs future brood. Current group ancestry/bundle stays captured through replacement; no new physical founding/network action is implied.
 
 153 names shelter profiles only from returned confirmation or an actually received camp report. Remembered Sites exposes witnessed cover/damp/access cues and stable labels; selected context explains preparation estimate/extra food, actual pack receipt and unknown occupants/safety. Private profile/remaining pack/preparation progress stays hidden while campers are away. Unidentified preparation may spend the carried pack; the real messenger reports its remainder. Inspection remains free and normal UI never reads hidden site objects.
+
+154 provides stable Home/Daughter/Nest N attention cycling and independent local OUTWARD/INWARD work. New camps name their origin/destination and Queen controls show the actually departed reproductive group. Additional-pile gathering, scouts, care, growth and maternal investment consume their own approved state/commands. The third Entrance explains that supplies still use the original Home–Daughter link; no extra transport action is inferred. Returned camp notes keep actual origin/route; physical review labels multiple piles distinctly. Inspection remains free.
 
 ## Views and evidence
 

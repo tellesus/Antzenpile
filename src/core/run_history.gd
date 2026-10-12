@@ -133,7 +133,7 @@ func restore(data: Variant, tick: int, bounds: Rect2, paused: bool) -> bool:
 		if not entry.stats is Array or entry.stats.size()!=13: return false
 		for number: Variant in entry.stats:
 			if not WorkerLedger.valid_count(number): return false
-		if not _records(entry.piles,"piles",2,bounds) or not _records(entry.nodes,"nodes",64,bounds) or not _records(entry.trails,"trails",32,bounds) or not _records(entry.scouts,"scouts",8,bounds): return false
+		if not _records(entry.piles,"piles",64,bounds) or not _records(entry.nodes,"nodes",64,bounds) or not _records(entry.trails,"trails",32,bounds) or not _records(entry.scouts,"scouts",8,bounds): return false
 		if entry.piles.is_empty() or entry.stats[7]!=entry.piles.size() or entry.stats[8]!=entry.trails.size(): return false
 	if data.ended and (data.frames.is_empty() or previous!=tick or not paused): return false
 	previous=-1

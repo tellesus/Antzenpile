@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 153. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 154. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 149 adds BroodEnvironment for local heat/dry larval exposure, surviving pupation eligibility and bounded inherited larval rates. Existing worker/reproductive owners retain care, food and paid cohort ownership. Moderate warmth relief cannot erase severe heat, wetness, health or refuse strain. Reproductive progress retains exact rates through a small integer remainder. Environment definitions/UI use the same registry and paid queue.
 
@@ -11,6 +11,8 @@ Implementation baseline: gameplay through 153. This is a current technical refer
 152 makes the queen bundle authoritative for future offspring, independently of GeneticRepertoire adult carriers. Paid laying captures parent identity/generation/bundle; supported trial emergence updates only its still-present mother. Imported or historical-trial adults cannot rewrite a successor. Home proxy/founder migration is explicit; current per-pile trial/reproductive owners now serve Daughter. First founding and local replacement transfer the paid bundle/ancestry once; generalized daughter-origin founding/queen transport remain M5.
 
 153 SiteDefinition/Catalog owns four immutable profiles plus neutral legacy behavior. World/scout/knowledge/perception capture static confirmed site identity through the existing delivery boundary; normal views read remembered/local facts only. Founding owns quoted versus physically learned profile, preparation duration, real pack/dose and a logical private camper observation. Unidentified preparation spends carried food; only the real messenger returns its evidence/remaining pack. Occupied profile affects developed-Nursery heat/moisture through existing climate owners. The single first-daughter/camp limit remains for the next M5 generalization.
+
+154 separates origin-aware FoundingCampSystem transitions from FoundingSystem selection. The first `founding` remains the legacy supply/settler connection owner; route-keyed `extra_foundings` retain independent pending/completed proof. Real daughter-origin groups transfer settlers/packs/ancestry into additional piles once. Per-pile exploration is generalized through `extra_exploration` beside the two compatibility aliases; aggregate detailed-agent/intent cap remains eight. Local work and named attention use generic pile IDs. Extra interpile edges remain inactive until the transport card, without borrowing legacy supply ownership.
 
 ## Ownership and dependency direction
 
@@ -40,7 +42,7 @@ JourneyResponse owns one shared party slot across both piles. Combat, reinforcem
 
 ## Present network and genetics limits
 
-The implemented network is Home plus `satellite_1`. The founding/settler/supply contracts still contain that bounded scope; generalized multi-pile IDs/connections do not exist yet. Home and Daughter supplies share one exclusive physical connection with independent payer receipts. Settler handoff is a ledger transfer, not a death/birth. Do not make content-catalog claims imply arbitrary networks already work.
+Additional independently working `satellite_N` piles and daughter-origin founding exist after 154. Generalized physical connection transport/rescue remains next; first-connection supplies/settlers keep their existing ownership. Home and Daughter supplies share one exclusive physical connection with independent payer receipts. Settler handoff is a ledger transfer, not a death/birth. Do not make content-catalog claims imply arbitrary networks already work.
 
 GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance at laying, movement captures effects at departure, and loss/transfer preserves profiles. Home and Daughter use paid maternal trials and captured queen bundles. Local viability/replacement and daughter reproductive generations work; portable network queens and daughter-origin founding require M5.
 

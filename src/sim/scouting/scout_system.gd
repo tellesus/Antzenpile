@@ -126,8 +126,7 @@ func set_effort(target: Variant, origin_id: String = "home") -> bool:
 	if policy == null: return _reject("Unknown exploration pile")
 	if typeof(target) != TYPE_INT or not WorkerLedger.valid_count(target) or target > config.active_cap:
 		return _reject("Exploration target must fit the scout capacity")
-	var other: ExplorationState = _run.daughter_exploration if origin_id == "home" else _run.exploration
-	if target + other.target > config.active_cap: return _reject("Shared exploration cap reached; lower effort at the other pile")
+	if target + _run.other_exploration_target(origin_id) > config.active_cap: return _reject("Shared exploration cap reached; lower effort at the other pile")
 	policy.target = target
 	var active: Array[ScoutAgent] = []
 	for agent: ScoutAgent in _run.scouts.values():
@@ -169,8 +168,8 @@ func recall(id: String) -> bool:
 
 
 func maintain_effort() -> void:
-	_maintain_pile_effort("home")
-	if _run.colony.piles.has("satellite_1"): _maintain_pile_effort("satellite_1")
+	var ids: Array=_run.colony.piles.keys();ids.sort()
+	for id: String in ids: _maintain_pile_effort(id)
 
 
 func _maintain_pile_effort(origin_id: String) -> void:
@@ -263,6 +262,7 @@ func dispatch_investigation(origin_id: String, knowledge_id: String) -> bool:
 func tick(delta: float) -> void:
 	_run.exploration.decay(delta, _run.rain.phase == "raining")
 	_run.daughter_exploration.decay(delta, _run.rain.phase == "raining")
+	for policy: ExplorationState in _run.extra_exploration.values(): policy.decay(delta,_run.rain.phase=="raining")
 	for memory: ScoutMissionMemory in _run.scout_missions.values():
 		var half_life: float = config.rain_scent_half_life if _run.rain.phase == "raining" else config.departure_scent_half_life
 		memory.scent = roundf(memory.scent * pow(0.5, delta / half_life) * 1e10) / 1e10

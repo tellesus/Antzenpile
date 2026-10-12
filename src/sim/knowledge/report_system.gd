@@ -76,9 +76,10 @@ func capture(recording: bool = true) -> void:
 			var phase: String=pile.chambers.projects[id].phase if pile.chambers.projects.has(id) else "unbuilt"
 			var key: String="chamber/"+pile.id+"/"+id;var previous: Variant=journal.seen.get(key)
 			if journal.changed(key,phase) and (phase!="unbuilt" or previous!=null and previous!="unbuilt"): journal.add("chamber",pile.id,id,time,time,"canceled" if phase=="unbuilt" else phase,0,0,recording)
-	if _run.founding.reported_tick>0:
-		var received: float=_run.founding.reported_tick*SimulationClock.TICK_INTERVAL
-		if _run.founding.phase in ["ready","failed","established"] and journal.changed("camp/"+_run.founding.route_id,str(received)+":"+_run.founding.phase): journal.add("camp","home",_run.founding.route_id,received,received,_run.founding.phase,0,0,recording)
+	for camp: FoundingState in _run.all_foundings():
+		if camp.reported_tick<=0:continue
+		var received: float=camp.reported_tick*SimulationClock.TICK_INTERVAL
+		if camp.phase in ["ready","failed","established"] and journal.changed("camp/"+camp.route_id,str(received)+":"+camp.phase):journal.add("camp",camp.origin_pile,camp.route_id,received,received,camp.phase,0,0,recording)
 	for origin: String in ["home","satellite_1"]:
 		var supply: InterpileSupplyState=_run.supply if origin=="home" else _run.daughter_supply
 		if supply.trips_reported>0 and journal.changed("supplies/"+origin,supply.last_reported_tick):

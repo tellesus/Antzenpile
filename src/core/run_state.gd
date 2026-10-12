@@ -27,6 +27,8 @@ var daughter_supply := InterpileSupplyState.new()
 var supply_origin: String = "home"
 var reinforcement := WorkerReinforcementState.new()
 var founding := FoundingState.new()
+var extra_foundings: Dictionary[String,FoundingState]={}
+var extra_exploration: Dictionary[String,ExplorationState]={}
 var exploration: ExplorationState = Exploration.new()
 var daughter_exploration: ExplorationState = Exploration.new()
 var world: WorldState
@@ -64,7 +66,7 @@ var _scenario_id: String
 
 func exploration_for(pile_id: String) -> ExplorationState:
 	if not colony.piles.has(pile_id): return null
-	return exploration if pile_id == "home" else daughter_exploration if pile_id == "satellite_1" else null
+	return exploration if pile_id == "home" else daughter_exploration if pile_id == "satellite_1" else extra_exploration.get(pile_id)
 
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
@@ -95,8 +97,13 @@ func to_dict() -> Dictionary:
 	ids.sort()
 	for id: String in ids:
 		delivered.append(delivered_observations[id].to_dict())
+	var camps: Array[Dictionary]=[];var policies: Dictionary={}
+	ids=extra_foundings.keys();ids.sort()
+	for id: String in ids: camps.append(extra_foundings[id].to_dict())
+	ids=extra_exploration.keys();ids.sort()
+	for id: String in ids: policies[id]=extra_exploration[id].to_dict()
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
-	return {"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
+	return {"extra_foundings":camps,"extra_exploration":policies,"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"daughter_supply":daughter_supply.to_dict(), "supply_origin":supply_origin,
@@ -176,7 +183,22 @@ func restore(data: Dictionary) -> bool:
 	var restored_daughter_exploration := Exploration.new()
 	if data.has("daughter_exploration") and (not data.daughter_exploration is Dictionary or not restored_daughter_exploration.restore(data.daughter_exploration, restored_world, restored_clock.simulation_time)): return false
 	if not restored_colony.piles.has("satellite_1") and restored_daughter_exploration.to_dict() != Exploration.new().to_dict(): return false
-	if restored_exploration.target + restored_daughter_exploration.target > SCOUT_CONFIG.active_cap: return false
+	var restored_extra_exploration: Dictionary[String,ExplorationState]={}
+	var extra_policies: Variant=data.get("extra_exploration",{})
+	if not extra_policies is Dictionary: return false
+	for id: Variant in extra_policies:
+		if not id is String or id in ["home","satellite_1"] or not restored_colony.piles.has(id) or not extra_policies[id] is Dictionary: return false
+		var policy:=Exploration.new()
+		if not policy.restore(extra_policies[id],restored_world,restored_clock.simulation_time): return false
+		restored_extra_exploration[id]=policy
+	var restored_policies: Dictionary[String,ExplorationState]={"home":restored_exploration,"satellite_1":restored_daughter_exploration}
+	for id: String in restored_colony.piles:
+		if id not in ["home","satellite_1"]:
+			if not restored_extra_exploration.has(id): return false
+			restored_policies[id]=restored_extra_exploration[id]
+	var exploration_target: int=0
+	for policy: ExplorationState in restored_policies.values(): exploration_target+=policy.target
+	if exploration_target>SCOUT_CONFIG.active_cap: return false
 	if not data.scouts is Array or data.scouts.size() > SCOUT_CONFIG.active_cap or not WorkerLedger.valid_count(data.next_scout_id) or data.next_scout_id < 1:
 		return false
 	var restored_scouts: Dictionary[String, ScoutAgent] = {}
@@ -210,10 +232,10 @@ func restore(data: Dictionary) -> bool:
 				return false
 	for origin_id: String in restored_colony.piles:
 		var exploring_standing: int = 0
-		var policy: ExplorationState = restored_exploration if origin_id == "home" else restored_daughter_exploration
+		var policy: ExplorationState = restored_policies[origin_id]
 		for agent: ScoutAgent in restored_scouts.values():
 			if agent.standing and agent.origin_pile == origin_id:
-				if not data.has("exploration" if origin_id == "home" else "daughter_exploration"): return false
+				if not data.has("exploration" if origin_id == "home" else "daughter_exploration" if origin_id=="satellite_1" else "extra_exploration"): return false
 				exploring_standing += 1 if not agent.lost and agent.phase not in ["returning", "blocked_returning"] else 0
 		if exploring_standing > policy.target: return false
 	if not data.delivered_observations is Array:
@@ -271,9 +293,9 @@ func restore(data: Dictionary) -> bool:
 		if memory.target_knowledge_id.is_empty(): continue # Legacy/general departures have no named target.
 		if not restored_knowledge.nodes.has(memory.target_knowledge_id): return false
 		if restored_scouts.has(memory.id) and "known:" + restored_scouts[memory.id].investigation_source_id != memory.target_knowledge_id: return false
-	for priority: String in restored_exploration.priorities + restored_daughter_exploration.priorities:
-		if not restored_knowledge.nodes.has(priority):
-			return false
+	for policy: ExplorationState in restored_policies.values():
+		for priority: String in policy.priorities:
+			if not restored_knowledge.nodes.has(priority): return false
 	for agent: ScoutAgent in restored_scouts.values():
 		for source_id: String in agent.known_sources:
 			if not restored_knowledge.nodes.has("known:" + source_id):
@@ -283,6 +305,16 @@ func restore(data: Dictionary) -> bool:
 	var restored_founding:=FoundingState.new()
 	var founding_data: Variant=data.get("founding",restored_founding.to_dict())
 	if not founding_data is Dictionary or not restored_founding.restore(founding_data,restored_colony,restored_clock.tick_count,restored_world): return false
+	if restored_founding.origin_pile!="home" or restored_founding.destination_pile!="satellite_1": return false
+	var restored_extra_foundings: Dictionary[String,FoundingState]={}
+	var extra_camps: Variant=data.get("extra_foundings",[])
+	if not extra_camps is Array or extra_camps.size()>restored_world.nodes.size()*restored_colony.piles.size(): return false
+	for record: Variant in extra_camps:
+		var camp:=FoundingState.new()
+		if not record is Dictionary or not camp.restore(record,restored_colony,restored_clock.tick_count,restored_world) or camp.phase=="none" or camp.destination_pile=="satellite_1" or camp.route_id==restored_founding.route_id or restored_extra_foundings.has(camp.route_id): return false
+		restored_extra_foundings[camp.route_id]=camp
+	var restored_camps: Array[FoundingState]=[restored_founding]
+	for camp: FoundingState in restored_extra_foundings.values(): restored_camps.append(camp)
 	var restored_supply:=InterpileSupplyState.new()
 	var supply_data: Variant=data.get("supply",restored_supply.to_dict())
 	if not supply_data is Dictionary or not restored_supply.restore(supply_data,restored_colony,restored_founding,restored_clock.tick_count): return false
@@ -299,23 +331,9 @@ func restore(data: Dictionary) -> bool:
 	if not reinforcement_data is Dictionary or not restored_reinforcement.restore(reinforcement_data,restored_colony,restored_founding,restored_supply,restored_clock.tick_count): return false
 	if restored_reinforcement.active() and (restored_daughter_supply.phase != "none" or restored_supply_origin != "home"): return false
 	var restored_trails := Trails.new()
-	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, active_supply, restored_reinforcement, restored_supply_origin):
+	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, active_supply, restored_reinforcement, restored_supply_origin, restored_extra_foundings.values()):
 		return false
-	# One paid, physically reported foundation owns the only current daughter.
-	var daughter: PileState=restored_colony.piles.get("satellite_1")
-	if (daughter!=null)!=(restored_founding.phase=="established"): return false
-	for pile: PileState in restored_colony.piles.values():
-		if pile.id not in ["home","satellite_1"]: return false
-		if pile.id=="home" and (not pile.foundation.is_empty() or pile.workers.transferred_in>0): return false
-	if daughter!=null:
-		var parent: PileState=restored_colony.piles.home
-		var route: TrailRouteState=restored_trails.routes[restored_founding.route_id]
-		if daughter.foundation.is_empty() or daughter.foundation.route_id!=route.id or daughter.position!=route.estimated_destination or daughter.foundation.queen_traits!=restored_founding.reproductive_group.inherited_traits: return false
-		if daughter.foundation.get("site_profile","")!=restored_founding.site_profile: return false
-		if daughter.foundation.founded_tick<restored_founding.reported_tick or daughter.foundation.founded_tick>restored_clock.tick_count: return false
-		var migrants: int=FoundingState.CONFIG.workers-1+restored_reinforcement.arrivals*WorkerReinforcementState.CONFIG.reinforcement_workers
-		if parent.workers.transferred_out!=migrants or daughter.workers.transferred_in!=migrants or daughter.workers.transferred_out!=0: return false
-		if daughter.genetics.imported!=parent.genetics.exported: return false
+	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement): return false
 	# A paid young queen has one current body owner; founding history is not stock.
 	var reproductive_bodies: Dictionary={}
 	for pile: PileState in restored_colony.piles.values():
@@ -328,9 +346,11 @@ func restore(data: Dictionary) -> bool:
 			var identity: String="queen:"+pile.id+":raised:"+str(int(group.laid_tick))
 			if reproductive_bodies.has(identity): return false
 			reproductive_bodies[identity]=true
-	if restored_founding.phase in ["outbound","settling","messenger","returning","ready"]:
-		var identity: String="queen:home:raised:"+str(int(restored_founding.reproductive_group.laid_tick))
+	for camp: FoundingState in restored_camps:
+		if camp.phase not in ["outbound","settling","messenger","returning","ready"]: continue
+		var identity: String="queen:"+camp.origin_pile+":raised:"+str(int(camp.reproductive_group.laid_tick))
 		if reproductive_bodies.has(identity): return false
+		reproductive_bodies[identity]=true
 	for agent: ScoutAgent in restored_scouts.values():
 		for route_id: String in agent.avoid_routes:
 			if not restored_trails.routes.has(route_id) or restored_trails.routes[route_id].origin_pile != agent.origin_pile or restored_trails.routes[route_id].reported_losses < 1:
@@ -348,17 +368,18 @@ func restore(data: Dictionary) -> bool:
 		used_scout_ids[evidence.scout_id] = true
 	for evidence: Observation in archived.values():
 		used_scout_ids[evidence.scout_id] = true
-	if restored_founding.site_report!=null:
-		var report: Observation=restored_founding.site_report
+	for camp: FoundingState in restored_camps:
+		if camp.site_report==null: continue
+		var report: Observation=camp.site_report
 		var suffix: String=report.scout_id.trim_prefix("scout_")
 		if report.scout_id!="scout_"+suffix or not suffix.is_valid_int() or str(suffix.to_int())!=suffix or suffix.to_int()<1 or suffix.to_int()>=data.next_scout_id: return false
-		if restored_founding.reported_tick==0:
+		if camp.reported_tick==0:
 			if used_scout_ids.has(report.scout_id): return false
 			used_scout_ids[report.scout_id]=true
 		else:
 			var delivered: Observation=restored_delivered.get(report.id,archived.get(report.id))
 			if delivered==null or delivered.to_dict()!=report.to_dict(): return false
-			if archived.has(report.id) and restored_knowledge._received_at[report.id]<restored_founding.reported_tick*SimulationClock.TICK_INTERVAL: return false
+			if archived.has(report.id) and restored_knowledge._received_at[report.id]<camp.reported_tick*SimulationClock.TICK_INTERVAL: return false
 	var active_detours: int = 0
 	for cohort: TransitCohort in restored_trails.cohorts.values():
 		var sample_ids: Array[String] = []
@@ -546,6 +567,8 @@ func restore(data: Dictionary) -> bool:
 	daughter_supply = restored_daughter_supply
 	supply_origin = restored_supply_origin
 	founding = restored_founding
+	extra_foundings=restored_extra_foundings
+	extra_exploration=restored_extra_exploration
 	trails = restored_trails
 	rain = restored_rain
 	honeydew = restored_honeydew
@@ -588,3 +611,73 @@ static func _valid_honeydew(state: HoneydewState, restored_world: WorldState, re
 			elif commitments.has(commitment_id):
 				return false
 	return true
+
+func all_foundings() -> Array[FoundingState]:
+	var result: Array[FoundingState]=[founding]
+	var keys: Array=extra_foundings.keys();keys.sort()
+	for id: String in keys: result.append(extra_foundings[id])
+	return result
+func all_exploration() -> Dictionary[String,ExplorationState]:
+	var result: Dictionary[String,ExplorationState]={"home":exploration}
+	if colony.piles.has("satellite_1"):result.satellite_1=daughter_exploration
+	for id: String in extra_exploration:result[id]=extra_exploration[id]
+	return result
+func other_exploration_target(pile_id: String) -> int:
+	var total: int=0
+	for id: String in all_exploration():
+		if id!=pile_id: total+=all_exploration()[id].target
+	return total
+
+static func _profile_sum(into: Dictionary, pile_id: String, profiles: Dictionary) -> void:
+	if not into.has(pile_id):into[pile_id]={}
+	for key: String in profiles:into[pile_id][key]=into[pile_id].get(key,0)+profiles[key]
+static func _valid_foundations(colony_state: ColonyState, camps: Array[FoundingState], network: TrailNetwork, tick: int, reinforcements: WorkerReinforcementState) -> bool:
+	var established: Dictionary={};var destinations: Dictionary={};var sites: Dictionary={};var active_origins: Dictionary={}
+	var incoming: Dictionary={};var outgoing: Dictionary={};var gene_in: Dictionary={};var gene_out: Dictionary={}
+	for camp: FoundingState in camps:
+		if camp.phase=="none":continue
+		if not network.routes.has(camp.route_id):return false
+		var route: TrailRouteState=network.routes[camp.route_id]
+		var parent: PileState=colony_state.piles[camp.origin_pile]
+		if camp.departed_tick<parent.foundation.get("founded_tick",0):return false
+		if camp.phase not in ["failed","established"]:
+			if active_origins.has(parent.id):return false
+			active_origins[parent.id]=true
+		if camp.phase!="failed":
+			if sites.has(route.destination_knowledge_id) or destinations.has(camp.destination_pile):return false
+			sites[route.destination_knowledge_id]=true;destinations[camp.destination_pile]=true
+		if camp.phase!="established":
+			if camp.phase!="failed" and colony_state.piles.has(camp.destination_pile):return false
+			continue
+		if not colony_state.piles.has(camp.destination_pile):return false
+		var child: PileState=colony_state.piles[camp.destination_pile]
+		if child.foundation.is_empty() or child.foundation.parent_id!=parent.id or child.foundation.route_id!=route.id or child.position!=route.estimated_destination or child.foundation.queen_traits!=camp.reproductive_group.inherited_traits or child.foundation.get("site_profile","")!=camp.site_profile:return false
+		if child.foundation.founded_tick<camp.reported_tick or child.foundation.founded_tick>tick:return false
+		if not camp.profiles_recorded:
+			# The only old foundation is exactly recoverable from its transfer history.
+			if camp.origin_pile!="home" or camp.destination_pile!="satellite_1":return false
+			camp.settler_profiles=child.genetics.imported.duplicate()
+			for key: String in reinforcements.moved_profiles:
+				var amount: int=camp.settler_profiles.get(key,0)-reinforcements.moved_profiles[key]
+				if amount<0:return false
+				if amount==0:camp.settler_profiles.erase(key)
+				else:camp.settler_profiles[key]=amount
+			if child.genetics.migration_count(camp.settler_profiles)!=FoundingState.CONFIG.workers-1:return false
+			camp.profiles_recorded=true
+		established[child.id]=true
+		incoming[child.id]=incoming.get(child.id,0)+FoundingState.CONFIG.workers-1
+		outgoing[parent.id]=outgoing.get(parent.id,0)+FoundingState.CONFIG.workers-1
+		_profile_sum(gene_in,child.id,camp.settler_profiles);_profile_sum(gene_out,parent.id,camp.settler_profiles)
+	if reinforcements.arrivals>0:
+		incoming["satellite_1"]=incoming.get("satellite_1",0)+reinforcements.arrivals*WorkerReinforcementState.CONFIG.reinforcement_workers
+		outgoing["home"]=outgoing.get("home",0)+reinforcements.arrivals*WorkerReinforcementState.CONFIG.reinforcement_workers
+		_profile_sum(gene_in,"satellite_1",reinforcements.moved_profiles);_profile_sum(gene_out,"home",reinforcements.moved_profiles)
+	for pile: PileState in colony_state.piles.values():
+		if pile.id=="home" and not pile.foundation.is_empty() or pile.id!="home" and not established.has(pile.id):return false
+		if pile.workers.transferred_in!=incoming.get(pile.id,0) or pile.workers.transferred_out!=outgoing.get(pile.id,0) or pile.genetics.imported!=gene_in.get(pile.id,{}) or pile.genetics.exported!=gene_out.get(pile.id,{}):return false
+	return true
+
+func camp_for_route(route_id: String) -> FoundingState:
+	for camp: FoundingState in all_foundings():
+		if camp.phase!="none" and camp.route_id==route_id:return camp
+	return null

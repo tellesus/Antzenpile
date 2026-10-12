@@ -4,7 +4,7 @@ const Copy=preload("res://src/presentation/interface_text.gd")
 const Memory=preload("res://src/presentation/outward/source_memory.gd")
 
 static func pile_name(id: String) -> String:
-	return "Home" if id=="home" else "Daughter" if id=="satellite_1" else id.capitalize().replace("_"," ")
+	return "Home" if id=="home" else "Daughter" if id=="satellite_1" else "Nest "+id.trim_prefix("satellite_") if id.begins_with("satellite_") else id.capitalize().replace("_"," ")
 
 static func source_name(entry: Dictionary, status: Dictionary) -> String:
 	var knowledge_id: String=entry.subject_id

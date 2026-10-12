@@ -137,7 +137,7 @@ func activate_at(at: Vector2) -> bool:
 		if pile_command.is_valid(): pile_command.call("home")
 		selected_id="entrance"; queue_redraw(); return true
 	if _status.get("daughter_available",false) and _pile_rect().has_point(at):
-		var target: String = "home" if _status.get("daughter",false) else "satellite_1"
+		var target: String = _status.get("other_pile","home" if _status.get("daughter",false) else "satellite_1")
 		if not _status.get("other_pile_attention", {}).is_empty() and pressure_command.is_valid():
 			var result: Dictionary = pressure_command.call(target)
 			activation.outcome(result)
@@ -656,7 +656,7 @@ func _draw_node_labels(id: String, at: Vector2) -> void:
 
 
 func _draw_hud(size: Vector2) -> void:
-	_label(Vector2(24, 38), "INWARD  /  ADAPTATION WEB" if selected_id == "adaptation" else "INWARD  /  DAUGHTER" if _status.get("daughter",false) else "INWARD  /  HOME", Color("dad7c8"), 22)
+	_label(Vector2(24, 38), "INWARD  /  ADAPTATION WEB" if selected_id == "adaptation" else "INWARD  /  "+_status.get("pile_name","Daughter" if _status.get("daughter",false) else "Home").to_upper(), Color("dad7c8"), 22)
 	var web_hint: String = "Next brood: %s · change until eggs are laid" % Web.short_title(_queued_trait()) if not _queued_trait().is_empty() else "Inspect a trait, then queue it for the next brood."
 	_label(Vector2(24, 63), web_hint if selected_id == "adaptation" else "Local workers and stores · Home exploration shared" if _status.get("daughter",false) else "Tap a function to inspect it.", Color("82939c"), 13)
 	if not _status.is_empty():
@@ -876,6 +876,9 @@ func _draw_context(size: Vector2) -> void:
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
 			_detail_line(box, 117, "Trail workers: %d" % _status.trail_workers)
 			if not _status.get("supply",{}).is_empty(): _draw_supply_context(box)
+			elif _status.get("daughter",false):
+				_label(box.position+Vector2(16,163),"Supplies use the Home–Daughter link",Color("8fa1a8"),12)
+				_label(box.position+Vector2(16,187),"This nest gathers and grows locally",Color("8fa1a8"),12)
 		"guest":
 			var guest: Dictionary = _status.get("guest", {})
 			var observation: String = guest.get("observation", "")
@@ -1052,7 +1055,7 @@ func _draw_controls(size: Vector2) -> void:
 	if _status.get("daughter_available",false):
 		UIStyle.surface(self,_pile_rect(),Color("29392f"))
 		var attention: Dictionary = _status.get("other_pile_attention", {})
-		var title: String = attention.get("title", "INSPECT HOME" if _status.get("daughter",false) else "INSPECT DAUGHTER")
+		var title: String = attention.get("title", "INSPECT "+_status.get("other_pile_name","Home" if _status.get("daughter",false) else "Daughter").to_upper())
 		_label(_pile_rect().get_center()+Vector2(0,-4 if not attention.is_empty() else 6),title,Color("d3dcd4"),14 if not attention.is_empty() else 16,HORIZONTAL_ALIGNMENT_CENTER)
 		if not attention.is_empty():
 			_label(_pile_rect().get_center()+Vector2(0,17),Copy.fit_line(" / ".join(attention.causes),_font,12,_pile_rect().size.x-24),Color("c4ac95"),12,HORIZONTAL_ALIGNMENT_CENTER)

@@ -248,14 +248,14 @@ func set_daughter_supply(enabled: Variant, source_id: String = "home") -> bool:
 	return (supply if source_id == "home" else daughter_supply).set_enabled(enabled) if source_id in ["home","satellite_1"] else false
 
 
-func establish_daughter(knowledge_id: String) -> bool:
+func establish_daughter(knowledge_id: String, origin_id: String="home") -> bool:
 	if run.history.ended: return false
-	return founding.establish(knowledge_id)
+	return founding.establish(knowledge_id,origin_id)
 
 
-func start_founding(knowledge_id: String) -> bool:
+func start_founding(knowledge_id: String, origin_id: String="home") -> bool:
 	if run.history.ended: return false
-	return founding.start(knowledge_id)
+	return founding.start(knowledge_id,origin_id)
 
 
 func start_reproduction(pile_id: String) -> bool:

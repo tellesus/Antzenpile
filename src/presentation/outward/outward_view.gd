@@ -852,7 +852,7 @@ func _draw_hud(size: Vector2) -> void:
 	if not sources_open and not exploration_open and not _status.get("other_pile", "").is_empty():
 		var switch: Rect2 = _button_rect("pile")
 		UIStyle.surface(self,switch,Color("26383a"))
-		_label(switch.get_center()+Vector2(0,5),"LOOK FROM " + ("HOME" if _daughter() else "DAUGHTER"),Color("dce5d9"),13,HORIZONTAL_ALIGNMENT_CENTER)
+		_label(switch.get_center()+Vector2(0,5),"LOOK FROM " + _status.get("other_pile_name","Home" if _daughter() else "Daughter").to_upper(),Color("dce5d9"),13,HORIZONTAL_ALIGNMENT_CENTER)
 
 
 func _draw_context(size: Vector2) -> void:
