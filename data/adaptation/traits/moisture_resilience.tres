@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/trait_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+id = "moisture_resilience"
+title = "Moisture Resilience"
+family = "environment"
+benefit = "Half the dry-larva slowdown"
+tradeoff = "Inheriting larvae need 20% more carbs"
+evidence = "Dry-exposed larvae survive to pupation"
+carbohydrate = 14.0
+protein = 16.0
+water = 8.0
+dry_relief = 0.5
+larval_carbohydrate_multiplier = 1.2

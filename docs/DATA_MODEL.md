@@ -1,6 +1,8 @@
 # Current state contracts
 
-Baseline: gameplay through 148. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
+Baseline: gameplay through 149. Intended new schemas are in the [bible](SYSTEMS_BIBLE.md) and [catalogs](README.md), not implemented merely by this document. Detailed historical fields are [archive-only](archive/pre_1_0/contracts/DATA_MODEL.md); current validators/tests/source own exact shape.
+
+149 adds optional pile `environment: {seen, candidates}` and worker/reproductive `environment_exposure`, each limited to the two climate trait IDs. Candidates require prior exposure; paid/queued/established traits require their earned eligibility or documented founder/import inheritance. Imports do not fabricate local climate evidence. Brood/reproductive exposure must agree with the pile and cannot occur in eggs. Reproductive `progress_remainder` defaults to zero and stores 0–19 twentieths of a legacy quarter; current exact rate uses 80 units/tick, with non-larval remainder zero. Old state continues unchanged; invalid additions reject atomically.
 
 ## Persistent envelope and run
 

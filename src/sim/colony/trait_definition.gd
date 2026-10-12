@@ -15,4 +15,8 @@ extends Resource
 @export var carry_change: float=0
 @export var larval_food_multiplier: float=1
 @export var care_gain: float=0
+@export var larval_carbohydrate_multiplier: float=1
+@export var warm_relief: float=0
+@export var dry_relief: float=0
+@export var comfortable_rate: float=1
 func costs() -> Dictionary: return {"carbohydrate":carbohydrate,"protein":protein,"water":water}

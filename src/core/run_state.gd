@@ -486,7 +486,7 @@ func restore(data: Dictionary) -> bool:
 		for project: ChamberProject in pile.chambers.projects.values():
 			if project.funded_tick>restored_clock.tick_count or project.progress_ticks>restored_clock.tick_count-project.funded_tick: return false
 		var reproductive: ReproductionState = pile.reproduction
-		var minimum_ticks: float = float(reproductive.progress_quarters)/4.0
+		var minimum_ticks: float = reproductive.progress_ticks()
 		if reproductive.phase in ["larva","pupa","ready"]: minimum_ticks+=reproductive.CONFIG.egg_ticks
 		if reproductive.phase in ["pupa","ready"]: minimum_ticks+=reproductive.CONFIG.larva_ticks
 		if reproductive.phase=="ready": minimum_ticks+=reproductive.CONFIG.pupa_ticks

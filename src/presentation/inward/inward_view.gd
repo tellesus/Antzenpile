@@ -193,7 +193,7 @@ func activate_at(at: Vector2) -> bool:
 		web_family = "foraging"
 		queue_redraw()
 		return true
-	if selected_id == "adaptation" and _status.get("adaptation_options", {}).has("fighter") and _web_family_rect().has_point(at):
+	if selected_id == "adaptation" and Web.families(_status).size()>1 and _web_family_rect().has_point(at):
 		web_family = Web.next_family(_status,web_family)
 		web_selection = "foraging"
 		return true
@@ -305,7 +305,7 @@ func _run_command(command: String) -> void:
 				activation.outcome(result)
 				_feedback = "New brood started" if result.get("accepted", false) else result.get("reason", "Brood unavailable")
 				_feedback_until = Time.get_ticks_msec() + 3000
-		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance", "adaptation_fighter", "adaptation_efficient_nurses", "cancel_adaptation":
+		"adaptation_lean", "adaptation_load", "adaptation_persistent", "adaptation_security", "adaptation_tolerance", "adaptation_fighter", "adaptation_efficient_nurses", "adaptation_heat_resilience", "adaptation_moisture_resilience", "cancel_adaptation":
 			if adaptation_command.is_valid():
 				var result: Dictionary = adaptation_command.call("" if command == "cancel_adaptation" else command.trim_prefix("adaptation_"))
 				activation.outcome(result)
@@ -495,7 +495,7 @@ func _draw() -> void:
 		Web.draw_graph(self, size, _status, web_selection, _animation_time, web_family)
 		UIStyle.surface(self, _web_back_rect(), Color("18252b"))
 		_label(_web_back_rect().position + Vector2(98, 29), "COLONY NETWORK", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
-		if _status.get("adaptation_options", {}).has("fighter"):
+		if Web.families(_status).size()>1:
 			UIStyle.surface(self, _web_family_rect(), Color("28212f"))
 			_label(_web_family_rect().position + Vector2(110, 29), "INSPECT "+Web.next_family(_status,web_family).to_upper(), Color("d3c5df"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 		_draw_hud(size)
@@ -971,7 +971,7 @@ func _draw_genetic_context(box: Rect2) -> void:
 			_detail_line(box, 326, "Change choice until eggs are laid" if queued else "Replaces choice; no waiting list")
 	elif _status.adaptation_trial.get("adaptation_id", "") == web_selection:
 		_detail_line(box, 185, "Locked · " + str(_status.adaptation_trial.stage).capitalize())
-		_detail_line(box, 211, "Expresses only with surviving adults")
+		_detail_line(box, 211, "Larval effects apply to this brood" if web_selection in BroodEnvironment.TRAITS else "Expresses only with surviving adults")
 		if not _queued_trait().is_empty():
 			_detail_line(box, 247, "Next: " + Web.short_title(_queued_trait()))
 			_detail_line(box, 273, "This brood's trait stays locked")
@@ -979,10 +979,10 @@ func _draw_genetic_context(box: Rect2) -> void:
 		var expressed: int = _status.get("adaptation_options", {}).get(web_selection, {}).get("expressed", _status.adapted_workers)
 		_detail_line(box, 185, "%d / %d adults carry this trait" % [expressed, _status.workers_total])
 		_detail_line(box, 211, "Future brood inherits this trait")
-		_detail_line(box, 247, "Effects scale with adult carriers")
+		_detail_line(box, 247, "Effects follow each laid brood" if web_selection in BroodEnvironment.TRAITS else "Effects scale with adult carriers")
 	else:
 		_detail_line(box, 185, "Exclusive branch already chosen" if Web.trait_state(_status, web_selection) == "Other branch chosen" else "Trait not available")
-		_detail_line(box, 211, "Laid and inherited traits stay fixed")
+		_detail_line(box, 211, definition.evidence if web_selection in BroodEnvironment.TRAITS else "Laid and inherited traits stay fixed")
 	if web_selection in ["security", "tolerance"] and not _can_choose_adaptation():
 		_detail_line(box, 302, "Associates Nursery harm sooner" if web_selection == "security" else "Associates Nursery harm later")
 		_detail_line(box, 326, "Reassign tenders for new staffing")

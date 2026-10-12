@@ -54,22 +54,27 @@ func tick() -> void:
 		var state: ReproductionState = pile.reproduction
 		if not state.active(): continue
 		state.food_shortfalls.clear()
-		var quarters: int = 4
+		var units: int = 80
 		if state.phase=="larva":
-			var rate: float = minf(pile.temperature.larval_rate(),minf(pile.brood_health.larval_rate(),minf(pile.midden.larval_rate(),pile.humidity.larval_rate())))
-			quarters=roundi(rate*4)
-			var seconds: float = SimulationClock.TICK_INTERVAL * quarters / 4.0
+			pile.environment.observe(pile,state.environment_exposure)
+			var rate: float = BroodEnvironment.larval_rate(pile,state.inherited_traits)
+			units=roundi(rate*80)
+			var seconds: float = SimulationClock.TICK_INTERVAL * units / 80.0
 			var multiplier: float = FOOD.developed_larval_food_multiplier*TraitCatalog.reproductive_food_multiplier(state.inherited_traits)
-			var costs: Dictionary = {"carbohydrate":CONFIG.space*BROOD.carbohydrate_per_larva_second*seconds*multiplier,"protein":CONFIG.space*BROOD.protein_per_larva_second*seconds*multiplier,"water":CONFIG.space*BROOD.water_per_larva_second*seconds*multiplier}
+			var costs: Dictionary = {"carbohydrate":CONFIG.space*BROOD.carbohydrate_per_larva_second*seconds*multiplier*TraitCatalog.carbohydrate_multiplier(state.inherited_traits),"protein":CONFIG.space*BROOD.protein_per_larva_second*seconds*multiplier,"water":CONFIG.space*BROOD.water_per_larva_second*seconds*multiplier}
 			if not pile.consume_resources(costs):
 				for resource: String in PileState.RESOURCE_IDS:
 					if pile.resources[resource]<costs[resource]: state.food_shortfalls.append(resource)
 				continue
-		state.progress_quarters+=quarters
+		var accumulated: int = state.progress_quarters*20+state.progress_remainder+units
+		state.progress_quarters=accumulated/20
+		state.progress_remainder=accumulated%20
 		if state.progress_quarters<CONFIG.stage_ticks(state.phase)*4: continue
-		state.progress_quarters=0
+		state.progress_quarters=0; state.progress_remainder=0
 		if state.phase=="egg": state.phase="larva"
-		elif state.phase=="larva": state.phase="pupa"
+		elif state.phase=="larva":
+			state.phase="pupa"
+			pile.environment.survived(state.environment_exposure)
 		else:
 			state.phase="ready"
 			var commitment: String = "reproduction:"+id
@@ -80,4 +85,4 @@ func summary(pile_id: String) -> Dictionary:
 	if not _run.colony.piles.has(pile_id): return {}
 	var pile: PileState = _run.colony.piles[pile_id]
 	var state: ReproductionState = pile.reproduction
-	return {"phase":"departed" if pile_id=="home" and _run.founding.phase not in ["none","failed","established"] else state.phase,"progress":float(state.progress_quarters)/maxi(1,CONFIG.stage_ticks(state.phase)*4),"space":CONFIG.space,"occupied_space":state.occupied_space(),"nurses":CONFIG.nurses,"costs":CONFIG.costs(),"emerged_required":CONFIG.emerged_required,"ready_queens":1 if state.phase=="ready" else 0,"ready_males":2 if state.phase=="ready" else 0,"food_shortfalls":state.food_shortfalls.duplicate(),"blocker":blocker(pile)}
+	return {"phase":"departed" if pile_id=="home" and _run.founding.phase not in ["none","failed","established"] else state.phase,"progress":state.progress_ticks()/maxi(1,CONFIG.stage_ticks(state.phase)),"space":CONFIG.space,"occupied_space":state.occupied_space(),"nurses":CONFIG.nurses,"costs":CONFIG.costs(),"emerged_required":CONFIG.emerged_required,"ready_queens":1 if state.phase=="ready" else 0,"ready_males":2 if state.phase=="ready" else 0,"food_shortfalls":state.food_shortfalls.duplicate(),"blocker":blocker(pile)}

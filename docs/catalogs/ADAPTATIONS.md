@@ -1,6 +1,6 @@
 # Adaptation web and trait catalog
 
-Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Seven definition-driven traits exist through [148](../tasks/148_trait_definitions_and_efficient_nurses.md); three new leaves remain planned. This is a composite species, not literal genetics.
+Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Nine definition-driven traits exist through [149](../tasks/149_environmental_brood_traits.md); Rapid Trail Repair remains planned. This is a composite species, not literal genetics.
 
 ## Rules family
 
@@ -56,13 +56,15 @@ Do not homogenize these into one “+efficiency” statistic. Recognition affect
 
 Implemented [148](../tasks/148_trait_definitions_and_efficient_nurses.md), runtime `efficient_nurses`: full expression care throughput +50%, inherited larval food +20%; 12C/12P/6W/two nurses/eight trial brood, provisional. Local demanding workload/shortage plus supported emergence reveals eligibility. Existing adults stay unchanged; reserve rounds conservatively and zero carers never suffice.
 
-**AT-HEAT — Heat Resilience (Environment).** Newly laid inheriting brood tolerates a somewhat wider warm Nursery band. It still needs water, care and regulation and can still fail under severe heat. Tradeoff: slower baseline development in comfortable conditions, giving a clear reason not to choose it everywhere. Evidence is local warm-brood strain followed by surviving brood/reproductive progression. Verify captured cohorts under warm and comfortable conditions; never retrofit active brood or grant global outdoor immunity.
+**AT-HEAT — Heat Resilience (Environment), implemented 149.** Newly laid inheriting brood tolerates a somewhat wider warm Nursery band. It still needs water, care and regulation and can still fail under severe heat. Tradeoff: slower baseline development in comfortable conditions, giving a clear reason not to choose it everywhere. Evidence is local warm-brood strain followed by surviving brood/reproductive progression. Verify captured cohorts under warm and comfortable conditions; never retrofit active brood or grant global outdoor immunity.
 
-**AT-MOISTURE — Moisture Resilience (Environment).** Inheriting brood has a reduced dry-moisture penalty. It does not refill water or erase food demand. Tradeoff: additional larval carbohydrate demand under otherwise favorable conditions. Evidence is local dry-brood strain and surviving progression. Verify recovery under dry pressure versus the nutrition opportunity cost. This is compatible with Heat Resilience but combined costs and maximum mitigation are explicitly bounded.
+**AT-MOISTURE — Moisture Resilience (Environment), implemented 149.** Inheriting brood has a reduced dry-moisture penalty. It does not refill water or erase food demand. Tradeoff: additional larval carbohydrate demand under otherwise favorable conditions. Evidence is local dry-brood strain and surviving progression. Verify recovery under dry pressure versus the nutrition opportunity cost. This is compatible with Heat Resilience but combined costs and maximum mitigation are explicitly bounded.
+
+149 magnitudes: warm larval penalty halved, severe heat unchanged, comfortable heat-lineage larval development ×0.9; dry penalty halved, moisture-lineage larval carbohydrate ×1.2. The slowest independent pressure wins and rate never exceeds one. Evidence is exposure of worker/reproductive larvae followed by that cohort surviving to pupation. Each trial costs 14C/16P/8W, two nurses and eight spaces; values remain provisional.
 
 **AT-REPAIR — Rapid Trail Repair (Chemistry).** Expressed traveling workers lay a stronger replacement contribution where an existing scent corridor is worn or rain-disturbed. It changes deposition, not route familiarity or the decay half-life of old scent. Tradeoff: increased journey food demand. Evidence comes from returned disrupted-trail experience and surviving brood progression. Verify rebuilding versus extra energy; no instant new path, autonomous reroute or hidden weather forecast. It may coexist with Persistent Chemistry; combined food demand and scent strength have authored bounds.
 
-The four new traits are Planned 1.0 M3. Their benefit/cost mechanisms are part of the current design; exact magnitudes remain authored and unset until a card compares meaningful choices. Tuning is not permission to invent another currency or ant caste.
+Efficient Nurses and both environment traits are implemented; Rapid Trail Repair remains planned M3. Authored magnitudes stay provisional until integrated comparisons. Tuning is not permission to invent another currency or ant caste.
 
 ## Presentation and verification
 

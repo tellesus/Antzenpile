@@ -1,6 +1,8 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 148. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 149. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+
+149 adds BroodEnvironment for local heat/dry larval exposure, surviving pupation eligibility and bounded inherited larval rates. Existing worker/reproductive owners retain care, food and paid cohort ownership. Moderate warmth relief cannot erase severe heat, wetness, health or refuse strain. Reproductive progress retains exact rates through a small integer remainder. Environment definitions/UI use the same registry and paid queue.
 
 ## Ownership and dependency direction
 
