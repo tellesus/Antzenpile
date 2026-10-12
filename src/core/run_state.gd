@@ -483,6 +483,7 @@ func restore(data: Dictionary) -> bool:
 		if pile.brood_health.last_loss_tick > restored_clock.tick_count:
 			return false
 		if pile.reproduction.laid_tick > restored_clock.tick_count: return false
+		if pile.queen.replacing() and (pile.queen.replacement_started>restored_clock.tick_count or pile.queen.replacement_progress>restored_clock.tick_count-pile.queen.replacement_started): return false
 		for project: ChamberProject in pile.chambers.projects.values():
 			if project.funded_tick>restored_clock.tick_count or project.progress_ticks>restored_clock.tick_count-project.funded_tick: return false
 		var reproductive: ReproductionState = pile.reproduction

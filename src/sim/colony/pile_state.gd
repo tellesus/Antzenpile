@@ -7,6 +7,7 @@ var food_toxicity := FoodToxicityState.new()
 var brood_health := BroodHealthState.new()
 var temperature := TemperatureState.new()
 var reproduction := ReproductionState.new()
+var queen := QueenState.new()
 var environment := BroodEnvironment.new()
 var investments := preload("res://src/sim/colony/investment_intent.gd").new()
 var chambers := preload("res://src/sim/colony/chamber_set.gd").new()
@@ -20,7 +21,11 @@ const RESOURCE_IDS: Array[String] = ["carbohydrate", "protein", "water"]
 var foundation: Dictionary = {}
 var id: String = "home"
 var position: Vector2 = Vector2(20, 20)
-var queen_count: int = 1
+var queen_count: int:
+	get: return queen.count
+	set(value):
+		queen.count=value
+		queen.condition=queen.CONFIG.maximum_condition if value>0 else 0
 var workers: WorkerLedger = Ledger.new()
 var resources: Dictionary[String, float] = {"carbohydrate": 0.0, "protein": 0.0, "water": 0.0}
 var brood_cohorts: Array[BroodCohort] = []
@@ -73,7 +78,7 @@ func to_dict() -> Dictionary:
 	for cohort: BroodCohort in brood_cohorts:
 		brood_records.append(cohort.to_dict())
 	var record: Dictionary={"id": id, "position": [position.x, position.y], "queen_count": queen_count,
-		"workers": workers.to_dict(), "resources": resources.duplicate(),
+		"queen":queen.to_dict(id),"workers": workers.to_dict(), "resources": resources.duplicate(),
 		"brood_cohorts": brood_records, "brood_matured_total": brood_matured_total,
 		"brood_started_total": brood_started_total, "brood_lost_total": brood_lost_total,
 		"brood_intent": brood_intent,
@@ -277,7 +282,7 @@ func restore(data: Dictionary) -> bool:
 		for trait_id: Variant in founding_data.queen_traits:
 			if not trait_id is String or not AdaptationRules.valid_trait(trait_id) or trait_id in founder_traits: return false
 			founder_traits.append(trait_id)
-		if not AdaptationRules.compatible(founder_traits) or data.queen_count!=1: return false
+		if not AdaptationRules.compatible(founder_traits) or data.queen_count>1: return false
 	var restored := Ledger.new()
 	if not restored.restore(data.workers):
 		return false
@@ -446,6 +451,9 @@ func restore(data: Dictionary) -> bool:
 	for exposure: String in restored_reproduction.environment_exposure:
 		if exposure not in restored_environment.seen: return false
 	if occupied+maxi(0,restored_reproduction.occupied_space()-restored_chambers.reproductive_spaces())>brood_limit: return false
+	var restored_queen:=QueenState.new()
+	restored_queen.count=int(data.queen_count);restored_queen.condition=restored_queen.CONFIG.maximum_condition if data.queen_count>0 else 0
+	if not restored_queen.restore(data.get("queen",restored_queen.to_dict(data.id)),data.id,int(data.queen_count),restored,restored_genetics.established,emerged,restored_nursery_state,data.food_exchange_state,restored_reproduction): return false
 	var adaptation_commitment: String = "adaptation:" + data.id
 	var adaptation_record: Dictionary = restored.to_dict().commitments.get(adaptation_commitment, {})
 	if trials == 1:
@@ -502,7 +510,7 @@ func restore(data: Dictionary) -> bool:
 	food_toxicity = restored_toxicity
 	id = data.id
 	position = Vector2(data.position[0], data.position[1])
-	queen_count = int(data.queen_count)
+	queen = restored_queen
 	workers = restored
 	resources = restored_resources
 	brood_cohorts = restored_brood

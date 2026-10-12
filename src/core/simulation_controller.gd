@@ -44,6 +44,7 @@ var supply: InterpileSupplySystem
 var reinforcement: WorkerReinforcementSystem
 var founding: FoundingSystem
 var reproduction: ReproductionSystem
+var queens: QueenSystem
 var investments: RefCounted
 var chambers: RefCounted
 var reports: ReportSystem
@@ -83,6 +84,7 @@ func _attach_run(next_run: RunState) -> void:
 	trails.swarm = swarm
 	adaptation = Adaptation.new(run)
 	reproduction = ReproductionSystem.new(run)
+	queens=QueenSystem.new(run)
 	investments=preload("res://src/sim/colony/investment_system.gd").new(run,adaptation,reproduction)
 	brood = Brood.new(run, adaptation,investments)
 	food_toxicity = FoodToxicitySystem.new(run)
@@ -301,6 +303,7 @@ func _tick(delta: float) -> void:
 	heat.tick()
 	guest.tick()
 	brood_health.tick()
+	queens.tick()
 	brood.tick(delta)
 	reproduction.tick()
 	founding.tick()
@@ -323,3 +326,10 @@ func end_run() -> bool:
 func review_snapshot() -> Dictionary:
 	if not run.history.ended: return {}
 	return {"history":run.history.review_dict(),"bounds":[run.world.bounds.position.x,run.world.bounds.position.y,run.world.bounds.size.x,run.world.bounds.size.y],"terrain":run.world.terrain.duplicate(true),"scenario":run.scenario_id,"seed":str(run.run_seed)}
+
+func set_queen_care(pile_id: String, target: Variant) -> bool:
+	if run.history.ended: return false
+	return queens.set_care(pile_id,target)
+func replace_queen(pile_id: String, cancel: bool=false) -> bool:
+	if run.history.ended: return false
+	return queens.cancel_replacement(pile_id) if cancel else queens.start_replacement(pile_id)

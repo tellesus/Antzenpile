@@ -52,6 +52,9 @@ func capture(recording: bool = true) -> void:
 	var pile_ids: Array=_run.colony.piles.keys();pile_ids.sort()
 	for pile_id: String in pile_ids:
 		var pile: PileState=_run.colony.piles[pile_id]
+		var queen_status: String=QueenSystem.new(_run).summary(pile.id).status
+		var queen_previous: Variant=journal.seen.get("queen/"+pile.id)
+		if journal.changed("queen/"+pile.id,queen_status) and (queen_status in ["weakened","lost","replacing"] or queen_previous in ["weakened","lost","replacing"]): journal.add("queen",pile.id,pile.id,time,time,queen_status,pile.queen.generation,0,recording)
 		if journal.changed("investment/"+pile.id,",".join(pile.investments.priority)+"/"+pile.queued_adaptation): journal.add("investment",pile.id,pile.id,time,time,pile.investments.first() if not pile.investments.priority.is_empty() else "none",pile.investments.priority.size(),0,recording)
 		if pile.reproduction.phase!="none" and journal.changed("investment/"+pile.id+"/laid",pile.reproduction.laid_tick): journal.add("investment",pile.id,pile.id,time,time,"reproduction_laid",0,0,recording)
 		var trial: BroodCohort=pile.trial_cohort()

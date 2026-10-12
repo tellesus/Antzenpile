@@ -1,0 +1,51 @@
+class_name QueenState
+extends RefCounted
+## Local aggregate queen viability and one physically owned replacement group.
+const CONFIG = preload("res://data/resources/default_queen.tres")
+var count: int = 1
+var identity: String = ""
+var parent_identity: String = ""
+var generation: int = 0
+var condition: int = CONFIG.maximum_condition
+var carers: int = 0
+var inherited_traits: Array[String] = []
+var replacement_group: Dictionary = {}
+var replacement_progress: int = 0
+var replacement_started: int = 0
+
+func queen_id(pile_id: String) -> String:
+	return identity if not identity.is_empty() else "queen:"+pile_id+":founder"
+func replacing() -> bool: return not replacement_group.is_empty()
+func to_dict(pile_id: String) -> Dictionary:
+	return {"count":count,"identity":queen_id(pile_id),"parent_identity":parent_identity,"generation":generation,"condition":condition,"carers":carers,"inherited_traits":inherited_traits.duplicate(),"replacement_group":replacement_group.duplicate(true),"replacement_progress":replacement_progress,"replacement_started":replacement_started}
+
+func restore(data: Variant, pile_id: String, queens: int, ledger: WorkerLedger, established: Array[String], matured: int, nursery: String, food: String, reproduction: ReproductionState) -> bool:
+	if not data is Dictionary or data.size()!=10 or not data.has_all(to_dict(pile_id).keys()): return false
+	for key: String in ["count","generation","condition","carers","replacement_progress","replacement_started"]:
+		if not WorkerLedger.valid_count(data[key]): return false
+	if data.count!=queens or data.condition>CONFIG.maximum_condition or (data.count>0)!=(data.condition>0) or data.carers>CONFIG.care_cap or data.count==0 and data.carers>0: return false
+	for key: String in ["identity","parent_identity"]:
+		if not data[key] is String or data[key].length()>160: return false
+	if not data.identity.begins_with("queen:") or (data.generation==0)!=(data.parent_identity=="") or data.identity==data.parent_identity: return false
+	if not data.inherited_traits is Array or not data.replacement_group is Dictionary: return false
+	var traits: Array[String]=[]
+	for value: Variant in data.inherited_traits:
+		if not value is String or value not in established or value in traits: return false
+		traits.append(value)
+	if not AdaptationRules.compatible(traits): return false
+	var care: Dictionary=ledger.to_dict().commitments.get("queen_care:"+pile_id,{})
+	if data.carers==0 and not care.is_empty() or data.carers>0 and care!={"kind":"internal","owner_id":pile_id,"count":int(data.carers)}: return false
+	var replacement: Dictionary=ledger.to_dict().commitments.get("queen_replacement:"+pile_id,{})
+	var restored_group: Dictionary={}
+	if data.replacement_group.is_empty():
+		if data.replacement_progress!=0 or data.replacement_started!=0 or not replacement.is_empty(): return false
+	else:
+		if data.count!=0 or reproduction.phase!="none" or data.replacement_progress>=CONFIG.replacement_ticks or replacement!={"kind":"internal","owner_id":pile_id,"count":CONFIG.replacement_nurses}: return false
+		var group:=ReproductionState.new()
+		if not group.restore(data.replacement_group,WorkerLedger.new(),pile_id,established,matured,nursery,food,0) or group.phase!="ready": return false
+		if group.laid_tick+group.CONFIG.egg_ticks+group.CONFIG.larva_ticks+group.CONFIG.pupa_ticks>data.replacement_started: return false
+		restored_group=group.to_dict()
+	count=int(data.count);identity=data.identity;parent_identity=data.parent_identity;generation=int(data.generation)
+	condition=int(data.condition);carers=int(data.carers);inherited_traits=traits
+	replacement_group=restored_group;replacement_progress=int(data.replacement_progress);replacement_started=int(data.replacement_started)
+	return true

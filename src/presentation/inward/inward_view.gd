@@ -34,6 +34,8 @@ var brood_command: Callable
 var brood_care_command: Callable
 var brood_intent_command: Callable
 var reproduction_command: Callable
+var queen_care_command: Callable
+var queen_replacement_command: Callable
 var investment_priority_command: Callable
 var chamber_controls:=preload("res://src/presentation/inward/chamber_controls.gd").new()
 var chamber_command: Callable
@@ -143,9 +145,20 @@ func activate_at(at: Vector2) -> bool:
 		elif pile_command.is_valid(): pile_command.call(target)
 		return true
 	if selected_id == "queen":
-		for tab: String in (["workers"] if _status.get("daughter",false) else ["workers","reproduction"]):
+		for tab: String in _queen_tabs():
 			if _queen_tab_rect(tab).has_point(at):
 				queen_tab=tab; queue_redraw(); return true
+		if queen_tab=="continuity":
+			for target: int in [0,1,2]:
+				if _queen_care_rect(target).has_point(at):
+					if queen_care_command.is_valid():
+						var result: Dictionary=queen_care_command.call(target);activation.outcome(result);show_feedback("Queen care updated" if result.get("accepted",false) else result.get("reason","Care unavailable"))
+					return true
+			if _queen_replace_rect().has_point(at):
+				if queen_replacement_command.is_valid():
+					var result: Dictionary=queen_replacement_command.call();activation.outcome(result);show_feedback("Replacement commitment updated" if result.get("accepted",false) else result.get("reason","Replacement unavailable"))
+				return true
+			if Rect2(get_viewport_rect().size.x-316,144,292,388).has_point(at): return true
 		if queen_tab=="reproduction":
 			if _priority_rect("reproduction").has_point(at) and _both_investments():
 				_prioritize("reproduction");return true
@@ -406,7 +419,8 @@ func _brood_rect() -> Rect2:
 
 
 func _queen_tab_rect(tab: String) -> Rect2:
-	return Rect2(get_viewport_rect().size.x-300+(132 if tab=="reproduction" else 0),190,128,44)
+	var tabs: Array[String]=_queen_tabs();var width: float=260.0/tabs.size()
+	return Rect2(get_viewport_rect().size.x-300+width*tabs.find(tab),190,width-4,44)
 
 
 func _reproduction_rect() -> Rect2:
@@ -704,10 +718,12 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box, 224, "Cleanup efficiency doubled")
 				_detail_line(box, 246, "Isolated refuse stays unusable")
 		"queen":
-			for tab: String in (["workers"] if _status.get("daughter",false) else ["workers","reproduction"]):
+			for tab: String in _queen_tabs():
 				var button: Rect2 = _queen_tab_rect(tab)
 				UIStyle.surface(self,button,Color("354d55") if queen_tab==tab else Color("263038"))
-				_label(button.get_center()+Vector2(0,5),"WORKER BROOD" if tab=="workers" else "REPRODUCTION",Color("dce5d9"),12,HORIZONTAL_ALIGNMENT_CENTER)
+				_label(button.get_center()+Vector2(0,5),"BROOD" if tab=="workers" else "REPRODUCE" if tab=="reproduction" else "CONTINUITY",Color("dce5d9"),11,HORIZONTAL_ALIGNMENT_CENTER)
+			if queen_tab=="continuity":
+				_draw_queen_continuity(box);return
 			if queen_tab=="reproduction":
 				_draw_reproduction_context(box)
 				return
@@ -1073,3 +1089,29 @@ func _label(at: Vector2, value: String, color: Color, font_size: int, align: Hor
 		placed.x -= width
 	draw_string_outline(_font,placed,value,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,3,Color(0,0,0,0.82))
 	draw_string(_font, placed, value, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
+
+func _queen_tabs() -> Array[String]:
+	var tabs: Array[String]=["workers"]
+	if not _status.get("daughter",false): tabs.append("reproduction")
+	tabs.append("continuity")
+	return tabs
+func _queen_care_rect(target: int) -> Rect2:
+	return Rect2(get_viewport_rect().size.x-300+target*88,354,84,44)
+func _queen_replace_rect() -> Rect2:
+	return Rect2(get_viewport_rect().size.x-300,452,260,44)
+func _draw_queen_continuity(box: Rect2) -> void:
+	var state: Dictionary=_status.get("queen_condition",{})
+	var causes: Array=state.get("causes",[])
+	var lines: Array[String]=["Queen: "+str(state.get("status","steady")).capitalize(),"Condition %.0f%% · generation %d" % [state.get("condition",100),state.get("generation",0)],"Needs: "+" / ".join(causes) if not causes.is_empty() else "No severe local strain observed","Carer/sec: .001C · .0004P · .001W"]
+	for index: int in lines.size():
+		_label(box.position+Vector2(16,111+index*26),Copy.fit_line(lines[index],_font,12,260),Color("a9b9bc"),12)
+	for target: int in [0,1,2]:
+		var rect: Rect2=_queen_care_rect(target)
+		UIStyle.surface(self,rect,Color("354d55") if state.get("carers",0)==target else Color("263038"))
+		_label(rect.get_center()+Vector2(0,5),"STOP CARE" if target==0 else "%d CARER%s" % [target,"S" if target>1 else ""],Color("dce5d9"),11,HORIZONTAL_ALIGNMENT_CENTER)
+	var replacing: bool=state.get("status","")=="replacing"
+	var outcome: String="Establishing young queen · %.0f%%" % (state.get("replacement_progress",0)*100) if replacing else "8 carbs · 6 protein · 4 water · 2 nurses"
+	var waiting: String="Cancel returns group; paid food spent" if replacing else state.get("replacement_blocker","")
+	_label(box.position+Vector2(16,274),Copy.fit_line(outcome,_font,12,260),Color("a9b9bc"),12)
+	_label(box.position+Vector2(16,300),Copy.fit_line(waiting if not waiting.is_empty() else "120 seconds · raised group consumed",_font,12,260),Color("a9b9bc"),12)
+	_draw_action(_queen_replace_rect(),"CANCEL ESTABLISHMENT" if replacing else "ESTABLISH REPLACEMENT QUEEN")

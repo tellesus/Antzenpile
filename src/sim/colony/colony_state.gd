@@ -38,10 +38,14 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 	if not data.has("piles") or not data.piles is Array:
 		return false
 	var restored: Dictionary[String, PileState] = {}
+	var queen_ids: Dictionary={}
 	for value: Variant in data.piles:
 		var pile := Pile.new()
 		if not value is Dictionary or not pile.restore(value) or restored.has(pile.id) or not bounds.has_point(pile.position):
 			return false
+		var queen_id: String=pile.queen.queen_id(pile.id)
+		if queen_ids.has(queen_id): return false
+		queen_ids[queen_id]=true
 		restored[pile.id] = pile
 	if not restored.has("home") or restored.home.position != home_position:
 		return false
@@ -62,7 +66,7 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 	if incoming!=outgoing or gene_in!=gene_out: return false
 	for pile: PileState in restored.values():
 		for commitment_id: String in pile.workers.to_dict().commitments:
-			for prefix: String in ["sanitation:", "midden:", "humidity:", "reproduction:"]:
+			for prefix: String in ["sanitation:", "midden:", "humidity:", "reproduction:", "queen_care:", "queen_replacement:"]:
 				if commitment_id.begins_with(prefix) and commitment_id != prefix + pile.id:
 					return false
 			if commitment_id.begins_with("food_exchange:") and commitment_id != "food_exchange:" + pile.id:

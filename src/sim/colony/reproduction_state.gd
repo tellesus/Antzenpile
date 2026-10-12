@@ -47,7 +47,7 @@ func restore(data: Dictionary, ledger: WorkerLedger, pile_id: String, establishe
 	if not shortfalls.is_empty() and data.phase!="larva": return false
 	if data.phase == "none":
 		if data.laid_tick!=0 or not traits.is_empty() or not shortfalls.is_empty(): return false
-	elif matured < CONFIG.emerged_required or nursery_state != "developed" or food_state != "developed" or queens < 1: return false
+	elif matured < CONFIG.emerged_required or nursery_state != "developed" or food_state != "developed": return false
 	var record: Dictionary = ledger.to_dict().commitments.get("reproduction:"+pile_id,{})
 	if ongoing:
 		if record.get("kind")!="internal" or record.get("owner_id")!=pile_id or record.get("count")!=CONFIG.nurses: return false

@@ -1,10 +1,12 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 150. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 151. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 149 adds BroodEnvironment for local heat/dry larval exposure, surviving pupation eligibility and bounded inherited larval rates. Existing worker/reproductive owners retain care, food and paid cohort ownership. Moderate warmth relief cannot erase severe heat, wetness, health or refuse strain. Reproductive progress retains exact rates through a small integer remainder. Environment definitions/UI use the same registry and paid queue.
 
 150 completes the ten-entry trait registry with Rapid Trail Repair. Transit owns captured repair carrier fraction and private corridor exposure; only living return delivers the local experience. A later paid worker/reproductive comparison surviving to pupation earns eligibility. Fresh scent deposition gains on previously trafficked weak segments only; old decay, familiarity and physical routes stay independent. Chemistry food surcharges add under a 1.35 bound before the separate foraging effect. The web has a free Chemistry family.
+
+151 QueenState owns local aggregate count/identity/condition/generation and the exclusively transferred replacement group; `queen_count` is derived compatibility. QueenSystem runs before laying and owns paid care, nutrition/severe-condition strain, local death and coarse replacement. Ledger pools protect brood care; death releases carers and clears unpaid investments only. Funded reproductive/worker brood continues queenless. Local replacement reserves nurses and a real ready group, consumes paid food once, returns the unused group on cancellation and produces one successor on completion. Home trait-proxy/founder migration and daughter reproductive investment remain the next M4 card.
 
 ## Ownership and dependency direction
 
@@ -36,7 +38,7 @@ JourneyResponse owns one shared party slot across both piles. Combat, reinforcem
 
 The implemented network is Home plus `satellite_1`. The founding/settler/supply contracts still contain that bounded scope; generalized multi-pile IDs/connections do not exist yet. Home and Daughter supplies share one exclusive physical connection with independent payer receipts. Settler handoff is a ledger transfer, not a death/birth. Do not make content-catalog claims imply arbitrary networks already work.
 
-GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance at laying, movement captures effects at departure, and loss/transfer preserves profiles. Home uses queued worker trials; Daughter offspring use founder queen traits. Full queen records, daughter trials/reproductive generations and new traits require their roadmap cards.
+GeneticRepertoire tracks disjoint phenotype bundles. Brood captures inheritance at laying, movement captures effects at departure, and loss/transfer preserves profiles. Home uses queued worker trials; Daughter offspring use founder queen traits. Local QueenState viability/replacement exists; explicit maternal bundles, daughter trials/reproductive generations and portable network queens require their next roadmap cards.
 
 143 adds per-pile InvestmentIntent and an injected InvestmentSystem coordinating existing adaptation/reproduction laying owners. At most one pending trait and one reproductive intent coexist; priority order preserves earliest queuing/replacement and supports explicit reorder. Eligible specials get the next opportunity before ordinary Auto Brood; structurally ineligible early/follow-up intents allow prerequisite growth. Manual laying honors the first pending intent. Queuing spends no resources/space/labor; actual laying removes only its funded intent, leaving paid cohorts and other pending work intact. Current reproductive/trial capability remains Home-only until M4.
 

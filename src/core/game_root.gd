@@ -87,6 +87,8 @@ func _ready() -> void:
 		inward.brood_care_command = relieve_brood_care
 		inward.brood_intent_command = set_brood_intent
 		inward.reproduction_command = toggle_reproductive_queue
+		inward.queen_care_command=set_queen_care
+		inward.queen_replacement_command=replace_queen
 		inward.investment_priority_command = prioritize_investment
 		inward.chamber_command = order_chamber
 		inward.effort_command = set_effort
@@ -243,7 +245,10 @@ func inspect_need(pile_id: String, organ: String) -> Dictionary:
 	for need: Dictionary in Pressure.needs(inward_status(pile_id)): valid=valid or need.organ==organ
 	if not valid: return {"accepted":false,"reason":"Condition improved or changed"}
 	inspect_pile(pile_id)
-	if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
+	if _inward_view!=null:
+		_inward_view.selected_id=organ
+		if organ=="queen" and simulation.queens.summary(pile_id).status in ["weakened","lost","replacing"]: _inward_view.queen_tab="continuity"
+		_inward_view._process(0)
 	if _reports_view!=null: _reports_view.opened=false
 	set_mode("inward")
 	return {"accepted":true,"reason":""}
@@ -253,11 +258,12 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies","investment","chamber"]:
+	if selected.kind in ["project","brood","trait","supplies","investment","chamber","queen"]:
 		inspect_pile(selected.pile_id)
-		var organ: String="nursery" if selected.kind=="chamber" else "queen" if selected.kind=="investment" else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
+		var organ: String="nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
 		if selected.kind=="chamber" and _inward_view!=null: _inward_view.chamber_controls.opened=true;_inward_view.chamber_controls.selected=selected.subject_id
+		if selected.kind=="queen" and _inward_view!=null: _inward_view.queen_tab="continuity"
 		set_mode("inward")
 	else:
 		var knowledge_id: String=selected.subject_id if selected.kind=="source" else simulation.run.trails.routes[selected.subject_id].destination_knowledge_id
@@ -567,7 +573,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
 	return {"reinforcement":simulation.reinforcement.summary(), "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
-		"reproduction": simulation.reproduction.summary(pile_id),
+		"queen_condition":simulation.queens.summary(pile_id),"reproduction": simulation.reproduction.summary(pile_id),
 		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
 			"cap":simulation.humidity.CONFIG.care_cap,"suggestion":1,"gallery":pile.chambers.complete("ventilation_gallery"),
@@ -1073,3 +1079,10 @@ func _show_review() -> void:
 func review_new_colony() -> void:
 	var seed_value: int = int(Time.get_ticks_usec()%2147483646)+1
 	start_new_colony(seed_value,current_scenario())
+
+func set_queen_care(target: int) -> Dictionary:
+	var accepted: bool=simulation.set_queen_care(inward_pile_id,target)
+	return {"accepted":accepted,"reason":simulation.queens.last_error}
+func replace_queen() -> Dictionary:
+	var accepted: bool=simulation.replace_queen(inward_pile_id,simulation.run.colony.piles[inward_pile_id].queen.replacing())
+	return {"accepted":accepted,"reason":simulation.queens.last_error}

@@ -1,10 +1,12 @@
 # Current UI contracts and development boundaries
 
-Baseline: gameplay through 150. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Eight identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
+Baseline: gameplay through 151. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Eight identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
 
 149 reveals Environment only after local larval strain or inherited lineage. A revealed leaf explains that exposed larvae must survive to pupation; heat/dry benefit, recurring cost, queue/paid lock and adult carrier count remain distinct. Environmental effects follow the laid brood, not current adult share. Family navigation remains free.
 
 150 exposes Rapid Trail Repair after returned corridor experience, with the subsequent brood-pupation requirement. Chemistry is a separate free family for Persistent Chemistry/Repair; each leaf appears only with justified evidence/inheritance. Benefits, actual carriers, food cost and queue/paid locks use the same contextual panel. Foraging/partner presentation remains separate.
+
+151 adds a separate free Queen Continuity tab beside Brood/Reproduce. Local condition/generation, actual nutrient/severe-condition causes, 0–2 paid carers and lost/establishing successor status use approved local state. A ready reproductive group funds replacement after loss; cancellation returns the group but not paid food. Queen warnings and recovery transitions enter retained Reports/Needs, which open Continuity directly. Paid brood continues after local queen loss; no premature extinction or fabricated remote outcome.
 
 ## Views and evidence
 
