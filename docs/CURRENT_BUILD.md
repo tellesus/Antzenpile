@@ -1,6 +1,6 @@
 # Current build and gaps
 
-Baseline: gameplay through card 152; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
+Baseline: gameplay through card 153; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
 
 ## Implemented foundation
 
@@ -11,10 +11,10 @@ Baseline: gameplay through card 152; design reset through 138. The pre-reset gam
 | Perception and scouts | Returned memories, standing exploration/rechecks, physical recall/missing settlement; shared cap eight; persistent delivered/local journal; knowledge-based source comparisons and named priorities/local/shared effort waits. | Remaining content profiles and generalized multi-pile scouting. |
 | Resources | Three stores; eight identities/stable labels; captured mixed cargo/receipts/filters, Garden fruit and Roadside heavier seeds/temporary crumbs; legacy fallback and known fuel-capacity gate. | Dew/seep and remaining ecology behavior; no cache buffering bottleneck. |
 | Routes | Separate route/segment types, scent/familiarity, aggregate cohorts, detours, actual alternate courses and incoming cargo. | Shared multi-segment connections and broader network traffic/closure; no automatic optimal-route planner. |
-| INWARD | Queen, Nursery, Food Exchange, Entrance, Midden, local care/health; development/expansion; modular paid projects, Reproductive Alcove and staffed Ventilation Gallery. | Refuge/broader organ/network entries; mixed-yield Food Exchange. |
-| Brood/reproductives | Auto/manual worker brood; saved reproductive/adaptation priority with Auto Brood on; Alcove space; paid Home groups and physical first founding. | Daughter-origin founding and portable queen rescue remain M5; local viability/replacement and maternal generations work. |
+| INWARD | Queen, Nursery, Food Exchange, Entrance, Midden, local care/health; development/expansion; modular paid projects, Reproductive Alcove and staffed Ventilation Gallery. | Refuge/broader organ/network entries. |
+| Brood/reproductives | Auto/manual worker brood; saved reproductive/adaptation priority with Auto Brood on; Alcove space; paid per-pile groups, queen-owned ancestry and physical first founding. | Daughter-origin founding and portable queen rescue remain M5; local viability/replacement and maternal generations work. |
 | Adaptation | Ten definition-driven traits, including care, environment and Rapid Trail Repair; captured inheritance/travel, actual expression and bounded climate/nutrition/deposition tradeoffs. | Generalized network piles follow M5; integrated trait balance remains M7. |
-| Network | Home plus exactly one `satellite_1`; local daughter jobs/scouts/gathering/defense; exclusive two-way supplies and Home settlers. | Multiple sites/piles, founding from daughters, paid migration/queen relocation, isolation/evacuation/abandonment. |
+| Network | Home plus exactly one `satellite_1`; four returned site profiles/two alternatives per setting, paid preparation/local climate, local daughter jobs and exclusive supplies/settlers. | Multiple piles, founding from daughters, paid migration/queen relocation, isolation/evacuation/abandonment. |
 | Conflict | Stationary ambusher, independent rival foraging/counter-recruitment, physical messengers, Clear/Hunt, finite remains, retreat, alternate approach. | Moving predator and network/nest hazard responses; more general encounter/content definitions. |
 | Conflict controls | Direct circle, flexible recruitment, protected care/real travel; shared tap/outcome cues now cover views/menus/reports/review. | Further visual feel stays deferred to beta; ordinary staffing remains next. |
 | Environment and health | Rain/heat, moisture/temperature care, refuse-related brood strain, recurring guest harm/clearing and contaminated intake. | Planned zone/connection/nest disturbances, new site profiles and useful evacuation counterplay. |
@@ -24,7 +24,7 @@ Local queen weakening, paid care and replacement now work. Maternal lineage and 
 
 ## Latest actual verification
 
-[Card 152](tasks/152_maternal_lineage_and_daughter_reproduction.md) recorded 9,495 checks/zero failures, targeted 1,594/zero, clean import/Main and 23 standard/compact headless daughter/maternal-context drawing callbacks. [151](tasks/151_queen_viability_and_replacement.md) recorded the prior 9,458/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the systems beta.
+[Card 153](tasks/153_returned_site_profiles.md) recorded 9,602 checks/zero failures, targeted 2,309/zero, clean import/Main and 35 standard/compact headless site/camp drawing callbacks. [152](tasks/152_maternal_lineage_and_daughter_reproduction.md) recorded the prior 9,495/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the systems beta.
 
 The player supplies manual visual feedback. No screen monitoring, desktop automation, paid testers or broad compute sweeps are authorized. The documentation reset does not rerun the engine or claim new gameplay evidence. Existing user audio imports/images/translations and saved slot are preserved.
 

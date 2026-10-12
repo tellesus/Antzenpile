@@ -23,7 +23,7 @@ static func entries(signals: Array[Dictionary], status: Dictionary, category: St
 		var state: String = "Reported empty" if reported_empty else "Previously delivered" if total > 0 else "Trace reported"
 		if category == "nest_site": state = "Last recheck unconfirmed" if reported_empty else "Possible shelter reported"
 		result.append({"id": signal_data.id, "knowledge_id": signal_data.source_knowledge_id, "category": category,
-			"source_type":signal_data.get("source_type",""),"memory_label":signal_data.get("memory_label",""),
+			"site_profile":signal_data.get("site_profile",""),"source_type":signal_data.get("source_type",""),"memory_label":signal_data.get("memory_label",""),
 			"bearing": signal_data.get("bearing"), "age": signal_data.age, "state": state,
 			"workers": route.get("allocated_workers", 0),
 			"waiting_workers":route.get("waiting_workers",0),
@@ -68,11 +68,13 @@ static func bundle_label(route: Dictionary) -> String:
 static func display_name(entry: Dictionary) -> String:
 	var type: String = entry.get("source_type", "")
 	var name: String = SourceCatalog.PROFILES[type].display_name if SourceCatalog.PROFILES.has(type) else "Aphid honeydew" if entry.get("honeydew",false) else "Protein remains" if entry.get("knowledge_id",entry.get("source_knowledge_id",""))=="known:ambusher_carcass" else {"carbohydrate":"Sweet trace","protein":"Protein trace","water":"Water trace","nest_site":"Shelter memory"}.get(entry.get("category",""),"Unidentified trace")
+	if SiteCatalog.DEFINITIONS.has(entry.get("site_profile","")): name=SiteCatalog.get_profile(entry.site_profile).display_name
 	var label: String = entry.get("memory_label", "")
 	return name + (" " + label if not label.is_empty() else "")
 
 static func description(entry: Dictionary) -> String:
 	var type: String = entry.get("source_type", "")
+	if SiteCatalog.DEFINITIONS.has(entry.get("site_profile","")): return SiteCatalog.get_profile(entry.site_profile).cues
 	return SourceCatalog.PROFILES[type].description if SourceCatalog.PROFILES.has(type) else "Identity unconfirmed · return a sample"
 
 

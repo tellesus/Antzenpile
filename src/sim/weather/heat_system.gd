@@ -34,7 +34,8 @@ func tick() -> void:
 		var pile: PileState = _run.colony.piles[id]
 		if pile.nursery_state != "developed": continue
 		var state: TemperatureState = pile.temperature
-		state.temperature = int(move_toward(state.temperature, air, CONFIG.drift_per_tick))
+		var local_air: int=CONFIG.baseline+roundi((air-CONFIG.baseline)*SiteCatalog.for_pile(pile).heat_exposure) if air>CONFIG.baseline else air
+		state.temperature = int(move_toward(state.temperature, local_air, CONFIG.drift_per_tick))
 		var care_step: int=pile.chambers.climate_step(CONFIG.care_step)
 		var adjustment: int = mini(maxi(0, state.temperature - CONFIG.baseline), pile.humidity.carers * care_step)
 		if adjustment == 0: continue

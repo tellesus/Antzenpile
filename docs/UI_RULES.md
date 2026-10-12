@@ -1,6 +1,6 @@
 # Current UI contracts and development boundaries
 
-Baseline: gameplay through 152. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Eight identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
+Baseline: gameplay through 153. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Eight identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
 
 149 reveals Environment only after local larval strain or inherited lineage. A revealed leaf explains that exposed larvae must survive to pupation; heat/dry benefit, recurring cost, queue/paid lock and adult carrier count remain distinct. Environmental effects follow the laid brood, not current adult share. Family navigation remains free.
 
@@ -9,6 +9,8 @@ Baseline: gameplay through 152. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-commu
 151 adds a separate free Queen Continuity tab beside Brood/Reproduce. Local condition/generation, actual nutrient/severe-condition causes, 0–2 paid carers and lost/establishing successor status use approved local state. A ready reproductive group funds replacement after loss; cancellation returns the group but not paid food. Queen warnings and recovery transitions enter retained Reports/Needs, which open Continuity directly. Paid brood continues after local queen loss; no premature extinction or fabricated remote outcome.
 
 152 gives Daughter the same free Brood/Reproduce/Continuity tabs and Adaptation Web as Home. Costs/queues remain local and paid groups locked. Maternal inherited status is distinct from known adult carrier expression: immigrants can contribute now while a maternal trial is still available. Overview names known adult traits; current queen lineage governs future brood. Current group ancestry/bundle stays captured through replacement; no new physical founding/network action is implied.
+
+153 names shelter profiles only from returned confirmation or an actually received camp report. Remembered Sites exposes witnessed cover/damp/access cues and stable labels; selected context explains preparation estimate/extra food, actual pack receipt and unknown occupants/safety. Private profile/remaining pack/preparation progress stays hidden while campers are away. Unidentified preparation may spend the carried pack; the real messenger reports its remainder. Inspection remains free and normal UI never reads hidden site objects.
 
 ## Views and evidence
 

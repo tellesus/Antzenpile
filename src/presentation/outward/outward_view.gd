@@ -873,7 +873,7 @@ func _draw_context(size: Vector2) -> void:
 	UIStyle.surface(self, box, Color("111921"))
 	UIStyle.surface(self, box, Color("41535a"), true)
 	_label(box.position + Vector2(16, 31), Copy.fit_line(Memories.display_name(selected),_font,20,260), Color("819092") if _reported_empty(selected) else _signal_color(selected.category), 20)
-	_label(box.position + Vector2(16, 58), Copy.fit_line(Memories.description(selected) if not selected.get("source_type","").is_empty() else "A %s trace · identity unconfirmed" % selected.confidence_label,_font,12,260), Color("d4d8d1"), 12)
+	_label(box.position + Vector2(16, 58), Copy.fit_line(Memories.description(selected) if not selected.get("source_type","").is_empty() or not selected.get("site_profile","").is_empty() else "A %s trace · identity unconfirmed" % selected.confidence_label,_font,12,260), Color("d4d8d1"), 12)
 	var distance_word: String = "nearby" if selected.estimated_distance < 6.0 else "within reach" if selected.estimated_distance < 14.0 else "distant"
 	_label(box.position + Vector2(16, 84), "Feels %s · around %.0f m" % [distance_word, selected.estimated_distance], Color("a8b8bd"), 15)
 	_label(box.position + Vector2(16, 109), "Last sensed " + Copy.duration(selected.age) + " ago", Color("8fa1a8"), 15)
@@ -1002,7 +1002,17 @@ func _draw_founding_context(box: Rect2) -> void:
 		lines=["Shelter not confirmed on arrival","Party and reproductives returned","Supplies returned; travel food spent","Return report "+Copy.duration(_status.time-camp.reported_at)+" ago",camp.get("blocker","")]
 	else:
 		lines=["Commit 12 workers + queen + 2 males","Pack: 6 carbs · 3 protein · 3 water","Travel also spends carbohydrate","Settlers stay; a report returns",camp.get("blocker","Occupants and safety unknown")]
-	for index: int in lines.size(): _label(box.position+Vector2(16,145+index*24),lines[index],Color("b9c5a1") if index==0 else Color("8fa1a8"),14 if index==0 else 12)
+	if status=="ready":
+		var pack: Dictionary=camp.get("supplies",{})
+		lines[2]="Pack arrived: %.0f carbs / %.0f protein / %.0f water" % [pack.get("carbohydrate",6),pack.get("protein",3),pack.get("water",3)]
+	if status in ["none","failed"] and camp.get("site_profile","").is_empty() and camp.get("blocker","").is_empty(): lines[4]="Unknown preparation may spend the pack"
+	if status in ["none","failed"] and not camp.get("site_profile","").is_empty():
+		lines[2]="Prep: %.0fs · +%.0f carbs; travel extra" % [camp.get("preparation_seconds",120),camp.get("preparation_carbohydrate",0)]
+		lines[3]=camp.get("site_tradeoff","Occupants and safety unknown")
+		if camp.get("blocker","").is_empty(): lines[4]="Occupants and safety remain unknown"
+	for index: int in lines.size():
+		var font_size: int=14 if index==0 else 12
+		_label(box.position+Vector2(16,145+index*24),Copy.fit_line(lines[index],_font,font_size,260),Color("b9c5a1") if index==0 else Color("8fa1a8"),font_size)
 	if status in ["none","failed"]:
 		var available: bool=camp.get("blocker","").is_empty() and not camp.is_empty()
 		UIStyle.surface(self,_founding_rect(),Color("354039") if available else Color("202326"))
@@ -1227,7 +1237,7 @@ func _draw_sources() -> void:
 		UIStyle.surface(self, box, Color("30382f") if entry.id == selected_id else Color("182329"))
 		var title: String = Memories.display_name(entry)
 		var lines: Array[String]=["%s · %s ago" % [title,Copy.duration(entry.age)],entry.state+(" · ALARM" if entry.danger else ""),Memories.staffing_label(entry),Memories.receipt_label(entry,_status.get("time",0),"here" if _daughter() else "home"),Memories.intake_label(entry)]
-		if entry.category=="nest_site": lines=[lines[0],entry.state,"Safety and occupants unknown","Inspection does not start founding",""]
+		if entry.category=="nest_site": lines=[lines[0],entry.state,Memories.description(entry) if not entry.get("site_profile","").is_empty() else "Safety and occupants unknown","Inspection does not start founding",""]
 		for line: int in lines.size(): _label(box.position+Vector2(10,18+line*18),Copy.fit_line(lines[line],_font,12,280),Color("c48c7c") if entry.danger and line==1 else Color("d4c6a8") if line==0 else Color("96aab0"),12)
 	if entries.is_empty():
 		_label(Vector2(40, 275), "No returned memory of a nest site" if source_category == "nest_site" else "No returned memory of this resource", Color("96aab0"), 14)

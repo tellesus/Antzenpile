@@ -39,6 +39,8 @@ func restore(data: Dictionary, definition_ids: Array[String]) -> bool:
 		if not value.definition_id is String or not definition_ids.has(value.definition_id):
 			return _reject("Unknown resource definition")
 		var source_type: Variant = value.get("source_type", "")
+		var site: Variant=value.get("site_profile","")
+		if not SiteCatalog.accepts(site,value.definition_id): return _reject("Unknown or incompatible site profile")
 		if not SourceCatalog.accepts(source_type, value.definition_id): return _reject("Unknown or incompatible source type")
 		if not _numbers(value.position, 2) or not _number(value.quantity) or value.quantity < 0.0:
 			return _reject("Invalid node position/quantity")
@@ -53,6 +55,7 @@ func restore(data: Dictionary, definition_ids: Array[String]) -> bool:
 		node.id = value.id
 		node.definition_id = value.definition_id
 		node.source_type = source_type
+		node.site_profile=site
 		node.position = position
 		node.quantity = value.quantity
 		node.active = value.active

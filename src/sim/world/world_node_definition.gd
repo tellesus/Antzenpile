@@ -4,6 +4,7 @@ extends Resource
 @export var id: String = ""
 @export var definition: ResourceDefinition
 @export var source_profile: SourceProfile
+@export var site_profile: SiteDefinition
 @export var position: Vector2
 @export var initial_quantity: float = 100.0
 @export var initial_active: bool = true

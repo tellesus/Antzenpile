@@ -2,6 +2,7 @@ extends SceneTree
 ## Small explicit suite registry. Run with --headless --path . --script res://tests/run_tests.gd.
 
 const SUITES: Array[Script] = [
+	preload("res://tests/test_site_profiles.gd"),
 	preload("res://tests/test_maternal_lineage.gd"),
 	preload("res://tests/test_queen_continuity.gd"),
 	preload("res://tests/test_rapid_trail_repair.gd"),

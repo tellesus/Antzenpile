@@ -1,6 +1,6 @@
 # Current implementation architecture
 
-Implementation baseline: gameplay through 152. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
+Implementation baseline: gameplay through 153. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 149 adds BroodEnvironment for local heat/dry larval exposure, surviving pupation eligibility and bounded inherited larval rates. Existing worker/reproductive owners retain care, food and paid cohort ownership. Moderate warmth relief cannot erase severe heat, wetness, health or refuse strain. Reproductive progress retains exact rates through a small integer remainder. Environment definitions/UI use the same registry and paid queue.
 
@@ -9,6 +9,8 @@ Implementation baseline: gameplay through 152. This is a current technical refer
 151 QueenState owns local aggregate count/identity/condition/generation and the exclusively transferred replacement group; `queen_count` is derived compatibility. QueenSystem runs before laying and owns paid care, nutrition/severe-condition strain, local death and coarse replacement. Ledger pools protect brood care; death releases carers and clears unpaid investments only. Funded reproductive/worker brood continues queenless. Local replacement reserves nurses and a real ready group, consumes paid food once, returns the unused group on cancellation and produces one successor on completion. Home trait-proxy/founder migration and daughter reproductive investment remain the next M4 card.
 
 152 makes the queen bundle authoritative for future offspring, independently of GeneticRepertoire adult carriers. Paid laying captures parent identity/generation/bundle; supported trial emergence updates only its still-present mother. Imported or historical-trial adults cannot rewrite a successor. Home proxy/founder migration is explicit; current per-pile trial/reproductive owners now serve Daughter. First founding and local replacement transfer the paid bundle/ancestry once; generalized daughter-origin founding/queen transport remain M5.
+
+153 SiteDefinition/Catalog owns four immutable profiles plus neutral legacy behavior. World/scout/knowledge/perception capture static confirmed site identity through the existing delivery boundary; normal views read remembered/local facts only. Founding owns quoted versus physically learned profile, preparation duration, real pack/dose and a logical private camper observation. Unidentified preparation spends carried food; only the real messenger returns its evidence/remaining pack. Occupied profile affects developed-Nursery heat/moisture through existing climate owners. The single first-daughter/camp limit remains for the next M5 generalization.
 
 ## Ownership and dependency direction
 

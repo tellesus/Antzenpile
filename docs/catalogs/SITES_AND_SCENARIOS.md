@@ -22,10 +22,12 @@ Site descriptions are game profiles, not universal geological claims. Different 
 
 | ID / site | Practical advantage | Tradeoff / returned cues | Status |
 | --- | --- | --- | --- |
-| SITE-LOAM — Sheltered soil pocket | Moderate preparation and balanced local brood conditions; useful baseline. | Limited shelter against heavy surface disturbance; returning witness reports a sheltered opening and soil condition. | Planned M5; existing generic site is its migration-neutral foundation. |
-| SITE-ROOT — Root shelter | Better shelter from surface exposure and access along root ground. | Damp periods can increase climate/refuse pressure; do not promise hidden honeydew nearby. | Planned M5/M6. |
-| SITE-STONE — Under-stone cavity | Durable cover and favorable protection for supported disturbances. | More preparation/indirect connection terrain and potential trapped moisture; only witnessed cavity/access cues are shown. | Planned M5/M6. |
-| SITE-EDGE — Edge-ground opening | Convenient access to exposed feeding/crossing opportunities where physically present. | Higher traffic/heat disturbance exposure; returned vibration/open-ground cues support the risk impression. | Planned M5/M6. |
+| SITE-LOAM — Sheltered soil pocket | Moderate preparation and balanced local brood conditions; useful baseline. | Limited shelter against heavy surface disturbance; returning witness reports a sheltered opening and soil condition. | Implemented [153](../tasks/153_returned_site_profiles.md); generic old sites retain neutral behavior. |
+| SITE-ROOT — Root shelter | Better shelter from surface exposure and access along root ground. | Damp periods can increase climate/refuse pressure; do not promise hidden honeydew nearby. | Profile/preparation/climate implemented 153; disturbance integration remains M6. |
+| SITE-STONE — Under-stone cavity | Durable cover and favorable protection for supported disturbances. | More preparation/indirect connection terrain and potential trapped moisture; only witnessed cavity/access cues are shown. | Profile/preparation/climate implemented 153; disturbance integration remains M6. |
+| SITE-EDGE — Edge-ground opening | Convenient access to exposed feeding/crossing opportunities where physically present. | Higher traffic/heat disturbance exposure; returned vibration/open-ground cues support the risk impression. | Profile/preparation/climate implemented 153; disturbance integration remains M6. |
+
+153 authors two alternative sites per new setting. Provisional Loam/Root/Stone/Edge: heat exposure .85/.75/.5/1, damp offset 0/+100,000/+75,000/0, preparation 480/600/720/360 ticks, extra preparation food 0/2/4/0 carbs. Quoted food is spent at Home; an unidentified site is learned physically and consumes the extra from its real pack before reporting. Profiles alter developed-Nursery ambient through the existing climate owners, with no immunity/free water. Generic old sites retain exposure 1, zero offset/extra food and 480 ticks.
 
 Several instances can share a type. Pile names belong to the colony/player and stay stable across attention/save; profile names do not become hidden world labels. The launch scenarios must demonstrate Home plus two independently staffed daughters and a daughter-origin later-generation founding. This is an acceptance example, not a hard arbitrary three-pile cap.
 

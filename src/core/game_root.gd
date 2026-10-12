@@ -232,7 +232,7 @@ func report_snapshot(detailed: bool = false) -> Dictionary:
 		for need: Dictionary in Pressure.needs(inward_status(id)):
 			need.pile_id=id;result.needs.append(need)
 	for route: TrailRouteState in simulation.run.trails.routes.values(): result.trails.append({"id":route.id,"destination_knowledge_id":route.destination_knowledge_id})
-	for node: KnownNode in simulation.run.knowledge.nodes.values(): result.sources[node.id]={"category":node.definition_id,"source_type":node.source_type,"memory_label":SourceCatalog.label(node.label_index)}
+	for node: KnownNode in simulation.run.knowledge.nodes.values(): result.sources[node.id]={"category":node.definition_id,"source_type":node.source_type,"site_profile":node.site_profile,"memory_label":SourceCatalog.label(node.label_index)}
 	return result
 
 func mark_reports_read(id: int) -> Dictionary:
@@ -478,7 +478,7 @@ func exploration_summary(pile_id: String = "home") -> Dictionary:
 		var awaiting: bool=false
 		for memory: ScoutMissionMemory in simulation.run.scout_missions.values():
 			if memory.origin_pile==pile_id and memory.target_knowledge_id==id and memory.completed_at()<0: awaiting=true
-		priorities.append({"id":id,"name":SourceMemory.display_name({"source_type":known.source_type,"category":known.definition_id,"memory_label":SourceCatalog.label(known.label_index)}),"awaiting":awaiting,"last_sent":policy.priority_last_sent.get(id,-1.0)})
+		priorities.append({"id":id,"name":SourceMemory.display_name({"source_type":known.source_type,"site_profile":known.site_profile,"category":known.definition_id,"memory_label":SourceCatalog.label(known.label_index)}),"awaiting":awaiting,"last_sent":policy.priority_last_sent.get(id,-1.0)})
 	return {"other_target":other.target,"target": policy.target, "bias": policy.bias,"wait":wait,"manual_away":local-standing,"shared_away":simulation.run.active_scout_count(),"priority_details":priorities,
 		"away": simulation.scouting.standing_count(pile_id), "priorities": policy.priorities.duplicate(),
 		"missing": simulation.run.missing_scouts(pile_id),
@@ -573,7 +573,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
 	return {"reinforcement":simulation.reinforcement.summary(), "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary(), "pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.has("satellite_1"), "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
-		"queen_condition":simulation.queens.summary(pile_id),"reproduction": simulation.reproduction.summary(pile_id),
+		"local_site":{"profile":pile.foundation.get("site_profile",""),"cues":SiteCatalog.for_pile(pile).cues},"queen_condition":simulation.queens.summary(pile_id),"reproduction": simulation.reproduction.summary(pile_id),
 		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
 			"cap":simulation.humidity.CONFIG.care_cap,"suggestion":1,"gallery":pile.chambers.complete("ventilation_gallery"),

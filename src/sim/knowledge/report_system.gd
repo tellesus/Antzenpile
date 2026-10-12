@@ -17,7 +17,7 @@ func capture(recording: bool = true) -> void:
 		if journal.changed("source/"+node.id,node.last_delivered_at):
 			var delivery: Dictionary=_run.knowledge.latest_delivery(node.id)
 			if delivery.is_empty(): continue
-			journal.add("source",delivery.evidence.origin_pile,node.id,delivery.evidence.observed_at,delivery.received_at,node.source_type,0 if _run.knowledge.temporal_hint(node.id).get("last_return_empty",false) else 1,0,recording)
+			journal.add("source",delivery.evidence.origin_pile,node.id,delivery.evidence.observed_at,delivery.received_at,"site:"+delivery.evidence.site_profile if not delivery.evidence.site_profile.is_empty() else node.source_type,0 if _run.knowledge.temporal_hint(node.id).get("last_return_empty",false) else 1,0,recording)
 	var route_ids: Array=_run.trails.routes.keys();route_ids.sort()
 	for route_id: String in route_ids:
 		var route: TrailRouteState=_run.trails.routes[route_id]

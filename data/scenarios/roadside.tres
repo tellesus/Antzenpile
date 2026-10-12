@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=26 format=3]
+[gd_resource type="Resource" script_class="ScenarioDefinition" load_steps=29 format=3]
 [ext_resource type="Script" path="res://src/sim/world/scenario_definition.gd" id="scenario"]
 [ext_resource type="Script" path="res://src/sim/world/world_node_definition.gd" id="node"]
 [ext_resource type="Script" path="res://src/sim/world/terrain_definition.gd" id="terrain"]
@@ -12,11 +12,21 @@
 [ext_resource type="Resource" path="res://data/sources/aphid_honeydew.tres" id="source_honey"]
 [ext_resource type="Resource" path="res://data/sources/cracked_seeds.tres" id="source_seed"]
 [ext_resource type="Resource" path="res://data/sources/picnic_crumbs.tres" id="source_crumbs"]
+[ext_resource type="Resource" path="res://data/sites/edge.tres" id="site_first"]
+[ext_resource type="Resource" path="res://data/sites/stone.tres" id="site_second"]
 [sub_resource type="Resource" id="nest_site"]
 script = ExtResource("node")
 id = "nest_site_01"
 definition = ExtResource("nest")
+site_profile = ExtResource("site_first")
 position = Vector2(5, 5)
+initial_quantity = 1.0
+[sub_resource type="Resource" id="nest_alternative"]
+script = ExtResource("node")
+id = "nest_site_02"
+definition = ExtResource("nest")
+site_profile = ExtResource("site_second")
+position = Vector2(36, 4)
 initial_quantity = 1.0
 [sub_resource type="Resource" id="carb_exposed"]
 script = ExtResource("node")
@@ -90,6 +100,6 @@ initial_quantity = 60.0
 [resource]
 script = ExtResource("scenario")
 id = "roadside"
-nodes = Array[ExtResource("node")]([SubResource("nest_site"), SubResource("carb_exposed"), SubResource("carb_sheltered"), SubResource("protein_01"), SubResource("protein_picnic"), SubResource("water_01"), SubResource("aphid_01"), SubResource("rival_food"), SubResource("carb_spill"), SubResource("seed_01")])
+nodes = Array[ExtResource("node")]([SubResource("nest_site"), SubResource("nest_alternative"), SubResource("carb_exposed"), SubResource("carb_sheltered"), SubResource("protein_01"), SubResource("protein_picnic"), SubResource("water_01"), SubResource("aphid_01"), SubResource("rival_food"), SubResource("carb_spill"), SubResource("seed_01")])
 terrain = Array[ExtResource("terrain")]([SubResource("sheltered"), SubResource("exposed")])
 

@@ -8,6 +8,7 @@ var origin_pile: String
 var source_node_id: String
 var definition_id: String
 var source_type: String = ""
+var site_profile: String = ""
 var first_observed_at: float
 var observed_at: float
 var estimated_position: Vector2
@@ -25,6 +26,7 @@ func detached_copy() -> Observation:
 	copy.source_node_id = source_node_id
 	copy.definition_id = definition_id
 	copy.source_type = source_type
+	copy.site_profile=site_profile
 	copy.first_observed_at = first_observed_at
 	copy.observed_at = observed_at
 	copy.estimated_position = estimated_position
@@ -37,7 +39,7 @@ func detached_copy() -> Observation:
 
 func to_dict() -> Dictionary:
 	return {"id": id, "scout_id": scout_id, "origin_pile": origin_pile,
-		"source_node_id": source_node_id, "definition_id": definition_id, "source_type":source_type,
+		"source_node_id": source_node_id, "definition_id": definition_id, "source_type":source_type,"site_profile":site_profile,
 		"first_observed_at": first_observed_at, "observed_at": observed_at,
 		"estimated_position": [estimated_position.x, estimated_position.y],
 		"uncertainty_radius": uncertainty_radius, "closest_distance": closest_distance,
@@ -55,6 +57,8 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	# Validate identity only; historical evidence must not refresh from current truth.
 	if data.definition_id != world.nodes[data.source_node_id].definition_id:
 		return false
+	var site: Variant=data.get("site_profile","")
+	if not SiteCatalog.accepts(site,data.definition_id) or not site.is_empty() and (not data.proximity_confirmed or site!=world.nodes[data.source_node_id].site_profile): return false
 	var type: Variant = data.get("source_type", "")
 	if not SourceCatalog.accepts(type, data.definition_id) or not type.is_empty() and (type != world.nodes[data.source_node_id].source_type or not data.proximity_confirmed): return false
 	for key: String in ["first_observed_at", "observed_at", "uncertainty_radius", "closest_distance"]:
@@ -78,6 +82,7 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	source_node_id = data.source_node_id
 	definition_id = data.definition_id
 	source_type = type
+	site_profile=site
 	first_observed_at = data.first_observed_at
 	observed_at = data.observed_at
 	estimated_position = estimate

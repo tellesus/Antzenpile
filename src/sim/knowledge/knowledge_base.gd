@@ -109,6 +109,7 @@ func recovery_report(knowledge_id: String, after: float) -> bool:
 
 
 static func _valid_evidence(evidence: Observation, time: float) -> bool:
+	if not SiteCatalog.accepts(evidence.site_profile,evidence.definition_id) or not evidence.site_profile.is_empty() and not evidence.proximity_confirmed: return false
 	if not SourceCatalog.accepts(evidence.source_type, evidence.definition_id) or not evidence.source_type.is_empty() and not evidence.proximity_confirmed: return false
 	if evidence.id != evidence.scout_id + ":" + evidence.source_node_id or evidence.scout_id.is_empty() or evidence.source_node_id.is_empty() or evidence.origin_pile.is_empty() or evidence.definition_id.is_empty():
 		return false
@@ -136,6 +137,7 @@ func _rebuild_node(source_id: String) -> void:
 		if evidence.source_node_id != source_id:
 			continue
 		if not evidence.source_type.is_empty(): node.source_type = evidence.source_type
+		if not evidence.site_profile.is_empty(): node.site_profile=evidence.site_profile
 		node.evidence_ids.append(id)
 		node.first_observed_at = minf(node.first_observed_at, evidence.first_observed_at)
 		node.first_delivered_at = minf(node.first_delivered_at, _received_at[id])
@@ -291,6 +293,7 @@ static func _matches_quantized_position(record: Dictionary, expected: Dictionary
 	var comparable: Dictionary = record.duplicate(true)
 	if expected.has("collective_search") and not comparable.has("collective_search"):
 		comparable.collective_search = false
+	if expected.has("site_profile") and not comparable.has("site_profile"): comparable.site_profile=""
 	if expected.has("source_type") and not comparable.has("source_type"): comparable.source_type = ""
 	if expected.has("label_index"):
 		comparable.label_index = int(comparable.get("label_index", expected.label_index))

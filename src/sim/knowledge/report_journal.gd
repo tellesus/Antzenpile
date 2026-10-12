@@ -98,6 +98,7 @@ static func _valid_entry(entry: Variant, colony: ColonyState, knowledge: Knowled
 		"source":
 			if not knowledge.nodes.has(entry.subject_id): return false
 			var node: KnownNode=knowledge.nodes[entry.subject_id]
+			if entry.detail.begins_with("site:"): return node.definition_id=="nest_site" and SiteCatalog.DEFINITIONS.has(entry.detail.trim_prefix("site:")) and entry.amount in [0.0,1.0]
 			return entry.amount in [0.0,1.0] and SourceCatalog.accepts(entry.detail,node.definition_id) and (entry.detail.is_empty() or entry.detail==node.source_type)
 		"trait": return entry.subject_id in AdaptationRules.TRAITS and entry.detail=="established" and entry.subject_id in colony.piles[entry.pile_id].genetics.established
 		"project": return entry.subject_id in ["nursery","food_exchange","midden","queen"] and entry.detail in ["developed","expanded","ready"]

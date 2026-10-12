@@ -12,7 +12,9 @@ static func source_name(entry: Dictionary, status: Dictionary) -> String:
 		for route: Dictionary in status.get("trails",[]):
 			if route.id==entry.subject_id: knowledge_id=route.destination_knowledge_id;break
 	var memory: Dictionary=status.get("sources",{}).get(knowledge_id,{"category":"unknown"}).duplicate()
-	if entry.kind=="source": memory.source_type=entry.detail
+	if entry.kind=="source":
+		memory.site_profile=entry.detail.trim_prefix("site:") if entry.detail.begins_with("site:") else ""
+		memory.source_type="" if entry.detail.begins_with("site:") else entry.detail
 	return Memory.display_name(memory)
 
 static func title(entry: Dictionary, status: Dictionary) -> String:

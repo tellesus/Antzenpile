@@ -282,7 +282,7 @@ func restore(data: Dictionary) -> bool:
 			return false
 	var restored_founding:=FoundingState.new()
 	var founding_data: Variant=data.get("founding",restored_founding.to_dict())
-	if not founding_data is Dictionary or not restored_founding.restore(founding_data,restored_colony,restored_clock.tick_count): return false
+	if not founding_data is Dictionary or not restored_founding.restore(founding_data,restored_colony,restored_clock.tick_count,restored_world): return false
 	var restored_supply:=InterpileSupplyState.new()
 	var supply_data: Variant=data.get("supply",restored_supply.to_dict())
 	if not supply_data is Dictionary or not restored_supply.restore(supply_data,restored_colony,restored_founding,restored_clock.tick_count): return false
@@ -311,6 +311,7 @@ func restore(data: Dictionary) -> bool:
 		var parent: PileState=restored_colony.piles.home
 		var route: TrailRouteState=restored_trails.routes[restored_founding.route_id]
 		if daughter.foundation.is_empty() or daughter.foundation.route_id!=route.id or daughter.position!=route.estimated_destination or daughter.foundation.queen_traits!=restored_founding.reproductive_group.inherited_traits: return false
+		if daughter.foundation.get("site_profile","")!=restored_founding.site_profile: return false
 		if daughter.foundation.founded_tick<restored_founding.reported_tick or daughter.foundation.founded_tick>restored_clock.tick_count: return false
 		var migrants: int=FoundingState.CONFIG.workers-1+restored_reinforcement.arrivals*WorkerReinforcementState.CONFIG.reinforcement_workers
 		if parent.workers.transferred_out!=migrants or daughter.workers.transferred_in!=migrants or daughter.workers.transferred_out!=0: return false
@@ -347,6 +348,17 @@ func restore(data: Dictionary) -> bool:
 		used_scout_ids[evidence.scout_id] = true
 	for evidence: Observation in archived.values():
 		used_scout_ids[evidence.scout_id] = true
+	if restored_founding.site_report!=null:
+		var report: Observation=restored_founding.site_report
+		var suffix: String=report.scout_id.trim_prefix("scout_")
+		if report.scout_id!="scout_"+suffix or not suffix.is_valid_int() or str(suffix.to_int())!=suffix or suffix.to_int()<1 or suffix.to_int()>=data.next_scout_id: return false
+		if restored_founding.reported_tick==0:
+			if used_scout_ids.has(report.scout_id): return false
+			used_scout_ids[report.scout_id]=true
+		else:
+			var delivered: Observation=restored_delivered.get(report.id,archived.get(report.id))
+			if delivered==null or delivered.to_dict()!=report.to_dict(): return false
+			if archived.has(report.id) and restored_knowledge._received_at[report.id]<restored_founding.reported_tick*SimulationClock.TICK_INTERVAL: return false
 	var active_detours: int = 0
 	for cohort: TransitCohort in restored_trails.cohorts.values():
 		var sample_ids: Array[String] = []

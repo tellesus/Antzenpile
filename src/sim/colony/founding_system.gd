@@ -16,15 +16,17 @@ func blocker(knowledge_id: String) -> String:
 	if prior!=null and (prior.purpose!="founding" or prior.status!="inactive" or pile.workers.count("trail:"+prior.id)!=-1): return "Shelter route is already committed"
 	if _run.founding.phase=="failed" and _run.trails.routes[_run.founding.route_id].destination_knowledge_id!=knowledge_id: return "Recheck the prior shelter before retrying"
 	if prior==null and pile.workers.count("trail:route_%d" % _run.trails.next_route_id)!=-1: return "Founding commitment unavailable"
+	if _run.knowledge.nodes[knowledge_id].site_profile.is_empty() and _run.next_scout_id>=WorkerLedger.MAX_COUNT: return "Site report identity unavailable"
 	if _run.trails.next_route_id>=WorkerLedger.MAX_COUNT: return "Route ID unavailable"
 	if pile.workers_assignable<CONFIG.workers: return "Need %d available founding workers" % CONFIG.workers
-	var costs: Dictionary=_costs(endpoint)
+	var costs: Dictionary=_costs(endpoint,_run.knowledge.nodes[knowledge_id].site_profile)
 	for id: String in PileState.RESOURCE_IDS:
 		if pile.resources[id]<costs[id]: return "Need %.2f %s for founding" % [costs[id],id]
 	return ""
-func _costs(endpoint: Vector2) -> Dictionary:
+func _costs(endpoint: Vector2, profile_id: String="") -> Dictionary:
 	var start: Vector2=_run.colony.piles.home.position
 	var costs: Dictionary=CONFIG.supplies()
+	costs.carbohydrate+=SiteCatalog.get_profile(profile_id).extra_carbohydrate
 	costs.carbohydrate+=TRAILS.round_trip_energy_cost(CONFIG.workers,start.distance_to(endpoint),TrailSegmentState.terrain_cost_for(_run.world,start,endpoint))
 	return costs
 func start(knowledge_id: String) -> bool:
@@ -47,9 +49,12 @@ func start(knowledge_id: String) -> bool:
 	var allocated: bool=pile.allocate_workers(commitment,CONFIG.workers); assert(allocated)
 	var state:=FoundingState.new(); state.phase="outbound"; state.route_id=route.id
 	state.leg_ticks=TRAILS.leg_ticks(pile.position.distance_to(endpoint)); state.departed_tick=_run.clock.tick_count
+	state.site_profile=_run.knowledge.nodes[knowledge_id].site_profile
+	state.quoted_site_profile=state.site_profile
+	state.preparation_ticks=SiteCatalog.get_profile(state.site_profile).preparation_ticks
 	state.reproductive_group=pile.reproduction.to_dict()
 	state.contaminant_mass=roundf(pile.food_toxicity.mass*CONFIG.carbohydrate/pile.resources.carbohydrate*100000000.0)/100000000.0
-	var paid: bool=pile.consume_resources(_costs(endpoint)); assert(paid)
+	var paid: bool=pile.consume_resources(_costs(endpoint,state.site_profile)); assert(paid)
 	pile.reproduction=ReproductionState.new(); _run.founding=state
 	route.desired_workers=CONFIG.workers; route.allocated_workers=CONFIG.workers; route.active_workers=CONFIG.workers; route.status="active"
 	last_error=""; return true
@@ -65,7 +70,7 @@ func establish(knowledge_id: String) -> bool:
 	daughter.id="satellite_1"; daughter.position=route.estimated_destination
 	daughter.brood_started_total=0
 	var traits: Array[String]=[]; traits.assign(state.reproductive_group.inherited_traits)
-	daughter.foundation={"parent_id":"home","route_id":route.id,"queen_traits":traits,"founded_tick":_run.clock.tick_count}
+	daughter.foundation={"parent_id":"home","route_id":route.id,"queen_traits":traits,"founded_tick":_run.clock.tick_count,"site_profile":state.site_profile}
 	daughter.genetics.established=traits.duplicate()
 	daughter.queen.inherited_traits=traits.duplicate()
 	if not state.reproductive_group.get("parent_queen_id","").is_empty():
@@ -79,7 +84,7 @@ func establish(knowledge_id: String) -> bool:
 		last_error="Settler transfer unavailable"; return false
 	var retired: bool=parent.workers.retire_commitment("trail:"+route.id); assert(retired)
 	for id: String in PileState.RESOURCE_IDS:
-		var deposited: bool=daughter.deposit_resource(id,CONFIG.supplies()[id],state.contaminant_mass if id=="carbohydrate" else 0.0); assert(deposited)
+		var deposited: bool=daughter.deposit_resource(id,state.carried_supplies()[id],state.contaminant_mass if id=="carbohydrate" else 0.0); assert(deposited)
 	_run.colony.piles[daughter.id]=daughter
 	route.purpose="interpile"; route.desired_workers=0; route.allocated_workers=0; route.active_workers=0; route.status="inactive"
 	state.phase="established"
@@ -90,26 +95,30 @@ func tick() -> void:
 	state.elapsed_ticks+=1
 	var route: TrailRouteState=_run.trails.routes[state.route_id]
 	if state.phase=="settling":
-		if state.elapsed_ticks>=CONFIG.preparation_ticks: state.phase="messenger"; state.elapsed_ticks=0
+		if state.elapsed_ticks>=state.preparation_ticks: state.phase="messenger"; state.elapsed_ticks=0
 		return
 	if state.elapsed_ticks<state.leg_ticks: return
 	state.elapsed_ticks=0
 	if state.phase=="outbound":
 		# Test the remembered place physically; never navigate to the hidden coordinate.
 		var site: WorldNodeState=_run.world.nodes.get(_run.knowledge.nodes[route.destination_knowledge_id].source_node_id)
-		state.phase="settling" if site!=null and site.definition_id=="nest_site" and site.active and site.quantity>0 and site.position.distance_to(route.estimated_destination)<=TRAILS.interaction_radius else "returning"
+		var confirmed: bool=site!=null and site.definition_id=="nest_site" and site.active and site.quantity>0 and site.position.distance_to(route.estimated_destination)<=TRAILS.interaction_radius
+		if confirmed and state.site_profile.is_empty() and not site.site_profile.is_empty():
+			_learn_site(state,route,site)
+		state.phase="settling" if confirmed and site.site_profile==state.site_profile else "returning"
 		return
 	var pile: PileState=_run.colony.piles.home
 	var returning: int=1 if state.phase=="messenger" else CONFIG.workers
 	var released: bool=pile.workers.release("trail:"+route.id,returning); assert(released)
 	route.active_workers-=returning; route.allocated_workers-=returning; route.desired_workers-=returning
 	state.reported_tick=_run.clock.tick_count
+	if state.site_report!=null: _run.delivered_observations[state.site_report.id]=state.site_report.detached_copy()
 	if state.phase=="messenger": state.phase="ready"
 	else:
 		state.phase="failed"; route.status="inactive"
 		var retired: bool=pile.workers.retire_commitment("trail:"+route.id); assert(retired)
 		for id: String in PileState.RESOURCE_IDS:
-			var deposited: bool=pile.deposit_resource(id,CONFIG.supplies()[id],state.contaminant_mass if id=="carbohydrate" else 0.0); assert(deposited)
+			var deposited: bool=pile.deposit_resource(id,state.carried_supplies()[id],state.contaminant_mass if id=="carbohydrate" else 0.0); assert(deposited)
 		var restored:=ReproductionState.new()
 		var valid: bool=restored.restore(state.reproductive_group,pile.workers,"home",pile.genetics.established,pile.brood_matured_total,pile.nursery_state,pile.food_exchange_state,pile.queen_count); assert(valid)
 		pile.reproduction=restored
@@ -119,7 +128,10 @@ func tick() -> void:
 func summary(knowledge_id: String) -> Dictionary:
 	var state: FoundingState=_run.founding
 	var for_site: bool=state.phase!="none" and _run.trails.routes[state.route_id].destination_knowledge_id==knowledge_id
-	var result: Dictionary={"status":"awaiting" if for_site and state.awaiting() else state.phase if for_site else "none","workers":CONFIG.workers,"supplies":CONFIG.supplies(),"blocker":blocker(knowledge_id)}
+	var profile_id: String=_run.knowledge.nodes[knowledge_id].site_profile if _run.knowledge.nodes.has(knowledge_id) else ""
+	if for_site and state.reported_tick>0: profile_id=state.site_profile
+	var profile: SiteDefinition=SiteCatalog.get_profile(profile_id)
+	var result: Dictionary={"site_profile":profile_id,"site_cues":profile.cues,"site_tradeoff":profile.tradeoff,"preparation_seconds":profile.preparation_ticks*SimulationClock.TICK_INTERVAL,"preparation_carbohydrate":profile.extra_carbohydrate,"status":"awaiting" if for_site and state.awaiting() else state.phase if for_site else "none","workers":CONFIG.workers,"supplies":state.carried_supplies() if for_site and state.reported_tick>0 else CONFIG.supplies(),"blocker":blocker(knowledge_id)}
 	if for_site:
 		result.age=(_run.clock.tick_count-state.departed_tick)*SimulationClock.TICK_INTERVAL
 		if state.phase in ["ready","failed","established"]:
@@ -127,3 +139,15 @@ func summary(knowledge_id: String) -> Dictionary:
 			result.settlers=CONFIG.workers-1 if state.phase=="ready" else 0
 	if for_site and state.phase=="established": result.daughter_id="satellite_1"
 	return result
+
+func _learn_site(state: FoundingState, route: TrailRouteState, site: WorldNodeState) -> void:
+	# Real campers can identify the entrance; unknown preparation spends carried food.
+	var profile: SiteDefinition=SiteCatalog.get_profile(site.site_profile)
+	state.site_profile=site.site_profile;state.preparation_ticks=profile.preparation_ticks
+	state.preparation_from_pack=profile.extra_carbohydrate>0
+	if state.preparation_from_pack: state.contaminant_mass=roundf(state.contaminant_mass*float(CONFIG.carbohydrate-profile.extra_carbohydrate)/CONFIG.carbohydrate*100000000.0)/100000000.0
+	var report:=Observation.new();report.scout_id="scout_%d" % _run.next_scout_id;_run.next_scout_id+=1
+	report.id=report.scout_id+":"+site.id;report.origin_pile="home";report.source_node_id=site.id;report.definition_id="nest_site";report.site_profile=site.site_profile
+	report.first_observed_at=_run.simulation_time;report.observed_at=_run.simulation_time
+	report.estimated_position=route.estimated_destination;report.uncertainty_radius=TRAILS.interaction_radius;report.closest_distance=0;report.proximity_confirmed=true
+	state.site_report=report

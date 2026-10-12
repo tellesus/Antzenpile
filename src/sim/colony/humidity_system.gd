@@ -40,7 +40,7 @@ func tick() -> void:
 			continue
 		var state: HumidityState = pile.humidity
 		var raining: bool = _run.rain.phase == "raining"
-		var ambient: int = CONFIG.wet_ambient if raining else CONFIG.dry_ambient
+		var ambient: int = clampi((CONFIG.wet_ambient if raining else CONFIG.dry_ambient)+SiteCatalog.for_pile(pile).moisture_offset,0,1000000)
 		var drift: int = CONFIG.wet_step if raining else CONFIG.dry_step
 		state.moisture = int(move_toward(state.moisture, ambient, drift))
 		var care_step: int=pile.chambers.climate_step(CONFIG.care_step)

@@ -280,7 +280,8 @@ func restore(data: Dictionary) -> bool:
 	if not founding_data is Dictionary: return false
 	var founder_traits: Array[String]=[]
 	if not founding_data.is_empty():
-		if data.id!="satellite_1" or founding_data.size()!=4 or not founding_data.has_all(["parent_id","route_id","queen_traits","founded_tick"]) or founding_data.parent_id!="home" or not founding_data.route_id is String or founding_data.route_id.is_empty() or not WorkerLedger.valid_count(founding_data.founded_tick) or not founding_data.queen_traits is Array: return false
+		if data.id!="satellite_1" or founding_data.size()!=4+int(founding_data.has("site_profile")) or not founding_data.has_all(["parent_id","route_id","queen_traits","founded_tick"]) or founding_data.parent_id!="home" or not founding_data.route_id is String or founding_data.route_id.is_empty() or not WorkerLedger.valid_count(founding_data.founded_tick) or not founding_data.queen_traits is Array: return false
+		if not SiteCatalog.accepts(founding_data.get("site_profile",""),"nest_site"): return false
 		for trait_id: Variant in founding_data.queen_traits:
 			if not trait_id is String or not AdaptationRules.valid_trait(trait_id) or trait_id in founder_traits: return false
 			founder_traits.append(trait_id)

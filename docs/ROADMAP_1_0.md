@@ -12,7 +12,7 @@ Windows desktop comes first. Keep touch-sized controls. Mobile, a fixed session-
 
 ## Milestone order
 
-M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
+M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5 is in progress with returned shelter profiles; generalized network/transport and M6–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
 
 | Milestone | Player outcome and required scope | Dependencies | Exit evidence |
 | --- | --- | --- | --- |
@@ -76,7 +76,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M4-B complete:** [152 maternal lineage/daughter reproduction](tasks/152_maternal_lineage_and_daughter_reproduction.md), queen-owned bundles independent of immigrants, captured ancestry, paid daughter trial/reproduction with Auto Brood and a real successor generation. Full 9,495/0; import/Main/headless drawing passed.
 
-**M2 core/M3/M4 complete; next: M5 site profiles, then a useful generalized nest network/transport/rescue.** Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
+**M5-A complete:** [153 returned site profiles](tasks/153_returned_site_profiles.md), four distinct shelter/preparation/climate profiles, two alternatives per new setting, historical cues, paid preparation and unknown-site physical pack/report handling. Full 9,602/0; import/Main/headless drawing passed.
+
+**M2 core/M3/M4 complete; next: M5 generalized piles/connections and physical transport/rescue.** Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 
