@@ -34,6 +34,6 @@ The initial finite-packet probe mistakenly treated the order number as workers. 
 
 ## Remaining M7 acceptance
 
-The supported connection-residue window1200–1800 precedes the ordinary first reported link in these runs. A separate bounded late-connection integration card must make that decision practical while preserving old worlds and paid cargo. Physical review also needs per-sample moving-predator/zone context instead of the old fixed ambusher position. These gaps remain explicit; M7 and the systems beta are not declared complete by this matrix.
+The original supported connection-residue window1200–1800 preceded ordinary first reported links. [173](../tasks/173_late_connection_pressure.md) completes the versioned2250–2850 fresh window with a real cold-run cue, closure, finite suspect recall and healthy local recovery, preserving old worlds/paid cargo. Physical review also needs per-sample moving-predator/zone context instead of the old fixed ambusher position. These gaps remain explicit; M7 and the systems beta are not declared complete by this matrix.
 
 Player graphical/feel/audio feedback follows the feature-complete systems beta (A88). Final presentation, measured desktop performance and distributable clean-machine acceptance remain M8/M9.

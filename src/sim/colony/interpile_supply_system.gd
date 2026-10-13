@@ -96,7 +96,7 @@ func tick() -> void:
    var deposited: bool=daughter.deposit_resource(id,state.cargo[id],state.contaminant_mass if id=="carbohydrate" else 0.0);assert(deposited)
   state.phase="returning";return
  # Delivery report and route reinforcement arrive with the actual returning party.
- if state.residue.contact.active():state.last_residue_report=state.residue.contact.report(_run.simulation_time)
+ if state.residue.contact.active():state.last_residue_report=state.residue.report(_run.simulation_time)
  state.residue=CargoResidueState.new()
  state.trips_reported+=1;state.last_reported_tick=_run.clock.tick_count
  if state.first_reported_tick==0: state.first_reported_tick=state.last_reported_tick
@@ -123,11 +123,12 @@ func _residue_contact() -> void:
  if state.phase=="returning":progress=1.0-progress
  var point: Vector2=_source().position.lerp(_target().position,progress)
  if not _run.connection_residue.contains(point,_run.clock.tick_count):return
+ state.residue.definition_id=_run.connection_residue.definition_id
  state.residue.contact.capture(point,_run.clock.tick_count)
  var carrying: bool=state.phase=="outbound" or state is StoreTransportState and state.current().arrived==0
  if carrying and state.cargo.get("carbohydrate",0.0)>0:
   state.residue.exposed=true;state.residue.original_mass=state.contaminant_mass
-  state.contaminant_mass=ResidueZoneState.contaminated(state.cargo.carbohydrate,state.contaminant_mass,CargoResidueState.CONFIG)
+  state.contaminant_mass=ResidueZoneState.contaminated(state.cargo.carbohydrate,state.contaminant_mass,_run.connection_residue.definition)
  if state is StoreTransportState:
   state.current().residue=state.residue.to_dict();state.current().contaminant=state.contaminant_mass
 func summary() -> Dictionary:

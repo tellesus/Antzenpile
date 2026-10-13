@@ -116,7 +116,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M7-B complete:** [172 integrated runs/balance](tasks/172_integrated_scenario_runs_and_balance.md), fresh three-setting arcs, actual three-nest Garden lineage, practical producer/packet choices, versioned Roadside warning and prepared/rescued recovery. Full10,959/0; import/Main/headless drawing passed. [Evidence](evidence/card172_complete_runs.md).
 
-**M1–M6 foundation/M7 arcs complete; next:173 practical late connection pressure and174 accurate physical review, then the systems beta.** Player graphical/feel checks defer to the systems beta (A88).
+**M7-C complete:** [173 late connection pressure](tasks/173_late_connection_pressure.md), practical fresh-world contact/returned cue, real closure/finite recall/local recovery and preserved old cargo definitions. Full10,978/0; import/Main/headless drawing passed.
+
+**M1–M6 foundation/M7 arcs and network pressure complete; next:174 accurate physical review, then the systems beta.** Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

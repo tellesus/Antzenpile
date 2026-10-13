@@ -49,7 +49,7 @@ var rival: RivalState = Rival.new()
 var accomplishment:=LineageAccomplishment.new()
 var surface_impact := SurfaceImpactState.new()
 var residue := ResidueZoneState.new()
-var connection_residue:=ResidueZoneState.new(CargoResidueState.CONFIG)
+var connection_residue:=ConnectionResidueState.new()
 var refuges: Dictionary[String,RefugeState]={}
 var nest_disturbance:=NestDisturbanceState.new()
 var predator: PredatorState = Predator.new()
@@ -495,11 +495,16 @@ func restore(data: Dictionary) -> bool:
 		if witness.active() and (restored_impact.profile_id!="dog_passage" or witness.serial>restored_impact.serial or SurfaceImpactState.serial_at(roundi(witness.observed_at/Clock.TICK_INTERVAL),data.seed.to_int())!=witness.serial):return false
 	var restored_residue:=ResidueZoneState.new()
 	if not restored_residue.restore(data.get("residue",restored_residue.to_dict()),data.scenario_id):return false
-	var restored_connection_residue:=ResidueZoneState.new(CargoResidueState.CONFIG)
+	var restored_connection_residue:=ConnectionResidueState.new()
 	if not restored_connection_residue.restore(data.get("connection_residue",restored_connection_residue.to_dict()),data.scenario_id):return false
 	for connection: ConnectionTrafficState in restored_connections.values():
 		for state: InterpileSupplyState in connection.supplies.values()+connection.stores.values():
 			if not restored_connection_residue.enabled and (state.residue.contact.active() or not state.last_residue_report.is_empty() or state is StoreTransportState and state.manifests.any(func(record: Dictionary)->bool:return record.has("residue"))):return false
+			if state.residue.contact.active() and state.residue.definition_id!=restored_connection_residue.definition_id:return false
+			if not state.last_residue_report.is_empty() and state.last_residue_report.get("definition_id","link_v1")!=restored_connection_residue.definition_id:return false
+			if state is StoreTransportState:
+				for record: Dictionary in state.manifests:
+					if record.has("residue") and record.residue.get("definition_id","link_v1")!=restored_connection_residue.definition_id:return false
 	for route: TrailRouteState in restored_trails.routes.values():
 		if not route.residue_report.is_empty() and (not restored_residue.enabled or not ResidueZoneState.valid_report(route.residue_report,restored_clock.simulation_time)):return false
 	for cohort: TransitCohort in restored_trails.cohorts.values():

@@ -9,7 +9,7 @@ func fixture(start_time: float=1200) -> SimulationController:
 	var original: SimulationController=Founding.new().fixture()
 	var authored:=Controller.new(6241,"roadside")
 	original.run.world.nodes["nest_site_02"]=authored.run.world.nodes.nest_site_02
-	var raw: Dictionary=snapshot(original);raw.scenario_id="roadside";raw.connection_residue.enabled=true
+	var raw: Dictionary=snapshot(original);raw.scenario_id="roadside";raw.connection_residue={"enabled":true}
 	var game:=Controller.new();assert(game.restore_snapshot(raw))
 	assert(game.dispatch_scout("home",Vector2(16,-16).angle()))
 	for tick: int in 2000:

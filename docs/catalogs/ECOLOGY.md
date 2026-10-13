@@ -63,3 +63,5 @@ Every new entry needs one ordinary case where its intended counterplay helps, on
 Post 1.0: large species catalogs, detailed dog/human behavior, full ecological food webs, beneficial-guest diplomacy, unrelated status-effect stacks and annual seasons. New art/species names alone do not justify another hazard engine.
 
 172 verifies fresh ordinary complete arcs and versioned ground-pressure timing with actual Refuge/rescue recovery. The late connection-residue window still needs practical fresh-world integration (173); moving-predator/zone physical review needs captured per-sample context (174). Existing payload/casualty/knowledge contracts are not a substitute for those acceptance cases.
+
+173 completes practical late connection-pressure integration: fresh link_v2 retains the footprint/dose with2250–2850 timing, captured cargo/receipt identity and strict old-world preservation. A real reported network demonstrates closure, paid continuation, finite suspect recall and healthy local recovery. Private versions and schedules stay out of normal presentation. Physical-review sampling remains174.

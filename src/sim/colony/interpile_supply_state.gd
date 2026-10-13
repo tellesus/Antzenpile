@@ -108,7 +108,7 @@ func restore_residue(data: Dictionary, colony: ColonyState, founding: FoundingSt
   if saved.exposed!=(carrying and cargo.get("carbohydrate",0.0)>0):return false
  var report: Variant=data.get("last_residue_report",{})
  if not report is Dictionary:return false
- if not report.is_empty() and (trips_reported==0 or not ResidueZoneState.valid_report(report,tick*SimulationClock.TICK_INTERVAL,CargoResidueState.CONFIG) or report.received_at<first_reported_tick*SimulationClock.TICK_INTERVAL or report.received_at>last_reported_tick*SimulationClock.TICK_INTERVAL):return false
+ if not report.is_empty() and (trips_reported==0 or not CargoResidueState.valid_report(report,tick*SimulationClock.TICK_INTERVAL) or report.received_at<first_reported_tick*SimulationClock.TICK_INTERVAL or report.received_at>last_reported_tick*SimulationClock.TICK_INTERVAL):return false
  residue=saved;last_residue_report=report.duplicate(true);return true
 func valid_route(route: TrailRouteState) -> bool:
  return route.purpose=="interpile" and route.allocated_workers==assigned() and route.active_workers==(CONFIG.workers if travelling() else 0) and route.desired_workers==(CONFIG.workers if enabled else 0) and route.status==("inactive" if phase=="none" else "active" if enabled else "recalling") and is_equal_approx(route.delivered_total,delivered_total()) and _valid_receipt(route.receipt)
