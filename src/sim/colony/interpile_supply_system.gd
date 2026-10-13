@@ -85,6 +85,7 @@ func tick() -> void:
   var paid: bool=home.consume_resources(plan.costs);assert(paid)
   state.phase="outbound";state.departed_tick=_run.clock.tick_count;state.trips_started+=1;route.active_workers=CONFIG.workers
   return
+ _residue_contact()
  state.elapsed_ticks+=1
  var daughter: PileState=_target()
  var leg: int=TRAILS.leg_ticks(home.position.distance_to(daughter.position))
@@ -95,6 +96,8 @@ func tick() -> void:
    var deposited: bool=daughter.deposit_resource(id,state.cargo[id],state.contaminant_mass if id=="carbohydrate" else 0.0);assert(deposited)
   state.phase="returning";return
  # Delivery report and route reinforcement arrive with the actual returning party.
+ if state.residue.contact.active():state.last_residue_report=state.residue.contact.report(_run.simulation_time)
+ state.residue=CargoResidueState.new()
  state.trips_reported+=1;state.last_reported_tick=_run.clock.tick_count
  if state.first_reported_tick==0: state.first_reported_tick=state.last_reported_tick
  state.last_payload=state.cargo.duplicate()
@@ -112,6 +115,21 @@ func _release(route: TrailRouteState) -> void:
  var retired: bool=ledger.retire_commitment("trail:"+route.id);assert(retired)
  route.allocated_workers=0;route.active_workers=0;route.status="inactive"
  _state().phase="none"
+func _residue_contact() -> void:
+ var state: InterpileSupplyState=_state()
+ if not state.travelling() or state.residue.contact.active():return
+ var leg: int=TRAILS.leg_ticks(_source().position.distance_to(_target().position))
+ var progress: float=float(state.elapsed_ticks)/leg
+ if state.phase=="returning":progress=1.0-progress
+ var point: Vector2=_source().position.lerp(_target().position,progress)
+ if not _run.connection_residue.contains(point,_run.clock.tick_count):return
+ state.residue.contact.capture(point,_run.clock.tick_count)
+ var carrying: bool=state.phase=="outbound" or state is StoreTransportState and state.current().arrived==0
+ if carrying and state.cargo.get("carbohydrate",0.0)>0:
+  state.residue.exposed=true;state.residue.original_mass=state.contaminant_mass
+  state.contaminant_mass=ResidueZoneState.contaminated(state.cargo.carbohydrate,state.contaminant_mass,CargoResidueState.CONFIG)
+ if state is StoreTransportState:
+  state.current().residue=state.residue.to_dict();state.current().contaminant=state.contaminant_mass
 func summary() -> Dictionary:
  if _connection()==null or not _connection().supplies.has(_source_id): return {}
  var state: InterpileSupplyState=_state()

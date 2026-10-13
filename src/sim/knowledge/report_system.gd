@@ -36,6 +36,12 @@ func capture(recording: bool = true) -> void:
 			journal.add("conflict",route.origin_pile,route.id,route.conflict_observed_at,route.conflict_received_at,route.conflict_report,0,0,recording)
 		if not route.residue_report.is_empty() and journal.changed("ground/"+route.id,route.residue_report.received_at):
 			journal.add("ground",route.origin_pile,route.id,route.residue_report.observed_at,route.residue_report.received_at,"residue",0,0,recording)
+	for connection: ConnectionTrafficState in _run.all_connections():
+		for payer: String in [connection.parent_id,connection.child_id]:
+			for family: String in ["supplies","stores"]:
+				var state: InterpileSupplyState=connection.supplies[payer] if family=="supplies" else connection.stores[payer]
+				var cue: Dictionary=state.last_residue_report
+				if not cue.is_empty() and journal.changed("link_ground/"+connection.route_id+"/"+payer+"/"+family,cue.received_at):journal.add("link_ground",payer,connection.route_id,cue.observed_at,cue.received_at,"residue",0,0,recording)
 	var response: JourneyResponseState=_run.journey_response
 	for kind: String in ["survey","pressure","defense","approach"]:
 		var records: Dictionary=response.reports if kind=="survey" else response.pressure.reports if kind=="pressure" else response.defense.outcomes if kind=="defense" else response.approach.reports

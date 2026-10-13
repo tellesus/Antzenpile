@@ -12,7 +12,8 @@ func receipt() -> Dictionary:
 func to_dict() -> Dictionary:
 	var result: Dictionary=super.to_dict();result.manifests=manifests.duplicate(true);return result
 func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tick: int, source_id: String="home") -> bool:
-	if data.size()!=16 or not data.has_all(to_dict().keys()) or not data.enabled is bool or data.enabled!=false or data.phase not in ["none","outbound","returning"]:return false
+	var required: Array=to_dict().keys();required.erase("residue");required.erase("last_residue_report")
+	if data.size() not in [16,18] or data.has("residue")!=data.has("last_residue_report") or not data.has_all(required) or not data.enabled is bool or data.enabled!=false or data.phase not in ["none","outbound","returning"]:return false
 	if not data.manifests is Array or data.manifests.size()>LIMIT:return false
 	for key: String in ["elapsed_ticks","departed_tick","trips_started","trips_reported","first_reported_tick","last_reported_tick"]:
 		if not WorkerLedger.valid_count(data[key]):return false
@@ -23,13 +24,20 @@ func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tic
 		leg=TRAILS.leg_ticks(colony.piles[founding.origin_pile].position.distance_to(colony.piles[founding.destination_pile].position))
 		previous=int(colony.piles[founding.destination_pile].foundation.founded_tick)
 	for raw: Variant in data.manifests:
-		if not raw is Dictionary or raw.size()!=10 or not raw.has_all(["resource","amount","departed","arrived","recalled","reported","carry","energy","chemistry","contaminant"]):return false
+		if not raw is Dictionary or raw.size() not in [10,11] or (raw.size()==11)!=raw.has("residue") or not raw.has_all(["resource","amount","departed","arrived","recalled","reported","carry","energy","chemistry","contaminant"]):return false
 		if raw.resource not in PileState.RESOURCE_IDS or not WorkerLedger.valid_count(raw.amount) or raw.amount<1:return false
 		for key: String in ["departed","arrived","recalled","reported"]:
 			if not WorkerLedger.valid_count(raw[key]) or raw[key]>tick:return false
 		for key: String in ["carry","energy","chemistry","contaminant"]:
 			if not typeof(raw[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(raw[key])):return false
 		if raw.carry<0.85 or raw.carry>1.3 or raw.energy<0.7 or raw.energy>1.2 or raw.chemistry<0 or raw.chemistry>1 or raw.contaminant<0 or raw.contaminant>raw.amount or (raw.resource!="carbohydrate" and raw.contaminant!=0):return false
+		var captured_residue: Dictionary={}
+		if raw.has("residue"):
+			var exposure:=CargoResidueState.new()
+			if not exposure.restore(raw.residue,tick,int(raw.departed),float(raw.amount) if raw.resource=="carbohydrate" else 0.0,float(raw.contaminant)) or not exposure.contact.active():return false
+			if raw.reported>0 and exposure.contact.observed_tick>raw.reported or raw.arrived>0 and exposure.exposed and exposure.contact.observed_tick>raw.arrived:return false
+			if exposure.exposed!=(raw.resource=="carbohydrate" and (raw.arrived==0 or exposure.contact.observed_tick<=raw.arrived)):return false
+			captured_residue=exposure.to_dict()
 		if raw.amount>floori((CONFIG.carbohydrate+CONFIG.protein+CONFIG.water)*raw.carry) or raw.departed<previous:return false
 		if raw.arrived!=0 and (raw.arrived!=raw.departed+leg or raw.recalled!=0):return false
 		if raw.recalled!=0 and (raw.recalled<raw.departed or raw.recalled>=raw.departed+leg):return false
@@ -40,6 +48,7 @@ func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tic
 			if raw.arrived>0:totals[raw.resource]+=int(raw.amount)*100000
 		elif parsed.size()!=data.manifests.size()-1:return false
 		var record: Dictionary=raw.duplicate()
+		if raw.has("residue"):record.residue=captured_residue
 		for key: String in ["amount","departed","arrived","recalled","reported"]:record[key]=int(record[key])
 		for key: String in ["carry","energy","chemistry","contaminant"]:record[key]=float(record[key])
 		parsed.append(record)
@@ -67,6 +76,8 @@ func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tic
 	enabled=false;phase=data.phase;elapsed_ticks=int(data.elapsed_ticks);departed_tick=int(data.departed_tick);trips_started=parsed.size();trips_reported=reported;first_reported_tick=int(data.first_reported_tick);last_reported_tick=int(data.last_reported_tick)
 	cargo.assign(expected_cargo);last_payload.assign(expected_last);delivered_units=totals;manifests=parsed
 	energy_multiplier=float(data.energy_multiplier);carry_multiplier=float(data.carry_multiplier);chemistry_fraction=float(data.chemistry_fraction);contaminant_mass=float(data.contaminant_mass)
+	if not restore_residue(data,colony,founding,tick,source_id):return false
+	if away and residue.to_dict()!=latest.get("residue",CargoResidueState.new().to_dict()):return false
 	return true
 static func packet(resource: String, amount: float) -> Dictionary[String,float]:
 	var result: Dictionary[String,float]={"carbohydrate":0.0,"protein":0.0,"water":0.0};result[resource]=amount;return result

@@ -257,14 +257,14 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","producer","investment","chamber","queen"]:
+	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","link_ground","producer","investment","chamber","queen"]:
 		inspect_pile(selected.pile_id)
 		var organ: String="adaptation" if selected.kind=="producer" else "nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null:
 			_inward_view.selected_id=organ
 			if selected.kind=="producer":_inward_view.web_family="foraging";_inward_view.web_selection="honeydew"
 			_inward_view._process(0)
-		if selected.kind in ["supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation"] and _inward_view!=null:
+		if selected.kind in ["supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","link_ground"] and _inward_view!=null:
 			_inward_view.connection_controls.opened=true
 			_inward_view.connection_controls.purpose="workers" if selected.kind=="migration" else "queen" if selected.kind=="relocation" else "brood" if selected.kind=="brood_rescue" else "departure" if selected.kind in ["departure","evacuation"] else "royals" if selected.kind=="royal_rescue" else "stores" if selected.kind=="store_rescue" else "supplies"
 			for entry: Dictionary in simulation.connection_summaries(selected.pile_id):

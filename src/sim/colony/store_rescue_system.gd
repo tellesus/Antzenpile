@@ -44,6 +44,7 @@ func recall() -> bool:
 func tick() -> void:
 	var state: StoreTransportState=_transport()
 	if not state.active():return
+	_residue_contact()
 	var leg: int=TRAILS.leg_ticks(_source().position.distance_to(_target().position))
 	if state.elapsed_ticks+1<leg:state.elapsed_ticks+=1;return
 	if state.phase=="outbound":state.current().arrived=_run.clock.tick_count;super.tick();return

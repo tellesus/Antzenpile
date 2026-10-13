@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ResidueDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/ecology/residue_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+position = Vector2(28,12)
+radius = 1.5
+first_tick = 4800
+duration_ticks = 2400
+contact_fraction = 0.25

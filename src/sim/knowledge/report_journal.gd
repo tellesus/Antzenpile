@@ -3,7 +3,7 @@ extends RefCounted
 ## Bounded semantic records of delivered/local facts; never physical replay data.
 const LIMIT: int = 192
 const SEEN_LIMIT: int = 512
-const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","producer","ground"]
+const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","producer","ground","link_ground"]
 var initialized: bool = false
 var since: float = 0.0
 var next_id: int = 1
@@ -21,10 +21,10 @@ func changed(key: String, value: Variant) -> bool:
 func add(kind: String, pile: String, subject: String, observed: float, received: float, detail: String = "", amount: float = 0, total: float = 0, recording: bool = true) -> void:
 	if not recording or next_id >= WorkerLedger.MAX_COUNT: return
 	amount=_quantity(amount);total=_quantity(total)
-	if kind in ["intake","ground"]:
+	if kind in ["intake","ground","link_ground"]:
 		for index: int in entries.size():
 			var existing: Dictionary = entries[index]
-			if existing.kind == kind and existing.subject_id == subject and existing.detail==detail:
+			if existing.kind == kind and existing.pile_id==pile and existing.subject_id == subject and existing.detail==detail:
 				existing.observed_at=observed; existing.received_at=received; existing.amount=amount
 				existing.total=_quantity(existing.total+amount); existing.repeats=mini(WorkerLedger.MAX_COUNT,existing.repeats+1)
 				_serialized[index]=JSON.stringify(existing,"",true,true); return
@@ -106,6 +106,7 @@ static func _valid_entry(entry: Variant, colony: ColonyState, knowledge: Knowled
 		"store_rescue": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail.get_slice(":",0) in ["delivered","returned"] and entry.detail.get_slice(":",1) in PileState.RESOURCE_IDS and WorkerLedger.valid_count(entry.amount) and entry.amount>=1 and entry.amount<=11
 		"departure","evacuation": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail in ["departed","arrived","returned","landing","escorts","recalled"] and WorkerLedger.valid_count(entry.amount)
 		"producer": return knowledge.nodes.has(entry.subject_id) and entry.subject_id=="known:"+HoneydewState.CONFIG.source_id and entry.detail in ["target","returned","not_found"] and WorkerLedger.valid_count(entry.amount) and entry.amount<=ProducerServiceState.CAP
+		"link_ground": return entry.detail=="residue" and entry.amount==0 and entry.total==0 and trails.routes.has(entry.subject_id) and trails.routes[entry.subject_id].purpose=="interpile" and (trails.routes[entry.subject_id].origin_pile==entry.pile_id or colony.piles[entry.pile_id].foundation.get("route_id","")==entry.subject_id)
 		"connection": return entry.detail in ["closed","opened"] and trails.routes.has(entry.subject_id) and trails.routes[entry.subject_id].purpose=="interpile" and (trails.routes[entry.subject_id].origin_pile==entry.pile_id or colony.piles[entry.pile_id].foundation.get("route_id","")==entry.subject_id)
 		"royal_rescue": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail in ["delivered","returned","landing","escorts"] and entry.amount in [0.0,1.0]
 		"brood_rescue": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail in ["delivered","returned","landing","escorts"] and WorkerLedger.valid_count(entry.amount) and entry.amount<=BroodCohort.CONFIG.starting_count

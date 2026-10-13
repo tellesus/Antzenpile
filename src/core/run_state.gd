@@ -48,6 +48,7 @@ var guest: GuestState = Guest.new()
 var rival: RivalState = Rival.new()
 var surface_impact := SurfaceImpactState.new()
 var residue := ResidueZoneState.new()
+var connection_residue:=ResidueZoneState.new(CargoResidueState.CONFIG)
 var predator: PredatorState = Predator.new()
 var journey_response: JourneyResponseState = JourneyResponseState.new()
 var delivered_observations: Dictionary[String, Observation] = {}
@@ -74,6 +75,7 @@ func exploration_for(pile_id: String) -> ExplorationState:
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
 	surface_impact.enabled = scenario == "roadside"
 	residue.enabled = scenario == "roadside"
+	connection_residue.enabled = scenario == "roadside"
 	_seed = seed_value
 	_scenario_id = scenario
 	rng.seed = _seed
@@ -113,7 +115,7 @@ func to_dict() -> Dictionary:
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"daughter_supply":daughter_supply.to_dict(), "supply_origin":supply_origin,
 		"reinforcement": reinforcement.to_dict(), "supply": supply.to_dict(), "founding": founding.to_dict(), "knowledge": knowledge.to_dict(), "trails": trails.to_dict(), "rain": rain.to_dict(), "exploration": exploration.to_dict(), "daughter_exploration": daughter_exploration.to_dict(),
-		"residue":residue.to_dict(),"surface_impact":surface_impact.to_dict(), "honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
+		"connection_residue":connection_residue.to_dict(),"residue":residue.to_dict(),"surface_impact":surface_impact.to_dict(), "honeydew": honeydew.to_dict(), "predator": predator.to_dict(), "rival": rival.to_dict(), "swarm": swarm.to_dict(), "guest": guest.to_dict(), "journey_response": journey_response.to_dict()}
 
 
 func active_scout_count() -> int:
@@ -460,6 +462,11 @@ func restore(data: Dictionary) -> bool:
 	if not restored_impact.restore(data.get("surface_impact", restored_impact.to_dict()), restored_clock.tick_count, data.seed.to_int(), data.scenario_id): return false
 	var restored_residue:=ResidueZoneState.new()
 	if not restored_residue.restore(data.get("residue",restored_residue.to_dict()),data.scenario_id):return false
+	var restored_connection_residue:=ResidueZoneState.new(CargoResidueState.CONFIG)
+	if not restored_connection_residue.restore(data.get("connection_residue",restored_connection_residue.to_dict()),data.scenario_id):return false
+	for connection: ConnectionTrafficState in restored_connections.values():
+		for state: InterpileSupplyState in connection.supplies.values()+connection.stores.values():
+			if not restored_connection_residue.enabled and (state.residue.contact.active() or not state.last_residue_report.is_empty() or state is StoreTransportState and state.manifests.any(func(record: Dictionary)->bool:return record.has("residue"))):return false
 	for route: TrailRouteState in restored_trails.routes.values():
 		if not route.residue_report.is_empty() and (not restored_residue.enabled or not ResidueZoneState.valid_report(route.residue_report,restored_clock.simulation_time)):return false
 	for cohort: TransitCohort in restored_trails.cohorts.values():
@@ -577,6 +584,10 @@ func restore(data: Dictionary) -> bool:
 	if not restored_reports.restore(data.get("reports",restored_reports.to_dict()),restored_colony,restored_knowledge,restored_trails,restored_clock.simulation_time): return false
 	for entry: Dictionary in restored_reports.entries:
 		if entry.kind=="survey" and entry.detail.contains(":") and entry.detail.get_slice(":",1)!=restored_predator.profile_id: return false
+		if entry.kind=="link_ground":
+			if not restored_connection_residue.enabled or not restored_connection_residue.active(roundi(entry.observed_at/Clock.TICK_INTERVAL)) or not restored_connections.has(entry.subject_id):return false
+			var link: ConnectionTrafficState=restored_connections[entry.subject_id]
+			if entry.received_at>maxf(link.supplies[entry.pile_id].last_residue_report.get("received_at",0.0),link.stores[entry.pile_id].last_residue_report.get("received_at",0.0)):return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()
@@ -608,6 +619,7 @@ func restore(data: Dictionary) -> bool:
 	honeydew = restored_honeydew
 	surface_impact = restored_impact
 	residue=restored_residue
+	connection_residue=restored_connection_residue
 	predator = restored_predator
 	journey_response = restored_response
 	rival = restored_rival

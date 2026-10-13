@@ -11,7 +11,7 @@ func to_dict() -> Dictionary:return {"observed_tick":observed_tick,"position":[p
 func report(time: float) -> Dictionary:
 	var estimate: Vector2=position.round()
 	return {"observed_at":observed_tick*SimulationClock.TICK_INTERVAL,"received_at":time,"estimated_position":[estimate.x,estimate.y]}
-func restore(data: Variant, tick: int) -> bool:
+func restore(data: Variant, tick: int, config: ResidueDefinition=ResidueZoneState.CONFIG) -> bool:
 	if not data is Dictionary or data.size()!=2 or not data.has_all(["observed_tick","position"]) or not WorkerLedger.valid_count(data.observed_tick) or data.observed_tick>tick:return false
 	if not data.position is Array or data.position.size()!=2:return false
 	for value: Variant in data.position:
@@ -19,5 +19,5 @@ func restore(data: Variant, tick: int) -> bool:
 	var point:=Vector2(data.position[0],data.position[1])
 	if data.observed_tick==0:
 		if point!=Vector2.ZERO:return false
-	elif data.observed_tick<ResidueZoneState.CONFIG.first_tick or data.observed_tick>=ResidueZoneState.CONFIG.first_tick+ResidueZoneState.CONFIG.duration_ticks or point.distance_to(ResidueZoneState.CONFIG.position)>ResidueZoneState.CONFIG.radius+0.00001:return false
+	elif data.observed_tick<config.first_tick or data.observed_tick>=config.first_tick+config.duration_ticks or point.distance_to(config.position)>config.radius+0.00001:return false
 	observed_tick=int(data.observed_tick);position=point;return true

@@ -18,6 +18,8 @@ var energy_multiplier: float=1.0
 var carry_multiplier: float=1.0
 var chemistry_fraction: float=0.0
 var contaminant_mass: float=0.0
+var residue:=CargoResidueState.new()
+var last_residue_report: Dictionary={}
 func travelling() -> bool: return phase in ["outbound","returning"]
 func assigned() -> int: return CONFIG.workers if phase!="none" else 0
 func delivered_total() -> float:
@@ -26,9 +28,10 @@ func receipt() -> Dictionary:
  if trips_reported==0: return {}
  return {"first_at":first_reported_tick*SimulationClock.TICK_INTERVAL,"last_at":last_reported_tick*SimulationClock.TICK_INTERVAL,"last_amount":last_payload.carbohydrate+last_payload.protein+last_payload.water,"earlier_unrecorded":false}
 func to_dict() -> Dictionary:
- return {"enabled":enabled,"phase":phase,"elapsed_ticks":elapsed_ticks,"departed_tick":departed_tick,"trips_started":trips_started,"trips_reported":trips_reported,"first_reported_tick":first_reported_tick,"last_reported_tick":last_reported_tick,"cargo":cargo.duplicate(),"last_payload":last_payload.duplicate(),"delivered_units":delivered_units.duplicate(),"energy_multiplier":energy_multiplier,"carry_multiplier":carry_multiplier,"chemistry_fraction":chemistry_fraction,"contaminant_mass":contaminant_mass}
+ return {"residue":residue.to_dict(),"last_residue_report":last_residue_report.duplicate(true),"enabled":enabled,"phase":phase,"elapsed_ticks":elapsed_ticks,"departed_tick":departed_tick,"trips_started":trips_started,"trips_reported":trips_reported,"first_reported_tick":first_reported_tick,"last_reported_tick":last_reported_tick,"cargo":cargo.duplicate(),"last_payload":last_payload.duplicate(),"delivered_units":delivered_units.duplicate(),"energy_multiplier":energy_multiplier,"carry_multiplier":carry_multiplier,"chemistry_fraction":chemistry_fraction,"contaminant_mass":contaminant_mass}
 func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tick: int, source_id: String = "home") -> bool:
- if data.size()!=15 or not data.has_all(to_dict().keys()): return false
+ var required: Array=to_dict().keys();required.erase("residue");required.erase("last_residue_report")
+ if data.size() not in [15,17] or not data.has_all(required) or data.has("residue")!=data.has("last_residue_report"): return false
  if not data.enabled is bool or not data.phase is String or data.phase not in ["none","waiting","outbound","returning"]: return false
  for key: String in ["elapsed_ticks","departed_tick","trips_started","trips_reported","first_reported_tick","last_reported_tick"]:
   if not WorkerLedger.valid_count(data[key]): return false
@@ -91,7 +94,22 @@ func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tic
  trips_started=int(data.trips_started);trips_reported=int(data.trips_reported);first_reported_tick=int(data.first_reported_tick);last_reported_tick=int(data.last_reported_tick)
  cargo=parsed_cargo;last_payload=parsed_last;delivered_units=units
  energy_multiplier=snappedf(float(data.energy_multiplier),0.00001);carry_multiplier=snappedf(float(data.carry_multiplier),0.00001);chemistry_fraction=snappedf(float(data.chemistry_fraction),0.00001);contaminant_mass=roundf(float(data.contaminant_mass)*100000000.0)/100000000.0
+ if not restore_residue(data,colony,founding,tick,source_id):return false
  return true
+func restore_residue(data: Dictionary, colony: ColonyState, founding: FoundingState, tick: int, source_id: String) -> bool:
+ var saved:=CargoResidueState.new()
+ if not saved.restore(data.get("residue",saved.to_dict()),tick,departed_tick,cargo.get("carbohydrate",0.0),contaminant_mass):return false
+ if saved.contact.active():
+  if not travelling() or not colony.piles.has(source_id) or not colony.piles.has(founding.destination_pile):return false
+  var other: String=founding.destination_pile if source_id==founding.origin_pile else founding.origin_pile
+  if Geometry2D.get_closest_point_to_segment(saved.contact.position,colony.piles[source_id].position,colony.piles[other].position).distance_to(saved.contact.position)>0.00001:return false
+  var leg: int=TRAILS.leg_ticks(colony.piles[source_id].position.distance_to(colony.piles[other].position))
+  var carrying: bool=saved.contact.observed_tick<=departed_tick+leg or self is StoreTransportState and (self as StoreTransportState).current().arrived==0
+  if saved.exposed!=(carrying and cargo.get("carbohydrate",0.0)>0):return false
+ var report: Variant=data.get("last_residue_report",{})
+ if not report is Dictionary:return false
+ if not report.is_empty() and (trips_reported==0 or not ResidueZoneState.valid_report(report,tick*SimulationClock.TICK_INTERVAL,CargoResidueState.CONFIG) or report.received_at<first_reported_tick*SimulationClock.TICK_INTERVAL or report.received_at>last_reported_tick*SimulationClock.TICK_INTERVAL):return false
+ residue=saved;last_residue_report=report.duplicate(true);return true
 func valid_route(route: TrailRouteState) -> bool:
  return route.purpose=="interpile" and route.allocated_workers==assigned() and route.active_workers==(CONFIG.workers if travelling() else 0) and route.desired_workers==(CONFIG.workers if enabled else 0) and route.status==("inactive" if phase=="none" else "active" if enabled else "recalling") and is_equal_approx(route.delivered_total,delivered_total()) and _valid_receipt(route.receipt)
 func _valid_receipt(saved: Dictionary) -> bool:

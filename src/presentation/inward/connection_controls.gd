@@ -94,6 +94,8 @@ func draw(view: Node2D, entries: Array) -> void:
 	Style.surface(view,box,Color("111d22"));Style.surface(view,box,Color("716753"),true)
 	_text(view,box.position+Vector2(16,30),"Connection orders",20,box.size.x-32)
 	if entry.is_empty():return
+	if not entry.get("residue_report",{}).is_empty():
+		_text(view,box.position+Vector2(16,50),"Strange ground reported "+Copy.duration(entry.get("time",0)-entry.residue_report.received_at)+" ago · close/stop limits new traffic",12,box.size.x-32)
 	_button(view,rect(size,"previous"),"‹");_button(view,rect(size,"next"),"›")
 	_text(view,box.position+Vector2(76,90),entry.source_name+" → "+entry.destination_name,17,box.size.x-152)
 	_button(view,rect(size,"supplies"),"SUPPLY",purpose=="supplies");_button(view,rect(size,"workers"),"WORKERS",purpose=="workers");_button(view,rect(size,"queen"),"QUEEN",purpose=="queen");_button(view,rect(size,"brood"),"BROOD",purpose=="brood");_button(view,rect(size,"stores"),"STORES",purpose=="stores");_button(view,rect(size,"royals"),"YOUNG",purpose=="royals");_button(view,rect(size,"departure"),"LEAVE",purpose=="departure")

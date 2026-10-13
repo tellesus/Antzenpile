@@ -25,6 +25,7 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"intake": text=Copy.resource(entry.detail).capitalize()+" returned: "+name
 		"loss": text="Journey losses reported: "+name
 		"ground":text="Strange residue on the journey: "+name
+		"link_ground":text="Strange residue reported between nests"
 		"conflict": text={"contested":"Junction contested","holding":"Junction holding","resisted":"Strong foreign resistance","reinforced":"Foreign reinforcement reported","secured":"Foreign force withdrew","withdrew":"Our ants withdrew","dispersed":"Encounter dispersed"}.get(entry.detail,"Junction report")
 		"survey": text=Memory.survey_label({"finding":entry.detail.get_slice(":",0),"predator_profile":entry.detail.get_slice(":",1)})
 		"pressure": text="Holding against resistance" if entry.detail=="holding" else "Resistance remains strong"
