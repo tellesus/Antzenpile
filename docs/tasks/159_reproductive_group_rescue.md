@@ -1,0 +1,21 @@
+# 159 — Reproductive-group rescue
+
+Status: complete (2026-10-13). M5-D / SYS-04/06/09/13/14.
+
+Outcome: move one already-paid young-queen/two-male group, either developing or ready, over an established adjacent connection. It keeps its original laying nest/date, maternal generation, inherited bundle and stage/progress. The received ready group can fund later local succession or founding without receiving a different identity. No new group is laid by transport.
+
+Extend the exclusive movement family with a typed reproductive body and provenance. Eight settling staff including four carriers and the existing four reproductive nurses, plus one messenger are the provisional aggregate handling burden; chosen staff settle with the group. Paid maximum-round-trip larval feeding and real nurse custody pause development during handling. Active groups require a prepared receiving Nursery/Food Exchange with eight spaces; ready groups need a free local reproductive-group slot. Source and recipient reproductive slots/required active space stay promised until physical arrival/return/report. Source nurses release only on departure; received nurses are real settled workers. Local brood care stays held.
+
+Support egg/larva/pupa/ready groups. Replacement already funded for local establishment is a separate commitment: finish or cancel it to return its actual ready group before choosing rescue. Preserve original identity through repeated travel, local maturation, queen replacement and daughter founding. Returning/received ancestry and exposure belong to their real owners; captured inheritance never changes adult phenotypes. Failed landing and recall return the actual group and party, with no spent-food refund.
+
+Normal ENTRANCE selection is free and shows the actual local group, payer/recipient, whole staff, minimum carriers/nurses, food and space waits. ORDER alone commits; return receipts distinguish delivered/returned/unsuitable. QUEEN/NURSERY show known outgoing or receiving promises; private arrival and crew transfer stay hidden from the source until the messenger. No body/stock truth in normal UI.
+
+Verify every stage, feeding, real nurse/escort transfer, immature versus ready capacity, concurrent reservations/Auto Brood, original identity and unrelated ancestry, actual onward founding/replacement, repeated/recall/failed landing, exact old/corrupt/duplicate/paused/four-speed saves and shared free mouse/touch selection versus ORDER. Focused then full/import/Main/headless drawing gates. Isolation/abandonment follows; no automatic mass evacuation.
+
+Implementation: original paid egg/larva/pupa/ready groups now have typed physical rescue with actual carried lineage, nurses/escorts, larval provisions and derived return/receiving promises. Original laying identity and custody ordinal survive handling, actual local maturation, succession and onward founding. Paid replacement remains a separate commitment; cancelling it returns its actual ready group before rescue. The source gets only returned outcome/headcounts; recipient local ownership and nurse assignment begin at real arrival.
+
+Changed files: reproductive identity/restore and typed rescue/movement family; pile space/promises, Run ownership/ancestry/transfer proof, founding/replacement identity, controller/Root/connection/Queen/Nursery/report presentation; rescue suite/registry and current contract/status docs.
+
+Verification: focused93/0, affected maternal/queen/brood/connection217/0; final full10,059/0 (294.29s), clean pinned4.7.2 import/Main120 and167 headless connection/Queen/Nursery draw callbacks across three piles/six purposes/two sizes plus outgoing/incoming/arrived/report states. All four stages, feeding/care, source/recipient promises, physical recall/second custody, ready delivery into an immature third nest, actual maturation/succession/onward founding, inherited bundle beside an unrelated mother, private settlement, old/corrupt/duplicate/paused/four-speed continuation and mouse/touch/free selection/ORDER pass. No manual feel/renderer performance claim (A88).
+
+Handoff: reproductive/store/worker-brood/mother rescue entries are complete.160 closes/reopens explicit connection traffic; final evacuation/abandonment follows before M6 nest hazards. No automatic mass evacuation/multi-hop planner is introduced.

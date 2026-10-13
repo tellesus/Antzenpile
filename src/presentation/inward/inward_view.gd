@@ -760,7 +760,7 @@ func _draw_context(size: Vector2) -> void:
 				_detail_line(box,117,"Reproductive brood · inspect Queen")
 				_detail_line(box,143,"Last short: "+Pressure.food_names(_status) if not Pressure.food_shortages(_status).is_empty() else "Four reproductive nurses committed")
 			_detail_line(box, 181, "%d emerged · %d brood lost" % [_status.brood_matured_total, _status.get("brood_losses", 0)] if _status.get("brood_health", {}).get("losses", 0) == 0 else "%d lost · %d during health strain" % [_status.get("brood_losses", 0), _status.brood_health.losses])
-			var promised: int=int(_status.get("brood_transport",{}).get("reserved",0))
+			var promised: int=int((_status.get("brood_transport",{}).get("reserved",0)+_status.get("brood_transport",{}).get("royal",0)))
 			if promised>0:_label(box.position+Vector2(16,209),"%d spaces promised for brood transport" % promised,Color("c2b58f"),12)
 			var care: Dictionary = _status.get("brood_care", {})
 			if care.get("missing", 0) > 0:
@@ -863,7 +863,7 @@ func _draw_context(size: Vector2) -> void:
 			if not links.is_empty():
 				_draw_action(connection_controls.button(size),"MANAGE CONNECTIONS")
 				_detail_line(box,211,"%d adjacent connections" % links.size())
-				_label(box.position+Vector2(16,239),"Choose payer, recipient and supplies / workers",Color("8fa1a8"),12)
+				_label(box.position+Vector2(16,239),"Choose supplies, workers or dependent ants",Color("8fa1a8"),12)
 				_label(box.position+Vector2(16,265),"Selection is free; ORDER funds actual travel",Color("8fa1a8"),12)
 
 		"guest":
@@ -916,7 +916,8 @@ func _draw_reproduction_context(box: Rect2) -> void:
 	var intent: Dictionary=_status.get("investments",{})
 	var queued: bool=intent.get("reproduction",false)
 	var costs: Dictionary = state.get("costs",{})
-	var current: String="Raise 1 young queen + 2 males" if phase=="none" else "Ready · inspect a remembered shelter" if phase=="ready" else "Founding group committed away" if phase=="departed" else "%s · %.0f%% · 1 queen + 2 males" % [phase.capitalize(),state.get("progress",0)*100]
+	var current: String="Raise 1 young queen + 2 males" if phase=="none" else "Ready · inspect a remembered shelter" if phase=="ready" else "Reproductive group away · await report" if phase=="departed" else "%s · %.0f%% · 1 queen + 2 males" % [phase.capitalize(),state.get("progress",0)*100]
+	if state.get("receiving",false):current="Receiving group · space promised"
 	var next: String="Next: reproductives" if intent.get("next","")=="reproduction" else "Next: "+Web.short_title(_queued_trait()) if intent.get("next","")=="adaptation" else "No special investment queued"
 	var wait: String=intent.get("reproduction_wait",state.get("blocker",""))
 	if queued and intent.get("next","")=="adaptation": wait="Adaptation has first priority"

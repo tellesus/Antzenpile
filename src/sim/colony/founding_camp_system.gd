@@ -87,7 +87,7 @@ func establish(knowledge_id: String) -> bool:
 	daughter.genetics.established=traits.duplicate()
 	daughter.queen.inherited_traits=traits.duplicate()
 	if not state.reproductive_group.get("parent_queen_id","").is_empty():
-		daughter.queen.identity="queen:"+origin_id+":raised:"+str(state.reproductive_group.laid_tick)
+		daughter.queen.identity=ReproductionState.body_identity(state.reproductive_group,origin_id)
 		daughter.queen.parent_identity=state.reproductive_group.parent_queen_id
 		daughter.queen.generation=int(state.reproductive_group.parent_generation)+1
 	# Experienced settlers bring the colony's existing knowledge, not live exterior truth.

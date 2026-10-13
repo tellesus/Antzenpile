@@ -11,6 +11,7 @@ func _init(run_state: RunState) -> void: _run=run_state
 func structural_blocker(pile: PileState) -> String:
 	for camp: FoundingState in _run.all_foundings():
 		if camp.origin_pile==pile.id and camp.phase not in ["none","failed","established"]: return "Founding group is committed away from this pile"
+	if pile.royal_reserved:return "Reproductive journey reserves this nest; await return"
 	if pile.reproduction.phase!="none": return "A reproductive group is already growing or ready"
 	if pile.queen_count<1: return "No queen can lay reproductive brood"
 	if pile.brood_matured_total<CONFIG.emerged_required: return "Raise %d workers before reproductive brood" % CONFIG.emerged_required
@@ -42,7 +43,7 @@ func start(pile_id: String, respect_priority: bool=true, scheduled: bool=false) 
 		pile.workers.release(commitment,CONFIG.nurses); pile.workers.retire_commitment(commitment)
 		last_error="Could not fund reproductive laying"; return false
 	# Scheduled laying happens at the start of this fixed interval, before its aging.
-	pile.reproduction.phase="egg"; pile.reproduction.laid_tick=maxi(0,_run.clock.tick_count-(1 if scheduled else 0))
+	pile.reproduction.origin_pile=pile.id;pile.reproduction.phase="egg"; pile.reproduction.laid_tick=maxi(0,_run.clock.tick_count-(1 if scheduled else 0))
 	pile.reproduction.parent_queen_id=pile.queen.queen_id(pile_id);pile.reproduction.parent_generation=pile.queen.generation
 	pile.reproduction.inherited_traits=pile.offspring_traits()
 	pile.reproduction.repair_comparison=pile.repair_experience and not pile.repair_candidate
@@ -88,7 +89,7 @@ func summary(pile_id: String) -> Dictionary:
 	if not _run.colony.piles.has(pile_id): return {}
 	var pile: PileState = _run.colony.piles[pile_id]
 	var state: ReproductionState = pile.reproduction
-	var departed: bool=false
+	var departed: bool=_run.royal_departed(pile_id)
 	for camp: FoundingState in _run.all_foundings():
 		if camp.origin_pile==pile_id and camp.phase not in ["none","failed","established"]:departed=true
-	return {"phase":"departed" if departed else state.phase,"progress":state.progress_ticks()/maxi(1,CONFIG.stage_ticks(state.phase)),"space":CONFIG.space,"occupied_space":state.occupied_space(),"nurses":CONFIG.nurses,"costs":CONFIG.costs(),"emerged_required":CONFIG.emerged_required,"ready_queens":1 if state.phase=="ready" else 0,"ready_males":2 if state.phase=="ready" else 0,"food_shortfalls":state.food_shortfalls.duplicate(),"blocker":blocker(pile)}
+	return {"receiving":pile.royal_reserved and not departed,"reserved_space":pile.royal_reserved_space,"phase":"departed" if departed else state.phase,"progress":state.progress_ticks()/maxi(1,CONFIG.stage_ticks(state.phase)),"space":CONFIG.space,"occupied_space":state.occupied_space(),"nurses":CONFIG.nurses,"costs":CONFIG.costs(),"emerged_required":CONFIG.emerged_required,"ready_queens":1 if state.phase=="ready" else 0,"ready_males":2 if state.phase=="ready" else 0,"food_shortfalls":state.food_shortfalls.duplicate(),"blocker":blocker(pile)}

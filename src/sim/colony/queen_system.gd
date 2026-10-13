@@ -75,7 +75,7 @@ func tick() -> void:
 				if not state.arrival_record.is_empty() and not state.previous_mothers.any(func(value: Dictionary)->bool:return value.identity==state.queen_id(id)):state.previous_mothers.append(state.mother(id))
 				state.parent_identity=state.replacement_group.get("parent_queen_id","") if not state.replacement_group.get("parent_queen_id","").is_empty() else state.queen_id(id)
 				state.generation=int(state.replacement_group.parent_generation)+1 if not state.replacement_group.get("parent_queen_id","").is_empty() else state.generation+1
-				state.identity="queen:"+id+":raised:"+str(state.replacement_group.laid_tick)
+				state.identity=ReproductionState.body_identity(state.replacement_group,id)
 				state.inherited_traits.assign(state.replacement_group.inherited_traits)
 				state.arrival_record.clear()
 				state.count=1;state.condition=CONFIG.maximum_condition

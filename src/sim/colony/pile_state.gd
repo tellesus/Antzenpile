@@ -47,6 +47,9 @@ var brood_reserved_space: int=0
 var brood_reserved_trial: String=""
 var brood_reserved_traits: Array[String]=[]
 var brood_lineages: Dictionary[String,Array]={}
+var royal_reserved: bool=false
+var royal_reserved_space: int=0
+var royal_reserved_traits: Array[String]=[]
 var brood_intent: String = "manual"
 var queued_adaptation: String = ""
 var adaptation_repertoire: String = ""
@@ -111,7 +114,7 @@ func to_dict() -> Dictionary:
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"nursery_expansion": {"state": nursery_expansion_state, "progress_seconds": nursery_expansion_progress},
 		"food_exchange_state": food_exchange_state, "food_toxicity": food_toxicity.to_dict(),
-		"brood_health": brood_health.to_dict(), "temperature": temperature.to_dict(), "reproduction": reproduction.to_dict(),
+		"royal_reserved":royal_reserved,"royal_reserved_space":royal_reserved_space,"royal_reserved_traits":royal_reserved_traits.duplicate(),"brood_health": brood_health.to_dict(), "temperature": temperature.to_dict(), "reproduction": reproduction.to_dict(),
 		"food_exchange_progress_seconds": food_exchange_progress_seconds, "midden": midden.to_dict(), "humidity": humidity.to_dict()}
 	if not foundation.is_empty(): record.foundation=foundation.duplicate(true)
 	return record
@@ -135,10 +138,10 @@ func nursery_occupied_space() -> int:
 	return occupied
 
 func shared_nursery_occupied_space() -> int:
-	return nursery_occupied_space()-mini(reproduction.occupied_space(),chambers.reproductive_spaces())
+	return nursery_occupied_space()-reproduction.occupied_space()+maxi(0,reproduction.occupied_space()+royal_reserved_space-chambers.reproductive_spaces())
 func free_worker_brood_space() -> int: return nursery_brood_capacity()-shared_nursery_occupied_space()-brood_reserved_space
 func free_reproductive_space() -> int:
-	return maxi(0,chambers.reproductive_spaces()-reproduction.occupied_space())+maxi(0,nursery_brood_capacity()-shared_nursery_occupied_space()-brood_reserved_space)
+	return maxi(0,chambers.reproductive_spaces()-reproduction.occupied_space()-royal_reserved_space)+maxi(0,nursery_brood_capacity()-shared_nursery_occupied_space()-brood_reserved_space)
 
 
 func nursery_care_capacity() -> int:
@@ -579,6 +582,15 @@ func restore(data: Dictionary) -> bool:
 	foundation=founding_data.duplicate(true)
 	if not foundation.is_empty(): foundation.queen_traits=founder_traits; foundation.founded_tick=int(foundation.founded_tick)
 	temperature = restored_temperature
+	var royal_promise: Variant=data.get("royal_reserved",false);var royal_space: Variant=data.get("royal_reserved_space",0);var royal_traits: Variant=data.get("royal_reserved_traits",[])
+	if not royal_promise is bool or not Ledger.valid_count(royal_space) or royal_space>ReproductionState.CONFIG.space or not royal_traits is Array:return false
+	var parsed_royal: Array[String]=[]
+	for value: Variant in royal_traits:
+		if not value is String or not AdaptationRules.valid_trait(value) or value in parsed_royal:return false
+		parsed_royal.append(value)
+	if not AdaptationRules.compatible(parsed_royal) or not royal_promise and (royal_space!=0 or not parsed_royal.is_empty()):return false
+	if occupied+int(reserved_brood)+maxi(0,restored_reproduction.occupied_space()+int(royal_space)-restored_chambers.reproductive_spaces())>brood_limit:return false
+	royal_reserved=royal_promise;royal_reserved_space=int(royal_space);royal_reserved_traits=parsed_royal
 	reproduction = restored_reproduction
 	brood_health = restored_health
 	midden = restored_midden
@@ -636,5 +648,6 @@ func planned_trait_union() -> Array[String]:
 	if queen.count>0 or queen.in_transit:result=_merged_traits(result,queen.inherited_traits)
 	for cohort: BroodCohort in brood_cohorts:result=_merged_traits(result,cohort.inherited_traits)
 	if reproduction.phase!="none":result=_merged_traits(result,reproduction.inherited_traits)
+	result=_merged_traits(result,royal_reserved_traits)
 	if queen.replacing():result=_merged_traits(result,typed_traits(queen.replacement_group.inherited_traits))
 	return result

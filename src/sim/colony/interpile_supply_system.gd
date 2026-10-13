@@ -17,6 +17,8 @@ func _target() -> PileState: return _run.colony.piles[_connection().target(_sour
 func _name() -> String: return _source().display_title()
 func _route() -> TrailRouteState: return _run.trails.routes[_connection().route_id]
 func _migration_active() -> bool:
+ for state: RoyalTransportState in _connection().royals.values():
+  if state.active():return true
  for state: StoreTransportState in _connection().stores.values():
   if state.active():return true
  for state: BroodTransportState in _connection().broods.values():

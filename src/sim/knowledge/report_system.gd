@@ -101,6 +101,10 @@ func capture(recording: bool = true) -> void:
 				var received: float=queen_transport.movement.last_reported_tick*SimulationClock.TICK_INTERVAL
 				journal.add("relocation",origin,connection.target(origin),received,received,"delivered" if queen_transport.current().arrived_tick>0 else queen_transport.current().reason if not queen_transport.current().reason.is_empty() else "returned",queen_transport.movement.last_settled,queen_transport.movement.reported_arrivals(),recording)
 
+			var royal_transport: RoyalTransportState=connection.royals[origin]
+			if royal_transport.movement.trips_reported>0 and journal.changed("royal_rescue/"+origin+"/"+connection.route_id,royal_transport.movement.last_reported_tick):
+				var report: Dictionary=royal_transport.last_report();var received: float=report.reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("royal_rescue",origin,connection.target(origin),received,received,"delivered" if report.arrived_tick>0 else report.reason if not report.reason.is_empty() else "returned",1 if report.arrived_tick>0 else 0,0,recording)
 			var brood_transport: BroodTransportState=connection.broods[origin]
 			if brood_transport.movement.trips_reported>0 and journal.changed("brood_rescue/"+origin+"/"+connection.route_id,brood_transport.movement.last_reported_tick):
 				var report: Dictionary=brood_transport.last_report();var received: float=report.reported_tick*SimulationClock.TICK_INTERVAL
