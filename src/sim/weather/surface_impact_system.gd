@@ -24,13 +24,16 @@ func tick() -> void:
 
 func encounter(cohort: TransitCohort) -> void:
 	var state: SurfaceImpactState = _run.surface_impact
-	if not state.active(_run.clock.tick_count, _run.run_seed) or cohort.worker_count <= 0 or cohort.impact_serial == state.serial or state.kills_total >= WorkerLedger.MAX_COUNT: return
+	if not state.enabled or cohort.worker_count<=0:return
 	var route: TrailRouteState = _run.trails.routes[cohort.route_id]
 	if route.purpose != "food": return
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	var progress: float = 1.0 - float(cohort.remaining_ticks) / TRAILS.leg_ticks(segment.length())
 	if cohort.direction == "inbound": progress = 1.0 - progress
 	var point: Vector2 = cohort.detour.position if cohort.detour != null else segment.point_at(progress)
+	if state.profile_id=="dog_passage" and state.serial>0 and point.distance_to(CONFIG.position)<=CONFIG.confirmation_radius:
+		cohort.passage_witness.capture(state.serial,point,_run.simulation_time)
+	if not state.active(_run.clock.tick_count, _run.run_seed) or cohort.impact_serial==state.serial or state.kills_total>=WorkerLedger.MAX_COUNT:return
 	if not state.disturbed(point): return
 	cohort.impact_serial = state.serial
 	_lose.call(cohort, route, "impact")

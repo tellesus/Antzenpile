@@ -9,6 +9,7 @@ var workers: int = 0
 var elapsed_ticks: int = 0
 var departed_at: float = 0
 var impact_fraction: float = -1
+var passage_witness:=PassageWitnessState.new()
 var residue_fraction: float = -1
 var ambush_fraction: float = -1
 var predator_profile: String = ""
@@ -24,10 +25,12 @@ func active() -> bool: return phase != "idle"
 func origin_id(trails: TrailNetwork) -> String:
 	return trails.routes[route_id].origin_pile if active() and trails.routes.has(route_id) else ""
 func to_dict() -> Dictionary:
-	return {"predator_profile":predator_profile,"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
+	return {"passage_witness":passage_witness.to_dict(),"predator_profile":predator_profile,"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
 		"residue_fraction":residue_fraction,"impact_fraction":impact_fraction, "ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict(),"orders":orders.targets.duplicate(),"goals":orders.goals.duplicate(),"approach":approach.to_dict(),"recruitment":orders.recruitment.duplicate(true)}
 
 func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: float, world: WorldState = null) -> bool:
+	var passage:=PassageWitnessState.new()
+	if not passage.restore(data.get("passage_witness",passage.to_dict()),time):return false
 	var profile: Variant = data.get("predator_profile", "")
 	if not PredatorCatalog.accepts(profile): return false
 	if not data.has_all(["route_id","phase","workers","elapsed_ticks","departed_at","ambush_fraction","foreign_seen","sampled_at","reports"]): return false
@@ -52,7 +55,7 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 			for value: Variant in report.estimated_position:
 				if not typeof(value) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(value)): return false
 			if not world.bounds.has_point(Vector2(report.estimated_position[0],report.estimated_position[1])): return false
-		if trails.routes[id].purpose != "food" or trails.routes[id].reported_losses <= 0 and trails.routes[id].residue_report.is_empty(): return false
+		if trails.routes[id].purpose != "food" or trails.routes[id].reported_losses <= 0 and trails.routes[id].residue_report.is_empty() and trails.routes[id].passage_memory.count==0: return false
 		if report.finding not in ["ambush","foreign","mixed","inconclusive","surface","residue"]: return false
 		for key: String in ["fraction","observed_at","received_at"]:
 			if not typeof(report[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(report[key])): return false
@@ -79,7 +82,7 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	if data.phase == "idle":
 		if data.route_id != "" or data.workers != 0 or data.elapsed_ticks != 0 or data.departed_at != 0 or impact != -1 or residue!=-1 or data.ambush_fraction != -1 or data.foreign_seen or data.sampled_at != 0 or not commitment.is_empty(): return false
 	else:
-		if not trails.routes.has(data.route_id) or trails.routes[data.route_id].purpose != "food" or trails.routes[data.route_id].reported_losses <= 0 and trails.routes[data.route_id].residue_report.is_empty(): return false
+		if not trails.routes.has(data.route_id) or trails.routes[data.route_id].purpose != "food" or trails.routes[data.route_id].reported_losses <= 0 and trails.routes[data.route_id].residue_report.is_empty() and trails.routes[data.route_id].passage_memory.count==0: return false
 		if restored_defense.mode == "investigate" and data.workers != CONFIG.investigation_workers: return false
 		if restored_defense.mode == "defend" and (not data.reports.has(data.route_id) or data.reports[data.route_id].finding not in ["ambush","mixed"]): return false
 		if restored_defense.mode == "defend" and (impact != -1 or residue!=-1 or data.ambush_fraction != -1 or data.foreign_seen or data.sampled_at != 0): return false
@@ -91,6 +94,8 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 		if commitment.get("kind") != "other" or commitment.get("owner_id") != data.route_id or commitment.get("count") != data.workers + restored_defense.extra_workers: return false
 		if data.elapsed_ticks * SimulationClock.TICK_INTERVAL > time - data.departed_at + TRAILS.leg_ticks(segment.length()) * SimulationClock.TICK_INTERVAL: return false
 	impact_fraction = float(impact)
+	if passage.active() and (impact<0 or data.phase=="idle" or restored_defense.mode!="investigate" or passage.observed_at<data.departed_at):return false
+	passage_witness=passage
 	residue_fraction=float(residue)
 	predator_profile = profile
 	route_id = data.route_id; phase = data.phase; workers = int(data.workers); elapsed_ticks = int(data.elapsed_ticks)

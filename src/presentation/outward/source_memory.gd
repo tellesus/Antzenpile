@@ -99,6 +99,9 @@ static func defense_label(outcome: Dictionary) -> String:
 static func predator_name(profile: String) -> String:
 	return "Spider-like predator" if profile == "wolf_spider" else "Beetle-like hunter" if profile=="beetle_hunter" else "Predatory arthropod"
 
+static func passage_name(impression: String) -> String:
+	return "Dog-like passage" if impression=="dog_like" else "Large animal passage" if impression=="large_animal" else "Surface disturbance"
+
 static func predator_addressed(route: Dictionary, state: Dictionary) -> bool:
 	var outcome: Dictionary=state.get("outcomes",{}).get(route.get("id",""),{})
 	return outcome.get("outcome", "")=="secured" and outcome.get("received_at",0.0)>=state.get("reports",{}).get(route.get("id",""),{}).get("received_at",0.0) and route.get("last_loss_time",0.0)<=outcome.get("received_at",0.0)

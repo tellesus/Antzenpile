@@ -8,3 +8,5 @@ extends Resource
 @export var interval_ticks: int = 720
 @export var duration_ticks: int = 48
 @export var remaining_scent: float = 0.25
+@export var profile_id: String = "dog_passage"
+@export var confirmation_radius: float = 0.75

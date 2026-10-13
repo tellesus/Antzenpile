@@ -35,6 +35,7 @@ var swarm_engaged: bool = false
 var impact_losses: int = 0
 var impact_serial: int = 0
 var impact_witness_at: float = 0.0
+var passage_witness:=PassageWitnessState.new()
 var rival_losses: int = 0
 var conflict_report: String = ""
 var conflict_observed_at: float = 0.0
@@ -60,7 +61,7 @@ func to_dict() -> Dictionary:
 		"lost_profiles": lost_profiles.duplicate(),
 		"witnessed_attack": witnessed_attack, "witnessed_fighting": witnessed_fighting,
 		"foreign_sampled": foreign_sampled, "reports_source_outcome": reports_source_outcome,
-		"impact_losses": impact_losses, "impact_serial": impact_serial, "impact_witness_at": impact_witness_at,
+		"passage_witness":passage_witness.to_dict(),"impact_losses": impact_losses, "impact_serial": impact_serial, "impact_witness_at": impact_witness_at,
 		"swarm_engaged": swarm_engaged, "rival_losses": rival_losses,
 		"conflict_report": conflict_report, "conflict_observed_at": conflict_observed_at, "conflict_serial":conflict_serial, "foreign_contact": foreign_contact, "predator_encountered": predator_encountered, "detour_attempted": detour_attempted,
 		"detour": detour.to_dict() if detour != null else null,
@@ -180,6 +181,9 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 		return false
 	id = data.id
 	var contact:=ResidueContactState.new()
+	var passage:=PassageWitnessState.new()
+	if not passage.restore(data.get("passage_witness",passage.to_dict()),time):return false
+	passage_witness=passage
 	if not contact.restore(data.get("residue_contact",contact.to_dict()),roundi(time/SimulationClock.TICK_INTERVAL)):return false
 	if contact.active() and data.direction=="inbound" and contamination+0.00000001<ResidueZoneState.contaminated(data.payload*carbohydrate,0):return false
 	residue_contact=contact

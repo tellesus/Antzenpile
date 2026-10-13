@@ -394,13 +394,20 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 			record.risk = "reported_loss" if journey_alarm(route) else "past_loss"
 		result.append(record)
 	for route: TrailRouteState in simulation.run.trails.routes.values():
+		var memory: Dictionary=route.passage_memory.summary()
+		if route.origin_pile!=pile_id or memory.is_empty() or memory.received_at<=route.residue_report.get("received_at",0.0) or memory.received_at<simulation.run.journey_response.reports.get(route.id,{}).get("received_at",0.0) or memory.received_at<route.impact_report.get("received_at",0.0):continue
+		var offset: Vector2=Vector2(memory.estimated_position[0],memory.estimated_position[1])-origin
+		result.append({"id":"threat:"+route.id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat","bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":5.0,"confidence":0.7,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time-memory.observed_at,"risk":"reported_ground","threat_kind":"surface","passage_impression":memory.impression,"traffic":null,"foreign_contact":false,"conflict_report":""})
+	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile!=pile_id or route.residue_report.is_empty():continue
+		if route.passage_memory.count>0 and route.passage_memory.received_at>route.residue_report.received_at:continue
 		var cue: Dictionary=route.residue_report
 		if cue.received_at<=maxf(route.impact_report.get("received_at",0.0),simulation.run.journey_response.reports.get(route.id,{}).get("received_at",0.0)):continue
 		var offset: Vector2=Vector2(cue.estimated_position[0],cue.estimated_position[1])-origin
 		result.append({"id":"threat:"+route.id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat","bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":4.0,"confidence":0.65,"confidence_label":"likely","strength":0.25,"age":simulation.run.simulation_time-cue.observed_at,"risk":"reported_ground","threat_kind":"residue","traffic":null,"foreign_contact":false,"conflict_report":""})
 	for route: TrailRouteState in simulation.run.trails.routes.values():
 		if route.origin_pile != pile_id or route.impact_report.is_empty(): continue
+		if route.passage_memory.count>0 and route.passage_memory.received_at>=route.impact_report.received_at:continue
 		if route.residue_report.get("received_at",0.0)>route.impact_report.received_at:continue
 		var report: Dictionary = simulation.run.journey_response.reports.get(route.id, {})
 		if report.get("received_at", 0.0) > route.impact_report.received_at: continue
@@ -414,6 +421,7 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		var impact: Dictionary = simulation.run.trails.routes[id].impact_report
 		if not impact.is_empty() and report.received_at <= impact.received_at: continue
 		if report.finding not in ["ambush","mixed","surface","residue"]: continue
+		if simulation.run.trails.routes[id].passage_memory.count>0 and simulation.run.trails.routes[id].passage_memory.received_at>=report.received_at:continue
 		if simulation.run.trails.routes[id].residue_report.get("received_at",0.0)>report.received_at:continue
 		var route: TrailRouteState = simulation.run.trails.routes[id]
 		if route.origin_pile != pile_id: continue
@@ -893,7 +901,7 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 				"purpose":route.purpose, "founding_intent":route.purpose in ["founding","interpile"] and camp!=null and camp.phase!="failed", "active_workers":sent if settlers_away else 0 if route.purpose=="founding" and camp!=null and camp.phase=="ready" else route.active_workers + pending, "checking_workers": checking, "status": status,
 				"conflict_report": route.conflict_report, "conflict_observed_at": route.conflict_observed_at, "conflict_received_at":route.conflict_received_at,
 				"foreign_reports": route.foreign_reports, "last_foreign_time": route.last_foreign_time,
-				"residue_report":route.residue_report.duplicate(true),"warning_kind":"residue" if route.residue_report.get("received_at",0.0)>=maxf(route.impact_report.get("received_at",0.0),simulation.run.journey_response.reports.get(route.id,{}).get("received_at",0.0)) and not route.residue_report.is_empty() or simulation.run.journey_response.reports.get(route.id,{}).get("finding","")=="residue" else "surface","impact_report":route.impact_report.duplicate(true), "surface_warning":simulation.journey_response._surface_warning(route.id),
+				"passage_memory":route.passage_memory.summary(),"residue_report":route.residue_report.duplicate(true),"warning_kind":_known_ground_kind(route),"impact_report":route.impact_report.duplicate(true), "surface_warning":simulation.journey_response._surface_warning(route.id),
 				"reported_losses": route.reported_losses, "last_loss_time": route.last_loss_time,
 				"ambusher_addressed": journey_addressed(route),
 				"journey_alarm":journey_alarm(route),"conflict_serial":route.conflict_serial,
@@ -910,6 +918,11 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 	summaries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.id < b.id)
 	return summaries
 
+func _known_ground_kind(route: TrailRouteState) -> String:
+	var report: Dictionary=simulation.run.journey_response.reports.get(route.id,{})
+	if route.passage_memory.count>0 and route.passage_memory.received_at>route.residue_report.get("received_at",0.0) and route.passage_memory.received_at>=report.get("received_at",0.0):return "surface"
+	return "residue" if route.residue_report.get("received_at",0.0)>=maxf(route.impact_report.get("received_at",0.0),report.get("received_at",0.0)) and not route.residue_report.is_empty() or report.get("finding","")=="residue" else "surface"
+
 func journey_addressed(route: TrailRouteState) -> bool:
 	var approach: Dictionary = simulation.run.journey_response.approach.reports.get(route.id,{})
 	if approach.get("outcome", "") == "found" and route.last_loss_time <= approach.get("received_at", 0.0): return true
@@ -924,6 +937,7 @@ func journey_alarm(route: TrailRouteState) -> bool:
 	var settled_at: float = maxf(float(outcome.get("received_at",0.0)),approached_at)
 	if route.conflict_report in ["secured","withdrew","dispersed"]: settled_at = maxf(settled_at,route.conflict_received_at)
 	if route.residue_report.get("received_at",0.0)>settled_at:return true
+	if route.passage_memory.count>0 and route.passage_memory.received_at>settled_at:return true
 	return route.reported_losses > 0 and route.last_loss_time > settled_at
 
 

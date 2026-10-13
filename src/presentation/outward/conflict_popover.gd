@@ -98,7 +98,7 @@ func reason(action: String, route: Dictionary, status: Dictionary) -> String:
 	if action in ["conflict_survey", "conflict_approach"]:
 		if state.get("away", false) or not state.get("other_party", "").is_empty(): return "Another response party is away"
 		if state.get("recruitment", {}).has(route.get("id")): return "Cancel the recruitment order first"
-		if action == "conflict_survey" and route.get("reported_losses", 0) == 0 and route.get("residue_report",{}).is_empty(): return "Needs a returned loss or ground cue"
+		if action == "conflict_survey" and route.get("reported_losses", 0) == 0 and route.get("residue_report",{}).is_empty() and route.get("passage_memory",{}).is_empty(): return "Needs a returned loss or ground cue"
 	return ""
 
 func approach_action(route: Dictionary, status: Dictionary) -> String:
@@ -193,6 +193,10 @@ func _history_records(route: Dictionary, status: Dictionary) -> Array[Dictionary
 	if not impact.is_empty(): records.append({"text":"Heavy surface impact reported","received":impact.received_at,"lines":["Heavy surface impact reported",_report_dates(impact,status)]})
 	var residue: Dictionary=route.get("residue_report",{})
 	if not residue.is_empty(): records.append({"text":"Strange ground residue reported","received":residue.received_at,"lines":["Strange ground residue reported",_report_dates(residue,status)]})
+	var passage: Dictionary=route.get("passage_memory",{})
+	if not passage.is_empty():
+		var text: String=Memory.passage_name(passage.impression)+" witnessed"
+		records.append({"text":text,"received":passage.received_at,"lines":[text,_report_dates(passage,status)]})
 	var approach: Dictionary = state.get("approach_reports",{}).get(id,{})
 	if not approach.is_empty():
 		var text: String = {"found":"Alternate course established","danger":"Danger on alternate course","unconfirmed":"Alternate course unconfirmed"}.get(approach.outcome,"Approach report")
@@ -219,7 +223,7 @@ func _latest(route: Dictionary, status: Dictionary) -> Dictionary:
 	return {"text":text,"date":"Arrived " + Copy.duration(status.get("time",0)-received) + " ago" if received>0 else "No fresh return yet"}
 
 func _identity(route: Dictionary, status: Dictionary) -> String:
-	if route.get("surface_warning",false): return "Strange ground residue" if route.get("warning_kind","")=="residue" else "Surface disturbance"
+	if route.get("surface_warning",false): return "Strange ground residue" if route.get("warning_kind","")=="residue" else Memory.passage_name(route.get("passage_memory",{}).get("impression",""))
 	var report: Dictionary = status.get("journey_response",{}).get("reports",{}).get(route.get("id"),{})
 	if report.get("finding", "") in ["ambush","mixed"]: return Memory.predator_name(report.get("predator_profile", ""))
 	return "Foreign ants" if kind(route,status)=="gather" else "Unidentified threat"
@@ -249,8 +253,11 @@ func _impression(view: Node2D, at: Vector2, route: Dictionary, status: Dictionar
 			var ant: Vector2 = at+Vector2((i-1)*24,(i%2)*6)
 			for part: int in 3: view.draw_circle(ant+Vector2(0,(part-1)*5),3,Color(color,0.6))
 			for side: int in [-1,1]: view.draw_line(ant,ant+Vector2(side*8,5),Color(color,0.4),1,true)
-	elif identity=="Surface disturbance":
+	elif identity in ["Surface disturbance","Large animal passage","Dog-like passage"]:
 		for i: int in 3: view.draw_arc(at+Vector2(0,i*7),28-i*4,PI*0.1,PI*0.9,16,Color(color,0.4-i*0.08),2,true)
+		if identity=="Dog-like passage":
+			view.draw_circle(at+Vector2(0,-7),8,Color(color,0.22))
+			for index: int in 4:view.draw_circle(at+Vector2((index-1.5)*8,-21+absf(index-1.5)*3),3,Color(color,0.35))
 	elif identity=="Strange ground residue":
 		for index: int in 5:view.draw_circle(at+Vector2(sin(index*1.7)*18,cos(index*2.3)*10),10,Color("849274",0.08))
 	else:

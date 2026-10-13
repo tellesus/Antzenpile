@@ -27,6 +27,7 @@ var foreign_reports: int = 0
 var last_foreign_time: float = 0.0
 var reported_impact_losses: int = 0
 var impact_report: Dictionary = {}
+var passage_memory:=PassageMemory.new()
 var residue_report: Dictionary = {}
 var reported_rival_losses: int = 0
 var conflict_report: String = ""
@@ -53,7 +54,7 @@ func to_dict() -> Dictionary:
 		"resume_on_report": resume_on_report, "last_empty_report_at": last_empty_report_at,
 		"reported_depleted": reported_depleted, "delivered_total": delivered_total, "receipt": receipt.duplicate(true),
 		"nutrient_receipts":nutrient_receipts.duplicate(true),
-		"residue_report":residue_report.duplicate(true),"reported_impact_losses": reported_impact_losses, "impact_report": impact_report.duplicate(true),
+		"passage_memory":passage_memory.to_dict(),"residue_report":residue_report.duplicate(true),"reported_impact_losses": reported_impact_losses, "impact_report": impact_report.duplicate(true),
 		"reported_rival_losses": reported_rival_losses, "conflict_report": conflict_report, "conflict_serial":conflict_serial,"settled_conflict_serial":settled_conflict_serial,
 		"conflict_observed_at": conflict_observed_at, "conflict_received_at": conflict_received_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
 		"attack_reports": attack_reports, "fighting_reports": fighting_reports,
@@ -162,6 +163,9 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 	var residue: Variant=data.get("residue_report",{})
 	if not residue is Dictionary or not residue.is_empty() and (saved_purpose!="food" or not ResidueZoneState.valid_report(residue,INF)):return false
 	residue_report=residue.duplicate(true)
+	var passage:=PassageMemory.new()
+	if not passage.restore(data.get("passage_memory",passage.to_dict()),INF):return false
+	passage_memory=passage
 	purpose=saved_purpose
 	id = data.id
 	origin_pile = data.origin_pile

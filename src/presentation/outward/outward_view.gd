@@ -609,7 +609,7 @@ func _button_at(at: Vector2) -> String:
 			var radial_command: String = conflict.button_at(at, get_viewport_rect().size)
 			if radial_command == "journey_close" and _carcass_returned(chosen_route): return "journey_carcass"
 			if not radial_command.is_empty(): return radial_command
-		elif (chosen_route.get("reported_losses",0) > 0 or not chosen_route.get("residue_report",{}).is_empty() or chosen_route.get("conflict_report", "") != "") and _journey_rect("journey_open").has_point(at): return "journey_open"
+		elif (chosen_route.get("reported_losses",0) > 0 or not chosen_route.get("residue_report",{}).is_empty() or not chosen_route.get("passage_memory",{}).is_empty() or chosen_route.get("conflict_report", "") != "") and _journey_rect("journey_open").has_point(at): return "journey_open"
 		if _journey_attention():
 			for command: String in ["scout","pause","speed_1","speed_4","speed_16","speed_64","inward","save","load","sources"]:
 				if _button_rect(command).has_point(at): return command
@@ -1316,7 +1316,7 @@ func _conflict_rect(command: String) -> Rect2:
 
 func _draw_journey_link() -> void:
 	var route: Dictionary = _selected_route(_selected_signal())
-	if route.get("reported_losses",0) <= 0 and route.get("conflict_report","") == "" and route.get("residue_report",{}).is_empty(): return
+	if route.get("reported_losses",0) <= 0 and route.get("conflict_report","") == "" and route.get("residue_report",{}).is_empty() and route.get("passage_memory",{}).is_empty(): return
 	var box: Rect2 = _journey_rect("journey_open")
 	UIStyle.surface(self, box,Color("39302b"))
 	_label(box.get_center() + Vector2(0,5),"JOURNEY REPORTS AND RESPONSE",Color("e0c5b7"),13,HORIZONTAL_ALIGNMENT_CENTER)
@@ -1332,7 +1332,7 @@ func _journey_recovery(route: Dictionary) -> bool:
 func _threat_caption(signal_data: Dictionary) -> String:
 	var route: Dictionary = _selected_route(signal_data)
 	var record: Dictionary = _status.get("journey_response",{}).get("outcomes",{}).get(route.get("id"),{})
-	if signal_data.get("threat_kind", "") == "surface": return "Surface disturbance memory"
+	if signal_data.get("threat_kind", "") == "surface": return Memories.passage_name(signal_data.get("passage_impression",""))+" memory"
 	if signal_data.get("threat_kind", "") == "residue":return "Strange ground residue memory"
 	return "Ambush memory" if record.get("outcome","") == "secured" else "Ambush trace"
 

@@ -4,6 +4,7 @@ extends RefCounted
 
 const CONFIG = preload("res://data/weather/roadside_surface_impact.tres")
 var enabled: bool = false
+var profile_id: String=""
 var serial: int = 0
 var kills_total: int = 0
 
@@ -20,13 +21,15 @@ func disturbed(point: Vector2) -> bool:
 	return enabled and serial > 0 and point.distance_to(CONFIG.position) <= CONFIG.radius
 
 func to_dict() -> Dictionary:
-	return {"enabled": enabled, "serial": serial, "kills_total": kills_total}
+	return {"profile_id":profile_id,"enabled": enabled, "serial": serial, "kills_total": kills_total}
 
 func restore(data: Variant, tick: int, seed_value: int, scenario: String) -> bool:
-	if not data is Dictionary or data.size() != 3 or not data.has_all(["enabled", "serial", "kills_total"]): return false
+	if not data is Dictionary or data.size() not in [3,4] or (data.size()==4)!=data.has("profile_id") or not data.has_all(["enabled", "serial", "kills_total"]): return false
+	if data.get("profile_id", "") not in ["","dog_passage"] or data.get("profile_id", "")!="" and not data.enabled:return false
 	if not data.enabled is bool or not WorkerLedger.valid_count(data.serial) or not WorkerLedger.valid_count(data.kills_total): return false
 	if data.enabled and scenario != "roadside": return false
 	if data.serial != (serial_at(tick, seed_value) if data.enabled else 0): return false
 	if data.serial == 0 and data.kills_total != 0: return false
 	enabled = data.enabled; serial = int(data.serial); kills_total = int(data.kills_total)
+	profile_id=data.get("profile_id", "")
 	return true

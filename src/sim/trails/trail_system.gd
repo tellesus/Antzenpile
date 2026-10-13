@@ -444,6 +444,7 @@ func _record_nutrient(route: TrailRouteState, id: String, amount: float) -> void
 
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if cohort.worker_count>0 and cohort.residue_contact.active():route.residue_report=cohort.residue_contact.report(_run.simulation_time)
+	if cohort.worker_count>0:route.passage_memory.remember(cohort.passage_witness,_run.simulation_time)
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	if cohort.worker_count > 0 and cohort.harvest_report != null:
 		assert(not _run.delivered_observations.has(cohort.harvest_report.id))

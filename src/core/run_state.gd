@@ -74,6 +74,7 @@ func exploration_for(pile_id: String) -> ExplorationState:
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
 	surface_impact.enabled = scenario == "roadside"
+	surface_impact.profile_id=SurfaceImpactState.CONFIG.profile_id if surface_impact.enabled else ""
 	residue.enabled = scenario == "roadside"
 	connection_residue.enabled = scenario == "roadside"
 	_seed = seed_value
@@ -460,6 +461,11 @@ func restore(data: Dictionary) -> bool:
 		if report.get("predator_profile", "") != "" and (report.predator_profile != restored_predator.profile_id or report.observed_at < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL): return false
 	var restored_impact := SurfaceImpactState.new()
 	if not restored_impact.restore(data.get("surface_impact", restored_impact.to_dict()), restored_clock.tick_count, data.seed.to_int(), data.scenario_id): return false
+	for route: TrailRouteState in restored_trails.routes.values():
+		var memory: PassageMemory=route.passage_memory
+		if memory.count>0 and (restored_impact.profile_id!="dog_passage" or memory.serial>restored_impact.serial or memory.received_at>restored_clock.simulation_time or SurfaceImpactState.serial_at(roundi(memory.observed_at/Clock.TICK_INTERVAL),data.seed.to_int())!=memory.serial):return false
+	for witness: PassageWitnessState in [restored_response.passage_witness]+restored_trails.cohorts.values().map(func(cohort: TransitCohort)->PassageWitnessState:return cohort.passage_witness):
+		if witness.active() and (restored_impact.profile_id!="dog_passage" or witness.serial>restored_impact.serial or SurfaceImpactState.serial_at(roundi(witness.observed_at/Clock.TICK_INTERVAL),data.seed.to_int())!=witness.serial):return false
 	var restored_residue:=ResidueZoneState.new()
 	if not restored_residue.restore(data.get("residue",restored_residue.to_dict()),data.scenario_id):return false
 	var restored_connection_residue:=ResidueZoneState.new(CargoResidueState.CONFIG)
@@ -584,6 +590,9 @@ func restore(data: Dictionary) -> bool:
 	if not restored_reports.restore(data.get("reports",restored_reports.to_dict()),restored_colony,restored_knowledge,restored_trails,restored_clock.simulation_time): return false
 	for entry: Dictionary in restored_reports.entries:
 		if entry.kind=="survey" and entry.detail.contains(":") and entry.detail.get_slice(":",1)!=restored_predator.profile_id: return false
+		if entry.kind=="passage":
+			var memory: PassageMemory=restored_trails.routes[entry.subject_id].passage_memory
+			if restored_impact.profile_id!="dog_passage" or memory.count<(2 if entry.detail=="dog_like" else 1) or entry.received_at>memory.received_at or entry.observed_at<SurfaceImpactState.first_tick(data.seed.to_int())*Clock.TICK_INTERVAL:return false
 		if entry.kind=="link_ground":
 			if not restored_connection_residue.enabled or not restored_connection_residue.active(roundi(entry.observed_at/Clock.TICK_INTERVAL)) or not restored_connections.has(entry.subject_id):return false
 			var link: ConnectionTrafficState=restored_connections[entry.subject_id]

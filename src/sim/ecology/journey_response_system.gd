@@ -137,7 +137,7 @@ func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	if state.active() or not _run.trails.routes.has(route_id): return _reject("Another party is away or the journey is unknown")
 	var route: TrailRouteState = _run.trails.routes[route_id]
-	if route.purpose != "food" or route.reported_losses <= 0 and route.residue_report.is_empty(): return _reject("A returned journey loss or ground cue is required")
+	if route.purpose != "food" or route.reported_losses <= 0 and route.residue_report.is_empty() and route.passage_memory.count==0: return _reject("A returned journey loss or ground cue is required")
 	var pending: Dictionary = state.orders.recruitment.get(route_id, {})
 	if not pending.is_empty() and (mode != "defend" or pending.kind != "defend" or pending.count != count): return _reject("Cancel the waiting recruitment order first")
 	var pile: PileState = _run.colony.piles[route.origin_pile]
@@ -323,6 +323,8 @@ func _sample() -> void:
 	if state.impact_fraction < 0 and _run.surface_impact.disturbed(point):
 		state.impact_fraction = snappedf(fraction, 0.05)
 		if state.residue_fraction<0:state.sampled_at = _run.simulation_time
+	if _run.surface_impact.profile_id=="dog_passage" and _run.surface_impact.serial>0 and point.distance_to(SurfaceImpactState.CONFIG.position)<=SurfaceImpactState.CONFIG.confirmation_radius:
+		state.passage_witness.capture(_run.surface_impact.serial,point,_run.simulation_time)
 	if state.residue_fraction<0 and _run.residue.contains(point,_run.clock.tick_count,CONFIG.survey_radius):
 		state.residue_fraction=snappedf(fraction,0.05)
 		state.sampled_at=_run.simulation_time
@@ -340,6 +342,7 @@ func _sample() -> void:
 
 func _arrive() -> void:
 	var state: JourneyResponseState = _run.journey_response
+	_run.trails.routes[state.route_id].passage_memory.remember(state.passage_witness,_run.simulation_time)
 	state.orders.targets[state.route_id] = 0
 	recruitment.cancel(state.route_id)
 	var finding: String = "residue" if state.residue_fraction>=0 else "surface" if state.impact_fraction >= 0 else "mixed" if state.ambush_fraction >= 0 and state.foreign_seen else "ambush" if state.ambush_fraction >= 0 else "foreign" if state.foreign_seen else "inconclusive"
@@ -378,6 +381,7 @@ func _arrive() -> void:
 	state.route_id = ""; state.phase = "idle"; state.workers = 0; state.elapsed_ticks = 0; state.departed_at = 0; state.impact_fraction = -1; state.ambush_fraction = -1; state.foreign_seen = false; state.sampled_at = 0
 	state.defense.reset_party()
 	state.residue_fraction=-1
+	state.passage_witness=PassageWitnessState.new()
 	state.predator_profile = ""
 	state.pressure.reset_party()
 	state.approach.reset_party()
@@ -411,7 +415,7 @@ func _surface_warning(route_id: String) -> bool:
 	if not _run.trails.routes.has(route_id): return false
 	var route: TrailRouteState = _run.trails.routes[route_id]
 	var report: Dictionary = _run.journey_response.reports.get(route_id, {})
-	return report.get("finding", "") in ["surface","residue"] or route.impact_report.get("received_at", 0.0) >= report.get("received_at", 0.0) and not route.impact_report.is_empty() or route.residue_report.get("received_at",0.0)>=report.get("received_at",0.0) and not route.residue_report.is_empty()
+	return report.get("finding", "") in ["surface","residue"] or route.impact_report.get("received_at", 0.0) >= report.get("received_at", 0.0) and not route.impact_report.is_empty() or route.residue_report.get("received_at",0.0)>=report.get("received_at",0.0) and not route.residue_report.is_empty() or route.passage_memory.count>0 and route.passage_memory.received_at>=report.get("received_at",0.0)
 
 func addressed(route_id: String) -> bool:
 	var outcome: Dictionary=_run.journey_response.defense.outcomes.get(route_id,{})
