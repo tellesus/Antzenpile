@@ -21,6 +21,8 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 	var name: String=source_name(entry,status)
 	var text: String="Report"
 	match entry.kind:
+		"lineage":text="Generation %d offspring raised" % entry.amount
+		"continuity":text="No supported lineage continuation"
 		"source": text="Source report: "+name+(" · EMPTY" if entry.amount==0 else "")
 		"intake": text=Copy.resource(entry.detail).capitalize()+" returned: "+name
 		"loss": text="Journey losses reported: "+name

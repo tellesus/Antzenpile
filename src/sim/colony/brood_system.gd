@@ -199,6 +199,7 @@ func _advance(pile: PileState, cohort: BroodCohort, delta: float, care_fraction:
 					var chance: float = AdaptationRules.RECOGNITION.variation_chance * float(cohort.count) / CONFIG.starting_count
 					pile.recognition_candidate = _run.genetic_rng.randf() < chance
 				pile.brood_matured_total += cohort.count
+				_run.accomplishment.observe(pile,cohort,_run.clock.tick_count)
 				pile.brood_cohorts.erase(cohort)
 			else:
 				cohort.progress_seconds = CONFIG.pupa_seconds - delta

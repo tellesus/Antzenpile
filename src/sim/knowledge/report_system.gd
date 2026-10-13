@@ -11,6 +11,11 @@ func prime() -> void:
 
 func capture(recording: bool = true) -> void:
 	var journal: ReportJournal=_run.reports;var time: float=_run.simulation_time
+	var accomplishment: LineageAccomplishment=_run.accomplishment
+	if journal.changed("lineage/generation",accomplishment.generation) and accomplishment.generation>0:
+		journal.add("lineage",accomplishment.pile_id,accomplishment.pile_id,accomplishment.tick*SimulationClock.TICK_INTERVAL,time,"grown",accomplishment.generation,accomplishment.count,recording)
+	var failed: bool=RunContinuity.failed(_run)
+	if journal.changed("continuity/failed",int(failed)) and failed:journal.add("continuity","home","home",time,time,"unrecoverable",0,0,recording)
 	var source_ids: Array=_run.knowledge.nodes.keys();source_ids.sort()
 	for source_id: String in source_ids:
 		var node: KnownNode=_run.knowledge.nodes[source_id]

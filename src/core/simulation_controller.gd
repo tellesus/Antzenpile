@@ -339,7 +339,7 @@ func end_run() -> bool:
 
 func review_snapshot() -> Dictionary:
 	if not run.history.ended: return {}
-	return {"history":run.history.review_dict(),"bounds":[run.world.bounds.position.x,run.world.bounds.position.y,run.world.bounds.size.x,run.world.bounds.size.y],"terrain":run.world.terrain.duplicate(true),"scenario":run.scenario_id,"seed":str(run.run_seed)}
+	return {"accomplishment":run.accomplishment.to_dict(),"history":run.history.review_dict(),"bounds":[run.world.bounds.position.x,run.world.bounds.position.y,run.world.bounds.size.x,run.world.bounds.size.y],"terrain":run.world.terrain.duplicate(true),"scenario":run.scenario_id,"seed":str(run.run_seed)}
 
 func set_queen_care(pile_id: String, target: Variant) -> bool:
 	if run.history.ended: return false

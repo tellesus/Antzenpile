@@ -112,7 +112,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M6-I complete:** [170 rival economic continuity](tasks/170_rival_economic_continuity.md), actual home reserve refill/withdrawal, paid bounded brood and dated encounter settlement. Full10,881/0; import/Main/headless drawing passed.
 
-**M1–M6 foundation complete; next: M7 continuity/outcomes, integrated scenarios and purposeful balance.** Player graphical/feel checks defer to the systems beta (A88).
+**M7-A complete:** [171 run continuity/accomplishment](tasks/171_run_continuity_and_accomplishment.md), approved cross-pile/paid-journey paths, delayed confirmed failure, actual successor offspring and free status/voluntary review. Full10,925/0; import/Main/headless drawing passed.
+
+**M1–M6 foundation complete; next: M7 integrated scenarios and purposeful balance (172), then the systems beta.** Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

@@ -46,6 +46,7 @@ var honeydew: HoneydewState = Honeydew.new()
 var swarm: SwarmState = Swarm.new()
 var guest: GuestState = Guest.new()
 var rival: RivalState = Rival.new()
+var accomplishment:=LineageAccomplishment.new()
 var surface_impact := SurfaceImpactState.new()
 var residue := ResidueZoneState.new()
 var connection_residue:=ResidueZoneState.new(CargoResidueState.CONFIG)
@@ -115,7 +116,7 @@ func to_dict() -> Dictionary:
 	ids=extra_exploration.keys();ids.sort()
 	for id: String in ids: policies[id]=extra_exploration[id].to_dict()
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
-	return {"refuges":shelters,"nest_disturbance":nest_disturbance.to_dict(),"connection_traffic":traffic,"extra_foundings":camps,"extra_exploration":policies,"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
+	return {"accomplishment":accomplishment.to_dict(),"refuges":shelters,"nest_disturbance":nest_disturbance.to_dict(),"connection_traffic":traffic,"extra_foundings":camps,"extra_exploration":policies,"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"daughter_supply":daughter_supply.to_dict(), "supply_origin":supply_origin,
@@ -613,8 +614,11 @@ func restore(data: Dictionary) -> bool:
 		if pile.brood_lost_total != pile.brood_health.losses + (restored_guest.reported_losses if pile.id == "home" else 0)+restored_nest.records.get(pile.id,{}).get("brood",0):
 			return false
 	var restored_reports := preload("res://src/sim/knowledge/report_journal.gd").new()
+	var restored_accomplishment:=LineageAccomplishment.new()
+	if not restored_accomplishment.restore(data.get("accomplishment",restored_accomplishment.to_dict()),restored_colony,restored_clock.tick_count):return false
 	if not restored_reports.restore(data.get("reports",restored_reports.to_dict()),restored_colony,restored_knowledge,restored_trails,restored_clock.simulation_time): return false
 	for entry: Dictionary in restored_reports.entries:
+		if entry.kind=="lineage" and (entry.amount>restored_accomplishment.generation or entry.observed_at>restored_accomplishment.tick*Clock.TICK_INTERVAL or entry.total>restored_colony.piles[entry.pile_id].brood_matured_total):return false
 		if entry.kind=="survey" and entry.detail.contains(":") and entry.detail.get_slice(":",1)!=restored_predator.profile_id: return false
 		if entry.kind=="passage":
 			var memory: PassageMemory=restored_trails.routes[entry.subject_id].passage_memory
@@ -659,6 +663,7 @@ func restore(data: Dictionary) -> bool:
 	predator = restored_predator
 	journey_response = restored_response
 	rival = restored_rival
+	accomplishment=restored_accomplishment
 	swarm = restored_swarm
 	guest = restored_guest
 	exploration = restored_exploration

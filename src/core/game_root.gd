@@ -120,6 +120,7 @@ func _ready() -> void:
 		_colony_controls.scenario_provider = current_scenario
 		_colony_controls.start_command = start_new_colony
 		_colony_controls.end_command = end_run_review
+		_colony_controls.status_provider = colony_status
 		_colony_controls.blocked = colony_controls_blocked
 		_colony_controls.interaction_started = cancel_field_gesture
 		_colony_controls.z_index = 101
@@ -258,6 +259,11 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
+	if selected.kind in ["lineage","continuity"]:
+		if _colony_controls!=null:
+			_colony_controls.opened=true;_colony_controls.status_open=true;_colony_controls.guide_open=false;_colony_controls.confirm_end=false
+		if _reports_view!=null:_reports_view.opened=false
+		return {"accepted":true,"reason":""}
 	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","link_ground","refuge","nest_crisis","producer","investment","chamber","queen"]:
 		inspect_pile(selected.pile_id)
 		var organ: String="adaptation" if selected.kind=="producer" else "nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
@@ -1151,3 +1157,9 @@ func moving_trial_summary(pile: PileState) -> Dictionary:
 				result.transport_wait="report" if source_id==pile.id else "incoming"
 				return result
 	return {}
+
+func colony_status() -> Dictionary:
+	var status: Dictionary=RunContinuity.snapshot(simulation.run,inward_pile_id)
+	status.time=simulation.run.simulation_time
+	for row: Dictionary in status.piles:row.name=pile_title(row.id)
+	return status

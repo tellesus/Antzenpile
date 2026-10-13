@@ -9,6 +9,8 @@ var seed_provider: Callable
 var scenario_provider: Callable
 var start_command: Callable
 var end_command: Callable
+var status_provider: Callable
+var status_open: bool=false
 var confirm_end: bool = false
 var blocked: Callable
 var interaction_started: Callable
@@ -61,12 +63,14 @@ func activate_at(at: Vector2) -> bool:
 	if help_button_rect().has_point(at):
 		opened = true
 		guide_open = true
+		status_open=false
 		guide_page = 0
 		return true
 	if button_rect().has_point(at):
 		opened = not opened
 		confirm_end = false
 		guide_open = false
+		status_open=false
 		if opened and scenario_provider.is_valid(): selected_scenario = scenario_provider.call()
 		return true
 	if not opened: return false
@@ -74,6 +78,11 @@ func activate_at(at: Vector2) -> bool:
 		if choice_rect("repeat").has_point(at) and end_command.is_valid():
 			if end_command.call(): opened=false; confirm_end=false
 		elif choice_rect("cancel").has_point(at): confirm_end=false
+		return true
+	if status_open:
+		if choice_rect("cancel").has_point(at):status_open=false;opened=false
+		elif choice_rect("end").has_point(at):confirm_end=true
+		elif choice_rect("guide").has_point(at):status_open=false;guide_open=true;guide_page=0
 		return true
 	if guide_open:
 		if guide_rect("back").has_point(at):
@@ -84,8 +93,7 @@ func activate_at(at: Vector2) -> bool:
 		return true
 	if choice_rect("end").has_point(at): confirm_end=true; return true
 	if choice_rect("guide").has_point(at):
-		guide_open = true
-		guide_page = 0
+		status_open = true
 		return true
 	if scenario_rect().has_point(at):
 		selected_scenario = ScenarioCatalog.IDS[(ScenarioCatalog.IDS.find(selected_scenario) + 1) % ScenarioCatalog.IDS.size()]
@@ -140,6 +148,9 @@ func _draw() -> void:
 	if guide_open:
 		_draw_guide(panel)
 		return
+	if status_open:
+		_draw_status(panel)
+		return
 	_label(panel.position+Vector2(24,32),"Colony menu",22,Color("d9d3be"))
 	_label(panel.position+Vector2(24,64),"New colonies replace unsaved progress.",15,Color("ccac91"))
 	_label(panel.position+Vector2(24,86),"Saved colony and sound settings stay.",14,Color("a9b9bc"))
@@ -147,7 +158,31 @@ func _draw() -> void:
 	_label(scenario_rect().position+Vector2(16,28),"SETTING: %s  ·  CHANGE" % ScenarioCatalog.label_for(selected_scenario),14,Color("a9b9bc"))
 	for choice: String in ["repeat","fresh","cancel","end","guide"]:
 		UIStyle.surface(self, choice_rect(choice),Color("35483c") if choice in ["repeat","fresh"] else Color("263038"))
-		_label(choice_rect(choice).position+Vector2(32,28),"REPEAT THIS SEED" if choice == "repeat" else "START WITH A FRESH SEED" if choice == "fresh" else "HOW TO PLAY" if choice == "guide" else "END RUN AND REVIEW" if choice == "end" else "CANCEL",14,Color("dce5d9"))
+		_label(choice_rect(choice).position+Vector2(32,28),"REPEAT THIS SEED" if choice == "repeat" else "START WITH A FRESH SEED" if choice == "fresh" else "COLONY STATUS" if choice == "guide" else "END RUN AND REVIEW" if choice == "end" else "CANCEL",14,Color("dce5d9"))
+
+func _draw_status(panel: Rect2) -> void:
+	var status: Dictionary=status_provider.call() if status_provider.is_valid() else {}
+	var phase: String=status.get("phase","awaiting")
+	_status_line(panel,32,"Colony status",20)
+	_status_line(panel,64,{"viable":"Lineage can continue","queenless":"Queenless · paid continuation remains","awaiting":"Awaiting remaining journey reports","unrecoverable":"No supported lineage continuation"}.get(phase,"Continuity uncertain"),17)
+	_status_line(panel,88,"A paid young group can establish a mother." if phase=="queenless" else "Expected returns remain unsettled." if phase=="awaiting" else "No reproductive or labor recovery remains." if phase=="unrecoverable" else "Food, care and travel still constrain recovery.",13)
+	_status_line(panel,110,"Review is voluntary; the saved slot stays." if phase=="unrecoverable" else "No free workers? Inspect held jobs and care.",13)
+	var receipt: Dictionary=status.get("accomplishment",{})
+	_status_line(panel,134,"Generation %d offspring raised · %s ago" % [receipt.generation,preload("res://src/presentation/interface_text.gd").duration(status.time-receipt.tick*SimulationClock.TICK_INTERVAL)] if receipt.get("generation",0)>0 else "Later-generation offspring not yet raised",13)
+	var rows: Array=status.get("piles",[])
+	for index: int in mini(4,rows.size()):
+		var row: Dictionary=rows[index]
+		if not row.local:
+			_status_line(panel,160+index*22,row.name+" · inspect this nest locally",13);continue
+		var condition: String="relinquished" if row.relinquished else "isolated" if row.isolated else "mother" if row.queen else "paid young" if row.young else "queenless"
+		_status_line(panel,160+index*22,"%s · %s · %d expected / %d free" % [row.name,condition,row.workers_expected,row.free],13)
+	if rows.size()>4:_status_line(panel,245,"%d other nests included" % (rows.size()-4),12)
+	for action: String in ["cancel","end","guide"]:
+		UIStyle.surface(self,choice_rect(action),Color("263038"))
+		_label(choice_rect(action).position+Vector2(24,28),{"cancel":"KEEP PLAYING","end":"END RUN AND REVIEW","guide":"HELP"}[action],14,Color("dce5d9"))
+
+func _status_line(panel: Rect2, y: float, value: String, size: int) -> void:
+	_label(panel.position+Vector2(24,y),preload("res://src/presentation/interface_text.gd").fit_line(value,_font,size,panel.size.x-48),size,Color("c4d0c1"))
 
 
 func _draw_guide(panel: Rect2) -> void:

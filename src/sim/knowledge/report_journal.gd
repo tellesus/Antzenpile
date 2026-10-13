@@ -3,7 +3,7 @@ extends RefCounted
 ## Bounded semantic records of delivered/local facts; never physical replay data.
 const LIMIT: int = 192
 const SEEN_LIMIT: int = 512
-const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","producer","ground","link_ground","passage","nest_crisis","refuge"]
+const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","producer","ground","link_ground","passage","nest_crisis","refuge","lineage","continuity"]
 var initialized: bool = false
 var since: float = 0.0
 var next_id: int = 1
@@ -21,7 +21,7 @@ func changed(key: String, value: Variant) -> bool:
 func add(kind: String, pile: String, subject: String, observed: float, received: float, detail: String = "", amount: float = 0, total: float = 0, recording: bool = true) -> void:
 	if not recording or next_id >= WorkerLedger.MAX_COUNT: return
 	amount=_quantity(amount);total=_quantity(total)
-	if kind in ["intake","ground","link_ground","passage","nest_crisis","refuge"]:
+	if kind in ["intake","ground","link_ground","passage","nest_crisis","refuge","lineage","continuity"]:
 		for index: int in entries.size():
 			var existing: Dictionary = entries[index]
 			if existing.kind == kind and existing.pile_id==pile and existing.subject_id == subject and existing.detail==detail:
@@ -114,6 +114,8 @@ static func _valid_entry(entry: Variant, colony: ColonyState, knowledge: Knowled
 		"migration": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail=="returned" and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total) and entry.amount<=entry.total
 		"supplies": return colony.piles.has(entry.subject_id) and entry.detail=="returned"
 		"investment": return entry.subject_id==entry.pile_id and entry.detail in ["none","adaptation","reproduction","adaptation_laid","reproduction_laid"] and entry.amount in [0.0,1.0,2.0]
+		"lineage": return entry.subject_id==entry.pile_id and entry.detail=="grown" and WorkerLedger.valid_count(entry.amount) and entry.amount>0 and WorkerLedger.valid_count(entry.total) and entry.total>0 and entry.total<=8
+		"continuity": return entry.subject_id==entry.pile_id and entry.detail=="unrecoverable" and entry.amount==0 and entry.total==0
 		"nest_crisis": return entry.subject_id==entry.pile_id and entry.detail in ["warning","impact","settled"] and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total)
 		"refuge": return entry.subject_id==entry.pile_id and entry.detail in ["preparing","ready","none","royals","workers"] and WorkerLedger.valid_count(entry.amount) and entry.amount in [0.0,4.0] and WorkerLedger.valid_count(entry.total) and entry.total<=RefugeState.CAPACITY
 		"queen": return entry.subject_id==entry.pile_id and entry.detail in ["weakened","lost","replacing","steady","supported","relocating","relocated"]
