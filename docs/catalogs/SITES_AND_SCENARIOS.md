@@ -39,19 +39,19 @@ Every launch setting supports establishment, worker growth, at least one useful 
 
 ### SC-BACKYARD — Backyard
 
-**Foundation layout; complete arc planned M7.** Introduce the basic nutrient/return loop with recognizable nectar/insect remains/puddle profiles and at least one food alternative after depletion. Aphids and an ambush predator provide a service-versus-risk decision. A sheltered soil site and a different connection/site profile let expansion change access and resilience. A later witnessed threat/heat/resource change tests recovery without requiring an unknown advanced action during the opening.
+**Complete command-directed arc verified172; player acceptance remains pending.** Introduce the basic nutrient/return loop with recognizable nectar/insect remains/puddle profiles and at least one food alternative after depletion. Aphids and an ambush predator provide a service-versus-risk decision. A sheltered soil site and a different connection/site profile let expansion change access and resilience. A later witnessed threat/heat/resource change tests recovery without requiring an unknown advanced action during the opening.
 
 Required choices: scouting versus immediate gathering; Home growth versus reproductive/site investment; clear/hunt/avoid; practical food/water contingency. Verify a continued reproductive lineage, including a recoverable shortage and a real saved return. It need not show every catalog entry at once.
 
 ### SC-GARDEN — Garden Edge
 
-**Foundation layout; complete arc planned M7.** Emphasize nectar/honeydew relationships, fruit/seed opportunities, moisture differences and water discovery. Root/stone sites offer distinct care/access costs. Climate/care traits and the new organs have a plausible pressure; 165 adds a roaming hunter near exposed food in fresh Garden Edge, changing the usefulness of dated route memories. More food production never guarantees sufficient care or protein.
+**Complete command-directed arc verified172; player acceptance remains pending.** Emphasize nectar/honeydew relationships, fruit/seed opportunities, moisture differences and water discovery. Root/stone sites offer distinct care/access costs. Climate/care traits and the new organs have a plausible pressure; 165 adds a roaming hunter near exposed food in fresh Garden Edge, changing the usefulness of dated route memories. More food production never guarantees sufficient care or protein.
 
 Required choices: attendants versus gatherers, care/adaptation versus new capacity, dependable source versus temporary mixed food, local specialization versus transport. Verify three-pile independent work and daughter-origin reproductives/founding under real supply constraints.
 
 ### SC-ROADSIDE — Roadside
 
-**Foundation layout; complete arc planned M7.** Emphasize exposed temporary crumbs, meaningful water alternatives, heavy passage and suspect intake/ground. Sites differ in access/shelter rather than handing out free combat or reserves. A nest/connection disturbance appears only when usable warning/isolating/refuge/evacuation actions exist; the opening must have a discoverable viable route.
+**Complete command-directed arc verified172; player acceptance remains pending.** Emphasize exposed temporary crumbs, meaningful water alternatives, heavy passage and suspect intake/ground. Sites differ in access/shelter rather than handing out free combat or reserves. A nest/connection disturbance appears only when usable warning/isolating/refuge/evacuation actions exist; the opening must have a discoverable viable route.
 
 Required choices: exploit temporary abundance versus safer food; fight a manageable predator versus avoid unassailable exposure; isolate suspect traffic while incoming cargo remains real; evacuate a viable lineage versus hold a prepared nest. Verify both successful rescue and genuinely unrecoverable loss without premature hidden-truth notification.
 
@@ -64,3 +64,5 @@ The release matrix must cover all ten resource/trait profiles across the three s
 Post 1.0: campaign destinations, comprehensive annual seasons, many more authored environments, huge nest empires and arbitrary procedurally generated topology. The initial settings become complete playable chapters before the catalog expands further.
 
 169 adds the bounded fresh-Roadside local ground crisis, with actual warning, refuge/rescue, site-cover mitigation and settlement. The complete command-directed scenario arcs and choice comparisons remain M7.
+
+172 records fresh seed3030 complete arcs and a bounded strategy comparison in the [matrix](../evidence/card172_complete_runs.md). Fresh Roadside ground_v2 warns2100/impacts2280/settles2340 so a reported network/rescue response can precede exposure; original enabled worlds remain ground_v1. Garden demonstrates actual daughter-origin third-nest founding and finite nutrient packets. Late connection-pressure and physical-review integrity remain separate M7 work; no fixed session-length target or broad tuning sweep was introduced.

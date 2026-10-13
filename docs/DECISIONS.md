@@ -33,6 +33,8 @@ The player authorizes continued implementation from the new roadmap without feed
 
 ## How decisions change
 
+M7 tuning172: fresh Roadside ground definition `ground_v2` moves the actual warning from1800 to2100 simulated seconds, retaining the180-second response window, footprint and loss rules. Fresh ordinary first-daughter reports at2002–2092 otherwise followed the old1980 impact, preventing useful pre-impact network rescue. Existing enabled three-field saves retain `ground_v1`; absent old events stay disabled. This is measured provisional content tuning, not a session-duration target. [Evidence](evidence/card172_complete_runs.md).
+
 M2 storage gate ([147](tasks/147_seeds_and_picnic_food.md)): current mixed/episodic arrivals have no store capacity or processing wait. No buffering decision is demonstrated; CH-CACHE stays out of 1.0 blockers without artificial caps/spoilage. Revisit only with evidence. This applies A87's explicit gated-content rule.
 
 Routine implementation/tuning follows the current definitions and bounded card. A choice changing a locked boundary or the agreed release foundation must be isolated and resolved with the player while independent work continues. Record accepted changes here and update the corresponding bible/catalog/roadmap together. Never treat a historical completed card's old limit or future recommendation as current authority.

@@ -1,17 +1,17 @@
 class_name NestDisturbanceSystem
 extends RefCounted
-const CONFIG=NestDisturbanceState.CONFIG
 const BROOD_SYSTEM=preload("res://src/sim/colony/brood_system.gd")
 var _run: RunState
 func _init(run: RunState) -> void:_run=run
 func tick() -> void:
 	var state: NestDisturbanceState=_run.nest_disturbance
+	var config: NestDisturbanceDefinition=state.definition()
 	var phase: String=state.phase(_run.clock.tick_count)
 	if phase=="dormant":return
 	var ids: Array=_run.colony.piles.keys();ids.sort()
 	for id: String in ids:
 		var pile: PileState=_run.colony.piles[id]
-		if pile.relinquished or pile.position.distance_to(CONFIG.position)>CONFIG.radius:continue
+		if pile.relinquished or pile.position.distance_to(config.position)>config.radius:continue
 		if not state.records.has(id):
 			if phase=="settled" or pile.workers_total==0 and pile.queen.count==0 and pile.brood_cohorts.is_empty() and pile.reproduction.phase=="none":continue
 			state.records[id]={"warned":_run.clock.tick_count,"impacted":0,"settled":0,"workers":0,"brood":0,"royals":0,"queen_injury":0}
@@ -22,24 +22,25 @@ func tick() -> void:
 			if RefugeSystem.new(_run).state(id).phase!="none":assert(RefugeSystem.new(_run).order(id,"release"))
 	if phase=="pressure" and not state.scent_disturbed:
 		for segment: TrailSegmentState in _run.trails.segments.values():
-			if segment.distance_to_path(CONFIG.position)<=CONFIG.radius:segment.decay_chemistry(-log(CONFIG.remaining_scent)/log(2.0))
+			if segment.distance_to_path(config.position)<=config.radius:segment.decay_chemistry(-log(config.remaining_scent)/log(2.0))
 		state.scent_disturbed=true
 func _impact(pile: PileState, record: Dictionary) -> void:
+	var config: NestDisturbanceDefinition=_run.nest_disturbance.definition()
 	record.impacted=_run.clock.tick_count
 	var refuge: RefugeState=RefugeSystem.new(_run).state(pile.id)
 	var exposure: float=SiteCatalog.for_pile(pile).ground_exposure
 	if pile.queen.count>0 and not refuge.protects(pile.queen.queen_id(pile.id)):
-		record.queen_injury=roundi(CONFIG.queen_injury*exposure);QueenSystem.new(_run).injure(pile.id,record.queen_injury)
+		record.queen_injury=roundi(config.queen_injury*exposure);QueenSystem.new(_run).injure(pile.id,record.queen_injury)
 	for cohort: BroodCohort in pile.brood_cohorts.duplicate():
 		if refuge.protects(cohort.uid(pile.id)):continue
-		var losses: int=mini(cohort.count,roundi(cohort.count*CONFIG.brood_loss_fraction*exposure))
+		var losses: int=mini(cohort.count,roundi(cohort.count*config.brood_loss_fraction*exposure))
 		for index: int in losses:
 			if BROOD_SYSTEM.new(_run).lose_one(pile.id,"",cohort.uid(pile.id)):record.brood+=1
 	if not pile.queen.replacement_group.is_empty() and not refuge.protects(ReproductionState.body_identity(pile.queen.replacement_group,pile.id)):
 		assert(QueenSystem.new(_run).lose_replacement(pile.id));record.royals+=3
 	if pile.reproduction.phase!="none" and not refuge.protects(pile.reproduction.identity(pile.id)):
 		assert(ReproductionSystem.new(_run).lose_group(pile.id));record.royals+=3
-	var workers: int=roundi(pile.workers_available*CONFIG.worker_loss_fraction*exposure)
+	var workers: int=roundi(pile.workers_available*config.worker_loss_fraction*exposure)
 	for index: int in workers:
 		var adapted: int=1 if _run.rng.randf()<pile.adaptation_fraction() else 0
 		var profile: String=pile.genetics.loss_profile(adapted==1,pile.adaptation_repertoire,pile.workers_total,_run.rng)

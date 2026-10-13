@@ -114,7 +114,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M7-A complete:** [171 run continuity/accomplishment](tasks/171_run_continuity_and_accomplishment.md), approved cross-pile/paid-journey paths, delayed confirmed failure, actual successor offspring and free status/voluntary review. Full10,925/0; import/Main/headless drawing passed.
 
-**M1–M6 foundation complete; next: M7 integrated scenarios and purposeful balance (172), then the systems beta.** Player graphical/feel checks defer to the systems beta (A88).
+**M7-B complete:** [172 integrated runs/balance](tasks/172_integrated_scenario_runs_and_balance.md), fresh three-setting arcs, actual three-nest Garden lineage, practical producer/packet choices, versioned Roadside warning and prepared/rescued recovery. Full10,959/0; import/Main/headless drawing passed. [Evidence](evidence/card172_complete_runs.md).
+
+**M1–M6 foundation/M7 arcs complete; next:173 practical late connection pressure and174 accurate physical review, then the systems beta.** Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

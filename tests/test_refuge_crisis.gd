@@ -8,7 +8,7 @@ func advance_to(game: SimulationController, target: float) -> void:
 	while game.run.simulation_time<target:game.advance(minf(60,target-game.run.simulation_time))
 func fixture(build: bool=true, crisis: bool=true) -> SimulationController:
 	var source: SimulationController=Founding.new().fixture()
-	var raw: Dictionary=snapshot(source);raw.scenario_id="roadside";raw.nest_disturbance.enabled=crisis
+	var raw: Dictionary=snapshot(source);raw.scenario_id="roadside";raw.nest_disturbance.enabled=crisis;raw.nest_disturbance.definition_id="ground_v1"
 	var game:=Controller.new();assert(game.restore_snapshot(raw))
 	if build:assert(game.chambers.order("home","refuge_chamber"));game.advance(120)
 	advance_to(game,1900)
@@ -63,7 +63,7 @@ func run(test: Object) -> bool:
 	test.check(held_system.state("home").phase=="ready" and held_game.run.colony.piles.home.brood_cohorts.is_empty() and twin.restore_snapshot(snapshot(held_game)),"Held shelter references survive actual maturation without duplicating adults or inventing more slots")
 	test.check(held_game.start_brood("home") and not held_system.state("home").protects(held_game.run.colony.piles.home.brood_cohorts[0].uid("home")),"A new laid cohort does not inherit a retired protected identity")
 	var rescued: SimulationController=preload("res://tests/test_connection_residue.gd").new().fixture()
-	var rescue_raw: Dictionary=snapshot(rescued);rescue_raw.nest_disturbance.enabled=true
+	var rescue_raw: Dictionary=snapshot(rescued);rescue_raw.nest_disturbance.enabled=true;rescue_raw.nest_disturbance.definition_id="ground_v1"
 	var rescue_game:=Controller.new();test.check(rescue_game.restore_snapshot(rescue_raw),"Established real network permits the local crisis")
 	advance_to(rescue_game,1900);rescue_game.start_brood("home");rescue_game.start_brood("home")
 	var link: ConnectionTrafficState=rescue_game.run.all_connections()[0]
@@ -73,7 +73,7 @@ func run(test: Object) -> bool:
 	test.check(rescue_game.run.colony.piles.satellite_1.brood_cohorts.any(func(cohort: BroodCohort)->bool:return cohort.uid("satellite_1")==uid) and not rescue_game.run.nest_disturbance.records.has("satellite_1") and rescue_game.run.nest_disturbance.records.home.brood>0,"Paid departure/arrival preserves evacuated brood outside the affected footprint while local brood remains exposed")
 	test.check(twin.restore_snapshot(snapshot(rescue_game)),"Crisis plus actual transported ancestry/care/cargo restores")
 	var cover_source: SimulationController=Founding.new().fixture()
-	var cover_raw: Dictionary=snapshot(cover_source);cover_raw.scenario_id="roadside";cover_raw.nest_disturbance.enabled=true
+	var cover_raw: Dictionary=snapshot(cover_source);cover_raw.scenario_id="roadside";cover_raw.nest_disturbance.enabled=true;cover_raw.nest_disturbance.definition_id="ground_v1"
 	var cover:=Controller.new();cover.restore_snapshot(cover_raw);cover.start_founding(Founding.SITE)
 	for tick: int in 2000:
 		if cover.run.founding.phase=="ready":break

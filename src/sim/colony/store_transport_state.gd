@@ -51,6 +51,7 @@ func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tic
 		if raw.has("residue"):record.residue=captured_residue
 		for key: String in ["amount","departed","arrived","recalled","reported"]:record[key]=int(record[key])
 		for key: String in ["carry","energy","chemistry","contaminant"]:record[key]=float(record[key])
+		for key: String in ["carry","energy","chemistry"]:record[key]=_captured_scale(record[key])
 		parsed.append(record)
 	var away: bool=data.phase!="none"
 	if away!=(parsed.size()>reported) or data.trips_started!=parsed.size() or data.trips_reported!=reported or not _same_packet(data.delivered_units,totals):return false
@@ -68,17 +69,22 @@ func restore(data: Dictionary, colony: ColonyState, founding: FoundingState, tic
 		var position_time: int=int(latest.arrived+data.elapsed_ticks if latest.recalled==0 else 2*latest.recalled-latest.departed-leg+data.elapsed_ticks)
 		if position_time>tick:return false
 		expected_cargo=packet(latest.resource,latest.amount)
-		if data.energy_multiplier!=latest.energy or data.carry_multiplier!=latest.carry or data.chemistry_fraction!=latest.chemistry or data.contaminant_mass!=latest.contaminant:return false
+		if _captured_scale(float(data.energy_multiplier))!=latest.energy or _captured_scale(float(data.carry_multiplier))!=latest.carry or _captured_scale(float(data.chemistry_fraction))!=latest.chemistry or data.contaminant_mass!=latest.contaminant:return false
 	else:
 		if data.elapsed_ticks!=0 or data.energy_multiplier!=1 or data.carry_multiplier!=1 or data.chemistry_fraction!=0 or data.contaminant_mass!=0:return false
 	if reported>0:expected_last=packet(last.resource,last.amount if last.arrived>0 else 0)
 	if not _same_packet(data.cargo,expected_cargo) or not _same_packet(data.last_payload,expected_last):return false
 	enabled=false;phase=data.phase;elapsed_ticks=int(data.elapsed_ticks);departed_tick=int(data.departed_tick);trips_started=parsed.size();trips_reported=reported;first_reported_tick=int(data.first_reported_tick);last_reported_tick=int(data.last_reported_tick)
 	cargo.assign(expected_cargo);last_payload.assign(expected_last);delivered_units=totals;manifests=parsed
-	energy_multiplier=float(data.energy_multiplier);carry_multiplier=float(data.carry_multiplier);chemistry_fraction=float(data.chemistry_fraction);contaminant_mass=float(data.contaminant_mass)
+	energy_multiplier=_captured_scale(float(data.energy_multiplier));carry_multiplier=_captured_scale(float(data.carry_multiplier));chemistry_fraction=_captured_scale(float(data.chemistry_fraction));contaminant_mass=float(data.contaminant_mass)
 	if not restore_residue(data,colony,founding,tick,source_id):return false
 	if away and residue.to_dict()!=latest.get("residue",CargoResidueState.new().to_dict()):return false
 	return true
+static func _captured_scale(value: float) -> float:
+	# Departure captures these scales on the same grid as ordinary supplies.
+	# Recover only JSON representation noise, never a meaningful discrepancy.
+	var canonical: float=snappedf(value,0.00001)
+	return canonical if absf(value-canonical)<=1e-15 else value
 static func packet(resource: String, amount: float) -> Dictionary[String,float]:
 	var result: Dictionary[String,float]={"carbohydrate":0.0,"protein":0.0,"water":0.0};result[resource]=amount;return result
 static func _same_packet(raw: Variant, expected: Dictionary) -> bool:
