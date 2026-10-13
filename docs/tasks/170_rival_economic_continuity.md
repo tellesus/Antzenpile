@@ -1,0 +1,21 @@
+# 170 — Rival economic continuity
+
+Status: complete. M6-I / ECO-RIVAL / SYS-02/10/14.
+
+Outcome: securing a junction creates breathing room, while a surviving neighboring colony can later send actual replacement foragers from home. Attrition remains meaningful: replacements use its finite living reserves or a paid, delayed aggregate brood; no new ants appear at the contested crossing. Withdrawal/alternate approaches remain useful counterplay.
+
+Use the existing immutable rival definition, independent ledger, physical forage leg, stored carbohydrate and paid counter-recruitment. Fresh worlds enable continuity; old snapshots without the field retain their original finite-population behavior. Preserve the initial thirty ants/six foragers and the current encounter cooldown. Refill a reduced viable foraging party only at an actual home arrival; a routed party at the existing retreat threshold rests at home for six hundred ticks and until enough living reserves are available. Resting workers are ledger-owned and scent still decays. Immediate reserve refill was rejected by the ordinary victory/recovery regression: it reopened pressure too quickly; a real home withdrawal interval preserves breathing room.
+
+Provisional replacement rule: at most four new workers in one paid group, two real home carers, eight carbohydrate for four (two per actual funded worker), six hundred ticks of development. Fund only missing population below the original thirty-ant ceiling, including pending brood. Paid groups cannot enlarge that ceiling; total living plus historical casualties equals original population plus actual emerged replacements. Carers are unavailable to counter-recruitment and release only at emergence. Food is spent at funding and never refunded or invented. Zero adults cannot fund a revival. The player does not receive the rival's live brood/stores/population in normal UI.
+
+Existing returned foreign-contact/pressure/settlement reports explain recurring encounters. Keep the delivered settlement's age explicit; a secured junction is the end of that encounter, not extinction of the other colony. Preserve finite paid reserve mobilizations and their travel; this card does not add a queen/genetics UI or an automatic empire planner.
+
+Verify actual-home refill versus no refill during combat/travel; real food/carers/time and population ceiling; rest/restart and irrecoverable rival labor loss; repeated encounter/withdrawal/avoidance; old, paused/four-speed, funded/near-emergence saved twins and atomic corrupt saves. Focused/affected checks, one final full suite, import/Main and affected returned-conflict drawing. Complete M6 coverage/status after this entry; M7 integration/balance follows.
+
+Completion: fresh rivals refill a reduced viable party at actual home arrival, or rest a routed remnant before a new departure. One bounded paid group consumes food and two ledger-owned carers, matures over six hundred ticks, releases support and restores only missing population. Old saves keep finite behavior; live economics remain private. Dated secured history explicitly distinguishes encounter settlement from permanent safety.
+
+Changed groups: immutable rival definition, continuity state, rival economy/rest/travel/save owner and legacy Run migration; conflict history copy; lifecycle and repeated-encounter regressions. Food debits use the existing decimal grid so JSON phase saves remain exact.
+
+Evidence: affected412/0 before the last history assertion; final full10,881 checks/0 failures,402.85s, including39 new continuity checks. Import/Main passed, plus17 headless circle callbacks at1280×720/900×600 (status/history/draft). Actual prepared victory gives180 seconds of useful gathering in the paired regression, then a genuinely new returned encounter; withdrawal prevents further fights. Paid/near-emergence/rest/old/corrupt saves and four speeds passed. Player graphics/feel/performance checks remain deferred (A88).
+
+Handoff: M6 content/crisis foundation is complete. M7 now defines complete-run continuity/outcomes and integrates purposeful three-setting runs and choice/balance evidence before the player systems beta. Provisional population, cost, developmental and withdrawal values are in the definition; the rival keeps its existing finite counter-recruitment budget.

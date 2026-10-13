@@ -188,7 +188,9 @@ func _history_records(route: Dictionary, status: Dictionary) -> Array[Dictionary
 		records.append({"text":text,"received":pressure.received_at,"lines":[text,_report_dates(pressure,status)]})
 	if route.get("conflict_report","")!="":
 		var text: String = {"contested":"Junction contested","holding":"Junction holding","resisted":"Strong foreign resistance","reinforced":"Foreign reinforcements reported","secured":"Foreign force withdrew","withdrew":"Our ants withdrew","dispersed":"Encounter dispersed"}.get(route.conflict_report,"Junction report")
-		records.append({"text":text,"received":route.conflict_received_at,"lines":[text,_report_dates({"received_at":route.conflict_received_at,"observed_at":route.get("conflict_observed_at",0)},status)]})
+		var lines: Array=[text,_report_dates({"received_at":route.conflict_received_at,"observed_at":route.get("conflict_observed_at",0)},status)]
+		if route.conflict_report=="secured":lines.append("Encounter ended · later traffic remains uncertain")
+		records.append({"text":text,"received":route.conflict_received_at,"lines":lines})
 	var impact: Dictionary = route.get("impact_report",{})
 	if not impact.is_empty(): records.append({"text":"Heavy surface impact reported","received":impact.received_at,"lines":["Heavy surface impact reported",_report_dates(impact,status)]})
 	var residue: Dictionary=route.get("residue_report",{})

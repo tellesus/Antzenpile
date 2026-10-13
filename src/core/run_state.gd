@@ -429,6 +429,7 @@ func restore(data: Dictionary) -> bool:
 	if not _valid_honeydew(restored_honeydew, restored_world, restored_colony, restored_knowledge, restored_trails,restored_clock.tick_count):
 		return false
 	var restored_rival := Rival.new()
+	if not data.has("rival"): restored_rival.continuity.enabled=false
 	if data.has("rival") and (not data.rival is Dictionary or not restored_rival.restore(data.rival, restored_world, restored_clock.tick_count)):
 		return false
 	var restored_response := JourneyResponseState.new()
