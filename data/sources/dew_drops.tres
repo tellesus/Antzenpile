@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WaterSourceProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/world/water_source_profile.gd" id="profile"]
+[resource]
+script = ExtResource("profile")
+id = "dew_drops"
+resource_id = "water"
+display_name = "Dew drops"
+description = "Small plant droplets; exposed water dries quickly"
+capacity = 3.0
+wet_refill_per_second = 0.08
+evaporation_per_second = 0.01

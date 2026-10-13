@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="WaterSourceProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/world/water_source_profile.gd" id="profile"]
+[resource]
+script = ExtResource("profile")
+id = "sheltered_seep"
+resource_id = "water"
+display_name = "Sheltered seep"
+description = "Slow water among damp soil grains; a sheltered supply"
+capacity = 8.0
+renewal_per_second = 0.025
+severe_dry_renewal_multiplier = 0.5

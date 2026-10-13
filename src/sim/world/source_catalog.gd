@@ -1,6 +1,8 @@
 class_name SourceCatalog
 extends RefCounted
 const PROFILES: Dictionary = {
+	"dew_drops":preload("res://data/sources/dew_drops.tres"),
+	"sheltered_seep":preload("res://data/sources/sheltered_seep.tres"),
 	"flower_nectar":preload("res://data/sources/flower_nectar.tres"),
 	"aphid_honeydew":preload("res://data/sources/aphid_honeydew.tres"),
 	"insect_remains":preload("res://data/sources/insect_remains.tres"),

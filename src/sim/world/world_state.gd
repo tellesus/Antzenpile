@@ -44,6 +44,8 @@ func restore(data: Dictionary, definition_ids: Array[String]) -> bool:
 		if not SourceCatalog.accepts(source_type, value.definition_id): return _reject("Unknown or incompatible source type")
 		if not _numbers(value.position, 2) or not _number(value.quantity) or value.quantity < 0.0:
 			return _reject("Invalid node position/quantity")
+		var source_profile: SourceProfile=SourceCatalog.PROFILES.get(source_type)
+		if source_profile is WaterSourceProfile and value.quantity>source_profile.capacity:return _reject("Small-water source exceeds its authored capacity")
 		var position := Vector2(value.position[0], value.position[1])
 		if not area.has_point(position) or typeof(value.active) != TYPE_BOOL or not value.properties is Dictionary:
 			return _reject("Node outside bounds or invalid active/properties")
