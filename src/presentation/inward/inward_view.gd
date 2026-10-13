@@ -856,6 +856,7 @@ func _draw_context(size: Vector2) -> void:
 			elif food_losses.get("losses",0) > 0:
 				_label(box.position + Vector2(16, 213), "Local losses: %d · last %.0fs ago" % [food_losses.losses,food_losses.age], Color("8fa1a8"), 15)
 		"entrance":
+			if _status.get("relinquished",false):_label(box.position+Vector2(16,188),"Nest relinquished · inspect receiver",Color("bbaa87"),13)
 			_detail_line(box, 65, "%d free · %d held for brood care" % [_status.get("workers_assignable",_status.workers_available),_status.get("brood_care",{}).get("held",0)])
 			_detail_line(box, 91, "Scouts away: %d" % _status.active_scouts)
 			_detail_line(box, 117, "Trail workers: %d" % _status.trail_workers)

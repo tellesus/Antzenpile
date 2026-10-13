@@ -257,13 +257,13 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","investment","chamber","queen"]:
+	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","investment","chamber","queen"]:
 		inspect_pile(selected.pile_id)
 		var organ: String="nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
-		if selected.kind in ["supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection"] and _inward_view!=null:
+		if selected.kind in ["supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation"] and _inward_view!=null:
 			_inward_view.connection_controls.opened=true
-			_inward_view.connection_controls.purpose="workers" if selected.kind=="migration" else "queen" if selected.kind=="relocation" else "brood" if selected.kind=="brood_rescue" else "royals" if selected.kind=="royal_rescue" else "stores" if selected.kind=="store_rescue" else "supplies"
+			_inward_view.connection_controls.purpose="workers" if selected.kind=="migration" else "queen" if selected.kind=="relocation" else "brood" if selected.kind=="brood_rescue" else "departure" if selected.kind in ["departure","evacuation"] else "royals" if selected.kind=="royal_rescue" else "stores" if selected.kind=="store_rescue" else "supplies"
 			for entry: Dictionary in simulation.connection_summaries(selected.pile_id):
 				if entry.destination_id==selected.subject_id or entry.id==selected.subject_id:_inward_view.connection_controls.selected=entry.id
 		if selected.kind=="chamber" and _inward_view!=null: _inward_view.chamber_controls.opened=true;_inward_view.chamber_controls.selected=selected.subject_id
@@ -433,7 +433,7 @@ func outward_status(pile_id: String) -> Dictionary:
 		"active_scouts": simulation.run.active_scout_count(), "scout_cap": simulation.scouting.config.active_cap,
 		"time": simulation.run.simulation_time, "paused": simulation.run.clock.paused,
 		"time_scale": simulation.run.clock.time_scale, "trails": trail_summaries(pile_id),
-		"resources": simulation.run.colony.piles[pile_id].resources.duplicate(),
+		"resources": simulation.run.known_final_departure(pile_id).left_stores if simulation.run.colony.piles[pile_id].relinquished else simulation.run.colony.piles[pile_id].resources.duplicate(),
 		"rain_phase": simulation.run.rain.phase, "temporal_hints": temporal_hints,
 		"scout_missions": scout_mission_summaries(pile_id),
 		"honeydew": honeydew_summary(pile_id),
@@ -577,7 +577,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)+simulation.run.unreported_transfers(pile_id,trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
-	return {"connections":simulation.connection_summaries(pile_id,_inward_view.connection_controls.settlers if _inward_view!=null else 8,(_inward_view.connection_controls.cargo_id if _inward_view.connection_controls.purpose=="stores" else _inward_view.connection_controls.cohort_uid) if _inward_view!=null else ""),"reinforcement":simulation.reinforcement.summary() if pile_id in ["home","satellite_1"] else {}, "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary() if pile_id in ["home","satellite_1"] else {}, "pile_name":pile_title(pile_id),"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.size()>1, "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
+	return {"relinquished":pile.relinquished,"final_departure":simulation.run.known_final_departure(pile_id),"connections":simulation.connection_summaries(pile_id,_inward_view.connection_controls.settlers if _inward_view!=null else 8,(_inward_view.connection_controls.cargo_id if _inward_view.connection_controls.purpose=="stores" else _inward_view.connection_controls.cohort_uid) if _inward_view!=null else ""),"reinforcement":simulation.reinforcement.summary() if pile_id in ["home","satellite_1"] else {}, "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary() if pile_id in ["home","satellite_1"] else {}, "pile_name":pile_title(pile_id),"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.size()>1, "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
 		"local_site":{"profile":pile.foundation.get("site_profile",""),"cues":SiteCatalog.for_pile(pile).cues},"queen_condition":simulation.queens.summary(pile_id),"reproduction": simulation.reproduction.summary(pile_id),
 		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
@@ -625,7 +625,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"nursery_costs": NURSERY_CONFIG.costs(),
 		"nursery_workers_required": NURSERY_CONFIG.workers_required,
 		"nursery_developed_capacity": BROOD_CONFIG.developed_nursery_brood_capacity,
-		"resources": pile.resources.duplicate(), "food_exchange_state": pile.food_exchange_state,
+		"resources": simulation.run.known_final_departure(pile_id).left_stores if pile.relinquished else pile.resources.duplicate(), "food_exchange_state": pile.food_exchange_state,
 		"food_sharing": simulation.food_toxicity.summary(pile_id),
 		"food_exchange_progress": pile.food_exchange_progress_seconds,
 		"food_exchange_duration": FOOD_CONFIG.build_seconds,
@@ -869,10 +869,11 @@ func trail_summaries(pile_id: String) -> Array[Dictionary]:
 			var pending: int = simulation.run.trails.pending_losses(route.id)
 			var camp: FoundingState=simulation.run.camp_for_route(route.id)
 			var connection: ConnectionTrafficState=simulation.run.connection_for(route.id) if route.purpose=="interpile" else null
-			var migration: WorkerReinforcementState=(connection.royals[connection.payer_id].movement if connection.royals[connection.payer_id].active() else connection.broods[connection.payer_id].movement if connection.broods[connection.payer_id].active() else connection.queens[connection.payer_id].movement if connection.queens[connection.payer_id].active() else connection.migrations[connection.payer_id]) if connection!=null else null
+			var migration: WorkerReinforcementState=(connection.evacuations[connection.payer_id].movement if connection.evacuations[connection.payer_id].active() else connection.royals[connection.payer_id].movement if connection.royals[connection.payer_id].active() else connection.broods[connection.payer_id].movement if connection.broods[connection.payer_id].active() else connection.queens[connection.payer_id].movement if connection.queens[connection.payer_id].active() else connection.migrations[connection.payer_id]) if connection!=null else null
 			var settlers_away: bool=migration!=null and migration.active()
-			var sent: int=migration.settlers+WorkerReinforcementState.CONFIG.reinforcement_messengers if settlers_away else 0
-			var status: String = route.status
+			var sent: int=migration.settlers+migration.messengers if settlers_away else 0
+			if connection!=null and simulation.run.colony.piles[pile_id].relinquished and not connection.evacuations[pile_id].current().is_empty():settlers_away=true;sent=int(connection.evacuations[pile_id].current().workers)
+			var status: String = "active" if connection!=null and simulation.run.colony.piles[pile_id].relinquished and not connection.evacuations[pile_id].current().is_empty() else route.status
 			if pending > 0 and status == "inactive":
 				status = "recalling" if route.desired_workers == 0 else "depleted" if route.reported_depleted else "active"
 			summaries.append({"id": route.id, "destination_knowledge_id": route.destination_knowledge_id,

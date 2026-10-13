@@ -12,7 +12,7 @@ Windows desktop comes first. Keep touch-sized controls. Mobile, a fixed session-
 
 ## Milestone order
 
-M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5 is in progress with returned shelter profiles, additional working piles and daughter-origin founding; two-way direct connection supplies/migration work after 155; physical laying-queen relocation works after 156; worker-brood rescue works after157; finite store rescue works after158; active/ready reproductive rescue works after159; explicit traffic closure works after160; abandonment and M6–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
+M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5 completed with returned shelter profiles, additional working piles and daughter-origin founding; two-way direct connection supplies/migration work after 155; physical laying-queen relocation works after 156; worker-brood rescue works after157; finite store rescue works after158; active/ready reproductive rescue works after159; explicit traffic closure works after160 and final departure/abandonment after161. M5 is complete; M6–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
 
 | Milestone | Player outcome and required scope | Dependencies | Exit evidence |
 | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system 
 | RES-NECTAR, RES-HONEYDEW, RES-INSECT, RES-HUNT, RES-PUDDLE | M1 identifies existing physical foundations; M2 normalizes yield handling. |
 | RES-FRUIT, RES-SEED, RES-CRUMBS, RES-DEW, RES-SEEP | M2 supports profiles; M6 authors/completes distinct behavior. Crumbs already have a temporary-source foundation. |
 | CH-QUEEN, CH-NURSERY, CH-EXCHANGE, CH-ENTRANCE, CH-MIDDEN | M2 refactors existing functionality without silently changing costs. |
-| CH-REPRODUCTIVE, CH-VENTILATION | M2 planned additions; each solves a stated scheduling/climate decision. |
+| CH-REPRODUCTIVE, CH-VENTILATION | M2 implemented144/145; each solves a stated scheduling/climate decision. |
 | CH-REFUGE | M6 after M5 physical rescue exists. |
 | CH-CACHE | M2 bottleneck experiment; Gated 1.0, excluded as a release blocker if no concrete decision is demonstrated. |
 | AT-LEAN, AT-LOAD, AT-PERSISTENT, AT-SECURITY, AT-TOLERANCE, AT-MANDIBLES | M3 registry/web migration of existing effects/IDs. |
@@ -92,7 +92,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M5-E complete:** [160 connection closure](tasks/160_connection_closure.md), explicit close/reopen policy, stopped repeating/waiting supplies, preserved paid owners/recall/report and independent local/other-edge continuation. Full10,131/0; import/Main/headless drawing passed.
 
-**M2 core/M3/M4 complete; next: M5 final departure/abandonment.** Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
+**M5-F complete:** [161 final departure/abandonment](tasks/161_final_departure_and_abandonment.md), staged lineage rescue then a real zero-messenger whole-workforce/empty departure, exact leftovers, actual recall/reactivation and receiver-owned confirmation with frozen source knowledge. Full10,183/0; import/Main/headless drawing passed. **M5 is complete.**
+
+**M2 core/M3/M4 complete; next: M6 water/producer ecology, then physical crisis/refuge.** Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

@@ -1,6 +1,6 @@
 # Current build and gaps
 
-Baseline: gameplay through card 160; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
+Baseline: gameplay through card 161; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
 
 ## Implemented foundation
 
@@ -14,7 +14,7 @@ Baseline: gameplay through card 160; design reset through 138. The pre-reset gam
 | INWARD | Queen, Nursery, Food Exchange, Entrance, Midden, local care/health; development/expansion; modular paid projects, Reproductive Alcove and staffed Ventilation Gallery. | Refuge/broader organ/network entries. |
 | Brood/reproductives | Auto/manual worker brood; saved reproductive/adaptation priority with Auto Brood on; Alcove space; paid per-pile groups, queen-owned ancestry and physical first founding. | Daughter-origin founding works; paid queen/worker-brood relocation works; active/ready reproductive-group rescue works. |
 | Adaptation | Ten definition-driven traits, including care, environment and Rapid Trail Repair; captured inheritance/travel, actual expression and bounded climate/nutrition/deposition tradeoffs. | Integrated trait balance remains M7. |
-| Network | Home plus additional independently working named piles, daughter-origin founding and captured generations; four site profiles, paid preparation/climate, two-way adjacent supplies/whole worker migration and finite store and active/ready reproductive-group rescue and supported laying-queen/worker-brood rescue with captured phenotype/ancestry, care/space promises and delayed receipts and explicit traffic closure/reopening. | Final departure/abandonment. |
+| Network | Home plus additional independently working named piles, daughter-origin founding and captured generations; four site profiles, paid preparation/climate, two-way adjacent supplies/whole worker migration and finite store and active/ready reproductive-group rescue and supported laying-queen/worker-brood rescue with captured phenotype/ancestry, care/space promises and delayed receipts and explicit traffic closure/reopening and whole final departure/abandonment. | Physical network/nest hazard integration remains M6. |
 | Conflict | Stationary ambusher, independent rival foraging/counter-recruitment, physical messengers, Clear/Hunt, finite remains, retreat, alternate approach. | Moving predator and network/nest hazard responses; more general encounter/content definitions. |
 | Conflict controls | Direct circle, flexible recruitment, protected care/real travel; shared tap/outcome cues now cover views/menus/reports/review. | Further visual feel stays deferred to beta; ordinary staffing remains next. |
 | Environment and health | Rain/heat, moisture/temperature care, refuse-related brood strain, recurring guest harm/clearing and contaminated intake. | Planned zone/connection/nest disturbances, new site profiles and useful evacuation counterplay. |
@@ -24,7 +24,7 @@ Local queen weakening, paid care and replacement now work. Maternal lineage and 
 
 ## Latest actual verification
 
-[Card160](tasks/160_connection_closure.md) recorded10,131 checks/zero failures (305.15s), focused72/zero, clean import/Main and176 headless connection/Queen/Nursery draw callbacks across standard/compact closed/reopened/travel states. [159](tasks/159_reproductive_group_rescue.md) recorded the prior10,059/zero. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the systems beta.
+[Card161](tasks/161_final_departure_and_abandonment.md) recorded10,183 checks/zero failures (336.69s), focused52/zero including same-tick destination changes, clean import/Main and212 headless connection/Queen/Nursery draw callbacks across standard/compact final/closed/rescue states. [160](tasks/160_connection_closure.md) recorded the prior10,131/zero. M5 network/rescue/closure/abandonment is complete. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the systems beta.
 
 The player supplies manual visual feedback. No screen monitoring, desktop automation, paid testers or broad compute sweeps are authorized. The documentation reset does not rerun the engine or claim new gameplay evidence. Existing user audio imports/images/translations and saved slot are preserved.
 

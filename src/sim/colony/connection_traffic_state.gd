@@ -9,6 +9,7 @@ var supplies: Dictionary[String,InterpileSupplyState]={}
 var migrations: Dictionary[String,WorkerReinforcementState]={}
 var queens: Dictionary[String,QueenTransportState]={}
 var broods: Dictionary[String,BroodTransportState]={}
+var evacuations: Dictionary[String,EvacuationTransportState]={}
 var royals: Dictionary[String,RoyalTransportState]={}
 var stores: Dictionary[String,StoreTransportState]={}
 var last_cargo_kind: String="supplies"
@@ -21,14 +22,14 @@ func _init(camp: FoundingState=null) -> void:
 	if camp==null:return
 	route_id=camp.route_id;parent_id=camp.origin_pile;child_id=camp.destination_pile;payer_id=parent_id
 	for id: String in [parent_id,child_id]:
-		supplies[id]=InterpileSupplyState.new();migrations[id]=WorkerReinforcementState.new();queens[id]=QueenTransportState.new();broods[id]=BroodTransportState.new();stores[id]=StoreTransportState.new();royals[id]=RoyalTransportState.new()
+		supplies[id]=InterpileSupplyState.new();migrations[id]=WorkerReinforcementState.new();queens[id]=QueenTransportState.new();broods[id]=BroodTransportState.new();stores[id]=StoreTransportState.new();royals[id]=RoyalTransportState.new();evacuations[id]=EvacuationTransportState.new()
 
 func target(source_id: String) -> String:
 	return child_id if source_id==parent_id else parent_id if source_id==child_id else ""
 
 func busy() -> bool:
 	for id: String in supplies:
-		if supplies[id].phase!="none" or migrations[id].active() or queens[id].active() or broods[id].active() or stores[id].active() or royals[id].active():return true
+		if supplies[id].phase!="none" or migrations[id].active() or queens[id].active() or broods[id].active() or stores[id].active() or royals[id].active() or evacuations[id].active():return true
 	return false
 
 func valid_route(route: TrailRouteState) -> bool:
@@ -36,7 +37,7 @@ func valid_route(route: TrailRouteState) -> bool:
 	if closed:
 		for id: String in supplies:
 			if supplies[id].enabled:return false
-			for departure: int in [supplies[id].departed_tick,migrations[id].departed_tick,queens[id].movement.departed_tick,broods[id].movement.departed_tick,stores[id].departed_tick,royals[id].movement.departed_tick]:
+			for departure: int in [supplies[id].departed_tick,migrations[id].departed_tick,queens[id].movement.departed_tick,broods[id].movement.departed_tick,stores[id].departed_tick,royals[id].movement.departed_tick,evacuations[id].movement.departed_tick]:
 				if departure>policy_tick:return false
 	var jobs: int=0
 	for id: String in supplies:
@@ -46,9 +47,11 @@ func valid_route(route: TrailRouteState) -> bool:
 		if broods[id].active():jobs+=1
 		if stores[id].active():jobs+=1
 		if royals[id].active():jobs+=1
-		if id!=payer_id and (supplies[id].phase!="none" or migrations[id].active() or queens[id].active() or broods[id].active() or stores[id].active() or royals[id].active()):return false
+		if evacuations[id].active():jobs+=1
+		if id!=payer_id and (supplies[id].phase!="none" or migrations[id].active() or queens[id].active() or broods[id].active() or stores[id].active() or royals[id].active() or evacuations[id].active()):return false
 	if jobs>1:return false
-	if last_cargo_kind=="stores":return stores[payer_id].trips_started>0 and supplies[payer_id].phase=="none" and not migrations[payer_id].active() and not queens[payer_id].active() and not broods[payer_id].active() and not royals[payer_id].active() and stores[payer_id].valid_route(route)
+	if last_cargo_kind=="stores":return stores[payer_id].trips_started>0 and supplies[payer_id].phase=="none" and not migrations[payer_id].active() and not queens[payer_id].active() and not broods[payer_id].active() and not royals[payer_id].active() and not evacuations[payer_id].active() and stores[payer_id].valid_route(route)
+	if evacuations[payer_id].active():return evacuations[payer_id].movement.valid_route(route,supplies[payer_id])
 	if royals[payer_id].active():return royals[payer_id].movement.valid_route(route,supplies[payer_id])
 	if broods[payer_id].active():return broods[payer_id].movement.valid_route(route,supplies[payer_id])
 	if queens[payer_id].active():return queens[payer_id].movement.valid_route(route,supplies[payer_id])
@@ -60,7 +63,7 @@ func to_dict() -> Dictionary:
 	var store_records: Dictionary={parent_id:stores[parent_id].to_dict(),child_id:stores[child_id].to_dict()}
 	var brood_records: Dictionary={parent_id:broods[parent_id].to_dict(),child_id:broods[child_id].to_dict()}
 	var queen_records: Dictionary={parent_id:queens[parent_id].to_dict(),child_id:queens[child_id].to_dict()}
-	var result: Dictionary={"closed":closed,"policy_actor":policy_actor,"policy_tick":policy_tick,"royals":royal_records,"last_cargo_kind":last_cargo_kind,"stores":store_records,"broods":brood_records,"queens":queen_records,"migrations":{child_id:migrations[child_id].to_dict()}}
+	var result: Dictionary={"evacuations":{parent_id:evacuations[parent_id].to_dict(),child_id:evacuations[child_id].to_dict()},"closed":closed,"policy_actor":policy_actor,"policy_tick":policy_tick,"royals":royal_records,"last_cargo_kind":last_cargo_kind,"stores":store_records,"broods":brood_records,"queens":queen_records,"migrations":{child_id:migrations[child_id].to_dict()}}
 	if not legacy:
 		result.payer_id=payer_id;result.supplies={parent_id:supplies[parent_id].to_dict(),child_id:supplies[child_id].to_dict()};result.migrations[parent_id]=migrations[parent_id].to_dict()
 	return result
@@ -82,6 +85,7 @@ func restore(data: Dictionary, colony: ColonyState, camp: FoundingState, tick: i
 		if data.closed or data.policy_tick!=0:return false
 	elif data.policy_actor not in [parent_id,child_id] or data.policy_tick<colony.piles[child_id].foundation.founded_tick:return false
 	closed=data.closed;policy_actor=data.policy_actor;policy_tick=int(data.policy_tick)
+	if not data.has("evacuations"):data.evacuations={parent_id:evacuations[parent_id].to_dict(),child_id:evacuations[child_id].to_dict()}
 	var expected: Array=to_dict().keys()
 	if data.size()!=expected.size() or not data.has_all(expected) or not data.migrations is Dictionary:return false
 	var ids: Array[String]=[child_id]
@@ -106,4 +110,7 @@ func restore(data: Dictionary, colony: ColonyState, camp: FoundingState, tick: i
 	if not data.royals is Dictionary or data.royals.size()!=2 or not data.royals.has_all([parent_id,child_id]):return false
 	for id: String in [parent_id,child_id]:
 		if not royals[id].restore(data.royals[id],self,colony,camp,tick) or (not royals[id].source_id.is_empty() and royals[id].source_id!=id):return false
+	if not data.evacuations is Dictionary or data.evacuations.size()!=2 or not data.evacuations.has_all([parent_id,child_id]):return false
+	for id: String in [parent_id,child_id]:
+		if not evacuations[id].restore(data.evacuations[id],self,colony,camp,tick) or not evacuations[id].source_id.is_empty() and evacuations[id].source_id!=id:return false
 	return true

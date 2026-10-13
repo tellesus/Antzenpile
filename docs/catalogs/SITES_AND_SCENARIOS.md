@@ -29,7 +29,7 @@ Site descriptions are game profiles, not universal geological claims. Different 
 
 153 authors two alternative sites per new setting. Provisional Loam/Root/Stone/Edge: heat exposure .85/.75/.5/1, damp offset 0/+100,000/+75,000/0, preparation 480/600/720/360 ticks, extra preparation food 0/2/4/0 carbs. Quoted food is spent at Home; an unidentified site is learned physically and consumes the extra from its real pack before reporting. Profiles alter developed-Nursery ambient through the existing climate owners, with no immunity/free water. Generic old sites retain exposure 1, zero offset/extra food and 480 ticks.
 
-Several instances can share a type. Pile names belong to the colony/player and stay stable across attention/save; profile names do not become hidden world labels. 154 verifies Home plus two independently staffed daughters and a daughter-origin later-generation founding. 155 adds actual two-way adjacent supplies and whole worker migration; portable rescue/isolation and launch-scenario integration remain M5/M7. This is an acceptance example, not a hard arbitrary three-pile cap.
+Several instances can share a type. Pile names belong to the colony/player and stay stable across attention/save; profile names do not become hidden world labels. 154 verifies Home plus two independently staffed daughters and a daughter-origin later-generation founding. 155 adds actual two-way adjacent supplies and whole worker migration; 156–161 add physical rescue, traffic closure and final departure/abandonment. Launch-scenario integration remains M7. This is an acceptance example, not a hard arbitrary three-pile cap.
 
 ## Scenario rules family
 

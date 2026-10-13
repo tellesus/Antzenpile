@@ -19,6 +19,7 @@ const FOOD_CONFIG = preload("res://data/resources/default_food_exchange.tres")
 const NURSERY_CONFIG = preload("res://data/resources/default_nursery_development.tres")
 const RESOURCE_IDS: Array[String] = ["carbohydrate", "protein", "water"]
 var foundation: Dictionary = {}
+var relinquished: bool=false
 var id: String = "home"
 var display_name: String=""
 static func valid_id(value: Variant) -> bool:
@@ -114,7 +115,7 @@ func to_dict() -> Dictionary:
 		"nursery_state": nursery_state, "nursery_progress_seconds": nursery_progress_seconds,
 		"nursery_expansion": {"state": nursery_expansion_state, "progress_seconds": nursery_expansion_progress},
 		"food_exchange_state": food_exchange_state, "food_toxicity": food_toxicity.to_dict(),
-		"royal_reserved":royal_reserved,"royal_reserved_space":royal_reserved_space,"royal_reserved_traits":royal_reserved_traits.duplicate(),"brood_health": brood_health.to_dict(), "temperature": temperature.to_dict(), "reproduction": reproduction.to_dict(),
+		"relinquished":relinquished,"royal_reserved":royal_reserved,"royal_reserved_space":royal_reserved_space,"royal_reserved_traits":royal_reserved_traits.duplicate(),"brood_health": brood_health.to_dict(), "temperature": temperature.to_dict(), "reproduction": reproduction.to_dict(),
 		"food_exchange_progress_seconds": food_exchange_progress_seconds, "midden": midden.to_dict(), "humidity": humidity.to_dict()}
 	if not foundation.is_empty(): record.foundation=foundation.duplicate(true)
 	return record
@@ -582,6 +583,8 @@ func restore(data: Dictionary) -> bool:
 	foundation=founding_data.duplicate(true)
 	if not foundation.is_empty(): foundation.queen_traits=founder_traits; foundation.founded_tick=int(foundation.founded_tick)
 	temperature = restored_temperature
+	if not data.get("relinquished",false) is bool:return false
+	relinquished=data.get("relinquished",false)
 	var royal_promise: Variant=data.get("royal_reserved",false);var royal_space: Variant=data.get("royal_reserved_space",0);var royal_traits: Variant=data.get("royal_reserved_traits",[])
 	if not royal_promise is bool or not Ledger.valid_count(royal_space) or royal_space>ReproductionState.CONFIG.space or not royal_traits is Array:return false
 	var parsed_royal: Array[String]=[]

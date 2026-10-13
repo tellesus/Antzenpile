@@ -312,6 +312,7 @@ func _tick(delta: float) -> void:
 			InterpileSupplySystem.new(run,id,connection.route_id).tick()
 			StoreRescueSystem.new(run,id,connection.route_id).tick()
 			RoyalRescueSystem.new(run,id,connection.route_id).tick()
+			FinalDepartureSystem.new(run,id,connection.route_id).tick()
 		for id: String in [connection.parent_id,connection.child_id]:WorkerReinforcementSystem.new(run,id,connection.route_id).tick()
 		for id: String in [connection.parent_id,connection.child_id]:QueenRelocationSystem.new(run,id,connection.route_id).tick()
 		for id: String in [connection.parent_id,connection.child_id]:BroodRescueSystem.new(run,id,connection.route_id).tick()
@@ -343,6 +344,7 @@ func connection_order(route_id: String, source_id: String, action: String, count
 	if run.history.ended:return {"accepted":false,"reason":"Run has ended"}
 	var connection: ConnectionTrafficState=run.connection_for(route_id)
 	if connection==null or connection.target(source_id).is_empty():return {"accepted":false,"reason":"Choose an established adjacent connection"}
+	if action=="open" and (run.colony.piles[source_id].relinquished or run.colony.piles[connection.target(source_id)].relinquished):return {"accepted":false,"reason":"One endpoint has been relinquished"}
 	if action in ["close","open"]:
 		if connection.closed==(action=="close"):return {"accepted":false,"reason":"Connection already closed" if connection.closed else "Connection already open"}
 		if action=="close":
@@ -355,6 +357,9 @@ func connection_order(route_id: String, source_id: String, action: String, count
 	if action in ["supply","stop_supply"]:
 		var system:=InterpileSupplySystem.new(run,source_id,route_id)
 		accepted=system.set_enabled(action=="supply");reason=system.last_error
+	elif action in ["final_departure","recall_departure"]:
+		var system:=FinalDepartureSystem.new(run,source_id,route_id)
+		accepted=system.start() if action=="final_departure" else system.recall();reason=system.last_error
 	elif action in ["rescue_royals","recall_royals"]:
 		var system:=RoyalRescueSystem.new(run,source_id,route_id)
 		accepted=system.start(count) if action=="rescue_royals" else system.recall();reason=system.last_error
@@ -379,5 +384,5 @@ func connection_summaries(pile_id: String, settlers: int=8, cohort_uid: String="
 		var owner: String=connection.payer_id
 		var choices: Array[Dictionary]=[]
 		for cohort: BroodCohort in run.colony.piles[pile_id].brood_cohorts:choices.append({"uid":cohort.uid(pile_id),"stage":cohort.stage,"count":cohort.count,"trial":cohort.adaptation_trial})
-		result.append({"closed":connection.closed,"royals":RoyalRescueSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_royals":RoyalRescueSystem.new(run,owner,connection.route_id).summary(settlers),"stores":StoreRescueSystem.new(run,pile_id,connection.route_id).summary_for(cohort_uid if cohort_uid in PileState.RESOURCE_IDS else "water",settlers),"assigned_stores":StoreRescueSystem.new(run,owner,connection.route_id).summary_for(),"cohorts":choices,"id":connection.route_id,"source_id":pile_id,"source_name":run.colony.piles[pile_id].display_title(),"destination_id":connection.target(pile_id),"destination_name":run.colony.piles[connection.target(pile_id)].display_title(),"payer_id":owner,"payer_name":run.colony.piles[owner].display_title(),"busy":connection.busy(),"supply":InterpileSupplySystem.new(run,pile_id,connection.route_id).summary(),"migration":WorkerReinforcementSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_supply":InterpileSupplySystem.new(run,owner,connection.route_id).summary(),"brood":BroodRescueSystem.new(run,pile_id,connection.route_id,cohort_uid).summary(settlers),"assigned_brood":BroodRescueSystem.new(run,owner,connection.route_id).summary(settlers),"queen":QueenRelocationSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_queen":QueenRelocationSystem.new(run,owner,connection.route_id).summary(settlers),"assigned_migration":WorkerReinforcementSystem.new(run,owner,connection.route_id).summary(settlers),"available":run.colony.piles[pile_id].workers_assignable})
+		result.append({"departure":FinalDepartureSystem.new(run,pile_id,connection.route_id).summary(),"assigned_departure":FinalDepartureSystem.new(run,owner,connection.route_id).summary(),"closed":connection.closed,"royals":RoyalRescueSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_royals":RoyalRescueSystem.new(run,owner,connection.route_id).summary(settlers),"stores":StoreRescueSystem.new(run,pile_id,connection.route_id).summary_for(cohort_uid if cohort_uid in PileState.RESOURCE_IDS else "water",settlers),"assigned_stores":StoreRescueSystem.new(run,owner,connection.route_id).summary_for(),"cohorts":choices,"id":connection.route_id,"source_id":pile_id,"source_name":run.colony.piles[pile_id].display_title(),"destination_id":connection.target(pile_id),"destination_name":run.colony.piles[connection.target(pile_id)].display_title(),"payer_id":owner,"payer_name":run.colony.piles[owner].display_title(),"busy":connection.busy() or run.colony.piles[pile_id].relinquished and not connection.evacuations[pile_id].current().is_empty(),"supply":InterpileSupplySystem.new(run,pile_id,connection.route_id).summary(),"migration":WorkerReinforcementSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_supply":InterpileSupplySystem.new(run,owner,connection.route_id).summary(),"brood":BroodRescueSystem.new(run,pile_id,connection.route_id,cohort_uid).summary(settlers),"assigned_brood":BroodRescueSystem.new(run,owner,connection.route_id).summary(settlers),"queen":QueenRelocationSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_queen":QueenRelocationSystem.new(run,owner,connection.route_id).summary(settlers),"assigned_migration":WorkerReinforcementSystem.new(run,owner,connection.route_id).summary(settlers),"available":run.colony.piles[pile_id].workers_assignable})
 	return result

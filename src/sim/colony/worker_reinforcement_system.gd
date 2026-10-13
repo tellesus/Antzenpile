@@ -19,16 +19,17 @@ func _cost(count: int=CONFIG.reinforcement_workers) -> float:
  var h: PileState=_source();var d: PileState=_target()
  var energy: float=AdaptationRules.energy_multiplier(h.adaptation_repertoire,h.adaptation_fraction())*(1.0+AdaptationRules.CHEMISTRY.extra_travel_energy*h.chemistry_fraction())
  # Settlers need one leg; the real messenger needs both.
- var equivalent: float=float(count)/2.0+CONFIG.reinforcement_messengers
+ var equivalent: float=float(count)/2.0+_state().messengers
  var base_cost: float=roundf(equivalent*h.position.distance_to(d.position)*TrailSegmentState.terrain_cost_for(_run.world,h.position,d.position)*TRAILS.carbohydrate_per_worker_meter*100000.0)/100000.0
  return snappedf(base_cost*energy,0.00001)
 func blocker(count: int=CONFIG.reinforcement_workers) -> String:
  if _connection()==null or not _connection().migrations.has(_source_id):return "Establish an adjacent pile first"
+ if _source().relinquished or _target().relinquished:return "One of these nests has been relinquished"
  if _connection().closed:return "Connection closed to new traffic; reopen it first"
  if not WorkerLedger.valid_count(count) or count<1 or count>=WorkerLedger.MAX_COUNT:return "Choose a whole positive settler count"
  if _connection().busy():return "Connection assigned; stop its job and await return"
  var h: PileState=_source();var d: PileState=_target()
- var required: int=count+CONFIG.reinforcement_messengers
+ var required: int=count+_state().messengers
  if h.workers_assignable<required:return "Need %d available %s workers" % [required,h.display_title()]
  if h.resources.carbohydrate<_cost(count):return "Need %.2f %s travel carbs" % [_cost(count),h.display_title()]
  if _state().trips_started>=WorkerLedger.MAX_COUNT or _state().moved_workers>WorkerLedger.MAX_COUNT-count or h.workers.transferred_out>WorkerLedger.MAX_COUNT-count or d.workers_total>WorkerLedger.MAX_COUNT-count or d.workers.transferred_in>WorkerLedger.MAX_COUNT-count:return "Worker transfer history or capacity is full"
@@ -43,7 +44,7 @@ func start(settlers: int=CONFIG.reinforcement_workers) -> bool:
  if not last_error.is_empty():return false
  var connection: ConnectionTrafficState=_connection()
  var h: PileState=_source();var route: TrailRouteState=_route()
- var count: int=settlers+CONFIG.reinforcement_messengers
+ var count: int=settlers+_state().messengers
  if not h.workers.create_commitment("trail:"+route.id,"trail",route.id):return _reject("Connection commitment unavailable")
  var allocated: bool=h.allocate_workers("trail:"+route.id,count);var paid: bool=h.consume_resources({"carbohydrate":_cost(settlers)});assert(allocated and paid)
  var state: WorkerReinforcementState=_state()
@@ -87,7 +88,7 @@ func _return_home() -> void:
 func summary(count: int=CONFIG.reinforcement_workers) -> Dictionary:
  if _connection()==null or not _connection().migrations.has(_source_id):return {}
  var state: WorkerReinforcementState=_state()
- return {"away":state.active(),"source_id":_source_id,"source_name":_source().display_title(),"destination_id":_target().id,"destination_name":_target().display_title(),"route_id":_connection().route_id,"sent":state.settlers+CONFIG.reinforcement_messengers if state.active() else 0,"settlers":state.settlers if state.active() else count,"messengers":CONFIG.reinforcement_messengers,"age":(_run.clock.tick_count-state.departed_tick)*SimulationClock.TICK_INTERVAL if state.active() else 0.0,"reports":state.trips_reported,"reported_workers":state.reported_workers(),"last_settled":state.last_settled,"report_age":(_run.clock.tick_count-state.last_reported_tick)*SimulationClock.TICK_INTERVAL if state.trips_reported>0 else 0.0,"blocker":blocker(count) if not state.active() else "","cost":_cost(count)}
+ return {"away":state.active(),"source_id":_source_id,"source_name":_source().display_title(),"destination_id":_target().id,"destination_name":_target().display_title(),"route_id":_connection().route_id,"sent":state.settlers+_state().messengers if state.active() else 0,"settlers":state.settlers if state.active() else count,"messengers":state.messengers,"age":(_run.clock.tick_count-state.departed_tick)*SimulationClock.TICK_INTERVAL if state.active() else 0.0,"reports":state.trips_reported,"reported_workers":state.reported_workers(),"last_settled":state.last_settled,"report_age":(_run.clock.tick_count-state.last_reported_tick)*SimulationClock.TICK_INTERVAL if state.trips_reported>0 else 0.0,"blocker":blocker(count) if not state.active() else "","cost":_cost(count)}
 
 func _settle() -> bool:
  var state: WorkerReinforcementState=_state();var h: PileState=_source();var d: PileState=_target()

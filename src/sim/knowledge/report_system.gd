@@ -104,6 +104,16 @@ func capture(recording: bool = true) -> void:
 				var received: float=queen_transport.movement.last_reported_tick*SimulationClock.TICK_INTERVAL
 				journal.add("relocation",origin,connection.target(origin),received,received,"delivered" if queen_transport.current().arrived_tick>0 else queen_transport.current().reason if not queen_transport.current().reason.is_empty() else "returned",queen_transport.movement.last_settled,queen_transport.movement.reported_arrivals(),recording)
 
+			var final_party: EvacuationTransportState=connection.evacuations[origin]
+			if not final_party.current().is_empty():
+				var record: Dictionary=final_party.current();var departure: float=record.departed_tick*SimulationClock.TICK_INTERVAL
+				if journal.changed("departure/"+origin+"/"+connection.route_id,record.sequence):journal.add("departure",origin,connection.target(origin),departure,departure,"departed",record.workers,0,recording)
+				if record.arrived_tick>0 and record.workers>0 and journal.changed("evacuation/"+origin+"/"+connection.route_id+"/arrival",record.arrived_tick):
+					var received: float=record.arrived_tick*SimulationClock.TICK_INTERVAL
+					journal.add("evacuation",connection.target(origin),origin,received,received,"arrived",record.workers,0,recording)
+				if record.returned_tick>0 and journal.changed("evacuation/"+origin+"/"+connection.route_id+"/return",record.returned_tick):
+					var received: float=record.returned_tick*SimulationClock.TICK_INTERVAL
+					journal.add("evacuation",origin,connection.target(origin),received,received,record.reason if not record.reason.is_empty() else "returned",record.workers,0,recording)
 			var royal_transport: RoyalTransportState=connection.royals[origin]
 			if royal_transport.movement.trips_reported>0 and journal.changed("royal_rescue/"+origin+"/"+connection.route_id,royal_transport.movement.last_reported_tick):
 				var report: Dictionary=royal_transport.last_report();var received: float=report.reported_tick*SimulationClock.TICK_INTERVAL

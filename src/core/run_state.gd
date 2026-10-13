@@ -348,7 +348,7 @@ func restore(data: Dictionary) -> bool:
 	var restored_trails := Trails.new()
 	if not data.trails is Dictionary or not restored_trails.restore(data.trails, restored_colony, restored_knowledge, restored_world, restored_clock.simulation_time, restored_founding, active_supply, restored_reinforcement, restored_supply_origin, restored_extra_foundings.values(),restored_connections):
 		return false
-	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement,restored_connections) or not _valid_queen_transports(restored_colony,restored_connections) or not _valid_brood_transports(restored_colony,restored_connections) or not _valid_royal_transports(restored_colony,restored_connections,restored_camps): return false
+	if not _valid_foundations(restored_colony,restored_camps,restored_trails,restored_clock.tick_count,restored_reinforcement,restored_connections) or not _valid_queen_transports(restored_colony,restored_connections) or not _valid_brood_transports(restored_colony,restored_connections) or not _valid_royal_transports(restored_colony,restored_connections,restored_camps) or not _valid_evacuations(restored_colony,restored_connections): return false
 	# A paid young queen has one current body owner; founding history is not stock.
 	var reproductive_bodies: Dictionary={}
 	for pile: PileState in restored_colony.piles.values():
@@ -692,7 +692,7 @@ static func _valid_foundations(colony_state: ColonyState, camps: Array[FoundingS
 		for connection: ConnectionTrafficState in connections.values():
 			for source_id: String in connection.migrations:
 				var target_id: String=connection.target(source_id)
-				for migration: WorkerReinforcementState in [connection.migrations[source_id],connection.queens[source_id].movement,connection.broods[source_id].movement,connection.royals[source_id].movement]:
+				for migration: WorkerReinforcementState in [connection.migrations[source_id],connection.queens[source_id].movement,connection.broods[source_id].movement,connection.royals[source_id].movement,connection.evacuations[source_id].movement]:
 					incoming[target_id]=incoming.get(target_id,0)+migration.moved_workers;outgoing[source_id]=outgoing.get(source_id,0)+migration.moved_workers
 					_profile_sum(gene_in,target_id,migration.moved_profiles);_profile_sum(gene_out,source_id,migration.moved_profiles)
 	for pile: PileState in colony_state.piles.values():
@@ -909,6 +909,12 @@ func unreported_transfers(pile_id: String, trait_id: String="*") -> int:
 	var total: int=0
 	for connection: ConnectionTrafficState in all_connections():
 		if not connection.migrations.has(pile_id):continue
+		var evacuation: EvacuationTransportState=connection.evacuations[pile_id]
+		if colony.piles[pile_id].relinquished and not evacuation.current().is_empty() and evacuation.current().arrived_tick>0:
+			if trait_id=="*":total+=int(evacuation.current().workers)
+			else:
+				for key: String in evacuation.current().profiles:
+					if trait_id in GeneticRepertoire.traits_for(key):total+=int(evacuation.current().profiles[key])
 		for movement: WorkerReinforcementState in [connection.migrations[pile_id],connection.queens[pile_id].movement,connection.broods[pile_id].movement,connection.royals[pile_id].movement]:
 			if not movement.active() or not movement.settled:continue
 			if trait_id=="*":total+=movement.settlers
@@ -1000,3 +1006,38 @@ static func _valid_royal_transports(colony_state: ColonyState, connections: Dict
 	for identity: String in bodies:
 		if bodies[identity].body.get("transport_count",0)>0 and not records.has(identity):return false
 	return true
+
+static func _valid_evacuations(colony_state: ColonyState, connections: Dictionary) -> bool:
+	var latest: Dictionary={};var orders: Dictionary={}
+	for connection: ConnectionTrafficState in connections.values():
+		for source_id: String in connection.evacuations:
+			var state: EvacuationTransportState=connection.evacuations[source_id]
+			for record: Dictionary in state.manifests:
+				if not orders.has(source_id):orders[source_id]=[]
+				orders[source_id].append(record)
+				if not latest.has(source_id) or record.sequence>latest[source_id].sequence:latest[source_id]=record
+			if state.active() and (state.movement.settled or state.current().workers!=colony_state.piles[source_id].workers_total):return false
+	for records: Array in orders.values():
+		records.sort_custom(func(a: Dictionary,b: Dictionary)->bool:return a.sequence<b.sequence)
+		for index: int in records.size():
+			if records[index].sequence!=index+1:return false
+			if index>0 and (records[index-1].arrived_tick>0 or records[index-1].returned_tick==0 or records[index].departed_tick<records[index-1].returned_tick):return false
+	for pile: PileState in colony_state.piles.values():
+		var record: Dictionary=latest.get(pile.id,{})
+		if pile.relinquished!=(not record.is_empty() and record.returned_tick==0):return false
+		if not pile.relinquished:continue
+		if pile.queen.count>0 or pile.queen.replacing() or pile.queen.in_transit or not pile.brood_cohorts.is_empty() or pile.reproduction.phase!="none" or pile.brood_reserved_space>0 or pile.royal_reserved:return false
+		if pile.workers_available!=0 or pile.brood_intent!="manual" or not pile.queued_adaptation.is_empty() or pile.investments.reproduction:return false
+		for connection: ConnectionTrafficState in connections.values():
+			if pile.id in [connection.parent_id,connection.child_id] and not connection.closed:return false
+	return true
+
+func known_final_departure(pile_id: String) -> Dictionary:
+	var result: Dictionary={}
+	for connection: ConnectionTrafficState in all_connections():
+		if not connection.evacuations.has(pile_id):continue
+		var state: EvacuationTransportState=connection.evacuations[pile_id]
+		if state.current().is_empty() or not result.is_empty() and state.current().sequence<=result.sequence:continue
+		var record: Dictionary=state.current()
+		result={"sequence":record.sequence,"departed_tick":record.departed_tick,"destination_id":connection.target(pile_id),"destination_name":colony.piles[connection.target(pile_id)].display_title(),"workers":record.workers,"left_stores":record.left_stores.duplicate(),"left_organs":record.left_organs.duplicate(),"returned":record.returned_tick>0}
+	return result

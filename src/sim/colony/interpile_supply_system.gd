@@ -17,6 +17,8 @@ func _target() -> PileState: return _run.colony.piles[_connection().target(_sour
 func _name() -> String: return _source().display_title()
 func _route() -> TrailRouteState: return _run.trails.routes[_connection().route_id]
 func _migration_active() -> bool:
+ for state: EvacuationTransportState in _connection().evacuations.values():
+  if state.active():return true
  for state: RoyalTransportState in _connection().royals.values():
   if state.active():return true
  for state: StoreTransportState in _connection().stores.values():
@@ -31,6 +33,7 @@ func _migration_active() -> bool:
 func set_enabled(value: Variant) -> bool:
  if not value is bool: return _reject("Supply intent must be on or off")
  if _connection()==null or not _connection().supplies.has(_source_id): return _reject("Establish a reported daughter pile first")
+ if value and (_source().relinquished or _target().relinquished):return _reject("One of these nests has been relinquished")
  if value and _connection().closed:return _reject("Connection closed to new traffic; reopen it first")
  var state: InterpileSupplyState=_state()
  if value and _other().phase != "none": return _reject("Other supply direction assigned; stop it and await return")
