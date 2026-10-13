@@ -81,6 +81,9 @@ func capture(recording: bool = true) -> void:
 		var received: float=camp.reported_tick*SimulationClock.TICK_INTERVAL
 		if camp.phase in ["ready","failed","established"] and journal.changed("camp/"+camp.route_id,str(received)+":"+camp.phase):journal.add("camp",camp.origin_pile,camp.route_id,received,received,camp.phase,0,0,recording)
 	for connection: ConnectionTrafficState in _run.all_connections():
+		if not connection.policy_actor.is_empty() and journal.changed("connection/"+connection.route_id,str(connection.policy_tick)+":"+str(connection.closed)):
+			var received: float=connection.policy_tick*SimulationClock.TICK_INTERVAL
+			journal.add("connection",connection.policy_actor,connection.route_id,received,received,"closed" if connection.closed else "opened",0,0,recording)
 		for origin: String in [connection.parent_id,connection.child_id]:
 			var supply: InterpileSupplyState=connection.supplies[origin]
 			var key: String="supplies/"+origin+("" if connection.legacy else "/"+connection.route_id)

@@ -29,7 +29,8 @@ func rect(size: Vector2, action: String) -> Rect2:
 		"less":return Rect2(at+Vector2(16,232 if purpose in ["brood","stores"] else 184),Vector2(48,44))
 		"more":return Rect2(at+Vector2(box.size.x-64,232 if purpose in ["brood","stores"] else 184),Vector2(48,44))
 		"order":return Rect2(at+Vector2(16,388),Vector2(box.size.x-32,44))
-		"stop":return Rect2(at+Vector2(16,446),Vector2(box.size.x-180,44))
+		"stop":return Rect2(at+Vector2(16,446),Vector2((box.size.x-188)/2,44))
+		"policy":return Rect2(at+Vector2(24+(box.size.x-188)/2,446),Vector2((box.size.x-188)/2,44))
 		"back":return Rect2(at+Vector2(box.size.x-148,446),Vector2(132,44))
 	return Rect2()
 func sync(entries: Array, pile_id: String) -> void:
@@ -50,7 +51,7 @@ func activate(view: Node2D, at: Vector2, entries: Array, command: Callable) -> b
 	if rect(size,"back").has_point(at):opened=false;return true
 	var entry: Dictionary=chosen(entries)
 	if entry.is_empty():return true
-	for action: String in ["previous","next","supplies","workers","queen","brood","stores","royals","cohort_previous","cohort_next","less","more","order","stop"]:
+	for action: String in ["previous","next","supplies","workers","queen","brood","stores","royals","cohort_previous","cohort_next","less","more","order","stop","policy"]:
 		if action in ["cohort_previous","cohort_next"] and purpose not in ["brood","stores"]:continue
 		if not rect(size,action).has_point(at):continue
 		match action:
@@ -73,6 +74,10 @@ func activate(view: Node2D, at: Vector2, entries: Array, command: Callable) -> b
 						if choices[i].uid==cohort_uid:index=i
 					cohort_uid=choices[posmod(index+(-1 if action=="cohort_previous" else 1),choices.size())].uid
 			"less","more":settlers=clampi(settlers+(-1 if action=="less" else 1),2 if purpose=="queen" else 1,entry.stores.capacity if purpose=="stores" else maxi(1,entry.available-1))
+			"policy":
+				if command.is_valid():
+					var result: Dictionary=command.call(selected,entry.source_id,"open" if entry.closed else "close",settlers,cohort_uid)
+					view.activation.outcome(result);view.show_feedback(("Connection reopened; order new traffic" if entry.closed else "Connection closed; paid trips finish") if result.get("accepted",false) else result.get("reason","Connection unavailable"))
 			"order","stop":
 				if not command.is_valid():return true
 				var source_id: String=entry.source_id
@@ -136,9 +141,11 @@ func draw(view: Node2D, entries: Array) -> void:
 		elif entry.assigned_queen.away:wait+="Queen party · %d sent · away %s" % [entry.assigned_queen.sent,Copy.duration(entry.assigned_queen.age)]
 		elif entry.assigned_migration.away:wait+="%d sent · away %s" % [entry.assigned_migration.sent,Copy.duration(entry.assigned_migration.age)]
 		else:wait+="%d supply workers · %s" % [entry.assigned_supply.workers,entry.assigned_supply.status]
+	if entry.closed:wait="Closed to new traffic · "+(wait if entry.busy else "reopen before ordering")
 	_text(view,box.position+Vector2(16,368),wait,13,box.size.x-32)
 	_button(view,rect(size,"order"),"ORDER SUPPLIES" if purpose=="supplies" else "ORDER YOUNG QUEEN RESCUE" if purpose=="royals" else "ORDER ONE STORE PACK" if purpose=="stores" else "ORDER BROOD RESCUE" if purpose=="brood" else "ORDER QUEEN RELOCATION" if purpose=="queen" else "ORDER %d SETTLERS" % settlers)
 	_button(view,rect(size,"stop"),"REQUEST RETURN" if entry.assigned_royals.away or entry.assigned_stores.away or entry.assigned_migration.away or entry.assigned_queen.away or entry.assigned_brood.away else "STOP AFTER SUPPLY TRIP")
+	_button(view,rect(size,"policy"),"OPEN CONNECTION" if entry.closed else "CLOSE TRAFFIC")
 	_button(view,rect(size,"back"),"BACK")
 func _button(view: Node2D, box: Rect2, label: String, active: bool=false) -> void:
 	Style.surface(view,box,Color("344c43") if active else Color("24333a"));_text(view,box.position+Vector2(12,28),label,13,box.size.x-24)

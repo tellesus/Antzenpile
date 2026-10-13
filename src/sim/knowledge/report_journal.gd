@@ -3,7 +3,7 @@ extends RefCounted
 ## Bounded semantic records of delivered/local facts; never physical replay data.
 const LIMIT: int = 192
 const SEEN_LIMIT: int = 512
-const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation","brood_rescue","store_rescue","royal_rescue"]
+const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection"]
 var initialized: bool = false
 var since: float = 0.0
 var next_id: int = 1
@@ -104,6 +104,7 @@ static func _valid_entry(entry: Variant, colony: ColonyState, knowledge: Knowled
 		"project": return entry.subject_id in ["nursery","food_exchange","midden","queen"] and entry.detail in ["developed","expanded","ready"]
 		"brood": return entry.subject_id==entry.pile_id and entry.detail in ["emerged","lost"] and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total)
 		"store_rescue": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail.get_slice(":",0) in ["delivered","returned"] and entry.detail.get_slice(":",1) in PileState.RESOURCE_IDS and WorkerLedger.valid_count(entry.amount) and entry.amount>=1 and entry.amount<=11
+		"connection": return entry.detail in ["closed","opened"] and trails.routes.has(entry.subject_id) and trails.routes[entry.subject_id].purpose=="interpile" and (trails.routes[entry.subject_id].origin_pile==entry.pile_id or colony.piles[entry.pile_id].foundation.get("route_id","")==entry.subject_id)
 		"royal_rescue": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail in ["delivered","returned","landing","escorts"] and entry.amount in [0.0,1.0]
 		"brood_rescue": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail in ["delivered","returned","landing","escorts"] and WorkerLedger.valid_count(entry.amount) and entry.amount<=BroodCohort.CONFIG.starting_count
 		"relocation": return colony.piles.has(entry.subject_id) and entry.subject_id!=entry.pile_id and entry.detail in ["delivered","returned","landing","escorts"] and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total)

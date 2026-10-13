@@ -257,15 +257,15 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","investment","chamber","queen"]:
+	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","investment","chamber","queen"]:
 		inspect_pile(selected.pile_id)
 		var organ: String="nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
-		if selected.kind in ["supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue"] and _inward_view!=null:
+		if selected.kind in ["supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection"] and _inward_view!=null:
 			_inward_view.connection_controls.opened=true
 			_inward_view.connection_controls.purpose="workers" if selected.kind=="migration" else "queen" if selected.kind=="relocation" else "brood" if selected.kind=="brood_rescue" else "royals" if selected.kind=="royal_rescue" else "stores" if selected.kind=="store_rescue" else "supplies"
 			for entry: Dictionary in simulation.connection_summaries(selected.pile_id):
-				if entry.destination_id==selected.subject_id:_inward_view.connection_controls.selected=entry.id
+				if entry.destination_id==selected.subject_id or entry.id==selected.subject_id:_inward_view.connection_controls.selected=entry.id
 		if selected.kind=="chamber" and _inward_view!=null: _inward_view.chamber_controls.opened=true;_inward_view.chamber_controls.selected=selected.subject_id
 		if selected.kind=="queen" and _inward_view!=null: _inward_view.queen_tab="continuity"
 		set_mode("inward")

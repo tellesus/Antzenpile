@@ -12,6 +12,9 @@ var broods: Dictionary[String,BroodTransportState]={}
 var royals: Dictionary[String,RoyalTransportState]={}
 var stores: Dictionary[String,StoreTransportState]={}
 var last_cargo_kind: String="supplies"
+var closed: bool=false
+var policy_actor: String=""
+var policy_tick: int=0
 var legacy: bool=false
 
 func _init(camp: FoundingState=null) -> void:
@@ -30,6 +33,11 @@ func busy() -> bool:
 
 func valid_route(route: TrailRouteState) -> bool:
 	if not supplies.has(payer_id):return false
+	if closed:
+		for id: String in supplies:
+			if supplies[id].enabled:return false
+			for departure: int in [supplies[id].departed_tick,migrations[id].departed_tick,queens[id].movement.departed_tick,broods[id].movement.departed_tick,stores[id].departed_tick,royals[id].movement.departed_tick]:
+				if departure>policy_tick:return false
 	var jobs: int=0
 	for id: String in supplies:
 		if supplies[id].phase!="none":jobs+=1
@@ -52,8 +60,10 @@ func to_dict() -> Dictionary:
 	var store_records: Dictionary={parent_id:stores[parent_id].to_dict(),child_id:stores[child_id].to_dict()}
 	var brood_records: Dictionary={parent_id:broods[parent_id].to_dict(),child_id:broods[child_id].to_dict()}
 	var queen_records: Dictionary={parent_id:queens[parent_id].to_dict(),child_id:queens[child_id].to_dict()}
-	if legacy:return {"royals":royal_records,"last_cargo_kind":last_cargo_kind,"stores":store_records,"broods":brood_records,"queens":queen_records,"migrations":{child_id:migrations[child_id].to_dict()}}
-	return {"royals":royal_records,"last_cargo_kind":last_cargo_kind,"stores":store_records,"broods":brood_records,"queens":queen_records,"payer_id":payer_id,"supplies":{parent_id:supplies[parent_id].to_dict(),child_id:supplies[child_id].to_dict()},"migrations":{parent_id:migrations[parent_id].to_dict(),child_id:migrations[child_id].to_dict()}}
+	var result: Dictionary={"closed":closed,"policy_actor":policy_actor,"policy_tick":policy_tick,"royals":royal_records,"last_cargo_kind":last_cargo_kind,"stores":store_records,"broods":brood_records,"queens":queen_records,"migrations":{child_id:migrations[child_id].to_dict()}}
+	if not legacy:
+		result.payer_id=payer_id;result.supplies={parent_id:supplies[parent_id].to_dict(),child_id:supplies[child_id].to_dict()};result.migrations[parent_id]=migrations[parent_id].to_dict()
+	return result
 
 func restore(data: Dictionary, colony: ColonyState, camp: FoundingState, tick: int) -> bool:
 	data=data.duplicate(true)
@@ -64,6 +74,14 @@ func restore(data: Dictionary, colony: ColonyState, camp: FoundingState, tick: i
 	if data.last_cargo_kind not in ["supplies","stores"]:return false
 	last_cargo_kind=data.last_cargo_kind
 	if not data.has("royals"):data.royals={parent_id:royals[parent_id].to_dict(),child_id:royals[child_id].to_dict()}
+	if not data.has("closed"):data.closed=false
+	if not data.has("policy_actor"):data.policy_actor=""
+	if not data.has("policy_tick"):data.policy_tick=0
+	if not data.closed is bool or not data.policy_actor is String or not WorkerLedger.valid_count(data.policy_tick) or data.policy_tick>tick:return false
+	if data.policy_actor.is_empty():
+		if data.closed or data.policy_tick!=0:return false
+	elif data.policy_actor not in [parent_id,child_id] or data.policy_tick<colony.piles[child_id].foundation.founded_tick:return false
+	closed=data.closed;policy_actor=data.policy_actor;policy_tick=int(data.policy_tick)
 	var expected: Array=to_dict().keys()
 	if data.size()!=expected.size() or not data.has_all(expected) or not data.migrations is Dictionary:return false
 	var ids: Array[String]=[child_id]

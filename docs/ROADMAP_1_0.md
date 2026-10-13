@@ -12,7 +12,7 @@ Windows desktop comes first. Keep touch-sized controls. Mobile, a fixed session-
 
 ## Milestone order
 
-M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5 is in progress with returned shelter profiles, additional working piles and daughter-origin founding; two-way direct connection supplies/migration work after 155; physical laying-queen relocation works after 156; worker-brood rescue works after157; finite store rescue works after158; active/ready reproductive rescue works after159; isolation and M6–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
+M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5 is in progress with returned shelter profiles, additional working piles and daughter-origin founding; two-way direct connection supplies/migration work after 155; physical laying-queen relocation works after 156; worker-brood rescue works after157; finite store rescue works after158; active/ready reproductive rescue works after159; explicit traffic closure works after160; abandonment and M6–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
 
 | Milestone | Player outcome and required scope | Dependencies | Exit evidence |
 | --- | --- | --- | --- |
@@ -90,7 +90,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M5-D reproductive entry complete:** [159 reproductive-group rescue](tasks/159_reproductive_group_rescue.md), paid immature/ready young queen/males, real nurses/carriers/feeding, protected slots/space and original identity through actual maturation/succession/onward founding. Full10,059/0; import/Main/headless drawing passed.
 
-**M2 core/M3/M4 complete; next: M5 isolation/abandonment.** Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
+**M5-E complete:** [160 connection closure](tasks/160_connection_closure.md), explicit close/reopen policy, stopped repeating/waiting supplies, preserved paid owners/recall/report and independent local/other-edge continuation. Full10,131/0; import/Main/headless drawing passed.
+
+**M2 core/M3/M4 complete; next: M5 final departure/abandonment.** Remaining source/producer behavior stays M6. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

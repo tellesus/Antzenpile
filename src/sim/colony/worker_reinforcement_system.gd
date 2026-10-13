@@ -24,6 +24,7 @@ func _cost(count: int=CONFIG.reinforcement_workers) -> float:
  return snappedf(base_cost*energy,0.00001)
 func blocker(count: int=CONFIG.reinforcement_workers) -> String:
  if _connection()==null or not _connection().migrations.has(_source_id):return "Establish an adjacent pile first"
+ if _connection().closed:return "Connection closed to new traffic; reopen it first"
  if not WorkerLedger.valid_count(count) or count<1 or count>=WorkerLedger.MAX_COUNT:return "Choose a whole positive settler count"
  if _connection().busy():return "Connection assigned; stop its job and await return"
  var h: PileState=_source();var d: PileState=_target()

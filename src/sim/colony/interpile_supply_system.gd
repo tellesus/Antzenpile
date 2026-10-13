@@ -31,6 +31,7 @@ func _migration_active() -> bool:
 func set_enabled(value: Variant) -> bool:
  if not value is bool: return _reject("Supply intent must be on or off")
  if _connection()==null or not _connection().supplies.has(_source_id): return _reject("Establish a reported daughter pile first")
+ if value and _connection().closed:return _reject("Connection closed to new traffic; reopen it first")
  var state: InterpileSupplyState=_state()
  if value and _other().phase != "none": return _reject("Other supply direction assigned; stop it and await return")
  if _migration_active(): return _reject("Wait for the worker reinforcement party to return")
@@ -120,4 +121,5 @@ func summary() -> Dictionary:
  if state.trips_reported>0: result.report_age=(_run.clock.tick_count-state.last_reported_tick)*SimulationClock.TICK_INTERVAL
  if _other().phase != "none": result.blocker="Other direction assigned; stop it and await return"
  if _migration_active():result.blocker="Worker party away; await return"
+ if _connection().closed and not state.travelling():result.blocker="Connection closed to new traffic; reopen it first"
  return result

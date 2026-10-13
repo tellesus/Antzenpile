@@ -9,6 +9,7 @@ func _draft(resource: String, amount: int) -> Dictionary:
 	return plan
 func blocker(resource: String, amount: int) -> String:
 	if _connection()==null or _connection().target(_source_id).is_empty():return "Choose an adjacent nest"
+	if _connection().closed:return "Connection closed to new traffic; reopen it first"
 	if resource not in PileState.RESOURCE_IDS or not WorkerLedger.valid_count(amount) or amount<1:return "Choose a nutrient and a whole positive amount"
 	if _connection().busy():return "Connection assigned; await return"
 	if _transport().manifests.size()>=StoreTransportState.LIMIT:return "Store movement history is full"
