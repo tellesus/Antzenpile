@@ -3,7 +3,7 @@ extends RefCounted
 ## Bounded semantic records of delivered/local facts; never physical replay data.
 const LIMIT: int = 192
 const SEEN_LIMIT: int = 512
-const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","producer"]
+const KINDS: Array[String] = ["source","intake","loss","conflict","survey","pressure","defense","approach","brood","trait","project","camp","supplies","dispatch","order","gathering","investment","chamber","queen","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","producer","ground"]
 var initialized: bool = false
 var since: float = 0.0
 var next_id: int = 1
@@ -21,7 +21,7 @@ func changed(key: String, value: Variant) -> bool:
 func add(kind: String, pile: String, subject: String, observed: float, received: float, detail: String = "", amount: float = 0, total: float = 0, recording: bool = true) -> void:
 	if not recording or next_id >= WorkerLedger.MAX_COUNT: return
 	amount=_quantity(amount);total=_quantity(total)
-	if kind == "intake":
+	if kind in ["intake","ground"]:
 		for index: int in entries.size():
 			var existing: Dictionary = entries[index]
 			if existing.kind == kind and existing.subject_id == subject and existing.detail==detail:
@@ -118,9 +118,10 @@ static func _valid_entry(entry: Variant, colony: ColonyState, knowledge: Knowled
 	if not trails.routes.has(entry.subject_id) or trails.routes[entry.subject_id].origin_pile!=entry.pile_id: return false
 	match entry.kind:
 		"intake": return entry.detail in PileState.RESOURCE_IDS and entry.total>=entry.amount
+		"ground": return entry.detail=="residue" and entry.amount==0 and entry.total==0 and trails.routes[entry.subject_id].purpose=="food"
 		"loss": return entry.detail=="reported" and WorkerLedger.valid_count(entry.amount) and entry.amount<=entry.total and entry.total<=trails.routes[entry.subject_id].reported_losses
 		"conflict": return entry.detail in ["contested","holding","resisted","reinforced","secured","withdrew","dispersed"]
-		"survey": return entry.detail in ["ambush","mixed","foreign","surface","inconclusive"] or entry.detail.split(":").size()==2 and entry.detail.get_slice(":",0) in ["ambush","mixed"] and PredatorCatalog.DEFINITIONS.has(entry.detail.get_slice(":",1))
+		"survey": return entry.detail in ["ambush","mixed","foreign","surface","inconclusive","residue"] or entry.detail.split(":").size()==2 and entry.detail.get_slice(":",0) in ["ambush","mixed"] and PredatorCatalog.DEFINITIONS.has(entry.detail.get_slice(":",1))
 		"pressure": return entry.detail in ["holding","resisted"] and WorkerLedger.valid_count(entry.amount)
 		"defense": return entry.detail in ["clear:secured","clear:withdrew","clear:not_found","hunt:secured","hunt:withdrew","hunt:not_found"] and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total) and entry.amount<=entry.total
 		"approach": return entry.detail in ["found","danger","unconfirmed"]

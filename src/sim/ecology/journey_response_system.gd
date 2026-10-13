@@ -43,7 +43,7 @@ func investigate_approach(route_id: String) -> bool:
 func defend(route_id: String, count: int = CONFIG.defense_workers) -> bool:
 	if not JourneyOrders.valid_target(count) or count == 0: return _reject("Choose a positive whole worker count")
 	var report: Dictionary = _run.journey_response.reports.get(route_id,{})
-	if _surface_warning(route_id): return _reject("Surface impacts cannot be fought; withdraw or test another approach")
+	if _surface_warning(route_id): return _reject("This ground hazard cannot be fought; withdraw or test another approach")
 	if report.get("finding","") not in ["ambush","mixed"]: return _reject("A returned ambusher survey is required")
 	if addressed(route_id): return _reject("Ambusher addressed; survey again if journey losses continue")
 	return _dispatch(route_id,"defend",count)
@@ -54,7 +54,7 @@ func set_force(route_id: String, target: int, all_hands: bool = false) -> bool:
 	if target > 0:
 		var origin: String = _run.trails.routes[route_id].origin_pile
 		if target > _run.colony.piles[origin].workers_total + _run.pending_for_pile(origin): return _reject("Order exceeds this pile's known workforce")
-		if _surface_warning(route_id): return _reject("Surface impacts cannot be fought; withdraw or test another approach")
+		if _surface_warning(route_id): return _reject("This ground hazard cannot be fought; withdraw or test another approach")
 		if state.active() and state.route_id == route_id and state.defense.mode != "defend": return _reject("Survey away; wait for its return or recall it")
 		if state.reports.get(route_id, {}).get("finding", "") not in ["ambush", "mixed"]: return _reject("Return a predator survey first")
 		if addressed(route_id): return _reject("This predator was already addressed")
@@ -88,7 +88,7 @@ func cancel_order(route_id: String) -> void:
 
 func set_goal(route_id: String, goal: String) -> bool:
 	var state: JourneyResponseState = _run.journey_response
-	if _surface_warning(route_id): return _reject("A surface impact leaves nothing to fight or harvest")
+	if _surface_warning(route_id): return _reject("This ground cue leaves nothing to fight or harvest")
 	if goal not in ["clear", "hunt"] or not _run.trails.routes.has(route_id) or state.reports.get(route_id, {}).get("finding", "") not in ["ambush", "mixed"]: return _reject("A returned predator survey is required")
 	if state.active() and state.route_id == route_id: return _reject("Goal locked for the dispatched party; recall before changing it")
 	state.orders.goals[route_id] = goal; last_error = ""; return true
@@ -137,7 +137,7 @@ func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	if state.active() or not _run.trails.routes.has(route_id): return _reject("Another party is away or the journey is unknown")
 	var route: TrailRouteState = _run.trails.routes[route_id]
-	if route.purpose != "food" or route.reported_losses <= 0: return _reject("A returned journey loss is required")
+	if route.purpose != "food" or route.reported_losses <= 0 and route.residue_report.is_empty(): return _reject("A returned journey loss or ground cue is required")
 	var pending: Dictionary = state.orders.recruitment.get(route_id, {})
 	if not pending.is_empty() and (mode != "defend" or pending.kind != "defend" or pending.count != count): return _reject("Cancel the waiting recruitment order first")
 	var pile: PileState = _run.colony.piles[route.origin_pile]
@@ -321,23 +321,28 @@ func _sample() -> void:
 	var fraction: float = float(state.elapsed_ticks) / _leg()
 	var point: Vector2 = segment.point_at(fraction)
 	if state.impact_fraction < 0 and _run.surface_impact.disturbed(point):
-		state.impact_fraction = snappedf(fraction, 0.05); state.sampled_at = _run.simulation_time
+		state.impact_fraction = snappedf(fraction, 0.05)
+		if state.residue_fraction<0:state.sampled_at = _run.simulation_time
+	if state.residue_fraction<0 and _run.residue.contains(point,_run.clock.tick_count,CONFIG.survey_radius):
+		state.residue_fraction=snappedf(fraction,0.05)
+		state.sampled_at=_run.simulation_time
 	# Cautious survey senses nearby danger without using its position as a navigation target.
 	if state.ambush_fraction < 0 and PredatorSystem.new(_run).in_range(point,CONFIG.survey_radius):
-		state.ambush_fraction = snappedf(fraction,0.05); state.sampled_at = _run.simulation_time
+		state.ambush_fraction = snappedf(fraction,0.05)
+		if state.residue_fraction<0 and state.impact_fraction<0:state.sampled_at = _run.simulation_time
 		state.predator_profile = _run.predator.profile_id
 	if not state.foreign_seen and _run.rival.contacts_total < WorkerLedger.MAX_COUNT and _run.rival.pheromone >= 0.1 and _run.world.nodes.has(RIVAL.food_id):
 		var nearest: Vector2 = Geometry2D.get_closest_point_to_segment(point,RIVAL.pile_position,_run.world.nodes[RIVAL.food_id].position)
 		if point.distance_to(nearest) <= RIVAL.contact_radius:
 			state.foreign_seen = true
-			if state.ambush_fraction<0 and state.impact_fraction<0: state.sampled_at = _run.simulation_time
+			if state.ambush_fraction<0 and state.impact_fraction<0 and state.residue_fraction<0: state.sampled_at = _run.simulation_time
 			_run.rival.contacts_total += 1
 
 func _arrive() -> void:
 	var state: JourneyResponseState = _run.journey_response
 	state.orders.targets[state.route_id] = 0
 	recruitment.cancel(state.route_id)
-	var finding: String = "surface" if state.impact_fraction >= 0 else "mixed" if state.ambush_fraction >= 0 and state.foreign_seen else "ambush" if state.ambush_fraction >= 0 else "foreign" if state.foreign_seen else "inconclusive"
+	var finding: String = "residue" if state.residue_fraction>=0 else "surface" if state.impact_fraction >= 0 else "mixed" if state.ambush_fraction >= 0 and state.foreign_seen else "ambush" if state.ambush_fraction >= 0 else "foreign" if state.foreign_seen else "inconclusive"
 	if state.defense.mode == "defend":
 		state.defense.outcomes[state.route_id] = {"outcome":state.defense.outcome,"lost":state.defense.lost,"sent":state.defense.sent,"observed_at":state.defense.observed_at,"received_at":_run.simulation_time}
 		if state.defense.goal == "hunt":
@@ -355,15 +360,16 @@ func _arrive() -> void:
 			candidate.exposure = snappedf(candidate.path_exposure(_run.world),0.0000000001)
 			_run.trails.segments[candidate.id] = candidate
 	else:
-		state.reports[state.route_id] = {"finding":finding,"fraction":state.impact_fraction if finding == "surface" else state.ambush_fraction,"observed_at":state.sampled_at,"received_at":_run.simulation_time}
+		state.reports[state.route_id] = {"finding":finding,"fraction":state.impact_fraction if finding == "surface" else state.residue_fraction if finding=="residue" else state.ambush_fraction,"observed_at":state.sampled_at,"received_at":_run.simulation_time}
 		if finding in ["ambush", "mixed"] and state.predator_profile != "": state.reports[state.route_id].predator_profile = state.predator_profile
-		if finding == "surface" or state.ambush_fraction >= 0 and (not _segment().waypoints.is_empty() or state.predator_profile=="beetle_hunter"):
-			var estimate: Vector2 = _segment().point_at(state.impact_fraction if finding == "surface" else state.ambush_fraction)
+		if finding in ["surface","residue"] or state.ambush_fraction >= 0 and (not _segment().waypoints.is_empty() or state.predator_profile=="beetle_hunter"):
+			var estimate: Vector2 = _segment().point_at(state.impact_fraction if finding == "surface" else state.residue_fraction if finding=="residue" else state.ambush_fraction)
 			if finding == "surface": estimate = estimate.round()
 			state.reports[state.route_id].estimated_position = [estimate.x,estimate.y]
-		if state.foreign_seen:
-			var route: TrailRouteState = _run.trails.routes[state.route_id]
-			route.foreign_reports += 1; route.last_foreign_time = _run.simulation_time
+	# Every surviving returning survey owns its contacts, including a rejected bypass.
+	if state.foreign_seen:
+		var route: TrailRouteState = _run.trails.routes[state.route_id]
+		route.foreign_reports += 1; route.last_foreign_time = _run.simulation_time
 	var origin: String = _run.trails.routes[state.route_id].origin_pile
 	var ledger: WorkerLedger = _run.colony.piles[origin].workers
 	var commitment: String = "journey:" + origin
@@ -371,6 +377,7 @@ func _arrive() -> void:
 	assert(released and retired)
 	state.route_id = ""; state.phase = "idle"; state.workers = 0; state.elapsed_ticks = 0; state.departed_at = 0; state.impact_fraction = -1; state.ambush_fraction = -1; state.foreign_seen = false; state.sampled_at = 0
 	state.defense.reset_party()
+	state.residue_fraction=-1
 	state.predator_profile = ""
 	state.pressure.reset_party()
 	state.approach.reset_party()
@@ -404,7 +411,7 @@ func _surface_warning(route_id: String) -> bool:
 	if not _run.trails.routes.has(route_id): return false
 	var route: TrailRouteState = _run.trails.routes[route_id]
 	var report: Dictionary = _run.journey_response.reports.get(route_id, {})
-	return report.get("finding", "") == "surface" or route.impact_report.get("received_at", 0.0) >= report.get("received_at", 0.0) and not route.impact_report.is_empty()
+	return report.get("finding", "") in ["surface","residue"] or route.impact_report.get("received_at", 0.0) >= report.get("received_at", 0.0) and not route.impact_report.is_empty() or route.residue_report.get("received_at",0.0)>=report.get("received_at",0.0) and not route.residue_report.is_empty()
 
 func addressed(route_id: String) -> bool:
 	var outcome: Dictionary=_run.journey_response.defense.outcomes.get(route_id,{})

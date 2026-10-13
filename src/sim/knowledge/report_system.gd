@@ -34,6 +34,8 @@ func capture(recording: bool = true) -> void:
 			journal.add("loss",route.origin_pile,route.id,route.last_loss_time,route.last_loss_time,"reported",route.reported_losses-previous,route.reported_losses,recording)
 		if not route.conflict_report.is_empty() and journal.changed("conflict/"+route.id,route.conflict_received_at):
 			journal.add("conflict",route.origin_pile,route.id,route.conflict_observed_at,route.conflict_received_at,route.conflict_report,0,0,recording)
+		if not route.residue_report.is_empty() and journal.changed("ground/"+route.id,route.residue_report.received_at):
+			journal.add("ground",route.origin_pile,route.id,route.residue_report.observed_at,route.residue_report.received_at,"residue",0,0,recording)
 	var response: JourneyResponseState=_run.journey_response
 	for kind: String in ["survey","pressure","defense","approach"]:
 		var records: Dictionary=response.reports if kind=="survey" else response.pressure.reports if kind=="pressure" else response.defense.outcomes if kind=="defense" else response.approach.reports

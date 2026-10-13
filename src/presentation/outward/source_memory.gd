@@ -107,7 +107,7 @@ static func survey_label(report: Dictionary) -> String:
 	var profile: String = report.get("predator_profile", "")
 	if report.get("finding", "") in ["ambush", "mixed"] and profile != "":
 		return predator_name(profile) + (" and foreign ants" if report.finding == "mixed" else " witnessed")
-	return {"ambush":"Predator witnessed", "mixed":"Predator and foreign ants", "foreign":"Foreign ants witnessed", "surface":"Heavy impact witnessed", "inconclusive":"Cause remains uncertain"}.get(report.get("finding", ""), "Survey returned")
+	return {"ambush":"Predator witnessed", "mixed":"Predator and foreign ants", "foreign":"Foreign ants witnessed", "surface":"Heavy impact witnessed", "residue":"Strange ground residue witnessed", "inconclusive":"Cause remains uncertain"}.get(report.get("finding", ""), "Survey returned")
 
 
 static func defense_is_latest(outcome: Dictionary, route: Dictionary) -> bool:

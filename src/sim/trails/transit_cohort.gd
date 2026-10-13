@@ -16,6 +16,7 @@ var cargo_source_type: String=""
 var cargo_yields: Dictionary[String,float]={}
 var cargo_bulk: float=1.0
 var contaminant_mass: float = 0.0
+var residue_contact := ResidueContactState.new()
 var remaining_ticks: int = 1
 var unpaid_energy_cost: float = 0.0
 var energy_multiplier: float = 1.0
@@ -50,7 +51,7 @@ var harvest_report: Observation
 func to_dict() -> Dictionary:
 	return {"id": id, "route_id": route_id, "direction": direction,
 		"worker_count": worker_count, "resource_id": resource_id,
-		"payload": payload, "remaining_ticks": remaining_ticks, "contaminant_mass": contaminant_mass,
+		"residue_contact":residue_contact.to_dict(),"payload": payload, "remaining_ticks": remaining_ticks, "contaminant_mass": contaminant_mass,
 		"cargo_source_type":cargo_source_type,"cargo_yields":cargo_yields.duplicate(),"cargo_bulk":cargo_bulk,
 		"unpaid_energy_cost": unpaid_energy_cost,
 		"energy_multiplier": energy_multiplier, "carry_multiplier": carry_multiplier,
@@ -178,6 +179,10 @@ func restore(data: Dictionary, world: WorldState, colony: ColonyState, time: flo
 	if data.get("foreign_contact", false) and not data.get("foreign_sampled", data.get("foreign_contact", false)):
 		return false
 	id = data.id
+	var contact:=ResidueContactState.new()
+	if not contact.restore(data.get("residue_contact",contact.to_dict()),roundi(time/SimulationClock.TICK_INTERVAL)):return false
+	if contact.active() and data.direction=="inbound" and contamination+0.00000001<ResidueZoneState.contaminated(data.payload*carbohydrate,0):return false
+	residue_contact=contact
 	route_id = data.route_id
 	direction = data.direction
 	worker_count = int(data.worker_count)

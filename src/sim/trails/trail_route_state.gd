@@ -27,6 +27,7 @@ var foreign_reports: int = 0
 var last_foreign_time: float = 0.0
 var reported_impact_losses: int = 0
 var impact_report: Dictionary = {}
+var residue_report: Dictionary = {}
 var reported_rival_losses: int = 0
 var conflict_report: String = ""
 var conflict_observed_at: float = 0.0
@@ -52,7 +53,7 @@ func to_dict() -> Dictionary:
 		"resume_on_report": resume_on_report, "last_empty_report_at": last_empty_report_at,
 		"reported_depleted": reported_depleted, "delivered_total": delivered_total, "receipt": receipt.duplicate(true),
 		"nutrient_receipts":nutrient_receipts.duplicate(true),
-		"reported_impact_losses": reported_impact_losses, "impact_report": impact_report.duplicate(true),
+		"residue_report":residue_report.duplicate(true),"reported_impact_losses": reported_impact_losses, "impact_report": impact_report.duplicate(true),
 		"reported_rival_losses": reported_rival_losses, "conflict_report": conflict_report, "conflict_serial":conflict_serial,"settled_conflict_serial":settled_conflict_serial,
 		"conflict_observed_at": conflict_observed_at, "conflict_received_at": conflict_received_at, "foreign_reports": foreign_reports, "last_foreign_time": last_foreign_time, "energy_limited": energy_limited, "reported_losses": reported_losses, "last_loss_time": last_loss_time,
 		"attack_reports": attack_reports, "fighting_reports": fighting_reports,
@@ -158,6 +159,9 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, bo
 		return false
 	var saved_purpose: Variant=data.get("purpose","food")
 	if not saved_purpose is String or saved_purpose not in ["food","founding","interpile"]: return false
+	var residue: Variant=data.get("residue_report",{})
+	if not residue is Dictionary or not residue.is_empty() and (saved_purpose!="food" or not ResidueZoneState.valid_report(residue,INF)):return false
+	residue_report=residue.duplicate(true)
 	purpose=saved_purpose
 	id = data.id
 	origin_pile = data.origin_pile

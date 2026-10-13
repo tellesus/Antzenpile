@@ -188,6 +188,7 @@ func tick(delta: float) -> void:
 		var segment: TrailSegmentState=_run.trails.segments[route.segment_id]
 		if cohort.worker_count>0 and segment.traffic>0 and (segment.pheromone_strength<TraitCatalog.DEFINITIONS.rapid_repair.worn_scent_threshold or _run.rain.phase=="raining" and segment.exposure>=RainSystem.CONFIG.exposed_min_exposure): cohort.repair_exposure=true
 		if surface_impact != null: surface_impact.encounter(cohort)
+		_residue_contact(cohort,route)
 		if cohort.detour != null:
 			if cohort.detour.tick(_run.world, _run.rng, _run.simulation_time):
 				cohort.detour_report = cohort.detour.observation.detached_copy()
@@ -239,6 +240,17 @@ func _encounter(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if not _predator.encounter(point,previous):
 		return
 	apply_loss(cohort, route, "predator")
+
+func _residue_contact(cohort: TransitCohort, route: TrailRouteState) -> void:
+	if route.purpose!="food" or cohort.worker_count==0 or cohort.residue_contact.active():return
+	var progress: float=1.0-float(cohort.remaining_ticks)/_leg_ticks(route)
+	if cohort.direction=="inbound":progress=1.0-progress
+	var point: Vector2=cohort.detour.position if cohort.detour!=null else _run.trails.segments[route.segment_id].point_at(progress)
+	if not _run.residue.contains(point,_run.clock.tick_count):return
+	cohort.residue_contact.capture(point,_run.clock.tick_count)
+	if cohort.direction=="inbound":
+		var carbohydrate: float=cohort.outputs().get("carbohydrate",0.0)
+		cohort.contaminant_mass=ResidueZoneState.contaminated(carbohydrate,cohort.contaminant_mass)
 
 
 func apply_loss(cohort: TransitCohort, route: TrailRouteState, cause: String) -> void:
@@ -411,6 +423,7 @@ func _collect(cohort: TransitCohort, route: TrailRouteState) -> void:
 		cohort.cargo_yields.assign(SourceCatalog.nutrients(node.source_type,node.definition_id))
 	var carbohydrate: float=cohort.cargo_yields.get("carbohydrate",0.0) if not cohort.cargo_yields.is_empty() else 1.0 if node.definition_id=="carbohydrate" else 0.0
 	cohort.contaminant_mass = amount * carbohydrate * node.properties.get("contaminant_fraction",0.0)
+	if cohort.residue_contact.active():cohort.contaminant_mass=ResidueZoneState.contaminated(amount*carbohydrate,cohort.contaminant_mass)
 	if amount > 0 and _run.next_scout_id < WorkerLedger.MAX_COUNT and not node.source_type.is_empty() and _run.knowledge.nodes[route.destination_knowledge_id].source_type != node.source_type:
 		var sample := Observation.new()
 		sample.scout_id = "scout_%d" % _run.next_scout_id; _run.next_scout_id += 1
@@ -430,6 +443,7 @@ func _record_nutrient(route: TrailRouteState, id: String, amount: float) -> void
 	entry.last_at=_run.simulation_time;entry.last_amount=amount;entry.total=float(String.num(float(entry.total)+amount,5))
 
 func _arrive_home(cohort: TransitCohort, route: TrailRouteState) -> void:
+	if cohort.worker_count>0 and cohort.residue_contact.active():route.residue_report=cohort.residue_contact.report(_run.simulation_time)
 	var pile: PileState = _run.colony.piles[route.origin_pile]
 	if cohort.worker_count > 0 and cohort.harvest_report != null:
 		assert(not _run.delivered_observations.has(cohort.harvest_report.id))
