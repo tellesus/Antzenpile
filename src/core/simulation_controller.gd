@@ -288,6 +288,7 @@ func _tick(delta: float) -> void:
 	if run.history.ended: return
 	if not run.reports.initialized: reports.prime()
 	surface_impact.tick()
+	predator.tick()
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():
 		if not run.knowledge.consume(run.delivered_observations, run.simulation_time):

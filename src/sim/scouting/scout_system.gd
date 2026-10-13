@@ -385,15 +385,12 @@ func _prune_history() -> void:
 
 
 func _ambush(agent: ScoutAgent, from: Vector2) -> bool:
-	if agent.predator_encountered or _run.clock.tick_count < PredatorSystem.CONFIG.first_tick:
+	if agent.predator_encountered:
 		return false
-	var edge: Vector2 = agent.position - from
-	var t: float = clampf((PredatorSystem.CONFIG.position - from).dot(edge) / maxf(edge.length_squared(), 0.000001), 0.0, 1.0)
-	var encounter: Vector2 = from + edge * t
-	if encounter.distance_to(PredatorSystem.CONFIG.position) > PredatorSystem.CONFIG.radius:
+	if not _predator.crosses(from,agent.position):
 		return false
 	agent.predator_encountered = true
-	if not _predator.encounter(encounter):
+	if not _predator.encounter(agent.position,from):
 		return false
 	var pile: PileState = _run.colony.piles[agent.origin_pile]
 	var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0

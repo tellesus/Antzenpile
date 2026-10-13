@@ -906,7 +906,7 @@ func journey_addressed(route: TrailRouteState) -> bool:
 	var approach: Dictionary = simulation.run.journey_response.approach.reports.get(route.id,{})
 	if approach.get("outcome", "") == "found" and route.last_loss_time <= approach.get("received_at", 0.0): return true
 	var outcome: Dictionary = simulation.run.journey_response.defense.outcomes.get(route.id,{})
-	return outcome.get("outcome","") == "secured" and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
+	return outcome.get("outcome","") == "secured" and outcome.get("received_at",0.0)>=simulation.run.journey_response.reports.get(route.id,{}).get("received_at",0.0) and route.reported_rival_losses == 0 and route.last_loss_time <= outcome.get("received_at",0.0)
 
 func journey_alarm(route: TrailRouteState) -> bool:
 	var approach: Dictionary = simulation.run.journey_response.approach.reports.get(route.id,{})

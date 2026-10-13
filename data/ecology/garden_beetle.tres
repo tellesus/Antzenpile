@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PredatorDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/ecology/predator_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+profile_id = "beetle_hunter"
+position = Vector2(24, 18)
+patrol_end = Vector2(31, 28)
+retreat_position = Vector2(36, 30)
+speed = 0.5
+radius = 2.0
+first_tick = 1200
+recovery_ticks = 120
+pause_ticks = 80
+feeding_radius = 8.0

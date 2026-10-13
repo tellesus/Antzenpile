@@ -45,7 +45,7 @@ Required choices: scouting versus immediate gathering; Home growth versus reprod
 
 ### SC-GARDEN — Garden Edge
 
-**Foundation layout; complete arc planned M7.** Emphasize nectar/honeydew relationships, fruit/seed opportunities, moisture differences and water discovery. Root/stone sites offer distinct care/access costs. Climate/care traits and the new organs have a plausible pressure; a roaming hunter changes the usefulness of old route memories. More food production never guarantees sufficient care or protein.
+**Foundation layout; complete arc planned M7.** Emphasize nectar/honeydew relationships, fruit/seed opportunities, moisture differences and water discovery. Root/stone sites offer distinct care/access costs. Climate/care traits and the new organs have a plausible pressure; 165 adds a roaming hunter near exposed food in fresh Garden Edge, changing the usefulness of dated route memories. More food production never guarantees sufficient care or protein.
 
 Required choices: attendants versus gatherers, care/adaptation versus new capacity, dependable source versus temporary mixed food, local specialization versus transport. Verify three-pile independent work and daughter-origin reproductives/founding under real supply constraints.
 

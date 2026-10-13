@@ -97,7 +97,11 @@ static func defense_label(outcome: Dictionary) -> String:
 	return {"secured": "Ambusher driven off", "withdrew": "Defenders withdrew", "not_found": "No ambusher found"}.get(outcome.get("outcome", ""), "No defensive return yet")
 
 static func predator_name(profile: String) -> String:
-	return "Spider-like predator" if profile == "wolf_spider" else "Predatory arthropod"
+	return "Spider-like predator" if profile == "wolf_spider" else "Beetle-like hunter" if profile=="beetle_hunter" else "Predatory arthropod"
+
+static func predator_addressed(route: Dictionary, state: Dictionary) -> bool:
+	var outcome: Dictionary=state.get("outcomes",{}).get(route.get("id",""),{})
+	return outcome.get("outcome", "")=="secured" and outcome.get("received_at",0.0)>=state.get("reports",{}).get(route.get("id",""),{}).get("received_at",0.0) and route.get("last_loss_time",0.0)<=outcome.get("received_at",0.0)
 
 static func survey_label(report: Dictionary) -> String:
 	var profile: String = report.get("predator_profile", "")

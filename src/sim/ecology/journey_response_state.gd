@@ -106,7 +106,9 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 		if not id is String or not trails.routes.has(id) or trails.routes[id].purpose != "food" or goals[id] not in ["clear", "hunt"]: return false
 		restored_orders.goals[id] = goals[id]
 	for id: String in restored_orders.targets:
-		if restored_orders.targets[id] > 0 and (not reports.has(id) or reports[id].finding not in ["ambush", "mixed"] or restored_defense.outcomes.get(id, {}).get("outcome", "") == "secured"): return false
+		var outcome: Dictionary=restored_defense.outcomes.get(id,{})
+		var addressed: bool=outcome.get("outcome", "")=="secured" and outcome.get("received_at",0.0)>=reports.get(id,{}).get("received_at",0.0) and trails.routes[id].last_loss_time<=outcome.get("received_at",0.0)
+		if restored_orders.targets[id] > 0 and (not reports.has(id) or reports[id].finding not in ["ambush", "mixed"] or addressed): return false
 	orders = restored_orders
 	approach = restored_approach
 	defense = restored_defense

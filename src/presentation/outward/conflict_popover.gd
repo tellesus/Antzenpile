@@ -30,7 +30,7 @@ func kind(route: Dictionary, status: Dictionary) -> String:
 	if own_party(route, status): return "defend" if state.get("mode") == "defend" else ""
 	if route.get("surface_warning", false): return ""
 	var finding: String = state.get("reports", {}).get(route.get("id"), {}).get("finding", "")
-	if finding in ["ambush", "mixed"] and state.get("outcomes", {}).get(route.get("id"), {}).get("outcome", "") != "secured": return "defend"
+	if finding in ["ambush", "mixed"] and not Memory.predator_addressed(route,state): return "defend"
 	return "gather" if route.get("foreign_reports", 0) > 0 or route.get("conflict_report", "") != "" else ""
 
 func limit(route: Dictionary, status: Dictionary) -> int:
@@ -235,6 +235,13 @@ func _impression(view: Node2D, at: Vector2, route: Dictionary, status: Dictionar
 			for i: int in (4 if clear else 2):
 				var bend: Vector2 = at+Vector2(side*(22+i*2),-12+i*8)
 				view.draw_polyline(PackedVector2Array([at+Vector2(side*8,-8+i*6),bend,bend+Vector2(side*8,9)]),Color(color,0.65 if clear else 0.22),1.2,true)
+	elif identity=="Beetle-like hunter":
+		view.draw_circle(at,16,Color(color,0.3));view.draw_circle(at+Vector2(0,-17),7,Color(color,0.35))
+		view.draw_line(at+Vector2(0,-8),at+Vector2(0,13),Color(color,0.55),1.2,true)
+		for side: int in [-1,1]:
+			for index: int in 3:
+				var bend: Vector2=at+Vector2(side*23,-10+index*11)
+				view.draw_polyline(PackedVector2Array([at+Vector2(side*10,-7+index*8),bend,bend+Vector2(side*6,7)]),Color(color,0.55),1.2,true)
 	elif identity=="Foreign ants":
 		for i: int in 3:
 			var ant: Vector2 = at+Vector2((i-1)*24,(i%2)*6)

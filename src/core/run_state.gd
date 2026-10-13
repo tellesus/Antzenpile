@@ -77,7 +77,7 @@ func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> voi
 	rng.seed = _seed
 	genetic_rng.seed = _seed ^ 0x415450
 	world = Loader.new().load_scenario(Scenarios.path_for(scenario))
-	predator.profile_id = Predator.CONFIG.profile_id
+	predator.initialize("beetle_hunter" if scenario=="garden_edge" else Predator.CONFIG.profile_id)
 	assert(world != null, "Run construction requires a registered authored scenario")
 	colony.initialize_home(world.home_position)
 	history.record(self,true)
@@ -450,6 +450,7 @@ func restore(data: Dictionary) -> bool:
 	var restored_predator := Predator.new()
 	if data.has("predator") and (not data.predator is Dictionary or not restored_predator.restore(data.predator, restored_clock.tick_count)):
 		return false
+	if restored_predator.profile_id=="beetle_hunter" and data.scenario_id!="garden_edge": return false
 	if restored_response.predator_profile != "" and (restored_response.predator_profile != restored_predator.profile_id or restored_response.sampled_at < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL): return false
 	for report: Dictionary in restored_response.reports.values():
 		if report.get("predator_profile", "") != "" and (report.predator_profile != restored_predator.profile_id or report.observed_at < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL): return false
@@ -507,7 +508,7 @@ func restore(data: Dictionary) -> bool:
 	if restored_response.phase == "fighting":
 		var segment: TrailSegmentState = restored_trails.segments[restored_trails.routes[restored_response.route_id].segment_id]
 		var point: Vector2 = segment.point_at(float(restored_response.elapsed_ticks) / JourneyResponseState.TRAILS.leg_ticks(segment.length()))
-		if restored_predator.defeated_at > 0 or restored_clock.tick_count < Predator.CONFIG.first_tick or point.distance_to(Predator.CONFIG.position) > Predator.CONFIG.radius: return false
+		if restored_predator.defeated_at > 0 or restored_clock.tick_count < restored_predator.definition().first_tick or point.distance_to(restored_predator.position()) > restored_predator.definition().radius: return false
 	for pile: PileState in restored_colony.piles.values():
 		var pending: int = restored_trails.pending_for_pile(pile.id) + (defense.lost if pile.id == defense_origin else 0)
 		var pending_adapted: int = restored_trails.pending_for_pile(pile.id,true) + (defense.adapted_lost if pile.id == defense_origin else 0)

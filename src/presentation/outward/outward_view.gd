@@ -1343,7 +1343,7 @@ func _mobilize_block_reason(route: Dictionary) -> String:
 	var state: Dictionary = _status.get("journey_response",{})
 	if route.get("surface_warning", false): return "Surface impact · use avoidance"
 	if state.get("away", false) and state.get("route_id", "") == route.get("id") and state.get("mode", "") != "defend": return "Survey away · await its return"
-	if state.get("outcomes", {}).get(route.get("id"), {}).get("outcome", "") == "secured": return "Predator already addressed"
+	if Memories.predator_addressed(route,state): return "Predator already addressed"
 	var finding: String = state.get("reports", {}).get(route.get("id"), {}).get("finding", "")
 	if finding == "foreign": return "Foreign ants · reinforce gatherers"
 	if finding not in ["ambush", "mixed"]: return "Needs returned predator survey"

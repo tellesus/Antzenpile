@@ -223,18 +223,20 @@ func tick(delta: float) -> void:
 
 
 func _encounter(cohort: TransitCohort, route: TrailRouteState) -> void:
-	if cohort.worker_count == 0 or cohort.predator_encountered or _run.clock.tick_count < PREDATOR_CONFIG.first_tick:
+	if cohort.worker_count == 0 or cohort.predator_encountered:
 		return
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	var progress: float = 1.0 - float(cohort.remaining_ticks) / _leg_ticks(route)
 	if cohort.direction == "inbound":
 		progress = 1.0 - progress
 	var point: Vector2 = segment.point_at( progress)
-	if point.distance_to(PREDATOR_CONFIG.position) > PREDATOR_CONFIG.radius:
+	var previous_progress: float=clampf(progress+1.0/_leg_ticks(route) if cohort.direction=="inbound" else progress-1.0/_leg_ticks(route),0,1)
+	var previous: Vector2=segment.point_at(previous_progress)
+	if not _predator.crosses(previous,point):
 		return
 	# Saturated encounters still consume this journey's one opportunity.
 	cohort.predator_encountered = true
-	if not _predator.encounter(point):
+	if not _predator.encounter(point,previous):
 		return
 	apply_loss(cohort, route, "predator")
 

@@ -45,7 +45,7 @@ func defend(route_id: String, count: int = CONFIG.defense_workers) -> bool:
 	var report: Dictionary = _run.journey_response.reports.get(route_id,{})
 	if _surface_warning(route_id): return _reject("Surface impacts cannot be fought; withdraw or test another approach")
 	if report.get("finding","") not in ["ambush","mixed"]: return _reject("A returned ambusher survey is required")
-	if _run.journey_response.defense.outcomes.get(route_id,{}).get("outcome","") == "secured": return _reject("Ambusher addressed; survey again if journey losses continue")
+	if addressed(route_id): return _reject("Ambusher addressed; survey again if journey losses continue")
 	return _dispatch(route_id,"defend",count)
 
 func set_force(route_id: String, target: int, all_hands: bool = false) -> bool:
@@ -57,7 +57,7 @@ func set_force(route_id: String, target: int, all_hands: bool = false) -> bool:
 		if _surface_warning(route_id): return _reject("Surface impacts cannot be fought; withdraw or test another approach")
 		if state.active() and state.route_id == route_id and state.defense.mode != "defend": return _reject("Survey away; wait for its return or recall it")
 		if state.reports.get(route_id, {}).get("finding", "") not in ["ambush", "mixed"]: return _reject("Return a predator survey first")
-		if state.defense.outcomes.get(route_id, {}).get("outcome", "") == "secured": return _reject("This predator was already addressed")
+		if addressed(route_id): return _reject("This predator was already addressed")
 	state.orders.targets[route_id] = target
 	recruitment.cancel(route_id)
 	if target == 0 and state.active() and state.route_id == route_id: recall()
@@ -236,7 +236,7 @@ func _find_ambusher() -> bool:
 	var state: JourneyResponseState = _run.journey_response
 	var segment: TrailSegmentState = _run.trails.segments[_run.trails.routes[state.route_id].segment_id]
 	var point: Vector2 = segment.point_at(float(state.elapsed_ticks) / _leg())
-	if _run.predator.defeated_at > 0 or _run.clock.tick_count < PREDATOR.first_tick or point.distance_to(PREDATOR.position) > PREDATOR.radius: return false
+	if not PredatorSystem.new(_run).in_range(point): return false
 	state.phase = "fighting"; state.defense.round_ticks = CONFIG.round_ticks
 	return true
 
@@ -264,10 +264,12 @@ func _combat() -> void:
 		state.workers -= 1; defense.lost += 1; defense.adapted_lost += adapted; _run.predator.defense_losses += 1
 		if profile != "": defense.lost_profiles[profile] = defense.lost_profiles.get(profile,0) + 1
 	if _run.predator.resistance == 0 and (defense.goal == "clear" or _run.predator.health == 0):
+		_run.predator.defeated_at = _run.simulation_time
 		if defense.goal == "hunt":
 			_run.predator.killed = true
 			PredatorCarcass.create(_run)
-		_run.predator.defeated_at = _run.simulation_time; _return("secured")
+		if _run.predator.motion!=null: _run.predator.motion.settle(_run.predator,_run.clock.tick_count)
+		_return("secured")
 	elif state.workers - state.pressure.messengers <= CONFIG.retreat_workers or defense.rounds >= CONFIG.max_rounds: _return("withdrew")
 	else:
 		defense.round_ticks = CONFIG.round_ticks
@@ -321,13 +323,14 @@ func _sample() -> void:
 	if state.impact_fraction < 0 and _run.surface_impact.disturbed(point):
 		state.impact_fraction = snappedf(fraction, 0.05); state.sampled_at = _run.simulation_time
 	# Cautious survey senses nearby danger without using its position as a navigation target.
-	if state.ambush_fraction < 0 and _run.predator.defeated_at == 0 and _run.clock.tick_count >= PREDATOR.first_tick and point.distance_to(PREDATOR.position) <= PREDATOR.radius + CONFIG.survey_radius:
+	if state.ambush_fraction < 0 and PredatorSystem.new(_run).in_range(point,CONFIG.survey_radius):
 		state.ambush_fraction = snappedf(fraction,0.05); state.sampled_at = _run.simulation_time
 		state.predator_profile = _run.predator.profile_id
 	if not state.foreign_seen and _run.rival.contacts_total < WorkerLedger.MAX_COUNT and _run.rival.pheromone >= 0.1 and _run.world.nodes.has(RIVAL.food_id):
 		var nearest: Vector2 = Geometry2D.get_closest_point_to_segment(point,RIVAL.pile_position,_run.world.nodes[RIVAL.food_id].position)
 		if point.distance_to(nearest) <= RIVAL.contact_radius:
-			state.foreign_seen = true; state.sampled_at = _run.simulation_time
+			state.foreign_seen = true
+			if state.ambush_fraction<0 and state.impact_fraction<0: state.sampled_at = _run.simulation_time
 			_run.rival.contacts_total += 1
 
 func _arrive() -> void:
@@ -354,7 +357,7 @@ func _arrive() -> void:
 	else:
 		state.reports[state.route_id] = {"finding":finding,"fraction":state.impact_fraction if finding == "surface" else state.ambush_fraction,"observed_at":state.sampled_at,"received_at":_run.simulation_time}
 		if finding in ["ambush", "mixed"] and state.predator_profile != "": state.reports[state.route_id].predator_profile = state.predator_profile
-		if finding == "surface" or state.ambush_fraction >= 0 and not _segment().waypoints.is_empty():
+		if finding == "surface" or state.ambush_fraction >= 0 and (not _segment().waypoints.is_empty() or state.predator_profile=="beetle_hunter"):
 			var estimate: Vector2 = _segment().point_at(state.impact_fraction if finding == "surface" else state.ambush_fraction)
 			if finding == "surface": estimate = estimate.round()
 			state.reports[state.route_id].estimated_position = [estimate.x,estimate.y]
@@ -402,5 +405,9 @@ func _surface_warning(route_id: String) -> bool:
 	var route: TrailRouteState = _run.trails.routes[route_id]
 	var report: Dictionary = _run.journey_response.reports.get(route_id, {})
 	return report.get("finding", "") == "surface" or route.impact_report.get("received_at", 0.0) >= report.get("received_at", 0.0) and not route.impact_report.is_empty()
+
+func addressed(route_id: String) -> bool:
+	var outcome: Dictionary=_run.journey_response.defense.outcomes.get(route_id,{})
+	return outcome.get("outcome", "")=="secured" and outcome.get("received_at",0.0)>=_run.journey_response.reports.get(route_id,{}).get("received_at",0.0) and _run.trails.routes[route_id].last_loss_time<=outcome.get("received_at",0.0)
 
 func _reject(reason: String) -> bool: last_error = reason; return false

@@ -4,6 +4,13 @@ extends RefCounted
 const CONFIG = preload("res://data/ecology/backyard_predator.tres")
 var last_attack_tick: int = -1
 var profile_id: String = ""
+var motion: PredatorMotionState
+
+func definition() -> PredatorDefinition: return PredatorCatalog.definition(profile_id)
+func position() -> Vector2: return motion.position if motion!=null else definition().position
+func initialize(id: String) -> void:
+	profile_id=id
+	if definition().speed>0: motion=PredatorMotionState.new();motion.initialize(definition())
 var kills_total: int = 0
 const RESPONSE = preload("res://data/ecology/default_journey_response.tres")
 var resistance: int = RESPONSE.resistance
@@ -14,8 +21,10 @@ var killed: bool = false
 
 
 func to_dict() -> Dictionary:
-	return {"profile_id":profile_id,"last_attack_tick": str(last_attack_tick), "kills_total": kills_total,
+	var result: Dictionary={"profile_id":profile_id,"last_attack_tick": str(last_attack_tick), "kills_total": kills_total,
 		"defense": {"resistance":resistance,"defeated_at":defeated_at,"losses":defense_losses,"health":health,"killed":killed}}
+	if motion!=null: result.motion=motion.to_dict()
+	return result
 
 
 func restore(data: Dictionary, tick: int) -> bool:
@@ -43,4 +52,8 @@ func restore(data: Dictionary, tick: int) -> bool:
 	last_attack_tick = last
 	kills_total = int(data.kills_total)
 	profile_id = data.get("profile_id", "")
+	if definition().speed>0:
+		motion=PredatorMotionState.new()
+		if not motion.restore(data.get("motion"),definition(),self,tick): return false
+	elif data.has("motion"): return false
 	return true
