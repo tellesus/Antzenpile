@@ -36,6 +36,7 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"brood_rescue": text="%d live brood delivered to %s" % [entry.amount,pile_name(entry.subject_id)] if entry.detail=="delivered" else "Brood party returned · recipient unsuitable" if entry.detail=="landing" else "Brood party returned · carers could not settle" if entry.detail=="escorts" else "Original brood returned home"
 		"relocation": text="Queen delivered to %s · %d escorts settled" % [pile_name(entry.subject_id),entry.amount] if entry.detail=="delivered" else "Queen returned · recipient became unsuitable" if entry.detail=="landing" else "Queen returned · escorts could not settle" if entry.detail=="escorts" else "Queen party returned home · no relocation"
 		"migration": text="Messenger returned: %d workers settled at %s" % [entry.amount,pile_name(entry.subject_id)]
+		"store_rescue": text="%d %s %s" % [entry.amount,entry.detail.get_slice(":",1),"delivered to "+pile_name(entry.subject_id) if entry.detail.begins_with("delivered:") else "returned home · travel food spent"]
 		"supplies": text="Supplies returned from trip to "+pile_name(entry.subject_id)
 		"dispatch": text="%d ants dispatched: %s" % [entry.amount,"survey" if entry.detail=="investigate" else "defense"]
 		"order": text="Force order: %d total" % entry.amount if entry.amount>0 else "Force order canceled"

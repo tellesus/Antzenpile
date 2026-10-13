@@ -87,6 +87,10 @@ func capture(recording: bool = true) -> void:
 			if supply.trips_reported>0 and journal.changed(key,supply.last_reported_tick):
 				var received: float=supply.last_reported_tick*SimulationClock.TICK_INTERVAL
 				journal.add("supplies",origin,connection.target(origin),received,received,"returned",supply.receipt().last_amount,0,recording)
+			var stores: StoreTransportState=connection.stores[origin]
+			if stores.trips_reported>0 and journal.changed("store_rescue/"+origin+"/"+connection.route_id,stores.last_reported_tick):
+				var report: Dictionary=stores.manifests[stores.trips_reported-1];var received: float=report.reported*SimulationClock.TICK_INTERVAL
+				journal.add("store_rescue",origin,connection.target(origin),received,received,("delivered:" if report.arrived>0 else "returned:")+report.resource,report.amount,0,recording)
 			var migration: WorkerReinforcementState=connection.migrations[origin]
 			if migration.trips_reported>0 and journal.changed("migration/"+origin+"/"+connection.route_id,migration.last_reported_tick):
 				var received: float=migration.last_reported_tick*SimulationClock.TICK_INTERVAL

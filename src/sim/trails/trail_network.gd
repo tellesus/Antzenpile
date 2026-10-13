@@ -219,7 +219,8 @@ func restore(data: Dictionary, colony: ColonyState, knowledge: KnowledgeBase, wo
 	# Rebuild owned multi-resource receipts from integer cargo history, avoiding JSON sum rounding.
 	for route: TrailRouteState in restored_routes.values():
 		if route.purpose=="interpile" and connections.has(route.id):
-			var owned_supply: InterpileSupplyState=connections[route.id].supplies[connections[route.id].payer_id]
+			var connection: ConnectionTrafficState=connections[route.id]
+			var owned_supply: InterpileSupplyState=connection.stores[connection.payer_id] if connection.last_cargo_kind=="stores" else connection.supplies[connection.payer_id]
 			route.receipt=owned_supply.receipt();route.delivered_total=owned_supply.delivered_total()
 		elif route.purpose=="interpile" and founding!=null and route.id==founding.route_id:
 			route.receipt=supply.receipt(); route.delivered_total=supply.delivered_total()

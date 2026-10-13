@@ -46,7 +46,7 @@ func start(settlers: int=CONFIG.reinforcement_workers) -> bool:
  if not h.workers.create_commitment("trail:"+route.id,"trail",route.id):return _reject("Connection commitment unavailable")
  var allocated: bool=h.allocate_workers("trail:"+route.id,count);var paid: bool=h.consume_resources({"carbohydrate":_cost(settlers)});assert(allocated and paid)
  var state: WorkerReinforcementState=_state()
- connection.payer_id=_source_id
+ connection.payer_id=_source_id;connection.last_cargo_kind="supplies"
  if connection.legacy:_run.supply_origin=_source_id
  route.delivered_total=connection.supplies[_source_id].delivered_total();route.receipt=connection.supplies[_source_id].receipt()
  state.settlers=settlers;state.profiles_captured=true;state.party_profiles=h.genetics.migration_plan(settlers,h.workers_total)

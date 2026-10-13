@@ -17,6 +17,8 @@ func _target() -> PileState: return _run.colony.piles[_connection().target(_sour
 func _name() -> String: return _source().display_title()
 func _route() -> TrailRouteState: return _run.trails.routes[_connection().route_id]
 func _migration_active() -> bool:
+ for state: StoreTransportState in _connection().stores.values():
+  if state.active():return true
  for state: BroodTransportState in _connection().broods.values():
   if state.active():return true
  for state: QueenTransportState in _connection().queens.values():
@@ -38,7 +40,7 @@ func set_enabled(value: Variant) -> bool:
   if not home.workers.create_commitment("trail:"+route.id,"trail",route.id): return _reject("Supply commitment unavailable")
   var allocated: bool=home.allocate_workers("trail:"+route.id,CONFIG.workers); assert(allocated)
   route.allocated_workers=CONFIG.workers;state.phase="waiting"
- _connection().payer_id=_source_id
+ _connection().payer_id=_source_id;_connection().last_cargo_kind="supplies"
  if _connection().legacy:_run.supply_origin = _source_id
  route.delivered_total=state.delivered_total();route.receipt=state.receipt()
  state.enabled=value;route.desired_workers=CONFIG.workers if value else 0
