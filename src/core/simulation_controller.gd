@@ -225,6 +225,10 @@ func start_honeydew_tending(pile_id: String) -> bool:
 	return ecology.start_tending(pile_id)
 
 
+func set_honeydew_target(pile_id: String, target: Variant) -> bool:
+	if run.history.ended:return false
+	return ecology.set_tending_target(pile_id,target)
+
 func stop_honeydew_tending(pile_id: String) -> bool:
 	if run.history.ended: return false
 	return ecology.stop_tending(pile_id)

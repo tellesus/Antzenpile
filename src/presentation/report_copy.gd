@@ -38,6 +38,7 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"migration": text="Messenger returned: %d workers settled at %s" % [entry.amount,pile_name(entry.subject_id)]
 		"departure": text="Final departure to %s · %d workers · nest relinquished" % [pile_name(entry.subject_id),entry.amount]
 		"evacuation": text="%d evacuated workers arrived from %s" % [entry.amount,pile_name(entry.subject_id)] if entry.detail=="arrived" else "Final party physically returned · original nest active again"
+		"producer": text="Attendant target: %d · gathering and defense remain separate" % entry.amount if entry.detail=="target" else "Attendants returned · remembered producer was unsuitable" if entry.detail=="not_found" else "Attendant party returned to the nest"
 		"connection": text="Connection closed to new traffic · paid trips continue" if entry.detail=="closed" else "Connection reopened · place a new order"
 		"royal_rescue": text="Young queen and males delivered to "+pile_name(entry.subject_id) if entry.detail=="delivered" else "Young queen party returned · recipient unsuitable" if entry.detail=="landing" else "Young queen party returned · nurses could not settle" if entry.detail=="escorts" else "Original young queen and males returned home"
 		"store_rescue": text="%d %s %s" % [entry.amount,entry.detail.get_slice(":",1),"delivered to "+pile_name(entry.subject_id) if entry.detail.begins_with("delivered:") else "returned home · travel food spent"]

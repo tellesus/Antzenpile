@@ -383,14 +383,8 @@ func _run_command(command: String) -> void:
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty() or not _is_honeydew(signal_data):
 				return
-			var action: Callable = honeydew_start_command if command == "honeydew_start" else honeydew_stop_command
-			if not action.is_valid():
-				return
-			var result: Dictionary = action.call(signal_data.source_knowledge_id)
-			activation.outcome(result)
-			_request_rejected = not result.get("accepted", false)
-			_request_selection = selected_id
-			_feedback = ("Producers tended" if command == "honeydew_start" else "Tending withdrawn") if result.get("accepted", false) else Copy.reason(result.get("reason", "Tending unavailable"))
+			var state: Dictionary=_status.honeydew
+			effort_draft.begin("producer",state.target if state.target>0 else state.required_workers,state.cap,state.required_workers)
 		"investigate":
 			var signal_data: Dictionary = _selected_signal()
 			if signal_data.is_empty() or not investigate_command.is_valid():
@@ -954,13 +948,13 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 	var route_text: String = "Gatherers carry these carbs home" if route.is_empty() or route.status == "inactive" else "Trail recalling · %d away" % route.active_workers if route.status == "recalling" else _recovery_note(route) if route.status == "depleted" else "Gatherers: %d assigned · %d away" % [route.allocated_workers, route.active_workers]
 	if route.get("waiting_workers",0)>0: route_text="%d assigned · %d waiting for labor" % [route.allocated_workers,route.waiting_workers]
 	_label(body.position + Vector2(16, 184), route_text, Color("a8b8bd"), 15)
-	var labor_text: String = "%d attendants boost output" % int(_status.honeydew.protection_workers) if relationship == "tended" else "%d attendants can boost output" % required
+	var labor_text: String = "Target %d · %d attendants committed" % [_status.honeydew.target,_status.honeydew.protection_workers] if relationship=="tended" or _status.honeydew.protection_workers>0 else "Suggested %d attendants · separate duty" % required
 	_label(body.position + Vector2(16, 201), labor_text, Color("8fa1a8"), 15)
 	if relationship in ["exploited", "tended"]:
 		var protect_box: Rect2 = _honeydew_button_rect()
 		var can_start: bool = relationship == "tended" or available >= required
 		UIStyle.surface(self, protect_box, Color("3d3328") if can_start else Color("202326"))
-		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "WITHDRAW ATTENDANTS" if relationship == "tended" else "ASSIGN APHID ATTENDANTS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
+		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "CHOOSE ATTENDANTS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	if route.get("waiting_workers",0)>0:
 		_draw_trail_button("gather_edit","CHOOSE WORKERS");_draw_trail_button("trail_cancel","CANCEL ORDER")
 	elif route.is_empty() or route.status in ["inactive", "recalling"]:

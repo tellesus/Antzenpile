@@ -57,9 +57,13 @@ func run(test: Object) -> bool:
 		root.simulation.advance(0.25)
 	view._status = root.inward_status("home")
 	var available: int = view._status.workers_available
-	test.check(view._status.honeydew.relationship == "exploited" and view.activate_at(view._honeydew_rect().get_center()) and root.simulation.run.colony.piles.home.workers_available == available - 6, "Harvested relationship acts through real six-worker protection commitment")
-	view._status = root.inward_status("home")
-	test.check(view.activate_at(view._honeydew_rect().get_center()) and root.simulation.run.colony.piles.home.workers_available == available, "Web withdrawal uses the existing authoritative relationship command")
+	var before_tending: Dictionary=root.simulation.run.to_dict()
+	test.check(view._status.honeydew.relationship=="exploited" and view.activate_at(view._honeydew_rect().get_center()) and view.effort_draft.opened and root.simulation.run.to_dict()==before_tending,"Harvested relationship opens a free whole-attendant draft")
+	view.effort_command=root.set_effort
+	view.activate_at(view.effort_draft.rect(view.get_viewport_rect().size,"effort_commit").get_center());view._status=root.inward_status("home")
+	test.check(root.simulation.run.colony.piles.home.workers_available==available-6,"Explicit attendant ORDER funds actual six-worker duty and travel")
+	view.activate_at(view._honeydew_rect().get_center());view.activate_at(view.effort_draft.rect(view.get_viewport_rect().size,"effort_zero").get_center());view.activate_at(view.effort_draft.rect(view.get_viewport_rect().size,"effort_commit").get_center());view._status=root.inward_status("home")
+	test.check(root.simulation.run.colony.piles.home.workers_available==available,"Same-frame zero-distance withdrawal returns the actual party once")
 	var detached: Dictionary = root.inward_status("home")
 	detached.honeydew.relationship = "tended"
 	test.check(root.inward_status("home").honeydew.relationship == "exploited" and not detached.honeydew.has("condition") and not detached.honeydew.has("quantity") and not detached.honeydew.has("pulse_ticks"), "Relationship context is detached and excludes source reality")

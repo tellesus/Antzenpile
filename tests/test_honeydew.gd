@@ -68,9 +68,10 @@ func run(test: Object) -> bool:
 	game.advance(30.0)
 	test.check(game.run.honeydew.condition > condition_before and game.run.world.nodes.aphid_01.quantity <= 40.0, "Protected producers recover and physical output stays capped")
 	var tended_output: float = game.run.world.nodes.aphid_01.quantity
-	test.check(game.stop_honeydew_tending("home") and pile.workers.count("honeydew:home") == -1 and pile.workers_total == workers_before, "Stopping protection releases ledger commitment")
+	test.check(game.stop_honeydew_tending("home") and pile.workers.count("honeydew:home") == 6 and pile.workers_total == workers_before, "Stopping attendance requests physical return without releasing remote workers")
 	condition_before = game.run.honeydew.condition
 	game.advance(30.0)
+	test.check(pile.workers.count("honeydew:home")==-1,"Attendants release only after actual return")
 	test.check(game.run.honeydew.condition < condition_before and game.run.world.nodes.aphid_01.quantity <= 40.0 and game.run.world.nodes.aphid_01.quantity >= tended_output, "Unprotected predator pressure lowers condition while output remains physical")
 	var legacy: Dictionary = snapshot.duplicate(true)
 	legacy.erase("honeydew")

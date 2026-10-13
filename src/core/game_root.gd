@@ -257,10 +257,13 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","investment","chamber","queen"]:
+	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","producer","investment","chamber","queen"]:
 		inspect_pile(selected.pile_id)
-		var organ: String="nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
-		if _inward_view!=null: _inward_view.selected_id=organ;_inward_view._process(0)
+		var organ: String="adaptation" if selected.kind=="producer" else "nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
+		if _inward_view!=null:
+			_inward_view.selected_id=organ
+			if selected.kind=="producer":_inward_view.web_family="foraging";_inward_view.web_selection="honeydew"
+			_inward_view._process(0)
 		if selected.kind in ["supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation"] and _inward_view!=null:
 			_inward_view.connection_controls.opened=true
 			_inward_view.connection_controls.purpose="workers" if selected.kind=="migration" else "queen" if selected.kind=="relocation" else "brood" if selected.kind=="brood_rescue" else "departure" if selected.kind in ["departure","evacuation"] else "royals" if selected.kind=="royal_rescue" else "stores" if selected.kind=="store_rescue" else "supplies"
@@ -530,13 +533,14 @@ func scout_mission_summaries(pile_id: String) -> Array[Dictionary]:
 
 
 func honeydew_summary(pile_id: String) -> Dictionary:
-	var producer_knowledge_id: String = "known:" + HONEYDEW_CONFIG.source_id
-	if pile_id == "home" and simulation.run.knowledge.nodes.has(producer_knowledge_id) and (simulation.run.knowledge.nodes[producer_knowledge_id].source_type == "aphid_honeydew" or simulation.run.honeydew.relationship in ["exploited","tended"]):
-		return {"knowledge_id": producer_knowledge_id,
-			"relationship": simulation.run.honeydew.relationship,
-			"protection_workers": simulation.run.honeydew.protection_workers,
-			"required_workers": AdaptationRules.protection_workers(HONEYDEW_CONFIG.protection_workers, simulation.run.recognition_share(pile_id))}
-	return {}
+	var known: String="known:"+HONEYDEW_CONFIG.source_id
+	if not simulation.run.knowledge.nodes.has(known) or simulation.run.knowledge.nodes[known].source_type!="aphid_honeydew" and simulation.run.honeydew.relationship=="unknown":return {}
+	var result: Dictionary=ProducerServiceSystem.new(simulation.run).summary(pile_id)
+	var count: int=result.target if result.target>0 else result.required_workers
+	for view: Node2D in [_outward_view,_inward_view]:
+		if view!=null and view.effort_draft.opened and view.effort_draft.kind=="producer":count=view.effort_draft.amount
+	result.quote=ProducerServiceSystem.new(simulation.run)._cost(pile_id,count)
+	return result
 
 
 func inward_status(pile_id: String) -> Dictionary:
@@ -751,8 +755,9 @@ func set_effort(kind: String, count: Variant) -> Dictionary:
 	match kind:
 		"climate": accepted=simulation.set_humidity_workers(inward_pile_id,count);reason=simulation.humidity.last_error
 		"cleanup": accepted=simulation.set_sanitation_workers(inward_pile_id,count);reason=simulation.sanitation.last_error
+		"producer":accepted=simulation.set_honeydew_target(inward_pile_id,count);reason=simulation.ecology.last_error
 		"exploration": accepted=simulation.set_exploration(count,inward_pile_id);reason=simulation.scouting.last_error
-	return {"accepted":accepted,"queued":accepted and kind=="exploration","reason":reason}
+	return {"accepted":accepted,"queued":accepted and kind in ["exploration","producer"],"reason":reason}
 
 
 func guest_summary(pile_id: String) -> Dictionary:
@@ -842,18 +847,16 @@ func set_honeydew_protection(enabled: bool) -> Dictionary:
 
 
 func start_honeydew_tending(knowledge_id: String) -> Dictionary:
-	if inward_pile_id != "home": return _home_order()
 	if knowledge_id != "known:" + HONEYDEW_CONFIG.source_id or not simulation.run.knowledge.nodes.has(knowledge_id):
 		return {"accepted": false, "reason": "Honeydew source unknown"}
-	var accepted: bool = simulation.start_honeydew_tending("home")
+	var accepted: bool = simulation.start_honeydew_tending(inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.ecology.last_error}
 
 
 func stop_honeydew_tending(knowledge_id: String) -> Dictionary:
-	if inward_pile_id != "home": return _home_order()
 	if knowledge_id != "known:" + HONEYDEW_CONFIG.source_id or not simulation.run.knowledge.nodes.has(knowledge_id):
 		return {"accepted": false, "reason": "Honeydew source unknown"}
-	var accepted: bool = simulation.stop_honeydew_tending("home")
+	var accepted: bool = simulation.stop_honeydew_tending(inward_pile_id)
 	return {"accepted": accepted, "reason": simulation.ecology.last_error}
 
 
@@ -930,7 +933,7 @@ func daughter_gathering_summary() -> Dictionary:
 	if not simulation.run.colony.piles.has(pile_id): return {}
 	var hints: Dictionary = {}
 	for id: String in simulation.run.knowledge.nodes: hints[id] = simulation.run.knowledge.temporal_hint(id)
-	var status: Dictionary = {"trails":trail_summaries(pile_id), "temporal_hints":hints, "honeydew":honeydew_summary("home")}
+	var status: Dictionary = {"trails":trail_summaries(pile_id), "temporal_hints":hints, "honeydew":honeydew_summary(pile_id)}
 	var signals: Array[Dictionary] = sensory_snapshot(pile_id)
 	var sources: Dictionary = {}
 	for category: String in PileState.RESOURCE_IDS:

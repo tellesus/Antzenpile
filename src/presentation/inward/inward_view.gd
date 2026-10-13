@@ -199,7 +199,8 @@ func activate_at(at: Vector2) -> bool:
 		web_selection = "foraging"
 		return true
 	if selected_id == "adaptation" and web_selection == "honeydew" and _status.get("honeydew", {}).get("relationship", "unknown") in ["exploited", "tended"] and _honeydew_rect().has_point(at):
-		_run_command("honeydew")
+		var service: Dictionary=_status.honeydew
+		effort_draft.begin("producer",service.target if service.target>0 else service.required_workers,service.cap,service.required_workers)
 		return true
 	var guest: Dictionary = _status.get("guest", {})
 	if selected_id == "nursery" and _guest_attention() and _guest_link_rect().has_point(at):
@@ -770,7 +771,7 @@ func _draw_context(size: Vector2) -> void:
 					_detail_line(box, 235, "Recall requested · await workers home")
 				elif not relief.is_empty():
 					var labels: Dictionary = {"climate":"RELEASE CLIMATE WORKERS", "cleanup":"RELEASE CLEANUP WORKERS", "aphids":"WITHDRAW APHID ATTENDANTS", "gatherers":"RECALL GATHERERS", "scouts":"RECALL SCOUTS · EXPLORATION OFF", "response":"RECALL RESPONSE PARTY", "supplies":"STOP DAUGHTER SUPPLIES", "daughter_supplies":"STOP HOMEBOUND SUPPLIES", "rejection":"STOP NURSERY REJECTION"}
-					_draw_action(_brood_care_rect(), labels.get(relief.kind, "MAKE ROOM FOR CARE"), "%d workers · other job reduced" % relief.workers if relief.kind in ["climate","cleanup"] else "Whole attendant group released" if relief.kind == "aphids" else "%d workers · gathering target reduced" % relief.workers if relief.kind == "gatherers" else "Workers must return through travel" if relief.kind in ["scouts","response","supplies","daughter_supplies"] else "Clearing stops; workers released")
+					_draw_action(_brood_care_rect(), labels.get(relief.kind, "MAKE ROOM FOR CARE"), "%d workers · other job reduced" % relief.workers if relief.kind in ["climate","cleanup"] else "Whole attendant group must travel home" if relief.kind == "aphids" else "%d workers · gathering target reduced" % relief.workers if relief.kind == "gatherers" else "Workers must return through travel" if relief.kind in ["scouts","response","supplies","daughter_supplies"] else "Clearing stops; workers released")
 					if relief.kind == "gatherers": _detail_line(box, 284, "From " + care.get("source_name", "remembered source"))
 				else:
 					_detail_line(box, 235, "Await workers or ongoing jobs ending")
@@ -980,11 +981,11 @@ func _draw_relationship_context(box: Rect2) -> void:
 		_detail_line(box, 151, "Harvest it through an OUTWARD trail")
 		_detail_line(box, 185, "Tending follows a loaded return")
 	else:
-		_detail_line(box, 125, "Workers tend producers" if state == "tended" else "Honeydew successfully harvested")
+		_detail_line(box, 125, "Attendant duty ordered" if state=="tended" else "Honeydew successfully harvested")
 		_detail_line(box, 151, "%d workers committed" % relationship.protection_workers if state == "tended" else "Needs %d available workers" % relationship.required_workers)
 		_detail_line(box, 185, "Improves output; does not guard trail")
 		_detail_line(box, 211, "Journey defense is a separate job")
-		_draw_action(_honeydew_rect(), "WITHDRAW ATTENDANTS" if state == "tended" else "ASSIGN APHID ATTENDANTS", "" if state == "tended" else Copy.local_shortage(_status, {}, relationship.required_workers))
+		_draw_action(_honeydew_rect(), "CHOOSE ATTENDANTS", "" if state == "tended" else Copy.local_shortage(_status, {}, relationship.required_workers))
 
 
 func _detail_line(box: Rect2, y: float, value: String) -> void:

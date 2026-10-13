@@ -416,7 +416,7 @@ func restore(data: Dictionary) -> bool:
 	var restored_honeydew := Honeydew.new()
 	if data.has("honeydew") and (not data.honeydew is Dictionary or not restored_honeydew.restore(data.honeydew)):
 		return false
-	if not _valid_honeydew(restored_honeydew, restored_world, restored_colony, restored_knowledge, restored_trails):
+	if not _valid_honeydew(restored_honeydew, restored_world, restored_colony, restored_knowledge, restored_trails,restored_clock.tick_count):
 		return false
 	var restored_rival := Rival.new()
 	if data.has("rival") and (not data.rival is Dictionary or not restored_rival.restore(data.rival, restored_world, restored_clock.tick_count)):
@@ -599,33 +599,45 @@ func restore(data: Dictionary) -> bool:
 	return true
 
 
-static func _valid_honeydew(state: HoneydewState, restored_world: WorldState, restored_colony: ColonyState, restored_knowledge: KnowledgeBase, restored_trails: TrailNetwork) -> bool:
-	var source_id: String = HONEYDEW_CONFIG.source_id
-	var commitment_id: String = "honeydew:home"
-	var has_source: bool = restored_world.nodes.has(source_id)
-	if has_source and restored_world.nodes[source_id].definition_id != "carbohydrate":
-		return false
-	if not has_source and state.relationship != "unknown":
-		return false
-	if state.relationship != "unknown":
-		if not restored_knowledge.nodes.has("known:" + source_id):
-			return false
-		var route: TrailRouteState = restored_trails.find_route("home", "known:" + source_id)
-		if route == null or route.delivered_total <= 0.0:
-			return false
-	for pile: PileState in restored_colony.piles.values():
-		var commitments: Dictionary = pile.workers.to_dict().commitments
-		for id: String in commitments:
-			if id.begins_with("honeydew:") and (pile.id != "home" or id != commitment_id):
-				return false
-		if pile.id == "home":
-			if state.recognition_share > 0 and "security" not in pile.genetics.established or state.recognition_share < 0 and "tolerance" not in pile.genetics.established:
-				return false
-			if state.relationship == "tended":
-				if not commitments.has(commitment_id) or commitments[commitment_id].kind != "other" or commitments[commitment_id].owner_id != source_id or commitments[commitment_id].count != state.protection_workers:
-					return false
-			elif commitments.has(commitment_id):
-				return false
+static func _valid_honeydew(state: HoneydewState, world_state: WorldState, colony_state: ColonyState, knowledge: KnowledgeBase, network: TrailNetwork, tick: int) -> bool:
+	var source_id: String=HONEYDEW_CONFIG.source_id;var has_source: bool=world_state.nodes.has(source_id)
+	if has_source and world_state.nodes[source_id].definition_id!="carbohydrate":return false
+	if not has_source and state.relationship!="unknown":return false
+	if state.relationship!="unknown":
+		if not knowledge.nodes.has("known:"+source_id):return false
+		var loaded: bool=false
+		for route: TrailRouteState in network.routes.values():
+			if route.destination_knowledge_id=="known:"+source_id and route.delivered_total>0:loaded=true
+		if not loaded:return false
+	if state.legacy_services:
+		var route: TrailRouteState=network.find_route("home","known:"+source_id)
+		if route==null or route.delivered_total<=0:return false
+		var old:=ProducerServiceState.new();old.target=state.protection_workers;old.count=state.protection_workers;old.phase="working";old.recognition_share=state.recognition_share;old.required=AdaptationRules.protection_workers(HONEYDEW_CONFIG.protection_workers,old.recognition_share);old.destination=route.estimated_destination;old.leg_ticks=WorkerReinforcementState.TRAILS.leg_ticks(colony_state.piles.home.position.distance_to(old.destination));old.legacy_onsite=true
+		state.services.home=old;state.legacy_services=false
+	for id: String in state.services:
+		if not colony_state.piles.has(id):return false
+		var pile: PileState=colony_state.piles[id];var service: ProducerServiceState=state.services[id];var route: TrailRouteState=network.find_route(id,"known:"+source_id)
+		if route==null or route.delivered_total<=0 or pile.relinquished and (service.target>0 or service.count>0):return false
+		if service.departed_tick>tick or service.recall_tick>tick or service.last_returned_tick>tick:return false
+		if service.legacy_onsite and (id!="home" or service.count!=service.required):return false
+		if service.recognition_share>0 and "security" not in pile.genetics.established or service.recognition_share<0 and "tolerance" not in pile.genetics.established:return false
+		if service.phase!="none":
+			if service.destination!=route.estimated_destination or service.leg_ticks!=WorkerReinforcementState.TRAILS.leg_ticks(pile.position.distance_to(service.destination)):return false
+			if not service.legacy_onsite:
+				if service.departed_tick<pile.foundation.get("founded_tick",0):return false
+				if service.phase=="outbound" and service.departed_tick+service.elapsed_ticks>tick:return false
+				if service.phase=="working" and service.departed_tick+service.leg_ticks>tick:return false
+			if service.phase=="returning":
+				var initial: int=0 if service.legacy_onsite or service.recall_tick>=service.departed_tick+service.leg_ticks else service.leg_ticks-(service.recall_tick-service.departed_tick)
+				if service.recall_tick<service.departed_tick or service.elapsed_ticks<initial or service.recall_tick+service.elapsed_ticks-initial>tick:return false
+	for pile: PileState in colony_state.piles.values():
+		var expected: ProducerServiceState=state.services.get(pile.id)
+		var commitments: Dictionary=pile.workers.to_dict().commitments;var pool: String="honeydew:"+pile.id
+		for key: String in commitments:
+			if key.begins_with("honeydew:") and key!=pool:return false
+		if expected!=null and expected.count>0:
+			if commitments.get(pool)!={"kind":"other","owner_id":source_id,"count":expected.count}:return false
+		elif commitments.has(pool):return false
 	return true
 
 func all_foundings() -> Array[FoundingState]:

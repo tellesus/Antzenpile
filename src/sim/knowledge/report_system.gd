@@ -80,6 +80,12 @@ func capture(recording: bool = true) -> void:
 		if camp.reported_tick<=0:continue
 		var received: float=camp.reported_tick*SimulationClock.TICK_INTERVAL
 		if camp.phase in ["ready","failed","established"] and journal.changed("camp/"+camp.route_id,str(received)+":"+camp.phase):journal.add("camp",camp.origin_pile,camp.route_id,received,received,camp.phase,0,0,recording)
+	for id: String in _run.honeydew.services:
+		var service: ProducerServiceState=_run.honeydew.services[id];var now: float=_run.simulation_time
+		if journal.changed("producer/"+id+"/target",service.known_target()):journal.add("producer",id,"known:"+HoneydewState.CONFIG.source_id,now,now,"target",service.known_target(),0,recording)
+		if service.last_returned_tick>0 and journal.changed("producer/"+id+"/return",service.last_returned_tick):
+			var received: float=service.last_returned_tick*SimulationClock.TICK_INTERVAL
+			journal.add("producer",id,"known:"+HoneydewState.CONFIG.source_id,received,received,service.last_result,0,0,recording)
 	for connection: ConnectionTrafficState in _run.all_connections():
 		if not connection.policy_actor.is_empty() and journal.changed("connection/"+connection.route_id,str(connection.policy_tick)+":"+str(connection.closed)):
 			var received: float=connection.policy_tick*SimulationClock.TICK_INTERVAL

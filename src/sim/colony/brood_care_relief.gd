@@ -19,8 +19,9 @@ func plan(pile_id: String) -> Dictionary:
 		return {"kind":"climate", "target":maxi(0,pile.humidity.carers-missing), "workers":mini(missing,pile.humidity.carers)}
 	if pile.midden.cleaners > 0:
 		return {"kind":"cleanup", "target":maxi(0,pile.midden.cleaners-missing), "workers":mini(missing,pile.midden.cleaners)}
-	if pile_id == "home" and _run.honeydew.relationship == "tended":
-		return {"kind":"aphids", "workers":_run.honeydew.protection_workers}
+	var service: ProducerServiceState=_run.honeydew.services.get(pile_id)
+	if service!=null and service.count>0:
+		return {"kind":"aphids","workers":service.count} if service.known_target()>0 else {"kind":"returning"}
 	var ids: Array = _run.trails.routes.keys(); ids.sort()
 	for id: String in ids:
 		var route: TrailRouteState = _run.trails.routes[id]

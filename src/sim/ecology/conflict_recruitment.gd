@@ -83,9 +83,11 @@ func _release_other_jobs(route_id: String, entry: Dictionary, pile: PileState) -
 		_reserve(route_id, entry, pile)
 	needed = int(entry.count) - pile.workers.count(pool(route_id)) - _returning(entry)
 	if needed <= 0: return
-	if pile.id == "home" and _run.honeydew.relationship == "tended":
-		assert(jobs.aphids.stop_tending(pile.id))
-		_reserve(route_id, entry, pile)
+	var service: ProducerServiceState=_run.honeydew.services.get(pile.id)
+	if service!=null and service.count>0:
+		if service.known_target()>0:assert(jobs.aphids.stop_tending(pile.id))
+		_reserve(route_id,entry,pile)
+		if service.count>0:return # The deliberately recalled crew must physically reach this nest first.
 	var ids: Array = _run.trails.routes.keys(); ids.sort()
 	for id: String in ids:
 		needed = int(entry.count) - pile.workers.count(pool(route_id)) - _returning(entry)
