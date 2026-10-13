@@ -323,6 +323,7 @@ func _sample() -> void:
 	# Cautious survey senses nearby danger without using its position as a navigation target.
 	if state.ambush_fraction < 0 and _run.predator.defeated_at == 0 and _run.clock.tick_count >= PREDATOR.first_tick and point.distance_to(PREDATOR.position) <= PREDATOR.radius + CONFIG.survey_radius:
 		state.ambush_fraction = snappedf(fraction,0.05); state.sampled_at = _run.simulation_time
+		state.predator_profile = _run.predator.profile_id
 	if not state.foreign_seen and _run.rival.contacts_total < WorkerLedger.MAX_COUNT and _run.rival.pheromone >= 0.1 and _run.world.nodes.has(RIVAL.food_id):
 		var nearest: Vector2 = Geometry2D.get_closest_point_to_segment(point,RIVAL.pile_position,_run.world.nodes[RIVAL.food_id].position)
 		if point.distance_to(nearest) <= RIVAL.contact_radius:
@@ -352,6 +353,7 @@ func _arrive() -> void:
 			_run.trails.segments[candidate.id] = candidate
 	else:
 		state.reports[state.route_id] = {"finding":finding,"fraction":state.impact_fraction if finding == "surface" else state.ambush_fraction,"observed_at":state.sampled_at,"received_at":_run.simulation_time}
+		if finding in ["ambush", "mixed"] and state.predator_profile != "": state.reports[state.route_id].predator_profile = state.predator_profile
 		if finding == "surface" or state.ambush_fraction >= 0 and not _segment().waypoints.is_empty():
 			var estimate: Vector2 = _segment().point_at(state.impact_fraction if finding == "surface" else state.ambush_fraction)
 			if finding == "surface": estimate = estimate.round()
@@ -366,6 +368,7 @@ func _arrive() -> void:
 	assert(released and retired)
 	state.route_id = ""; state.phase = "idle"; state.workers = 0; state.elapsed_ticks = 0; state.departed_at = 0; state.impact_fraction = -1; state.ambush_fraction = -1; state.foreign_seen = false; state.sampled_at = 0
 	state.defense.reset_party()
+	state.predator_profile = ""
 	state.pressure.reset_party()
 	state.approach.reset_party()
 

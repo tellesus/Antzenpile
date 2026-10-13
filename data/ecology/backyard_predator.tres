@@ -3,6 +3,7 @@
 
 [resource]
 script = ExtResource("1")
+profile_id = "wolf_spider"
 position = Vector2(29, 27)
 radius = 2.0
 first_tick = 1200

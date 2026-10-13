@@ -1,6 +1,6 @@
 # Current build and gaps
 
-Baseline: gameplay through card 163; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
+Baseline: gameplay through card 164; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
 
 ## Implemented foundation
 
@@ -15,7 +15,7 @@ Baseline: gameplay through card 163; design reset through 138. The pre-reset gam
 | Brood/reproductives | Auto/manual worker brood; saved reproductive/adaptation priority with Auto Brood on; Alcove space; paid per-pile groups, queen-owned ancestry and physical first founding. | Daughter-origin founding works; paid queen/worker-brood relocation works; active/ready reproductive-group rescue works. |
 | Adaptation | Ten definition-driven traits, including care, environment and Rapid Trail Repair; captured inheritance/travel, actual expression and bounded climate/nutrition/deposition tradeoffs. | Integrated trait balance remains M7. |
 | Network | Home plus additional independently working named piles, daughter-origin founding and captured generations; four site profiles, paid preparation/climate, two-way adjacent supplies/whole worker migration and finite store and active/ready reproductive-group rescue and supported laying-queen/worker-brood rescue with captured phenotype/ancestry, care/space promises and delayed receipts and explicit traffic closure/reopening and whole final departure/abandonment. | Physical network/nest hazard integration remains M6. |
-| Conflict | Stationary ambusher, independent rival foraging/counter-recruitment, physical messengers, Clear/Hunt, finite remains, retreat, alternate approach. | Moving predator and network/nest hazard responses; more general encounter/content definitions. |
+| Conflict | Typed stationary ambusher with returned spider-like outline, independent rival foraging/counter-recruitment, physical messengers, Clear/Hunt, finite remains, retreat, alternate approach. | Moving predator and network/nest hazard responses; more general encounter/content definitions. |
 | Conflict controls | Direct circle, flexible recruitment, protected care/real travel; shared tap/outcome cues now cover views/menus/reports/review. | Further visual feel stays deferred to beta; ordinary staffing remains next. |
 | Environment and health | Rain/heat, moisture/temperature care, refuse-related brood strain, recurring guest harm/clearing and contaminated intake. | Planned zone/connection/nest disturbances, new site profiles and useful evacuation counterplay. |
 | Runs and presentation | Backyard/Garden Edge/Roadside; voluntary end, sampled post-run physical review; layered desktop art/music and normal sensory UI. | Biological continuation/failure rules, integrated scenario arcs, final graphics/music, onboarding and distribution. |
@@ -24,7 +24,7 @@ Local queen weakening, paid care and replacement now work. Maternal lineage and 
 
 ## Latest actual verification
 
-[Card163](tasks/163_flexible_producer_tending.md) recorded10,296 checks/zero failures (364.94s), focused55/zero and final affected296/zero; clean import/Main and124 headless two-view drawing callbacks at standard/compact sizes. [162](tasks/162_dew_and_sheltered_seep.md) completed the ten source profiles; [161](tasks/161_final_departure_and_abandonment.md) completed M5. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the systems beta.
+[Card164](tasks/164_supported_predator_witnesses.md) recorded10,323 checks/zero failures (363.65s), affected1493/zero; clean import/Main and17 headless conflict callbacks at standard/compact sizes. [163](tasks/163_flexible_producer_tending.md) completed flexible producer service. [162](tasks/162_dew_and_sheltered_seep.md) completed the ten source profiles; [161](tasks/161_final_departure_and_abandonment.md) completed M5. This is tested correctness, not release enjoyment, packaged compatibility or renderer-performance acceptance. Manual graphical/feel checks defer to the systems beta.
 
 The player supplies manual visual feedback. No screen monitoring, desktop automation, paid testers or broad compute sweeps are authorized. The documentation reset does not rerun the engine or claim new gameplay evidence. Existing user audio imports/images/translations and saved slot are preserved.
 

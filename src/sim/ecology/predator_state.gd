@@ -3,6 +3,7 @@ extends RefCounted
 
 const CONFIG = preload("res://data/ecology/backyard_predator.tres")
 var last_attack_tick: int = -1
+var profile_id: String = ""
 var kills_total: int = 0
 const RESPONSE = preload("res://data/ecology/default_journey_response.tres")
 var resistance: int = RESPONSE.resistance
@@ -13,11 +14,12 @@ var killed: bool = false
 
 
 func to_dict() -> Dictionary:
-	return {"last_attack_tick": str(last_attack_tick), "kills_total": kills_total,
+	return {"profile_id":profile_id,"last_attack_tick": str(last_attack_tick), "kills_total": kills_total,
 		"defense": {"resistance":resistance,"defeated_at":defeated_at,"losses":defense_losses,"health":health,"killed":killed}}
 
 
 func restore(data: Dictionary, tick: int) -> bool:
+	if not PredatorCatalog.accepts(data.get("profile_id", "")): return false
 	if not data.has_all(["last_attack_tick", "kills_total"]) or not data.last_attack_tick is String or not data.last_attack_tick.is_valid_int() or str(data.last_attack_tick.to_int()) != data.last_attack_tick or not WorkerLedger.valid_count(data.kills_total):
 		return false
 	var last: int = data.last_attack_tick.to_int()
@@ -40,4 +42,5 @@ func restore(data: Dictionary, tick: int) -> bool:
 	health = int(restored_health); killed = restored_killed
 	last_attack_tick = last
 	kills_total = int(data.kills_total)
+	profile_id = data.get("profile_id", "")
 	return true

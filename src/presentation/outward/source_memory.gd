@@ -96,6 +96,15 @@ static func defense_label(outcome: Dictionary) -> String:
 	if outcome.get("goal", "clear") == "hunt" and outcome.get("outcome", "") == "secured": return "Predator killed · protein reported"
 	return {"secured": "Ambusher driven off", "withdrew": "Defenders withdrew", "not_found": "No ambusher found"}.get(outcome.get("outcome", ""), "No defensive return yet")
 
+static func predator_name(profile: String) -> String:
+	return "Spider-like predator" if profile == "wolf_spider" else "Predatory arthropod"
+
+static func survey_label(report: Dictionary) -> String:
+	var profile: String = report.get("predator_profile", "")
+	if report.get("finding", "") in ["ambush", "mixed"] and profile != "":
+		return predator_name(profile) + (" and foreign ants" if report.finding == "mixed" else " witnessed")
+	return {"ambush":"Predator witnessed", "mixed":"Predator and foreign ants", "foreign":"Foreign ants witnessed", "surface":"Heavy impact witnessed", "inconclusive":"Cause remains uncertain"}.get(report.get("finding", ""), "Survey returned")
+
 
 static func defense_is_latest(outcome: Dictionary, route: Dictionary) -> bool:
 	return not outcome.is_empty() and float(outcome.get("received_at", 0.0)) >= maxf(float(route.get("last_loss_time", 0.0)), float(route.get("last_witness_time", 0.0)))

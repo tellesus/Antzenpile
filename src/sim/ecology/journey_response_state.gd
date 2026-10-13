@@ -10,6 +10,7 @@ var elapsed_ticks: int = 0
 var departed_at: float = 0
 var impact_fraction: float = -1
 var ambush_fraction: float = -1
+var predator_profile: String = ""
 var foreign_seen: bool = false
 var sampled_at: float = 0
 var reports: Dictionary = {}
@@ -22,21 +23,27 @@ func active() -> bool: return phase != "idle"
 func origin_id(trails: TrailNetwork) -> String:
 	return trails.routes[route_id].origin_pile if active() and trails.routes.has(route_id) else ""
 func to_dict() -> Dictionary:
-	return {"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
+	return {"predator_profile":predator_profile,"route_id":route_id,"phase":phase,"workers":workers,"elapsed_ticks":elapsed_ticks,"departed_at":departed_at,
 		"impact_fraction":impact_fraction, "ambush_fraction":ambush_fraction,"foreign_seen":foreign_seen,"sampled_at":sampled_at,"reports":reports.duplicate(true),"defense":defense.to_dict(),"pressure":pressure.to_dict(),"orders":orders.targets.duplicate(),"goals":orders.goals.duplicate(),"approach":approach.to_dict(),"recruitment":orders.recruitment.duplicate(true)}
 
 func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: float, world: WorldState = null) -> bool:
+	var profile: Variant = data.get("predator_profile", "")
+	if not PredatorCatalog.accepts(profile): return false
 	if not data.has_all(["route_id","phase","workers","elapsed_ticks","departed_at","ambush_fraction","foreign_seen","sampled_at","reports"]): return false
 	if not data.route_id is String or not data.phase in ["idle","outbound","fighting","inbound"] or not WorkerLedger.valid_count(data.workers) or not WorkerLedger.valid_count(data.elapsed_ticks) or typeof(data.foreign_seen) != TYPE_BOOL or not data.reports is Dictionary: return false
 	for key: String in ["departed_at","sampled_at","ambush_fraction"]:
 		if not typeof(data[key]) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data[key])): return false
 	if data.departed_at < 0 or data.departed_at > time or data.sampled_at < 0 or data.sampled_at > time or (data.ambush_fraction != -1 and (data.ambush_fraction < 0 or data.ambush_fraction > 1)): return false
+	if profile != "" and data.ambush_fraction < 0: return false
 	var impact: Variant = data.get("impact_fraction", -1)
 	if not typeof(impact) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(impact)) or impact != -1 and (impact < 0 or impact > 1): return false
 	if (impact >= 0 or data.ambush_fraction >= 0 or data.foreign_seen) != (data.sampled_at > 0): return false
 	for id: Variant in data.reports:
 		var report: Variant = data.reports[id]
-		if not id is String or not trails.routes.has(id) or not report is Dictionary or report.size() not in [4,5] or not report.has_all(["finding","fraction","observed_at","received_at"]): return false
+		if not id is String or not trails.routes.has(id) or not report is Dictionary or report.size() not in [4,5,6] or not report.has_all(["finding","fraction","observed_at","received_at"]): return false
+		for key: Variant in report:
+			if key not in ["finding","fraction","observed_at","received_at","estimated_position","predator_profile"]: return false
+		if not PredatorCatalog.accepts(report.get("predator_profile", "")) or report.get("predator_profile", "") != "" and report.finding not in ["ambush", "mixed"]: return false
 		if report.has("estimated_position"):
 			if world == null or not report.estimated_position is Array or report.estimated_position.size() != 2: return false
 			for value: Variant in report.estimated_position:
@@ -81,6 +88,7 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 		if commitment.get("kind") != "other" or commitment.get("owner_id") != data.route_id or commitment.get("count") != data.workers + restored_defense.extra_workers: return false
 		if data.elapsed_ticks * SimulationClock.TICK_INTERVAL > time - data.departed_at + TRAILS.leg_ticks(segment.length()) * SimulationClock.TICK_INTERVAL: return false
 	impact_fraction = float(impact)
+	predator_profile = profile
 	route_id = data.route_id; phase = data.phase; workers = int(data.workers); elapsed_ticks = int(data.elapsed_ticks)
 	departed_at = float(data.departed_at); ambush_fraction = float(data.ambush_fraction); foreign_seen = data.foreign_seen; sampled_at = float(data.sampled_at); reports = data.reports.duplicate(true)
 	var restored_orders := JourneyOrders.new()

@@ -120,7 +120,7 @@ static func _valid_entry(entry: Variant, colony: ColonyState, knowledge: Knowled
 		"intake": return entry.detail in PileState.RESOURCE_IDS and entry.total>=entry.amount
 		"loss": return entry.detail=="reported" and WorkerLedger.valid_count(entry.amount) and entry.amount<=entry.total and entry.total<=trails.routes[entry.subject_id].reported_losses
 		"conflict": return entry.detail in ["contested","holding","resisted","reinforced","secured","withdrew","dispersed"]
-		"survey": return entry.detail in ["ambush","mixed","foreign","surface","inconclusive"]
+		"survey": return entry.detail in ["ambush","mixed","foreign","surface","inconclusive"] or entry.detail.split(":").size()==2 and entry.detail.get_slice(":",0) in ["ambush","mixed"] and PredatorCatalog.DEFINITIONS.has(entry.detail.get_slice(":",1))
 		"pressure": return entry.detail in ["holding","resisted"] and WorkerLedger.valid_count(entry.amount)
 		"defense": return entry.detail in ["clear:secured","clear:withdrew","clear:not_found","hunt:secured","hunt:withdrew","hunt:not_found"] and WorkerLedger.valid_count(entry.amount) and WorkerLedger.valid_count(entry.total) and entry.amount<=entry.total
 		"approach": return entry.detail in ["found","danger","unconfirmed"]

@@ -77,6 +77,7 @@ func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> voi
 	rng.seed = _seed
 	genetic_rng.seed = _seed ^ 0x415450
 	world = Loader.new().load_scenario(Scenarios.path_for(scenario))
+	predator.profile_id = Predator.CONFIG.profile_id
 	assert(world != null, "Run construction requires a registered authored scenario")
 	colony.initialize_home(world.home_position)
 	history.record(self,true)
@@ -449,6 +450,9 @@ func restore(data: Dictionary) -> bool:
 	var restored_predator := Predator.new()
 	if data.has("predator") and (not data.predator is Dictionary or not restored_predator.restore(data.predator, restored_clock.tick_count)):
 		return false
+	if restored_response.predator_profile != "" and (restored_response.predator_profile != restored_predator.profile_id or restored_response.sampled_at < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL): return false
+	for report: Dictionary in restored_response.reports.values():
+		if report.get("predator_profile", "") != "" and (report.predator_profile != restored_predator.profile_id or report.observed_at < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL): return false
 	var restored_impact := SurfaceImpactState.new()
 	if not restored_impact.restore(data.get("surface_impact", restored_impact.to_dict()), restored_clock.tick_count, data.seed.to_int(), data.scenario_id): return false
 	var impact_casualties: int = 0
@@ -559,6 +563,8 @@ func restore(data: Dictionary) -> bool:
 			return false
 	var restored_reports := preload("res://src/sim/knowledge/report_journal.gd").new()
 	if not restored_reports.restore(data.get("reports",restored_reports.to_dict()),restored_colony,restored_knowledge,restored_trails,restored_clock.simulation_time): return false
+	for entry: Dictionary in restored_reports.entries:
+		if entry.kind=="survey" and entry.detail.contains(":") and entry.detail.get_slice(":",1)!=restored_predator.profile_id: return false
 	if not data.clock is Dictionary or not clock.restore(data.clock):
 		return false
 	_seed = data.seed.to_int()

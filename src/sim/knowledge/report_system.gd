@@ -42,6 +42,7 @@ func capture(recording: bool = true) -> void:
 			var report: Dictionary=records[id]
 			if not journal.changed(kind+"/"+id,report.received_at): continue
 			var detail: String=report.finding if kind=="survey" else report.pressure if kind=="pressure" else report.get("goal","clear")+":"+report.outcome if kind=="defense" else report.outcome
+			if kind=="survey" and report.get("predator_profile", "") != "": detail += ":" + report.predator_profile
 			journal.add(kind,_run.trails.routes[id].origin_pile,id,report.get("observed_at",report.received_at),report.received_at,detail,report.get("lost",report.get("acknowledged_sent",report.get("length",0))),report.get("sent",0),recording)
 	var order_ids: Array=response.orders.targets.keys();order_ids.sort()
 	for id: String in order_ids:

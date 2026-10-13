@@ -176,7 +176,7 @@ func _history_records(route: Dictionary, status: Dictionary) -> Array[Dictionary
 	var id: String = route.get("id","")
 	var report: Dictionary = state.get("reports",{}).get(id,{})
 	if not report.is_empty():
-		var text: String = {"ambush":"Predator witnessed", "foreign":"Foreign ants witnessed", "mixed":"Predator and foreign ants", "surface":"Heavy impact witnessed", "inconclusive":"Attacker unidentified"}.get(report.finding,"Cause remains uncertain")
+		var text: String = Memory.survey_label(report)
 		records.append({"text":text,"received":report.received_at,"lines":["Survey: "+text,_report_dates(report,status)]})
 	var outcome: Dictionary = state.get("outcomes",{}).get(id,{})
 	if not outcome.is_empty():
@@ -218,8 +218,8 @@ func _latest(route: Dictionary, status: Dictionary) -> Dictionary:
 
 func _identity(route: Dictionary, status: Dictionary) -> String:
 	if route.get("surface_warning",false): return "Surface disturbance"
-	var finding: String = status.get("journey_response",{}).get("reports",{}).get(route.get("id"),{}).get("finding","")
-	if finding in ["ambush","mixed"]: return "Predatory arthropod"
+	var report: Dictionary = status.get("journey_response",{}).get("reports",{}).get(route.get("id"),{})
+	if report.get("finding", "") in ["ambush","mixed"]: return Memory.predator_name(report.get("predator_profile", ""))
 	return "Foreign ants" if kind(route,status)=="gather" else "Unidentified threat"
 
 func _source_name(route: Dictionary, status: Dictionary) -> String:
@@ -228,8 +228,8 @@ func _source_name(route: Dictionary, status: Dictionary) -> String:
 func _impression(view: Node2D, at: Vector2, route: Dictionary, status: Dictionary) -> void:
 	var identity: String = _identity(route,status)
 	var color := Color("8c7866")
-	if identity=="Predatory arthropod":
-		var clear: bool = not status.get("journey_response",{}).get("pressure_reports",{}).get(route.get("id"),{}).is_empty() or not status.get("journey_response",{}).get("outcomes",{}).get(route.get("id"),{}).is_empty()
+	if identity in ["Predatory arthropod", "Spider-like predator"]:
+		var clear: bool = identity=="Spider-like predator" or not status.get("journey_response",{}).get("pressure_reports",{}).get(route.get("id"),{}).is_empty() or not status.get("journey_response",{}).get("outcomes",{}).get(route.get("id"),{}).is_empty()
 		view.draw_circle(at,14,Color(color,0.35)); view.draw_circle(at+Vector2(0,-15),7,Color(color,0.3))
 		for side: int in [-1,1]:
 			for i: int in (4 if clear else 2):
