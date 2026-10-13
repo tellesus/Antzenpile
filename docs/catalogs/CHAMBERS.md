@@ -53,7 +53,7 @@ Verification: paired hot/damp ordinary piles show a bounded benefit and a real c
 
 ### CH-REFUGE — Refuge Chamber
 
-**Planned M6 after evacuation.** A paid protected local space for a viable queen and a bounded amount of brood during a physically approaching disturbance. A shared refuge capacity limits what can shelter; safe evacuation through a connection remains a different action. Protection mitigates the authored hazard's exposure, not all mortality or contamination.
+**Implemented169 after evacuation.** A paid protected local space for a viable queen and bounded named worker/reproductive brood during the supported ground disturbance. Seventeen shared spaces, four additional carers and paid twenty-second preparation make priorities useful; safe evacuation through a connection remains a different action. Protection mitigates the authored hazard's exposure, not all mortality or contamination.
 
 Local preparation occupies space and requires carers. A warning allows voluntary prepare/evacuate; no omniscient alarm is triggered by a hidden hazard before a witness/local symptom. Refuge does not teleport the queen, transfer the lineage to another pile or create a permanent invulnerable colony.
 

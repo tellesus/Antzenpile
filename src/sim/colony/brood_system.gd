@@ -111,14 +111,14 @@ func remaining_food_reserve(pile: PileState) -> Dictionary:
 		"water": ant_seconds * CONFIG.water_per_larva_second * multiplier}
 
 
-func lose_one(pile_id: String, stage: String = "") -> bool:
+func lose_one(pile_id: String, stage: String = "", uid: String = "") -> bool:
 	if not _run.colony.piles.has(pile_id):
 		return false
 	var pile: PileState = _run.colony.piles[pile_id]
 	if pile.brood_cohorts.is_empty() or pile.brood_lost_total >= WorkerLedger.MAX_COUNT:
 		return false
 	# Stable oldest-first choice, no individual brood agents or adult ledger debit.
-	var candidates: Array[BroodCohort] = pile.brood_cohorts.filter(func(item): return stage.is_empty() or item.stage == stage)
+	var candidates: Array[BroodCohort] = pile.brood_cohorts.filter(func(item): return (stage.is_empty() or item.stage == stage) and (uid.is_empty() or item.uid(pile_id)==uid))
 	if candidates.is_empty(): return false
 	var cohort: BroodCohort = candidates[0]
 	cohort.count -= 1

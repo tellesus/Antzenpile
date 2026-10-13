@@ -39,6 +39,8 @@ var queen_replacement_command: Callable
 var investment_priority_command: Callable
 var chamber_controls:=preload("res://src/presentation/inward/chamber_controls.gd").new()
 var chamber_command: Callable
+var refuge_command: Callable
+var refuge_controls:=RefugeControls.new()
 var effort_draft:=preload("res://src/presentation/effort_draft.gd").new()
 var effort_command: Callable
 var queen_tab: String = "workers"
@@ -95,6 +97,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if refuge_controls.opened:refuge_controls.activate(self,at,_status,refuge_command);return true
 	if connection_controls.activate(self,at,_status.get("connections",[]),connection_command):return true
 	if effort_draft.opened:
 		var effort_action: String=effort_draft.action_at(get_viewport_rect().size,at)
@@ -107,6 +110,8 @@ func activate_at(at: Vector2) -> bool:
 		var state: Dictionary=_status.get("humidity" if kind=="climate" else "midden",{})
 		effort_draft.begin(kind,int(state.get("carers" if kind=="climate" else "cleaners",0)),int(state.get("cap",4 if kind=="climate" else 8)),int(state.get("suggestion",1)));return true
 	if chamber_controls.activate(self,at,_status.get("chambers",[]),chamber_command): return true
+	if refuge_controls.activate(self,at,_status,refuge_command):return true
+	if refuge_controls.opened:return true
 	if chamber_controls.opened:
 		for command: String in ["outward","pause","speed_1","speed_4","speed_16","speed_64"]:
 			if _button_rect(command).has_point(at): _run_command(command);return true
@@ -239,9 +244,10 @@ func activate_at(at: Vector2) -> bool:
 			queue_redraw()
 			return true
 		return false
-	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty(), _status.get("midden", {}).get("revealed", false), Chambers.lobe_gain(_status) > 0.0, _status.get("daughter",false))
+	var picked: String = node_at(at, get_viewport_rect().size, not guest.is_empty(), _status.get("midden", {}).get("revealed", false), Chambers.lobe_gain(_status) > 0.0, _status.get("daughter",false),_status.get("refuge",{}).get("built",false))
 	if not picked.is_empty():
 		selected_id = picked
+		if picked=="refuge":refuge_controls.opened=true
 		if picked == "adaptation":
 			web_selection = "foraging"
 		queue_redraw()
@@ -335,10 +341,11 @@ static func positions(size: Vector2) -> Dictionary:
 		"entrance": origin + Vector2(field_width * 0.42, field_height * 0.79),
 		"adaptation": origin + Vector2(field_width * 0.77, field_height * 0.27),
 		"guest": origin + Vector2(field_width * 0.75, field_height * 0.83),
-		"midden": origin + Vector2(field_width * 0.11, field_height * 0.76)}
+		"midden": origin + Vector2(field_width * 0.11, field_height * 0.76),"refuge":origin+Vector2(field_width*0.58,field_height*0.60)}
 
 
-static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, midden_visible: bool = false, nursery_lobe_visible: bool = false, daughter: bool = false) -> String:
+static func node_at(at: Vector2, size: Vector2, guest_visible: bool = false, midden_visible: bool = false, nursery_lobe_visible: bool = false, daughter: bool = false, refuge_visible: bool=false) -> String:
+	if refuge_visible and _organ_hit(at,positions(size).refuge,Chambers.hit_radii("refuge")):return "refuge"
 	if nursery_lobe_visible and _organ_hit(at, positions(size).nursery + Chambers.lobe_offset(), Vector2(64,48)):
 		return "nursery"
 	if midden_visible and _organ_hit(at, positions(size).midden, Vector2(66,54)):
@@ -496,6 +503,7 @@ func _draw() -> void:
 		_draw_context(size)
 		_draw_controls(size)
 		chamber_controls.draw(self,_status.get("chambers",[]))
+		refuge_controls.draw(self,_status)
 		if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
 		connection_controls.draw(self,_status.get("connections",[]))
 		activation.draw(self)
@@ -512,10 +520,12 @@ func _draw() -> void:
 		_draw_flow(centers.entrance, centers.midden, false)
 	if not _status.get("guest", {}).is_empty():
 		_draw_flow(centers.guest, centers.nursery, false, Color("b79bcc"))
+	if _status.get("refuge",{}).get("built",false):_draw_flow(centers.nursery,centers.refuge,false,Color("a2b9aa"))
 
 	var visible_ids: Array[String] = NODES.duplicate()
 	if _status.get("midden", {}).get("revealed", false): visible_ids.append("midden")
 	if not _status.get("guest", {}).is_empty(): visible_ids.append("guest")
+	if _status.get("refuge",{}).get("built",false):visible_ids.append("refuge")
 	for id: String in visible_ids:
 		Chambers.rear(self,_status,id,centers[id],float(_focus_gains.get(id,0.0)))
 	for id: String in visible_ids:
@@ -530,6 +540,7 @@ func _draw() -> void:
 	_draw_context(size)
 	_draw_controls(size)
 	chamber_controls.draw(self,_status.get("chambers",[]))
+	refuge_controls.draw(self,_status)
 	if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
 	connection_controls.draw(self,_status.get("connections",[]))
 	activation.draw(self)
@@ -1044,6 +1055,7 @@ static func _title(id: String) -> String:
 		"adaptation": return "Adaptation"
 		"guest": return "Guest"
 		"midden": return "Midden"
+		"refuge":return "Refuge"
 	return ""
 
 

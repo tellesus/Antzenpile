@@ -30,19 +30,19 @@ static func extent(status: Dictionary, id: String) -> Vector2:
 	var base := Vector2(328, 273)
 	if id == "queen": return Vector2(350, 292)
 	if id == "adaptation": return Vector2(210, 175)
-	if id in ["midden", "guest"]: base = Vector2(164, 137)
+	if id in ["midden", "guest", "refuge"]: base = Vector2(164, 137)
 	if id == "entrance": return Vector2(306, 255)
 	return base * lerpf(0.84, 1.0, maturity(status, id))
 
 static func label_offset(id: String) -> float:
-	return 67.0 if id in ["midden", "guest"] else 86.0 if id == "adaptation" else 111.0 if id == "entrance" else 120.0
+	return 67.0 if id in ["midden", "guest", "refuge"] else 86.0 if id == "adaptation" else 111.0 if id == "entrance" else 120.0
 
 static func label_position(id: String, at: Vector2) -> Vector2:
 	return at+Vector2(102,92) if id == "food_exchange" else at+Vector2(0,label_offset(id))
 
 static func hit_radii(id: String) -> Vector2:
 	# Fixed targets contain the developed silhouette; focus/maturity never moves them.
-	if id in ["midden", "guest"]: return Vector2(65, 49)
+	if id in ["midden", "guest", "refuge"]: return Vector2(65, 49)
 	if id == "adaptation": return Vector2(84, 63)
 	return Vector2(133, 93) if id == "queen" else Vector2(123, 86)
 
@@ -69,6 +69,7 @@ static func _layer(canvas: Node2D, status: Dictionary, id: String, at: Vector2, 
 	var tint := Color.WHITE
 	if id in ["adaptation","guest"]: tint = Color(0.79,0.63,1.12)
 	if id == "midden": tint = Color(0.75,0.65,0.58)
+	if id == "refuge":tint=Color(0.72,0.88,0.80)
 	tint = tint.lerp(Color(0.76,0.51,0.40),(1.0-Activity.health(status,id))*0.22)
 	tint.a = lerpf(0.88,1.0,focus)
 	var area := Rect2(at-size*0.5,size)

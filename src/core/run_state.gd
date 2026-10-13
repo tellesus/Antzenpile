@@ -49,6 +49,8 @@ var rival: RivalState = Rival.new()
 var surface_impact := SurfaceImpactState.new()
 var residue := ResidueZoneState.new()
 var connection_residue:=ResidueZoneState.new(CargoResidueState.CONFIG)
+var refuges: Dictionary[String,RefugeState]={}
+var nest_disturbance:=NestDisturbanceState.new()
 var predator: PredatorState = Predator.new()
 var journey_response: JourneyResponseState = JourneyResponseState.new()
 var delivered_observations: Dictionary[String, Observation] = {}
@@ -77,6 +79,7 @@ func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> voi
 	surface_impact.profile_id=SurfaceImpactState.CONFIG.profile_id if surface_impact.enabled else ""
 	residue.enabled = scenario == "roadside"
 	connection_residue.enabled = scenario == "roadside"
+	nest_disturbance.enabled = scenario == "roadside"
 	_seed = seed_value
 	_scenario_id = scenario
 	rng.seed = _seed
@@ -104,14 +107,15 @@ func to_dict() -> Dictionary:
 	ids.sort()
 	for id: String in ids:
 		delivered.append(delivered_observations[id].to_dict())
-	var camps: Array[Dictionary]=[];var policies: Dictionary={};var traffic: Dictionary={}
+	var camps: Array[Dictionary]=[];var policies: Dictionary={};var traffic: Dictionary={};var shelters: Dictionary={}
+	for pile_id: String in refuges:shelters[pile_id]=refuges[pile_id].to_dict()
 	for connection: ConnectionTrafficState in all_connections():traffic[connection.route_id]=connection.to_dict()
 	ids=extra_foundings.keys();ids.sort()
 	for id: String in ids: camps.append(extra_foundings[id].to_dict())
 	ids=extra_exploration.keys();ids.sort()
 	for id: String in ids: policies[id]=extra_exploration[id].to_dict()
 	# JSON numbers cannot represent all 64-bit RNG states exactly.
-	return {"connection_traffic":traffic,"extra_foundings":camps,"extra_exploration":policies,"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
+	return {"refuges":shelters,"nest_disturbance":nest_disturbance.to_dict(),"connection_traffic":traffic,"extra_foundings":camps,"extra_exploration":policies,"reports":reports.to_dict(), "history":history.to_dict(), "version": SNAPSHOT_VERSION, "seed": str(_seed), "rng_state": str(rng.state), "genetic_rng_state": str(genetic_rng.state),
 		"scenario_id": _scenario_id, "clock": clock.to_dict(), "world": world.to_dict(), "colony": colony.to_dict(),
 		"scouts": scout_records, "scout_missions": missions, "scout_losses": scout_losses.duplicate(), "next_scout_id": next_scout_id, "delivered_observations": delivered,
 		"daughter_supply":daughter_supply.to_dict(), "supply_origin":supply_origin,
@@ -461,6 +465,27 @@ func restore(data: Dictionary) -> bool:
 		if report.get("predator_profile", "") != "" and (report.predator_profile != restored_predator.profile_id or report.observed_at < Predator.CONFIG.first_tick * Clock.TICK_INTERVAL): return false
 	var restored_impact := SurfaceImpactState.new()
 	if not restored_impact.restore(data.get("surface_impact", restored_impact.to_dict()), restored_clock.tick_count, data.seed.to_int(), data.scenario_id): return false
+	var restored_nest:=NestDisturbanceState.new()
+	if not restored_nest.restore(data.get("nest_disturbance",restored_nest.to_dict()),restored_colony,restored_clock.tick_count,data.scenario_id):return false
+	var restored_refuges: Dictionary[String,RefugeState]={}
+	var refuge_data: Variant=data.get("refuges",{})
+	if not refuge_data is Dictionary:return false
+	for pile_id: Variant in refuge_data:
+		var shelter:=RefugeState.new()
+		if not pile_id is String or not restored_colony.piles.has(pile_id) or not shelter.restore(refuge_data[pile_id],restored_colony.piles[pile_id],restored_clock.tick_count):return false
+		restored_refuges[pile_id]=shelter
+		for target: Dictionary in shelter.targets:
+			var parts: PackedStringArray=target.uid.split(":")
+			if target.kind=="brood":
+				if parts.size()!=2 or not restored_colony.piles.has(parts[0]) or not parts[1].trim_prefix("brood_").is_valid_int() or parts[1].trim_prefix("brood_").to_int()<1 or parts[1].trim_prefix("brood_").to_int()>restored_colony.piles[parts[0]].brood_started_total:return false
+				for cohort: BroodCohort in restored_colony.piles[pile_id].brood_cohorts:
+					if cohort.uid(pile_id)==target.uid and cohort.count>target.space:return false
+			else:
+				if parts.size() not in [3,4] or not restored_colony.piles.has(parts[1]):return false
+				if parts.size()==4 and (parts[2]!="raised" or not parts[3].is_valid_int() or parts[3].to_int()>shelter.started_tick):return false
+	for pile: PileState in restored_colony.piles.values():
+		for pool: String in pile.workers.to_dict().commitments:
+			if pool.begins_with("refuge:") and (pool!="refuge:"+pile.id or not restored_refuges.has(pile.id)):return false
 	for route: TrailRouteState in restored_trails.routes.values():
 		var memory: PassageMemory=route.passage_memory
 		if memory.count>0 and (restored_impact.profile_id!="dog_passage" or memory.serial>restored_impact.serial or memory.received_at>restored_clock.simulation_time or SurfaceImpactState.serial_at(roundi(memory.observed_at/Clock.TICK_INTERVAL),data.seed.to_int())!=memory.serial):return false
@@ -546,7 +571,7 @@ func restore(data: Dictionary) -> bool:
 					profiles[agent.lost_profile] = profiles.get(agent.lost_profile, 0) + 1
 		if pending_adapted > pile.adapted_workers_lost or pending > WorkerLedger.MAX_COUNT - pile.workers_total:
 			return false
-		if pile.food_toxicity.last_loss_tick > restored_clock.tick_count or pile.food_toxicity.losses > pile.workers.lost_total - losses_by_pile.get(pile.id,0): return false
+		if pile.food_toxicity.last_loss_tick > restored_clock.tick_count or pile.food_toxicity.losses+restored_nest.records.get(pile.id,{}).get("workers",0) > pile.workers.lost_total - losses_by_pile.get(pile.id,0): return false
 		if pile.rain_trace_observed and restored_rain.phase == "waiting":
 			return false
 		for trait_id: String in pile.genetics.established:
@@ -562,7 +587,7 @@ func restore(data: Dictionary) -> bool:
 		for key: String in profiles:
 			if profiles[key] > pile.genetics.lost.get(key,0): return false
 	var restored_guest := Guest.new()
-	if data.has("guest") and (not data.guest is Dictionary or not restored_guest.restore(data.guest, restored_colony.piles.home, restored_clock.tick_count)):
+	if data.has("guest") and (not data.guest is Dictionary or not restored_guest.restore(data.guest, restored_colony.piles.home, restored_clock.tick_count,restored_nest.records.get("home",{}).get("brood",0))):
 		return false
 	if restored_colony.piles.home.recognition_experience and restored_guest.phase == "absent" and restored_honeydew.relationship != "tended":
 		# A withdrawn relationship still has an observable loaded route history.
@@ -584,7 +609,7 @@ func restore(data: Dictionary) -> bool:
 		if reproductive.phase in ["pupa","ready"]: minimum_ticks+=reproductive.CONFIG.larva_ticks
 		if reproductive.phase=="ready": minimum_ticks+=reproductive.CONFIG.pupa_ticks
 		if minimum_ticks > restored_clock.tick_count-reproductive.laid_tick: return false
-		if pile.brood_lost_total != pile.brood_health.losses + (restored_guest.reported_losses if pile.id == "home" else 0):
+		if pile.brood_lost_total != pile.brood_health.losses + (restored_guest.reported_losses if pile.id == "home" else 0)+restored_nest.records.get(pile.id,{}).get("brood",0):
 			return false
 	var restored_reports := preload("res://src/sim/knowledge/report_journal.gd").new()
 	if not restored_reports.restore(data.get("reports",restored_reports.to_dict()),restored_colony,restored_knowledge,restored_trails,restored_clock.simulation_time): return false
@@ -629,6 +654,7 @@ func restore(data: Dictionary) -> bool:
 	surface_impact = restored_impact
 	residue=restored_residue
 	connection_residue=restored_connection_residue
+	nest_disturbance=restored_nest;refuges=restored_refuges
 	predator = restored_predator
 	journey_response = restored_response
 	rival = restored_rival

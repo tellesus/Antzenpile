@@ -85,6 +85,15 @@ func tick() -> void:
 			var released: bool = pile.workers.release(commitment,CONFIG.nurses); assert(released)
 			var retired: bool = pile.workers.retire_commitment(commitment); assert(retired)
 
+func lose_group(pile_id: String) -> bool:
+	var pile: PileState=_run.colony.piles[pile_id]
+	if pile.reproduction.phase=="none":return false
+	var pool: String="reproduction:"+pile_id
+	if pile.reproduction.active():
+		assert(pile.workers.release(pool,CONFIG.nurses));assert(pile.workers.retire_commitment(pool))
+	pile.reproduction=ReproductionState.new()
+	return true
+
 func summary(pile_id: String) -> Dictionary:
 	if not _run.colony.piles.has(pile_id): return {}
 	var pile: PileState = _run.colony.piles[pile_id]

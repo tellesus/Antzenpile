@@ -49,6 +49,9 @@ func draw(view: Node2D, entries: Array) -> void:
 		if chosen.id=="ventilation_gallery":
 			lines[5]=chosen.wait if not chosen.wait.is_empty() else "Climate staff and water still required"
 			lines[8]="Assign climate carers in Nursery"
+		if chosen.id=="refuge_chamber":
+			lines[5]="17 shared protected spaces" if chosen.phase=="complete" else chosen.wait
+			lines[8]="REFUGE / GROUND prepares named dependents"
 		for index: int in lines.size(): _text(view,box.position+Vector2(232,64+index*23),lines[index],14 if index==0 else 12,box.size.x-248)
 		if chosen.phase!="complete":
 			var target: Rect2=rect(size,"order");Style.surface(view,target,Color("35463d"));_text(view,target.position+Vector2(12,28),"CANCEL PROJECT" if chosen.phase in ["queued","developing"] else "QUEUE CONSTRUCTION",13,target.size.x-24)

@@ -44,6 +44,16 @@ func capture(recording: bool = true) -> void:
 				var state: InterpileSupplyState=connection.supplies[payer] if family=="supplies" else connection.stores[payer]
 				var cue: Dictionary=state.last_residue_report
 				if not cue.is_empty() and journal.changed("link_ground/"+connection.route_id+"/"+payer+"/"+family,cue.received_at):journal.add("link_ground",payer,connection.route_id,cue.observed_at,cue.received_at,"residue",0,0,recording)
+	for id: String in _run.nest_disturbance.records:
+		var record: Dictionary=_run.nest_disturbance.records[id]
+		for stage: String in ["warned","impacted","settled"]:
+			if record[stage]>0 and journal.changed("nest_crisis/"+id+"/"+stage,record[stage]):journal.add("nest_crisis",id,id,record[stage]*SimulationClock.TICK_INTERVAL,record[stage]*SimulationClock.TICK_INTERVAL,{"warned":"warning","impacted":"impact","settled":"settled"}[stage],record.workers,record.brood,recording)
+	for id: String in _run.refuges:
+		var shelter: RefugeState=_run.refuges[id]
+		var previous: String=str(journal.seen.get("refuge/"+id,""))
+		if journal.changed("refuge/"+id,shelter.phase+":"+shelter.priority+":"+str(shelter.started_tick)):
+			var detail: String="none" if shelter.phase=="none" and (previous.begins_with("preparing:") or previous.begins_with("ready:")) else shelter.priority if shelter.phase=="none" else shelter.phase
+			journal.add("refuge",id,id,time,time,detail,RefugeState.WORKERS if shelter.phase!="none" else 0,shelter.reserved_space(),recording)
 	var response: JourneyResponseState=_run.journey_response
 	for kind: String in ["survey","pressure","defense","approach"]:
 		var records: Dictionary=response.reports if kind=="survey" else response.pressure.reports if kind=="pressure" else response.defense.outcomes if kind=="defense" else response.approach.reports

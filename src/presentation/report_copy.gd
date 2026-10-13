@@ -27,6 +27,8 @@ static func title(entry: Dictionary, status: Dictionary) -> String:
 		"ground":text="Strange residue on the journey: "+name
 		"link_ground":text="Strange residue reported between nests"
 		"passage":text=Memory.passage_name(entry.detail)+" witnessed"
+		"nest_crisis":text={"warning":"Local ground-shift warning","impact":"Local ground pressure · losses observed","settled":"Ground settled · recovery can continue"}.get(entry.detail,"Ground report")
+		"refuge":text={"preparing":"Shelter preparation funded","ready":"Named dependents sheltered","none":"Shelter carers released","royals":"Shelter priority: young groups","workers":"Shelter priority: worker brood"}.get(entry.detail,"Shelter updated")
 		"conflict": text={"contested":"Junction contested","holding":"Junction holding","resisted":"Strong foreign resistance","reinforced":"Foreign reinforcement reported","secured":"Foreign force withdrew","withdrew":"Our ants withdrew","dispersed":"Encounter dispersed"}.get(entry.detail,"Junction report")
 		"survey": text=Memory.survey_label({"finding":entry.detail.get_slice(":",0),"predator_profile":entry.detail.get_slice(":",1)})
 		"pressure": text="Holding against resistance" if entry.detail=="holding" else "Resistance remains strong"

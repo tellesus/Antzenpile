@@ -12,7 +12,7 @@ Windows desktop comes first. Keep touch-sized controls. Mobile, a fixed session-
 
 ## Milestone order
 
-M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5 completed with returned shelter profiles, additional working piles and daughter-origin founding; two-way direct connection supplies/migration work after 155; physical laying-queen relocation works after 156; worker-brood rescue works after157; finite store rescue works after158; active/ready reproductive rescue works after159; explicit traffic closure works after160 and final departure/abandonment after161. M5 is complete; M6 water162, flexible per-pile producer service163 and supported stationary predator witnesses164 and roaming beetle165 and gathering residue166 and connection cargo residue167 and supported heavy passage168 are complete; remaining ecology/M7–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
+M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5 completed with returned shelter profiles, additional working piles and daughter-origin founding; two-way direct connection supplies/migration work after 155; physical laying-queen relocation works after 156; worker-brood rescue works after157; finite store rescue works after158; active/ready reproductive rescue works after159; explicit traffic closure works after160 and final departure/abandonment after161. M5 is complete; M6 water162, flexible per-pile producer service163 and supported stationary predator witnesses164 and roaming beetle165 and gathering residue166 and connection cargo residue167 and supported heavy passage168 and refuge/local ground crisis169 are complete; rival economic continuity/M7–M9 remain planned. Integrated M7 balance still follows the new lineage/network/ecology systems. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
 
 | Milestone | Player outcome and required scope | Dependencies | Exit evidence |
 | --- | --- | --- | --- |
@@ -108,7 +108,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M6-G complete:** [168 supported heavy passage](tasks/168_supported_heavy_passage.md), actual close distinct-passage evidence, dated large-animal/dog-like impressions and proper avoidance. Full10,784/0; import/Main/headless drawing passed.
 
-**M2 core/M3/M4/M5 complete; next: M6 refuge/nest disturbance, then M7 integrated runs.** Player graphical/feel checks defer to the systems beta (A88).
+**M6-H complete:** [169 refuge/local ground crisis](tasks/169_refuge_and_local_ground_crisis.md), actual shared named shelter, paid carers/preparation, local warning/impact/settlement, site cover and recovery. Full10,842/0; import/Main/headless drawing passed.
+
+**M2 core/M3/M4/M5 complete; next: 170 rival economic continuity, then M7 integrated runs.** Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 
@@ -122,3 +124,4 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 ## Deliberately after 1.0
 
 Mobile packaging/device optimization; detailed mating flights, individual genomes, latent-trait drift/reselection; large animal/species catalogs and detailed human behavior; beneficial-guest diplomacy; large automated logistics empires; comprehensive annual seasons/campaign/destination travel; fungi/seed-processing industry and arbitrary new currencies. These remain visible longer-term options, not unfinished release requirements. Strong evidence or a direct player instruction can change this boundary in Decisions and the roadmap together.
+

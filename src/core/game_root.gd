@@ -90,6 +90,7 @@ func _ready() -> void:
 		inward.queen_replacement_command=replace_queen
 		inward.investment_priority_command = prioritize_investment
 		inward.chamber_command = order_chamber
+		inward.refuge_command=order_refuge
 		inward.effort_command = set_effort
 		inward.guest_rejection_command = set_guest_rejection
 		inward.honeydew_command = set_honeydew_protection
@@ -257,7 +258,7 @@ func inspect_report(id: int) -> Dictionary:
 	for entry: Dictionary in simulation.run.reports.entries:
 		if entry.id==id: selected=entry;break
 	if selected.is_empty() or simulation.run.history.ended: return {"accepted":false,"reason":"Report no longer retained"}
-	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","link_ground","producer","investment","chamber","queen"]:
+	if selected.kind in ["project","brood","trait","supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","link_ground","refuge","nest_crisis","producer","investment","chamber","queen"]:
 		inspect_pile(selected.pile_id)
 		var organ: String="adaptation" if selected.kind=="producer" else "nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null:
@@ -269,6 +270,7 @@ func inspect_report(id: int) -> Dictionary:
 			_inward_view.connection_controls.purpose="workers" if selected.kind=="migration" else "queen" if selected.kind=="relocation" else "brood" if selected.kind=="brood_rescue" else "departure" if selected.kind in ["departure","evacuation"] else "royals" if selected.kind=="royal_rescue" else "stores" if selected.kind=="store_rescue" else "supplies"
 			for entry: Dictionary in simulation.connection_summaries(selected.pile_id):
 				if entry.destination_id==selected.subject_id or entry.id==selected.subject_id:_inward_view.connection_controls.selected=entry.id
+		if selected.kind in ["refuge","nest_crisis"] and _inward_view!=null:_inward_view.refuge_controls.opened=true
 		if selected.kind=="chamber" and _inward_view!=null: _inward_view.chamber_controls.opened=true;_inward_view.chamber_controls.selected=selected.subject_id
 		if selected.kind=="queen" and _inward_view!=null: _inward_view.queen_tab="continuity"
 		set_mode("inward")
@@ -597,7 +599,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		var expressed: int = pile.genetics.count_trait(trait_id) + simulation.run.pending_trait(pile_id, trait_id)+simulation.run.unreported_transfers(pile_id,trait_id)
 		genetic_summary.append({"id": trait_id, "expressed": expressed,
 			"fraction": float(expressed) / expected_total if expected_total > 0 else 0.0})
-	return {"relinquished":pile.relinquished,"final_departure":simulation.run.known_final_departure(pile_id),"connections":simulation.connection_summaries(pile_id,_inward_view.connection_controls.settlers if _inward_view!=null else 8,(_inward_view.connection_controls.cargo_id if _inward_view.connection_controls.purpose=="stores" else _inward_view.connection_controls.cohort_uid) if _inward_view!=null else ""),"reinforcement":simulation.reinforcement.summary() if pile_id in ["home","satellite_1"] else {}, "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary() if pile_id in ["home","satellite_1"] else {}, "pile_name":pile_title(pile_id),"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.size()>1, "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
+	return {"refuge":RefugeSystem.new(simulation.run).summary(pile_id),"nest_crisis":NestDisturbanceSystem.new(simulation.run).summary(pile_id),"relinquished":pile.relinquished,"final_departure":simulation.run.known_final_departure(pile_id),"connections":simulation.connection_summaries(pile_id,_inward_view.connection_controls.settlers if _inward_view!=null else 8,(_inward_view.connection_controls.cargo_id if _inward_view.connection_controls.purpose=="stores" else _inward_view.connection_controls.cohort_uid) if _inward_view!=null else ""),"reinforcement":simulation.reinforcement.summary() if pile_id in ["home","satellite_1"] else {}, "supply":(simulation.supply if pile_id == "home" else simulation.daughter_supply).summary() if pile_id in ["home","satellite_1"] else {}, "pile_name":pile_title(pile_id),"other_pile":next_pile_id(pile_id),"other_pile_name":pile_title(next_pile_id(pile_id)),"pile_id": pile_id, "daughter":not pile.foundation.is_empty(), "daughter_available":simulation.run.colony.piles.size()>1, "queen_traits":pile.offspring_traits(), "queens": pile.queen_count,
 		"local_site":{"profile":pile.foundation.get("site_profile",""),"cues":SiteCatalog.for_pile(pile).cues},"queen_condition":simulation.queens.summary(pile_id),"reproduction": simulation.reproduction.summary(pile_id),
 		"investments":simulation.investments.summary(pile_id),
 		"humidity": {"moisture": pile.humidity.moisture / 10000.0,
@@ -818,6 +820,11 @@ func prioritize_investment(kind: String) -> Dictionary:
 func order_chamber(chamber_id: String, cancel: bool=false) -> Dictionary:
 	var accepted: bool=simulation.order_chamber(inward_pile_id,chamber_id,cancel)
 	return {"accepted":accepted,"queued":accepted and not cancel,"reason":simulation.chambers.last_error}
+
+func order_refuge(action: String) -> Dictionary:
+	var system:=RefugeSystem.new(simulation.run)
+	var accepted: bool=not simulation.run.history.ended and system.order(inward_pile_id,action)
+	return {"accepted":accepted,"reason":system.last_error}
 
 
 func set_brood_intent(intent: String) -> Dictionary:

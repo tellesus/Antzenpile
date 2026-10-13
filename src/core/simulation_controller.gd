@@ -304,6 +304,8 @@ func _tick(delta: float) -> void:
 	food_exchange.tick(delta)
 	nursery.tick(delta)
 	chambers.tick()
+	RefugeSystem.new(run).tick()
+	NestDisturbanceSystem.new(run).tick()
 	sanitation.tick()
 	humidity.tick()
 	heat.tick()

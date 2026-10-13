@@ -8,3 +8,4 @@ extends Resource
 @export var moisture_offset: int=0
 @export var preparation_ticks: int=480
 @export var extra_carbohydrate: float=0
+@export var ground_exposure: float=1.0

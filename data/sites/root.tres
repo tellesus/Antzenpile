@@ -10,3 +10,4 @@ heat_exposure = 0.75
 moisture_offset = 100000
 preparation_ticks = 600
 extra_carbohydrate = 2
+ground_exposure = 0.75
