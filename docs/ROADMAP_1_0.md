@@ -118,7 +118,9 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M7-C complete:** [173 late connection pressure](tasks/173_late_connection_pressure.md), practical fresh-world contact/returned cue, real closure/finite recall/local recovery and preserved old cargo definitions. Full10,978/0; import/Main/headless drawing passed.
 
-**M1–M6 foundation/M7 arcs and network pressure complete; next:174 accurate physical review, then the systems beta.** Player graphical/feel checks defer to the systems beta (A88).
+**M7-D complete:** [174 physical-review integrity](tasks/174_physical_review_integrity.md), actual sampled moving-threat/active-zone context, strict bounded saves and honest old-sample omission. Full11,000/0; import/Main/headless drawing passed.
+
+**M1–M7 systems beta implemented and headlessly verified.** Next175 prepares a portable Windows beta for actual player review; M8 final presentation/balance feedback and M9 final distribution/performance/clean-machine gates remain. Player graphical/feel checks defer to the systems beta (A88).
 
 ## Release acceptance and cost discipline
 

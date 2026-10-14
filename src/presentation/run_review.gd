@@ -5,8 +5,6 @@ var activation:=preload("res://src/presentation/activation_feedback.gd").new()
 
 const UIStyle = preload("res://src/presentation/organic_ui.gd")
 const EVENT_LABELS: Dictionary = {"worker_loss": "Workers lost", "brood_loss": "Brood lost", "emergence": "Workers emerged", "pile_established": "Pile established", "trail_changed": "Trail changed", "findings_returned": "Findings returned", "rain_start": "Rain started", "rain_end": "Rain ended", "surface_impact": "Surface impact", "predator_loss": "Predator losses", "impact_loss": "Surface-impact losses", "rival_loss": "Rival losses", "predator_killed": "Predator killed", "food_toxicity_loss": "Food poisoning losses"}
-const PREDATOR = preload("res://data/ecology/backyard_predator.tres")
-const IMPACT = preload("res://data/weather/roadside_surface_impact.tres")
 const RIVAL = preload("res://data/ecology/backyard_rival.tres")
 var new_command: Callable
 var load_command: Callable
@@ -130,9 +128,14 @@ func _draw() -> void:
 		var points := PackedVector2Array()
 		for point: Array in trail.points: points.append(_at(point))
 		draw_polyline(points,Color(0.85,0.68,0.36,0.35+0.6*trail.scent),2,true)
-	if frame.predator:
-		_zone(PREDATOR.position,PREDATOR.radius,Color("b76d60"),"Ambusher")
-	if frame.impact: _zone(IMPACT.position,IMPACT.radius,Color("d99658"),"Surface impact")
+	var ecology: Dictionary=frame.get("ecology",{})
+	if not ecology.is_empty():
+		if frame.predator:
+			var predator: Dictionary=ecology.predator
+			_zone(Vector2(predator.position[0],predator.position[1]),predator.radius,Color("b76d60"),{"wolf_spider":"Spider-like ambusher","beetle_hunter":"Beetle hunter"}.get(predator.profile,"Ambush pressure"))
+		for zone: Dictionary in ecology.zones:
+			var color: Color=Color("d99658") if zone.kind=="surface" else Color("849e88") if zone.kind in ["residue","link_residue"] else Color("a4a086")
+			_zone(Vector2(zone.position[0],zone.position[1]),zone.radius,color,{"surface":"Surface impact","residue":"Ground residue","link_residue":"Connection residue","ground":"Ground warning" if zone.phase=="warning" else "Ground pressure"}[zone.kind])
 	if frame.rival:
 		var at: Vector2 = _at([RIVAL.pile_position.x,RIVAL.pile_position.y])
 		draw_rect(Rect2(at-Vector2(5,5),Vector2(10,10)),Color("b56fa6")); _label(at+Vector2(9,4),"Rival pile",12,Color("b56fa6"))
@@ -153,7 +156,7 @@ func _draw() -> void:
 	_label(side,"LINEAGE CONTINUED · GENERATION %d" % receipt.generation if receipt.get("generation",0)>0 and frame.tick.to_int()>=receipt.tick else "WHAT WAS REALLY THERE",16,Color("e6d5af"))
 	_label(side+Vector2(0,27),"Filled source: available  /  ring: empty",13,Color("aebbb9"))
 	_label(side+Vector2(0,49),"Outer ring: returned colony memory",13,Color("aebbb9"))
-	_label(side+Vector2(0,71),"Dots: scouts  /  lines: physical trails",13,Color("aebbb9"))
+	_label(side+Vector2(0,71),"Older sample: threat zones not recorded" if ecology.is_empty() else "Dots: scouts  /  lines: physical trails",13,Color("aebbb9"))
 	var swatches: Array = [["Water","68baca"],["Protein","c89767"],["Carbs","cbb574"],["Shelter","a2ad84"]]
 	for index: int in swatches.size():
 		var at: Vector2 = side+Vector2(index*94,91)

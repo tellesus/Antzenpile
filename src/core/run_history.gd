@@ -28,6 +28,17 @@ static func _rounded(values: Array) -> Array:
 	for value: Variant in values: result.append(snappedf(float(value),0.00001))
 	return result
 
+static func ecology_context(run) -> Dictionary:
+	var zones: Array[Dictionary]=[]
+	if run.surface_impact.active(run.clock.tick_count,run.run_seed):zones.append({"kind":"surface","position":_point(run.surface_impact.CONFIG.position),"radius":run.surface_impact.CONFIG.radius,"phase":"active"})
+	for pair: Array in [["residue",run.residue],["link_residue",run.connection_residue]]:
+		if pair[1].active(run.clock.tick_count):zones.append({"kind":pair[0],"position":_point(pair[1].definition.position),"radius":pair[1].definition.radius,"phase":"active"})
+	var phase: String=run.nest_disturbance.phase(run.clock.tick_count)
+	if phase in ["warning","pressure"]:
+		var config: NestDisturbanceDefinition=run.nest_disturbance.definition()
+		zones.append({"kind":"ground","position":_point(config.position),"radius":config.radius,"phase":phase})
+	return {"predator":{"profile":run.predator.profile_id,"position":_point(run.predator.position()),"radius":run.predator.definition().radius},"zones":zones}
+
 static func frame(run) -> Dictionary:
 	var piles: Array = []; var nodes: Array = []; var trails: Array = []; var scouts: Array = []
 	var stats: Array = [0,0,0,0,run.predator.kills_total,run.swarm.player_losses,run.surface_impact.kills_total,0,0,run.knowledge.nodes.size(),0,int(run.predator.killed),run.surface_impact.serial]
@@ -51,7 +62,7 @@ static func frame(run) -> Dictionary:
 	for id: String in ids:
 		var scout = run.scouts[id]
 		if not scout.lost: scouts.append({"id":id,"position":_point(scout.position)})
-	return {"tick":str(run.clock.tick_count),"piles":piles,"nodes":nodes,"trails":trails,"scouts":scouts,"rain":run.rain.phase=="raining","impact":run.surface_impact.active(run.clock.tick_count,run.run_seed),"predator":not run.predator.killed and run.predator.defeated_at==0,"rival":run.rival.direction!="dormant","stats":stats}
+	return {"ecology":ecology_context(run),"tick":str(run.clock.tick_count),"piles":piles,"nodes":nodes,"trails":trails,"scouts":scouts,"rain":run.rain.phase=="raining","impact":run.surface_impact.active(run.clock.tick_count,run.run_seed),"predator":not run.predator.killed and run.predator.defeated_at==0,"rival":run.rival.direction!="dormant","stats":stats}
 
 func record(run, force: bool = false) -> void:
 	if ended: return
@@ -125,7 +136,8 @@ func restore(data: Variant, tick: int, bounds: Rect2, paused: bool) -> bool:
 		decoded.append(entry)
 	var previous: int = -1
 	for entry: Variant in decoded:
-		if not entry is Dictionary or entry.size()!=10 or not entry.has_all(["tick","piles","nodes","trails","scouts","rain","impact","predator","rival","stats"]): return false
+		if not entry is Dictionary or entry.size()!=10+int(entry.has("ecology")) or not entry.has_all(["tick","piles","nodes","trails","scouts","rain","impact","predator","rival","stats"]): return false
+		if entry.has("ecology") and not _valid_ecology(entry.ecology,bounds):return false
 		if not _tick_valid(entry.tick, tick) or entry.tick.to_int()<=previous: return false
 		previous=entry.tick.to_int()
 		for flag: String in ["rain","impact","predator","rival"]:
@@ -156,12 +168,32 @@ func restore(data: Variant, tick: int, bounds: Rect2, paused: bool) -> bool:
 		for trail: Dictionary in entry.trails:
 			trail.traffic=int(trail.traffic); trail.scent=snappedf(float(trail.scent),0.00001)
 			for index: int in trail.points.size(): trail.points[index]=_rounded(trail.points[index])
+		if entry.has("ecology"):
+			entry.ecology.predator.position=_rounded(entry.ecology.predator.position)
+			for zone: Dictionary in entry.ecology.zones:zone.position=_rounded(zone.position)
 	for entry: Dictionary in events: entry.amount=int(entry.amount)
 	_encoded_frames.clear(); _encoded_bytes=0
 	for entry: Dictionary in frames:
 		_encoded_frames.append(JSON.stringify(entry,"",true,true))
 		_encoded_bytes+=_encoded_size(_encoded_frames[-1])
 	return true
+
+static func _valid_ecology(data: Variant, bounds: Rect2) -> bool:
+	if not data is Dictionary or data.size()!=2 or not data.has_all(["predator","zones"]) or not data.predator is Dictionary or data.predator.size()!=3 or not data.predator.has_all(["profile","position","radius"]):return false
+	if data.predator.profile not in ["","wolf_spider","beetle_hunter"] or not _zone_point(data.predator,bounds):return false
+	if not data.zones is Array or data.zones.size()>4:return false
+	var seen: Array[String]=[]
+	for zone: Variant in data.zones:
+		if not zone is Dictionary or zone.size()!=4 or not zone.has_all(["kind","position","radius","phase"]) or zone.kind not in ["surface","residue","link_residue","ground"] or zone.kind in seen or not _zone_point(zone,bounds):return false
+		if zone.phase not in (["warning","pressure"] if zone.kind=="ground" else ["active"]):return false
+		seen.append(zone.kind)
+	return true
+
+static func _zone_point(data: Dictionary, bounds: Rect2) -> bool:
+	if not data.position is Array or data.position.size()!=2 or not typeof(data.radius) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(data.radius)) or data.radius<=0 or data.radius>20:return false
+	for number: Variant in data.position:
+		if not typeof(number) in [TYPE_INT,TYPE_FLOAT] or not is_finite(float(number)):return false
+	return bounds.has_point(Vector2(data.position[0],data.position[1]))
 
 static func _tick_valid(value: Variant, maximum: int) -> bool:
 	return value is String and value.is_valid_int() and str(value.to_int())==value and value.to_int()>=0 and value.to_int()<=maximum
