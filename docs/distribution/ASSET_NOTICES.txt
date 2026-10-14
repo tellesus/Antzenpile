@@ -1,0 +1,20 @@
+Antzenpile systems-beta asset provenance
+
+Game art, score and sound cues are original project work. Blender-authored
+worker/queen/brood renders and vector art use committed project sources.
+Colony and sensory materials include OpenAI imagegen finishes from original
+project sculpts. Player reference screenshots are not shipped as backdrops.
+No runtime Blender, Krita, sampler, web service or paid addon is required.
+
+The layered original score incorporates CC0 recordings by Sam Gossner /
+Versilian Studios from the Versilian Community Sample Library (VCSL):
+https://github.com/sgossner/VCSL/tree/sfz
+https://versilian-studios.com/vcsl/
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Exact source URLs/hashes are retained in tools/music/sample_manifest.json
+in the source repository. Attribution is retained for provenance.
+
+The Godot engine is distributed under its MIT license. Its license and
+third-party copyright/license notices accompany this build in
+GODOT_LICENSE.txt and GODOT_COPYRIGHT.txt, pinned to Godot 4.7.2.
+These notices describe dependencies; they do not relicense Antzenpile.
