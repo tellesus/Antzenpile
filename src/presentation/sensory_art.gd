@@ -40,7 +40,7 @@ static func membrane(center: Vector2, radius: float, phase: float, squash: float
 	return points
 
 
-static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool) -> void:
+static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool, draw_body: bool = true) -> void:
 	var signal_data: Dictionary = entry.signal
 	var center: Vector2 = entry.center
 	var radius: float = entry.radius
@@ -50,7 +50,7 @@ static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool) -
 	var salience: float = (0.18 if empty else 0.45 + 0.55 * strength)
 	var drift: float = time * 0.25 + phase
 	var recognition: float = smoothstep(0.25, 0.75, clampf(float(signal_data.get("confidence", 0.0)), 0.0, 1.0))
-	if not empty:
+	if not empty and draw_body:
 		# Neutral baked density carries no object identity. Bounded drift exposes
 		# smoke-like structure, never hidden reality or simulation randomness.
 		for layer: int in 3:

@@ -6,6 +6,8 @@ const Panorama = preload("res://src/presentation/outward/outward_projection.gd")
 const SWARM_CONFIG = preload("res://data/ecology/default_swarm.tres")
 const UIStyle = preload("res://src/presentation/organic_ui.gd")
 const Art = preload("res://src/presentation/sensory_art.gd")
+const CloudField = preload("res://src/presentation/outward/chemical_field.gd")
+var chemical_field: ChemicalField
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 const TrailGlow = preload("res://src/presentation/outward/trail_glow.gd")
 const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd")
@@ -85,6 +87,11 @@ func show_feedback(message: String, rejected: bool = false) -> void:
 	_feedback_until = Time.get_ticks_msec() + 3000
 
 
+func _ready() -> void:
+	chemical_field = CloudField.new()
+	add_child(chemical_field)
+
+
 func _process(delta: float) -> void:
 	if signal_provider.is_valid() and status_provider.is_valid():
 		_signals = signal_provider.call()
@@ -95,6 +102,11 @@ func _process(delta: float) -> void:
 	if not _status.get("paused", false):
 		_animation_time = fposmod(_animation_time + minf(delta, 0.1), 3600.0)
 		_advance_departures(minf(delta, 0.1))
+	if chemical_field != null:
+		var empty_ids: Dictionary = {}
+		for entry: Dictionary in _placed:
+			empty_ids[entry.id] = _reported_empty(entry.signal)
+		chemical_field.sync(_placed, empty_ids, _animation_time, get_viewport_rect().size)
 	queue_redraw()
 
 
@@ -646,7 +658,6 @@ func _button_at(at: Vector2) -> String:
 func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	_prepare_signal_captions(size)
-	draw_rect(Rect2(Vector2.ZERO, size), Color.BLACK)
 	_draw_rain(size)
 	Art.home_entrance(self,Vector2(size.x*0.5,size.y*0.78))
 	_draw_trails(size)
@@ -822,7 +833,7 @@ func _draw_signal(entry: Dictionary) -> void:
 	var radius: float = entry.radius
 	var reported_empty: bool = _reported_empty(signal_data)
 	var color: Color = Color("819092") if reported_empty else Art.color_for(signal_data.category)
-	Art.cloud(self, entry, _animation_time, reported_empty)
+	Art.cloud(self, entry, _animation_time, reported_empty, false)
 	if entry.id == selected_id:
 		var attention: PackedVector2Array = Art.membrane(at, radius + 8.0, 1.5)
 		draw_polyline(attention.slice(1, 7), Color(0.88, 0.91, 0.83, 0.48), 1.2, true)
@@ -1343,6 +1354,8 @@ func _journey_recovery(route: Dictionary) -> bool:
 func _threat_caption(signal_data: Dictionary) -> String:
 	var route: Dictionary = _selected_route(signal_data)
 	var record: Dictionary = _status.get("journey_response",{}).get("outcomes",{}).get(route.get("id"),{})
+	if signal_data.get("threat_kind", "") in ["ambush", "mixed"] and signal_data.get("predator_profile", "") in ["wolf_spider", "beetle_hunter"]:
+		return Memories.predator_name(signal_data.predator_profile) + " memory"
 	if signal_data.get("threat_kind", "") == "surface": return Memories.passage_name(signal_data.get("passage_impression",""))+" memory"
 	if signal_data.get("threat_kind", "") == "residue":return "Strange ground residue memory"
 	return "Ambush memory" if record.get("outcome","") == "secured" else "Ambush trace"

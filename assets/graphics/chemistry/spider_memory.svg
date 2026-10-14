@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Authored sensory impression: eight legs, two body masses, no physical scene. -->
+  <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke-width="12" opacity=".16">
+      <path d="M237 234 Q178 209 176 139 Q175 91 128 68 M233 244 Q148 218 123 181 Q110 152 62 143 M234 256 Q145 254 116 282 Q86 314 48 311 M237 269 Q169 297 165 344 Q157 397 105 434"/>
+      <path d="M275 234 Q334 209 336 139 Q337 91 384 68 M279 244 Q364 218 389 181 Q402 152 450 143 M278 256 Q367 254 396 282 Q426 314 464 311 M275 269 Q343 297 347 344 Q355 397 407 434"/>
+    </g>
+    <g stroke-width="3.5" opacity=".88">
+      <path d="M237 234 Q178 209 176 139 Q175 91 128 68 M233 244 Q148 218 123 181 Q110 152 62 143 M234 256 Q145 254 116 282 Q86 314 48 311 M237 269 Q169 297 165 344 Q157 397 105 434"/>
+      <path d="M275 234 Q334 209 336 139 Q337 91 384 68 M279 244 Q364 218 389 181 Q402 152 450 143 M278 256 Q367 254 396 282 Q426 314 464 311 M275 269 Q343 297 347 344 Q355 397 407 434"/>
+    </g>
+    <path d="M231 219 Q232 197 245 191 M281 219 Q280 197 267 191 M245 194 Q251 183 250 170 M267 194 Q261 183 262 170" stroke-width="2.5" opacity=".7"/>
+    <path d="M231 265 Q210 293 214 332 Q219 379 256 387 Q293 379 298 332 Q302 293 281 265" stroke-width="4" opacity=".7"/>
+    <path d="M239 286 Q224 325 245 356 M273 287 Q287 323 267 365 M240 303 Q255 290 273 305 M232 327 Q255 311 281 328" stroke-width="2" opacity=".42"/>
+    <ellipse cx="256" cy="242" rx="28" ry="32" stroke-width="3" opacity=".8"/>
+  </g>
+  <ellipse cx="256" cy="325" rx="33" ry="48" fill="white" opacity=".12"/>
+  <ellipse cx="256" cy="243" rx="21" ry="27" fill="white" opacity=".22"/>
+</svg>

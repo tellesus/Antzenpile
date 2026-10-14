@@ -21,6 +21,7 @@ func run(test: Object) -> bool:
 		game.advance(0.25)
 	test.check(game.run.journey_response.predator_profile == "wolf_spider" and game.run.journey_response.ambush_fraction >= 0, "Physical close survey captures spider outline privately")
 	test.check(popover._identity(route, root.outward_status("home")) == "Unidentified threat" and root.outward_status("home").journey_response.reports.is_empty(), "Private outline does not leak during outbound or return travel")
+	test.check(not str(root.sensory_snapshot("home")).contains("wolf_spider"), "Cloud snapshots cannot reveal a privately captured spider before return")
 	var private_save: Dictionary = snapshot(game)
 	var twin := Controller.new()
 	test.check(twin.restore_snapshot(private_save) and twin.run.to_dict() == game.run.to_dict(), "Private captured profile restores exactly")
@@ -33,6 +34,10 @@ func run(test: Object) -> bool:
 	test.check(game.run.to_dict() == twin.run.to_dict(), "Actual return and witness journal continue identically after save")
 	var report: Dictionary = game.run.journey_response.reports.route_1
 	test.check(report.predator_profile == "wolf_spider" and report.observed_at < report.received_at, "Only actual return publishes dated supported identity")
+	var impression: Dictionary = {}
+	for signal_data: Dictionary in root.sensory_snapshot("home"):
+		if signal_data.category == "threat": impression = signal_data
+	test.check(impression.get("predator_profile", "") == "wolf_spider" and is_equal_approx(impression.age, game.run.simulation_time - report.observed_at), "Cloud receives only returned identity and its original observation age")
 	test.check(popover._identity(route, root.outward_status("home")) == "Spider-like predator" and popover.kind(route, root.outward_status("home")) == "defend", "Supported impression retains Clear/Hunt and force decisions")
 	test.check(Memory.survey_label(report).contains("Spider-like") and not str(root.outward_status("satellite_1").get("journey_response", {})).contains("wolf_spider"), "Witness copy uses supported outline and stays owned by its observing pile")
 	test.check(old.run.journey_response.reports.route_1.get("predator_profile", "") == "" and Memory.survey_label(old.run.journey_response.reports.route_1) == "Predator witnessed", "Old generic survey remains generic after actual delivery")

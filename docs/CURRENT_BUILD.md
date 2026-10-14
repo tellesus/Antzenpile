@@ -29,11 +29,13 @@ Local queen weakening, paid care and replacement now work. Maternal lineage and 
 Remaining work is tracked here instead of on dormant branches:
 
 - **Player-reported save validation failure:** save a short run, watch End Run/review, then load the earlier save. The attempted fix in the old chat was interrupted; no fix is claimed by consolidation. [178](tasks/178_player_save_validation.md) is the next bounded investigation, using a private copy of the real slot. The generic packaged round-trip gate does not close this report.
-- **M8 visuals:** richer animated chemical clouds, clearer ant/evidence-supported species impressions and arc-length-normalized trail traffic. The organic neon-trail proof itself is integrated.
+- **M8 visuals:** the organic trail proof and flowing chemical-cloud/spider/beetle memory pass179 are implemented. Remaining: ant/inward art, further supported source/species forms, arc-length trail traffic and player visual acceptance.
 - **Interaction and music:** simpler persistent menus/context controls, clearer draft/order dispatch and the planned music pass remain unimplemented follow-up work.
 - **Acceptance:** visible packaged-game playtesting, physical touch, balance/audio/feel, timing outliers and clean-machine validation remain open. These are not duplicate feature branches or a Windows 1.0 claim.
 
 ## Latest actual verification
+
+[179](tasks/179_living_chemical_clouds.md): flowing OUTWARD chemical materials, actual returned spider/beetle memory masks, observation-age fade and pause-aware internal motion. 11,026 full checks/zero failures;542 focused/zero; pinned import/Main and native multi-resolution input/knowledge captures pass. [Native timing and limits](evidence/card179/README.md). Menus/dispatch/music and player/release acceptance remain pending.
 
 [Card176](tasks/176_neon_trail_runtime_validation.md), now integrated into `main` by [177](tasks/177_main_consolidation.md), preserves the original five neon-trail proof commits and recovers the staged soft-edge correction and captures. Godot 4.7.2 Windows/RX 6650 XT: 11,003 full checks/zero failures, targeted 126/zero, clean import/Main, 12 native captures and two 60-second 1080p halo/control frame-loop samples. [Evidence and timing limitations](evidence/card176/README.md). This is the first bounded M8 visual proof; broader cloud/ant art, UI, music and final player/packaged-game acceptance remain pending.
 

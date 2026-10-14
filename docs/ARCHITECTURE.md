@@ -32,6 +32,8 @@ SimulationController attaches systems to one RunState and owns their fixed-tick 
 
 ## Worker/care and conflict contracts
 
+179 separates OUTWARD's black background and chemical material quads into a `ChemicalField` behind the existing trails, captions and controls. Each visible projected memory owns one `ChemicalCloud`/ShaderMaterial; turning away/removing a memory frees it, with no static material/scene cache. The existing view clock supplies `visual_time`; shaders never use engine `TIME` or simulation RNG. Fixed seeded noise and mipmapped authored masks provide bounded internal flow. `GameRoot.sensory_snapshot` copies predator identity only from a returned ambush/mixed report, with its original observation age. Clouds never query physical predators, private survey fields or report history. Source positions, hit areas and simulation/save contracts are unchanged.
+
 New work checks `PileState.workers_assignable`, not raw ledger availability; `allocate_workers` retains held brood care. Dedicated trial nurses are counted once. Every job target reduction goes through its owner; a view never edits a ledger or repairs a conservation failure.
 
 141 makes ordinary gathering an explicit whole target. TrailRoute owns a separate unsent `waiting_workers` count; stable route ticks fund that remainder only through care-protected local allocation. Zero-funded intent has no ledger pool. Reported depletion pauses further funding; cancellation clears waiting and recalls actual travelers. Desired minus surviving allocation is not an automatic replacement order after losses. Home and Daughter share a free staffing draft, with five as a suggestion.

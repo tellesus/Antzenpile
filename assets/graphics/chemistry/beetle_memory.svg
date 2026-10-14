@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Authored sensory impression: six legs, elytra and antennae. -->
+  <g fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke-width="12" opacity=".15">
+      <path d="M214 227 Q153 199 147 157 L100 121 M208 274 Q132 259 112 293 L60 317 M218 324 Q150 347 150 393 L109 440 M298 227 Q359 199 365 157 L412 121 M304 274 Q380 259 400 293 L452 317 M294 324 Q362 347 362 393 L403 440"/>
+    </g>
+    <g stroke-width="4" opacity=".88">
+      <path d="M214 227 Q153 199 147 157 L100 121 M208 274 Q132 259 112 293 L60 317 M218 324 Q150 347 150 393 L109 440 M298 227 Q359 199 365 157 L412 121 M304 274 Q380 259 400 293 L452 317 M294 324 Q362 347 362 393 L403 440"/>
+      <path d="M235 148 Q205 129 211 94 L182 65 M277 148 Q307 129 301 94 L330 65"/>
+    </g>
+    <path d="M216 223 Q188 252 193 306 Q196 378 256 407 Q316 378 319 306 Q324 252 296 223 Q256 201 216 223Z" stroke-width="4" opacity=".7"/>
+    <path d="M256 223 Q247 306 256 399 M224 240 Q202 290 225 345 M287 240 Q310 290 287 345" stroke-width="2.5" opacity=".58"/>
+    <path d="M217 219 Q213 186 230 168 Q256 155 282 168 Q299 186 295 219 M229 166 Q225 135 256 128 Q287 135 283 166" stroke-width="3.5" opacity=".8"/>
+    <path d="M245 135 L236 120 M267 135 L276 120" stroke-width="2" opacity=".7"/>
+  </g>
+  <ellipse cx="256" cy="303" rx="55" ry="77" fill="white" opacity=".09"/>
+  <ellipse cx="256" cy="190" rx="28" ry="23" fill="white" opacity=".2"/>
+</svg>

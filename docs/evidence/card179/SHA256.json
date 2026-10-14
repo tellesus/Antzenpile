@@ -1,0 +1,90 @@
+[
+  {
+    "path": "docs/evidence/card179/.gdignore",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "docs/evidence/card179/clouds_1920.png",
+    "sha256": "8c3413af82d49ebe3e36989cbe9063df53c246323d0ff5115b5919a3e42707b1"
+  },
+  {
+    "path": "docs/evidence/card179/private_survey_1920.png",
+    "sha256": "1557cd7e9f3eed6655cdd704cdc9b20153f7d90d4616dec51425decd245c3454"
+  },
+  {
+    "path": "docs/evidence/card179/README.md",
+    "sha256": "708eeb9ae8c3c77e07b296353fc1cc0f6c392d58dee082b166c8c2473df98bc8"
+  },
+  {
+    "path": "docs/evidence/card179/returned_beetle_1920.png",
+    "sha256": "a9403e02a2c383fbcbde645a51ec6306d0a22660b1df438c0a45a9f01c081bc4"
+  },
+  {
+    "path": "docs/evidence/card179/returned_spider_1920.png",
+    "sha256": "77342260dbe038a8bca30833e6ccb95aa68c6a71a3a1a272df4c4bf8ecbd011c"
+  },
+  {
+    "path": "docs/evidence/card179/selected_900.png",
+    "sha256": "7ebd7a79503cce295b85fbdcd1f8392e13ccee92f1b224f568ffd94eedd0c8d0"
+  },
+  {
+    "path": "docs/evidence/card179/spider_detail.png",
+    "sha256": "e6d5f39f261d7f6adb25f0edcc30efb9b0ad400a0f1fb5e8c50a6cb4d5a76232"
+  },
+  {
+    "path": "docs/evidence/card179/stale_memory_1920.png",
+    "sha256": "05fb54bea6f41b95d48a1ff6b23bef3af9ab4e0188bbe35af66fee3a67abd9f6"
+  },
+  {
+    "path": "docs/evidence/card179/windows_import-result.txt",
+    "sha256": "477d37207232a1d0e2a195e574d7bdb03a220d9d9820b5cd28a3ec6412cb428e"
+  },
+  {
+    "path": "docs/evidence/card179/windows_import.log",
+    "sha256": "b728de0c23f24d9aa31bc7608b177d7ca13857d7c3aca862a08506d00675123b"
+  },
+  {
+    "path": "docs/evidence/card179/windows_main-result.txt",
+    "sha256": "a911ebc795d91ebbe95cc3f098f12546d61efa06e6b1ba0e2ae6d4b87ca93004"
+  },
+  {
+    "path": "docs/evidence/card179/windows_main.log",
+    "sha256": "175b8eb128112293a52de2cc62bdce057c0811e78607f1d19951e6518ded0ce2"
+  },
+  {
+    "path": "docs/evidence/card179/windows_performance.json",
+    "sha256": "e4e2de2a4e97ef95087a8ea9411900c15081cbfccce68ed38dd567b82e973511"
+  },
+  {
+    "path": "docs/evidence/card179/windows_profile-result.txt",
+    "sha256": "95ad675458673957de6dfe0150896718bc0d62a05cdfd3ec051615260d9412ca"
+  },
+  {
+    "path": "docs/evidence/card179/windows_profile.log",
+    "sha256": "5995a1d485a83531050e0642cb20a9ef6059bb52333b0fb383e1d2d1a87ec1b4"
+  },
+  {
+    "path": "docs/evidence/card179/windows_regression-result.txt",
+    "sha256": "4c482d4de876f3f13c7352444c4975df99dc7383d25168979660df276e0f7016"
+  },
+  {
+    "path": "docs/evidence/card179/windows_regression.log",
+    "sha256": "7d34746a2eaa43ce1b7ea2058322c2f1a58f12edd6715d4b491adde082c718d4"
+  },
+  {
+    "path": "docs/evidence/card179/windows_render-result.txt",
+    "sha256": "f2f2c26056373eb738b28c9cf24ba4ab0e979f21bcd5561c30e69137b451e911"
+  },
+  {
+    "path": "docs/evidence/card179/windows_render.log",
+    "sha256": "4768d3808c6aabea01d26fdc4cf25165a65fb86be15f125a422094622ef919c5"
+  },
+  {
+    "path": "docs/evidence/card179/windows_targeted-result.txt",
+    "sha256": "da9c59eef241d6e44d0eac602fe5147904ea35bf3c7337197216f85448b1efb9"
+  },
+  {
+    "path": "docs/evidence/card179/windows_targeted.log",
+    "sha256": "3035ea867b312a5183da4cb028d9fe30d78d3b9a224a365d9f11a68aefda411c"
+  }
+]

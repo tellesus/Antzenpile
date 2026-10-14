@@ -439,7 +439,9 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		result.append({"id":"threat:" + id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat",
 			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":3.0,
 			"confidence":0.75,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time - report.observed_at,
-			"risk":"reported_attack","threat_kind":report.finding,"traffic":null,"foreign_contact":false,"conflict_report":""})
+			"risk":"reported_attack","threat_kind":report.finding,
+			"predator_profile":report.get("predator_profile", "") if report.finding in ["ambush", "mixed"] else "",
+			"traffic":null,"foreign_contact":false,"conflict_report":""})
 	return result
 
 

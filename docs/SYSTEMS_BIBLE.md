@@ -174,7 +174,7 @@ Recognize biological accomplishment/lineage continuation and offer continued pla
 
 ### SYS-13 Interface, communication and presentation
 
-**Purpose:** clarity about intent under uncertainty about reality. Foundation: rotating OUTWARD, abstract INWARD, direct conflict circle and restrained audio/art. M1 starts consistent activation feedback; M8 performs final graphics/music.
+**Purpose:** clarity about intent under uncertainty about reality. Foundation: rotating OUTWARD, abstract INWARD, direct conflict circle and evidence-limited presentation. M8's approved visual direction is conspicuous neon glow, texture and motion on deep black; sensory limits do not require restrained color. M1 starts consistent activation feedback; M8 performs final graphics/music.
 
 Use a common hierarchy: identity/pile, condition, current order, action/cost/wait reason, expandable evidence. Names describe actual jobs and source types. An unavailable action stays understandable. A brief accepted/queued/rejected response is visible at the activated control; longer status persists where useful. Draft inspection and acknowledgment do not look like a dispatched order.
 

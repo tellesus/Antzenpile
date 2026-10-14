@@ -66,6 +66,7 @@ func run(test: Object) -> bool:
 	var report: Dictionary=game.run.journey_response.reports.route_1.duplicate(true)
 	var senses: Array[Dictionary]=root.sensory_snapshot("home")
 	test.check(report.predator_profile=="beetle_hunter" and report.has("estimated_position"),"Returning survey publishes supported outline and dated coarse course")
+	test.check(senses.filter(func(item: Dictionary)->bool:return item.id=="threat:route_1")[0].get("predator_profile", "")=="beetle_hunter", "Cloud receives beetle anatomy only from the delivered report")
 	game.advance(10)
 	test.check(game.run.journey_response.reports.route_1==report and root.sensory_snapshot("home").filter(func(item: Dictionary)->bool:return item.id=="threat:route_1")[0].bearing==senses.filter(func(item: Dictionary)->bool:return item.id=="threat:route_1")[0].bearing,"Remembered sighting stays in place while actual hunter moves")
 	var departed_position: Vector2=game.run.predator.position()

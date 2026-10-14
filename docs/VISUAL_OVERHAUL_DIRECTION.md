@@ -13,7 +13,7 @@
 - For ordinary tasks default to a useful suggestion; offer +/-1, +/-5 or presets with clear meanings rather than repeating confusing number/commit controls. If a choice would sacrifice nursery care or reallocate protected work, show the consequence before ORDER. Summarize action feedback as acknowledged/queued/away/returned rather than success before a return report.
 - UI review should inspect active `src/presentation/outward/outward_view.gd`, conflict popover, gathering and effort draft implementations first, then conduct controlled mouse/touch usability tests before broad refactor.
 
-## First isolated implementation (this branch)
+## Integrated trail proof (PR #2, recovered176 and consolidated177)
 - `trail_visual.gd`: route-stable entrance fan-out and curved cubic Bézier shapes plus bounded nonphysical filament curl. Alarm markers and representative traffic use the same geometry. Faint chemical/familiarity distinction unchanged.
 - `outward_view.gd`: multiple translucent visual glow passes plus bright filament core, small worker halos.
 - `sensory_art.gd`: strongly saturated SDR category palette.
@@ -22,7 +22,7 @@
 ## Verification requirements
 - Run pinned Godot import, `tests/run_tests.gd`, Main smoke, visual screenshots for 1280×720/1920×1080/900×600, and native on-GPU 1080p measurements. These are **not passed merely by writing code**. Compare empty, weak, strong, ghost, rain, multiple trails, returned combat evidence, rotating seam and selected contexts; verify color readability and no false perception.
 - Known limitations of first proof: layered immediate-mode glows can produce overdraw; sprite/ant lighting remains proof-quality; travel along evenly sampled Bézier points is not yet arc-length-normalized. Measure and tune before further elaboration.
-- Next bounded visual card: investigate shader-animated wispy chemical clouds and returned-identity impression masks (without species guessing). UI cleanup is a separate card to avoid conflating interaction and visual correctness.
+- The next bounded visual card179 implements shader-animated wispy chemical clouds and returned-identity spider/beetle masks without species guessing. Each memory owns its material and uses the existing pause-aware clock; old identity fades with observation age. UI cleanup remains a separate card.
 
 ## Evidence to capture on workstation
 Record Godot 4.7.2 build, Compatibility renderer, GPU, window resolution, 1% low frame time and median FPS over 60 seconds, graphics settings and screenshot/state fixture; repeat with glow on/off and 6 active trails. Check pause visual-clock behavior separately.
