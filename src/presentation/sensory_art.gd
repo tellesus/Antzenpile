@@ -23,12 +23,12 @@ static func impression_gain(signal_data: Dictionary, empty: bool) -> float:
 
 static func color_for(category: String) -> Color:
 	match category:
-		"carbohydrate": return Color("dcb477")
-		"water": return Color("7fbfcf")
-		"protein": return Color("b8a1cf")
-		"nest_site": return Color("b9c5a1")
-		"threat": return Color("c58d79")
-	return Color("a0b1ae")
+		"carbohydrate": return Color("ffc05b")
+		"water": return Color("5ce8ff")
+		"protein": return Color("c993ff")
+		"nest_site": return Color("b2f59b")
+		"threat": return Color("ff7681")
+	return Color("a9cbbe")
 
 
 static func membrane(center: Vector2, radius: float, phase: float, squash: float = 0.8) -> PackedVector2Array:
