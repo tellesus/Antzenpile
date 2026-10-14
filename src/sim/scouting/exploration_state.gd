@@ -1,6 +1,6 @@
 class_name ExplorationState
 extends RefCounted
-## Home colony's standing intent; active workers remain in individual ledger commitments.
+## One pile's standing intent; active workers remain in individual ledger commitments.
 
 const CONFIG = preload("res://data/scouting/default_scouts.tres")
 var target: int = 0
@@ -41,7 +41,7 @@ func restore(data: Dictionary, world: WorldState, time: float) -> bool:
 		for index: int in 2:
 			if not parts[index].is_valid_int() or str(parts[index].to_int()) != parts[index] or parts[index].to_int() < 0 or parts[index].to_int() >= ceili(world.bounds.size[index] / CONFIG.coverage_cell_size):
 				return false
-		restored_coverage[key] = float(searched[key])
+		restored_coverage[key] = roundf(float(searched[key]) * 1e10) / 1e10
 	var restored_priorities: Array[String] = []
 	var restored_sent: Dictionary[String, float] = {}
 	for key: Variant in queued:

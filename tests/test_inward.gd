@@ -22,9 +22,12 @@ func run(test: Object) -> bool:
 	test.check(pile.deposit_resource("protein", 2.0) and root.inward_status("home").resources.protein == 7.0 and unchanged.resources.protein == 5.0, "INWARD store summary updates after a deposit without mutating an older detached snapshot")
 	for size: Vector2 in [Vector2(1280, 720), Vector2(900, 600)]:
 		var centers: Dictionary = View.positions(size)
-		test.check(centers.size() == 7 and centers.food_exchange.x < size.x - 316.0 and centers.adaptation.x < size.x - 316.0 and centers.guest.x < size.x - 316.0 and centers.midden.x < size.x - 316.0 and centers.queen.y > 98.0 and centers.entrance.y < size.y - 110.0 and centers.guest.y < size.y - 110.0, "Permanent functions and conditional guest/Midden fit beside context and above controls")
+		test.check(centers.size() == 8 and centers.food_exchange.x < size.x - 316.0 and centers.adaptation.x < size.x - 316.0 and centers.guest.x < size.x - 316.0 and centers.midden.x < size.x - 316.0 and centers.queen.y > 98.0 and centers.entrance.y < size.y - 110.0 and centers.guest.y < size.y - 110.0, "Permanent functions and conditional guest/Midden/Refuge fit beside context and above controls")
+		test.check(centers.refuge.x + ChamberArt.hit_radii("refuge").x < size.x - 316.0 and centers.refuge.y + ChamberArt.hit_radii("refuge").y < size.y - 110.0, "Refuge target fits within the functional network field")
+		test.check(View.node_at(centers.refuge, size) != "refuge" and View.node_at(centers.refuge, size, false, false, false, false, true) == "refuge", "Refuge becomes selectable only after the local chamber is built")
 		for id: String in View.NODES:
 			test.check(View.node_at(centers[id], size) == id, "Node hit target selects " + id)
+			test.check(View.node_at(centers[id], size, true, true, true, false, true) == id, "Built Refuge preserves the other function's center target: " + id)
 	var inward: InwardView = View.new()
 	var outward: OutwardView = Outward.new()
 	root.add_child(inward)

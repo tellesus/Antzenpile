@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SourceProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/world/source_profile.gd" id="profile"]
+[resource]
+script = ExtResource("profile")
+id = "picnic_crumbs"
+resource_id = "carbohydrate"
+display_name = "Picnic crumbs"
+description = "Temporary food · carbohydrates and some protein in each portion"
+yields = {"carbohydrate": 0.8, "protein": 0.2}
+bulk = 1.0

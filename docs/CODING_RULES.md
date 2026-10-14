@@ -2,6 +2,8 @@
 
 ## Scope and style
 
+- Current design/order lives in `SYSTEMS_BIBLE.md`, `ROADMAP_1_0.md` and their catalogs; `CURRENT_BUILD.md` records implemented status. Archived documents are historical evidence only. Do not treat a catalog entry or future schema as an existing API.
+- A modular content card names its system/catalog IDs and implements one complete useful entry before adding more. Reuse typed family owners/definitions; do not build a universal effect interpreter or speculative future scaffolding.
 - Implement one bounded task card in a small logical commit. A card should usually end in a player-visible behavior with its simulation, presentation, and evidence together; split it when the pieces need separate verification or a useful independent handoff. Avoid unrelated cleanup and unused future-system folders/classes. Expand roadmap cards against actual code before implementation.
 - Prefer typed GDScript, explicit fields and ownership, short focused functions, and descriptive names. Use snake_case files/methods/fields and PascalCase class names. Comments explain invariants and non-obvious choices.
 - Data and balance live in authored definitions/configuration. Keep provisional values visibly tunable. Favor simple, inspectable algorithms over speculative optimization or framework building.
@@ -13,6 +15,7 @@
 - Simulation is headless, uses only run-owned seeded randomness, and advances through fixed ticks. No UI text, camera, particle, audio, or input-key dependencies in simulation state/systems.
 - Views consume knowledge-derived sensory data or approved colony summaries; send semantic commands back. Simulation owns validation and mutation. Debug access is an explicit exception, never a normal presentation shortcut.
 - Every worker commitment/release/population change uses the ledger. Do not repair a failed invariant by silently editing totals. Route/cohort counts are reconciled views of commitments, not additional workers.
+- Player-colony jobs check `PileState.workers_assignable` and allocate through `PileState.allocate_workers` so existing brood keeps its carers. Raw ledger availability includes those carers; direct allocation remains for isolated ledger tests, legacy fixtures and the separate rival ledger.
 - Authored Resources are immutable definitions. Mutable runtime arrays/dictionaries are per-run. Use stable IDs and explicit versioned serialization; no opaque scene save as authoritative state.
 - Keep simulation/visual RNG streams separate. Stable processing order is required for repeatable seeds; do not rely on incidental scene order.
 
@@ -38,7 +41,7 @@ See README for verified Windows setup. Tests should exercise behavior and invari
 | Save/load | Continued state equals saved/reloaded continuation |
 | Presentation | No truth leaks; bearing wrap; mouse/touch shared paths; debug isolation |
 
-Run focused checks during implementation and the full headless suite once when code is final; at roughly four seconds today, that final suite is a cheap safety gate, not an optimization target. Repeat it when a subsequent fix can affect simulation or shared contracts. Run the editor import when adding or changing Godot resources, Main smoke for runtime/scene changes, and a graphical/manual probe for affected UI, art, input or audio. Do not routinely repeat all three for documentation-only changes or after an unchanged passing result. A headless pass does not prove renderer performance, touch usability, or music synchronization. Record platform and engine version for performance evidence; do not invent device budgets or claim Android validation from a desktop-only run.
+Run focused checks during implementation and the full headless suite once when code is final; record actual timing as the suite grows rather than assuming its old four-second cost. Bounded history now adds save/continuation coverage; repeated gates still need a changed result or implementation reason. Repeat it when a subsequent fix can affect simulation or shared contracts. Run the editor import when adding or changing Godot resources, Main smoke for runtime/scene changes, and a graphical/manual probe for affected UI, art, input or audio. Do not routinely repeat all three for documentation-only changes or after an unchanged passing result. A headless pass does not prove renderer performance, touch usability, or music synchronization. Record platform and engine version for performance evidence; do not invent device budgets or claim Android validation from a desktop-only run.
 
 ## Handoff
 

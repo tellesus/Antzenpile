@@ -1,0 +1,166 @@
+{
+	"engine": "4.7.2-stable (official)",
+	"failures": 0,
+	"platform": "Windows",
+	"policy": "Two previously ordinary paid card100 prefront/warm colonies, continued through the real front with one climate worker, actual paid gathering of both remembered alternative carbohydrate producers, existing rechecks/cleanup/guest response and actual rain. Physical pulse record is developer evidence, never UI data. Full per-tick JSON-restored continuation/conservation checked.",
+	"rows": [
+		{
+			"final": {
+				"air": "",
+				"home_water": 188.86732,
+				"known_sources": 7,
+				"thermal": {
+					"condition": "steady",
+					"larval_rate": 1.0
+				},
+				"water_source": 0.0
+			},
+			"hot_dry_ticks": 1357,
+			"pulses": [
+				{
+					"amount": 1.125,
+					"at": 3750.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3780.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3810.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3840.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3870.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 9.0,
+					"at": 3900.0,
+					"hot_dry": true,
+					"source": "carb_sheltered"
+				},
+				{
+					"amount": 1.125,
+					"at": 3900.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3930.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 0.125,
+					"at": 3960.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 12.0,
+					"at": 4200.0,
+					"hot_dry": false,
+					"source": "carb_sheltered"
+				}
+			],
+			"response_at": 3705.0,
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"final": {
+				"air": "",
+				"home_water": 215.87493,
+				"known_sources": 7,
+				"thermal": {
+					"condition": "steady",
+					"larval_rate": 1.0
+				},
+				"water_source": 0.0
+			},
+			"hot_dry_ticks": 1357,
+			"pulses": [
+				{
+					"amount": 1.125,
+					"at": 3750.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3780.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3810.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3840.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3870.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 9.0,
+					"at": 3900.0,
+					"hot_dry": true,
+					"source": "carb_sheltered"
+				},
+				{
+					"amount": 1.125,
+					"at": 3900.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 1.125,
+					"at": 3930.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 0.125,
+					"at": 3960.0,
+					"hot_dry": true,
+					"source": "aphid_01"
+				},
+				{
+					"amount": 12.0,
+					"at": 4200.0,
+					"hot_dry": false,
+					"source": "carb_sheltered"
+				}
+			],
+			"response_at": 3705.0,
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		}
+	]
+}

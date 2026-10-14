@@ -26,7 +26,7 @@ func to_dict() -> Dictionary:
 		"entry_tick": str(entry_tick), "next_entry_tick": str(next_entry_tick)}
 
 
-func restore(data: Dictionary, pile: PileState, tick: int) -> bool:
+func restore(data: Dictionary, pile: PileState, tick: int, other_brood_losses: int=0) -> bool:
 	if not data.has_all(["phase", "integration_ticks", "damage_ticks", "rejection_ticks", "rejection_duration_ticks", "reported_losses", "observation"]) or not data.phase in ["absent", "tolerated", "rejecting", "purged"] or not data.observation in ["", "tolerated", "loss", "foreign", "purged"]:
 		return false
 	for key: String in ["integration_ticks", "damage_ticks", "rejection_ticks", "rejection_duration_ticks", "reported_losses"]:
@@ -67,7 +67,7 @@ func restore(data: Dictionary, pile: PileState, tick: int) -> bool:
 			return false
 	elif due != 0:
 		return false
-	if data.integration_ticks > mini(CONFIG.integration_ticks, elapsed) or data.damage_ticks >= CONFIG.damage_ticks or data.damage_ticks > elapsed or data.reported_losses != pile.brood_lost_total or data.reported_losses > lifetime_elapsed / CONFIG.damage_ticks:
+	if data.integration_ticks > mini(CONFIG.integration_ticks, elapsed) or data.damage_ticks >= CONFIG.damage_ticks or data.damage_ticks > elapsed or data.reported_losses != pile.brood_lost_total - pile.brood_health.losses-other_brood_losses or data.reported_losses > lifetime_elapsed / CONFIG.damage_ticks:
 		return false
 	var commitment: Dictionary = pile.workers.to_dict().commitments.get("rejection:home", {})
 	var duration: int = AdaptationRules.rejection_duration(int(data.integration_ticks), float(share))

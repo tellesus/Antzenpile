@@ -56,9 +56,12 @@ func run(test: Object) -> bool:
 	view._status = root.outward_status("home")
 	view.selected_id = "signal:known:carb_exposed"
 	view.trail_set_command = root.set_trail_target
+	view.gather_order_command = root.order_gathering
 	var target_before: int = route.desired_workers
 	var available_before: int = game.run.colony.piles.home.workers_available
-	view._pointer_press(view._trail_button_rect("trail_more").get_center(), "mouse")
+	view._pointer_press(view._trail_button_rect("gather_edit").get_center(), "mouse")
+	view.gathering_draft.amount = target_before + 4
+	view._pointer_press(view.gathering_draft.rect(view.get_viewport_rect().size,"gather_commit").get_center(), "mouse")
 	test.check(route.desired_workers == target_before + 4 and game.run.colony.piles.home.workers_available == available_before - 4, "Mouse +4 reinforcement commits real reserve labor")
 	var now_held: int = 0
 	for cohort: TransitCohort in game.run.trails.cohorts.values():

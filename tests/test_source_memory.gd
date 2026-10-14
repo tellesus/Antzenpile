@@ -48,10 +48,11 @@ func run(test: Object) -> bool:
 		signals.append(item)
 	view._signals = signals
 	view.source_category = "carbohydrate"
+	var rows: int=view._source_rows()
 	view._run_command("source_page")
-	test.check(view.source_page == 1 and view._button_at(view._source_row_rect(2).get_center()) == "source_entry_2", "Seven old memories paginate with three accessible rows")
-	view._run_command("source_page")
-	test.check(view.source_page == 2 and view._button_at(view._source_row_rect(1).get_center()) == "source_panel", "Last partial page has no nonexistent selectable row")
+	test.check(view.source_page == 1 and view._button_at(view._source_row_rect(rows-1).get_center()) == "source_entry_"+str(rows-1), "Seven old memories paginate with responsive accessible rows")
+	while view.source_page<ceili(7.0/rows)-1: view._run_command("source_page")
+	test.check(view.source_page == ceili(7.0/rows)-1 and (rows==1 or view._button_at(view._source_row_rect(1).get_center()) == "source_panel"), "Last partial page has no nonexistent selectable row")
 	view._run_command("source_entry_0")
 	test.check(view.selected_id == "signal:known:memory_6", "Aged memory stays selectable without confidence floor")
 	view.free()

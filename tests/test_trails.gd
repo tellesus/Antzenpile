@@ -70,15 +70,20 @@ func run(test: Object) -> bool:
 	view.selected_id = view._signals[0].id
 	view.trail_create_command = root.create_trail_for
 	view.trail_set_command = root.set_trail_target
-	var more: Vector2 = view._trail_button_rect("trail_more").get_center()
-	test.check(view._button_at(more) == "trail_more", "Selected route exposes adjustment hit target")
+	view.gather_order_command = root.order_gathering
+	var more: Vector2 = view._trail_button_rect("gather_edit").get_center()
+	test.check(view._button_at(more) == "gather_edit", "Selected route exposes gathering draft hit target")
 	view._pointer_press(more, "mouse")
+	test.check(route.desired_workers == 5, "Opening gathering draft does not spend labor")
+	view._run_command("gather_more")
+	view._run_command("gather_commit")
 	test.check(route.allocated_workers == 6 and ledger.count("trail:route_1") == 6, "OUTWARD adjustment uses semantic allocation command")
 	view._status = root.outward_status("home")
 	view._pointer_press(view._trail_button_rect("trail_cancel").get_center(), "touch")
 	test.check(route.status == "recalling" and route.desired_workers == 0 and ledger.count("trail:route_1") == route.active_workers, "OUTWARD cancellation waits for travelling labor")
 	view._status = root.outward_status("home")
 	view._pointer_press(view._trail_button_rect("trail_create").get_center(), "mouse")
+	view._run_command("gather_commit")
 	test.check(route.status == "active" and route.allocated_workers == 5, "OUTWARD investment reopens preserved route")
 	view.free()
 	root.free()

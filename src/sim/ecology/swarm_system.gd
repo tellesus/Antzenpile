@@ -17,6 +17,8 @@ func _init(run_state: RunState, loss_command: Callable) -> void:
 
 func consider(cohort: TransitCohort, route: TrailRouteState) -> void:
 	var state: SwarmState = _run.swarm
+	# A routed foraging remnant is not a new attacking force.
+	if not state.active() and _run.rival.workers.count("rival:trail") <= CONFIG.rival_retreat_count: return
 	if cohort.worker_count <= 0 or not cohort.reports_source_outcome or route.desired_workers == 0 or _run.rival.workers.count("rival:trail") <= 0:
 		return
 	if state.active() and state.route_id != route.id:
@@ -24,15 +26,14 @@ func consider(cohort: TransitCohort, route: TrailRouteState) -> void:
 	if not state.active() and (route.foreign_reports < CONFIG.reports_to_escalate or _run.rival.pheromone < 0.1 or (state.last_finish_tick >= 0 and _run.clock.tick_count - state.last_finish_tick < CONFIG.cooldown_ticks)):
 		return
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
-	var intersection: Variant = Geometry2D.segment_intersects_segment(segment.start, segment.end, RIVAL.pile_position, _run.world.nodes[RIVAL.food_id].position)
-	if intersection == null:
-		return
-	var leg: int = TRAILS.leg_ticks(segment.start.distance_to(segment.end))
+	var leg: int = TRAILS.leg_ticks(segment.length())
 	var t: float = 1.0 - float(cohort.remaining_ticks) / leg
 	if cohort.direction == "inbound":
 		t = 1.0 - t
-	if segment.start.lerp(segment.end, t).distance_to(intersection) > RIVAL.contact_radius:
-		return
+	var intersection: Variant = null
+	for crossing: Vector2 in segment.intersections(RIVAL.pile_position, _run.world.nodes[RIVAL.food_id].position):
+		if segment.point_at(t).distance_to(crossing) <= RIVAL.contact_radius: intersection = crossing; break
+	if intersection == null: return
 	if not state.active():
 		if state.serial >= WorkerLedger.MAX_COUNT:
 			return
@@ -42,13 +43,17 @@ func consider(cohort: TransitCohort, route: TrailRouteState) -> void:
 		state.phase = "forming"
 		state.rival_engaged = false
 		state.round_ticks = 0
+		state.rounds = 0; state.pressure_reports_sent = 1
 		state.formation_ticks = TRAILS.leg_ticks(RIVAL.pile_position.distance_to(_run.world.nodes[RIVAL.food_id].position)) * 2 + 1
 		if not _messenger(cohort, route):
+			# The whole group returns when it cannot detach a courier/hold a front.
+			_finish("withdrew")
+			cohort.conflict_report = "withdrew"
 			return
 	cohort.swarm_engaged = true
 
 
-func _messenger(cohort: TransitCohort, route: TrailRouteState) -> bool:
+func _messenger(cohort: TransitCohort, route: TrailRouteState, report: String = "contested") -> bool:
 	var state: SwarmState = _run.swarm
 	var segment: TrailSegmentState = _run.trails.segments[route.segment_id]
 	var count: int = 0
@@ -58,35 +63,45 @@ func _messenger(cohort: TransitCohort, route: TrailRouteState) -> bool:
 	if cohort.worker_count < 2 or count >= TRAILS.max_cohorts_per_route or _run.trails.next_cohort_id >= WorkerLedger.MAX_COUNT:
 		# At capacity, the whole arriving group reports instead of creating a ninth batch.
 		cohort.direction = "inbound"
-		cohort.remaining_ticks = TRAILS.leg_ticks(segment.start.distance_to(state.position))
+		cohort.remaining_ticks = TRAILS.leg_ticks(segment.distance_from_start(state.position))
 		cohort.reports_source_outcome = false
-		cohort.conflict_report = "contested"
+		cohort.conflict_report = report
 		cohort.conflict_observed_at = _run.simulation_time
+		cohort.conflict_serial = state.serial
 		return false
 	var messenger := Cohort.new()
 	messenger.id = "cohort_%d" % _run.trails.next_cohort_id
 	messenger.route_id = route.id
 	messenger.worker_count = 1
 	messenger.direction = "inbound"
-	messenger.remaining_ticks = TRAILS.leg_ticks(segment.start.distance_to(state.position))
+	messenger.remaining_ticks = TRAILS.leg_ticks(segment.distance_from_start(state.position))
 	messenger.energy_multiplier = cohort.energy_multiplier
 	messenger.carry_multiplier = cohort.carry_multiplier
 	messenger.chemistry_fraction = cohort.chemistry_fraction
 	messenger.unpaid_energy_cost = roundf(cohort.unpaid_energy_cost / (cohort.worker_count + cohort.lost_workers) * 100000.0) / 100000.0
 	cohort.unpaid_energy_cost = roundf((cohort.unpaid_energy_cost - messenger.unpaid_energy_cost) * 100000.0) / 100000.0
-	messenger.payload = minf(cohort.payload, TRAILS.carry_per_worker * cohort.carry_multiplier)
+	messenger.payload = minf(cohort.payload, TRAILS.carry_per_worker * cohort.carry_multiplier/cohort.cargo_bulk)
+	if not cohort.cargo_yields.is_empty(): messenger.payload=float(String.num(messenger.payload,5))
+	messenger.contaminant_mass = cohort.contaminant_mass * messenger.payload / cohort.payload if cohort.payload > 0.0 else 0.0
+	cohort.contaminant_mass -= messenger.contaminant_mass
 	cohort.payload -= messenger.payload
+	if not cohort.cargo_yields.is_empty(): cohort.payload=float(String.num(cohort.payload,5))
 	messenger.resource_id = cohort.resource_id if messenger.payload > 0.0 else ""
+	if messenger.payload>0:
+		messenger.cargo_source_type=cohort.cargo_source_type;messenger.cargo_bulk=cohort.cargo_bulk;messenger.cargo_yields=cohort.cargo_yields.duplicate()
+		messenger.harvest_report=cohort.harvest_report;cohort.harvest_report=null
 	if cohort.payload == 0.0:
-		cohort.resource_id = ""
+		cohort.clear_cargo()
 	messenger.predator_encountered = cohort.predator_encountered
 	messenger.foreign_contact = cohort.foreign_contact
 	messenger.foreign_sampled = true
 	cohort.foreign_contact = false
 	cohort.foreign_sampled = true
 	messenger.reports_source_outcome = false
-	messenger.conflict_report = "contested"
+	messenger.conflict_report = report
 	messenger.conflict_observed_at = _run.simulation_time
+	messenger.combat_multiplier = cohort.combat_multiplier
+	messenger.conflict_serial = state.serial
 	cohort.worker_count -= 1
 	_run.trails.cohorts[messenger.id] = messenger
 	_run.trails.next_cohort_id += 1
@@ -106,6 +121,7 @@ func tick() -> void:
 	for cohort: TransitCohort in participants:
 		player_count += cohort.worker_count
 	var rival_count: int = maxi(0, _run.rival.workers.count("rival:trail"))
+	if _run.rival.reinforcement.phase == "engaged": rival_count += maxi(0,_run.rival.workers.count("rival:reinforcement"))
 	if not state.rival_engaged:
 		var food: Vector2 = _run.world.nodes[RIVAL.food_id].position
 		var leg: int = TRAILS.leg_ticks(RIVAL.pile_position.distance_to(food))
@@ -122,6 +138,7 @@ func tick() -> void:
 		elif state.formation_ticks == 0:
 			_finish("dispersed")
 		return
+	_counter_recruit(player_count, rival_count)
 	if rival_count <= CONFIG.rival_retreat_count:
 		_finish("secured")
 		return
@@ -131,11 +148,16 @@ func tick() -> void:
 	state.round_ticks -= 1
 	if state.round_ticks > 0:
 		return
-	if _run.rng.randf() < float(player_count) / (player_count + rival_count):
-		var removed: bool = _run.rival.workers.remove_living_workers("rival:trail", 1, "Junction conflict")
+	state.rounds += 1
+	var power: float = 0.0
+	for cohort: TransitCohort in participants: power += cohort.worker_count * cohort.combat_multiplier
+	if _run.rng.randf() < power / (power + rival_count):
+		var regulars: int = maxi(0,_run.rival.workers.count("rival:trail"))
+		var commitment: String = "rival:trail" if regulars == rival_count or _run.rng.randi_range(0,rival_count-1) < regulars else "rival:reinforcement"
+		var removed: bool = _run.rival.workers.remove_living_workers(commitment, 1, "Junction conflict")
 		assert(removed)
 		state.rival_losses += 1
-		_run.rival.cargo = minf(_run.rival.cargo, (rival_count - 1) * TRAILS.carry_per_worker)
+		_run.rival.cargo = minf(_run.rival.cargo, maxi(0,_run.rival.workers.count("rival:trail")) * TRAILS.carry_per_worker)
 	else:
 		var selected: int = _run.rng.randi_range(0, player_count - 1)
 		for cohort: TransitCohort in participants:
@@ -149,10 +171,35 @@ func tick() -> void:
 	var survivors: int = 0
 	for cohort: TransitCohort in _participants():
 		survivors += cohort.worker_count
-	if _run.rival.workers.count("rival:trail") <= CONFIG.rival_retreat_count:
+	var enemies: int = maxi(0,_run.rival.workers.count("rival:trail")) + (maxi(0,_run.rival.workers.count("rival:reinforcement")) if _run.rival.reinforcement.phase == "engaged" else 0)
+	if enemies <= CONFIG.rival_retreat_count:
 		_finish("secured")
-	elif survivors == 0 or float(survivors) / maxi(1, _run.rival.workers.count("rival:trail")) < CONFIG.retreat_ratio:
+	elif survivors == 0 or float(survivors) / maxi(1, enemies) < CONFIG.retreat_ratio:
 		_finish("withdrew")
+	elif state.rounds % CONFIG.pressure_every_rounds == 2 and state.pressure_reports_sent < CONFIG.max_pressure_reports:
+		var report: String = "reinforced" if _run.rival.reinforcement.phase == "engaged" else "holding" if survivors >= enemies else "resisted"
+		var cohorts: Array[TransitCohort] = _participants()
+		var route_cohorts: int = 0
+		for cohort: TransitCohort in _run.trails.cohorts.values():
+			if cohort.route_id == route.id: route_cohorts += 1
+		if cohorts[0].worker_count >= 2 and route_cohorts < TRAILS.max_cohorts_per_route:
+			_messenger(cohorts[0],route,report)
+			state.pressure_reports_sent += 1
+
+func _counter_recruit(player_count: int, rival_count: int) -> void:
+	var rival: RivalState = _run.rival
+	var group: RivalReinforcementState = rival.reinforcement
+	var state: SwarmState = _run.swarm
+	if group.phase != "idle" or group.swarm_serial == state.serial or group.mobilizations >= CONFIG.max_rival_mobilizations or rival.workers.available < CONFIG.rival_reinforcement_workers: return
+	if player_count <= rival_count and rival.workers.count("rival:trail") >= RIVAL.trail_workers - 1: return
+	var length: float = RIVAL.pile_position.distance_to(state.position)
+	var cost: float = TRAILS.round_trip_energy_cost(CONFIG.rival_reinforcement_workers,length,TrailSegmentState.terrain_cost_for(_run.world,RIVAL.pile_position,state.position))
+	if rival.stored_carbohydrate < cost: return
+	var allocated: bool = rival.workers.create_commitment("rival:reinforcement","other","rival_swarm") and rival.workers.allocate("rival:reinforcement",CONFIG.rival_reinforcement_workers)
+	assert(allocated)
+	rival.stored_carbohydrate = roundf((rival.stored_carbohydrate-cost)*100000.0)/100000.0
+	group.phase = "outbound"; group.travel_ticks = TRAILS.leg_ticks(length); group.remaining_ticks = group.travel_ticks
+	group.mobilizations += 1; group.swarm_serial = state.serial
 
 
 func _participants() -> Array[TransitCohort]:
@@ -172,13 +219,18 @@ func _finish(outcome: String) -> void:
 			if cohort.worker_count > 0:
 				cohort.conflict_report = outcome
 				cohort.conflict_observed_at = _run.simulation_time
+				cohort.conflict_serial = state.serial
 				if outcome == "withdrew":
 					var segment: TrailSegmentState = _run.trails.segments[_run.trails.routes[cohort.route_id].segment_id]
 					cohort.direction = "inbound"
-					cohort.remaining_ticks = TRAILS.leg_ticks(segment.start.distance_to(state.position))
+					cohort.remaining_ticks = TRAILS.leg_ticks(segment.distance_from_start(state.position))
 					cohort.reports_source_outcome = false
 	state.phase = "finished"
 	state.round_ticks = 0
 	state.formation_ticks = 0
 	state.rival_engaged = false
 	state.last_finish_tick = _run.clock.tick_count
+	var group: RivalReinforcementState = _run.rival.reinforcement
+	if group.phase in ["outbound", "engaged"]:
+		group.remaining_ticks = maxi(1,group.travel_ticks-group.remaining_ticks) if group.phase == "outbound" else group.travel_ticks
+		group.phase = "inbound"

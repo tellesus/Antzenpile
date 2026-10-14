@@ -1,0 +1,4 @@
+# Raw finish PNGs are packed losslessly in colony_material_finished.blend.
+# Keep one canonical editable source rather than committing duplicate pixels.
+*_finish.png
+*.blend1

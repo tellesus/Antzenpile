@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/trait_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+benefit = "Up to twice the combat contribution"
+carbohydrate = 16
+family = "combat"
+id = "fighter"
+larval_food_multiplier = 1.4
+protein = 20
+title = "Strong Mandibles"
+tradeoff = "Inheriting larvae need 40% more food"
+water = 8

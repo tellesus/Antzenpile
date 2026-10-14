@@ -1,0 +1,63 @@
+{
+  "license": "CC0-1.0",
+  "upstream_tree": "dfcf4a4918771eee884b96ad4493de82ef84daf6",
+  "source": "https://github.com/sgossner/VCSL/tree/sfz",
+  "samples": [
+    {
+      "file": "bass_drum.wav",
+      "source_path": "Membranophones/Struck Membranophones/Bass Drum 1/BDrumNew_hit_v2_rr1_Sum.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Membranophones/Struck%20Membranophones/Bass%20Drum%201/BDrumNew_hit_v2_rr1_Sum.wav",
+      "git_blob": "90e36064984ad741962e2f033e286bc16758b46c",
+      "sha256": "56827fe9b55f282a0db851e242bc24660d339a0e358b182966aea047240c1136",
+      "bytes": 281616
+    },
+    {
+      "file": "harp_c4.wav",
+      "source_path": "Chordophones/Composite Chordophones/Folk Harp/EWHarp_Normal_C4_v2_RR1.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Composite%20Chordophones/Folk%20Harp/EWHarp_Normal_C4_v2_RR1.wav",
+      "git_blob": "7118eaa188436970e23b28019b5b6e7fe6a1b5ef",
+      "sha256": "79774644727f61bd535e4b49f7eae0c31b0cac4d2714d33d8f6cd84e5db081d3",
+      "bytes": 775134
+    },
+    {
+      "file": "marimba_c4.wav",
+      "source_path": "Idiophones/Struck Idiophones/Marimba/Marimba_hit_Outrigger_C4_soft_01.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Idiophones/Struck%20Idiophones/Marimba/Marimba_hit_Outrigger_C4_soft_01.wav",
+      "git_blob": "6ccd29800db58963dd91136ea426b895d703bb22",
+      "sha256": "4d03d005166e8b366e6a983b7a4a89e0847e1d58a6d34dda35ddf74289cace94",
+      "bytes": 915446
+    },
+    {
+      "file": "timpani.wav",
+      "source_path": "Membranophones/Struck Membranophones/Timpani 2/Hit/Timpani7B_hit_v2_rr1_main.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Membranophones/Struck%20Membranophones/Timpani%202/Hit/Timpani7B_hit_v2_rr1_main.wav",
+      "git_blob": "c96da823b3a5b6bb780768f46205c4cea7f4312b",
+      "sha256": "0a5d272eef46caecfb496b803a7cd574edf0b5a9e91b9c5006581c21e54591f3",
+      "bytes": 1186706
+    },
+    {
+      "file": "frame_drum.wav",
+      "source_path": "Membranophones/Struck Membranophones/Frame Drum/HDrumL_HitMuted_v2_rr1_Sum.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Membranophones/Struck%20Membranophones/Frame%20Drum/HDrumL_HitMuted_v2_rr1_Sum.wav",
+      "git_blob": "401c1638c3e7bf730a275575c64cc1e0658a3e17",
+      "sha256": "fb08d2a29537fb6da0852ad8318709b8cbc312633237ca969e6e8f95ab5ca075",
+      "bytes": 305388
+    },
+    {
+      "file": "woodblock.wav",
+      "source_path": "Idiophones/Struck Idiophones/Woodblock/wood_click2_mp.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Idiophones/Struck%20Idiophones/Woodblock/wood_click2_mp.wav",
+      "git_blob": "f9c0fae178baa8d10863e8b3fcca8d27297d92e6",
+      "sha256": "cfb04b07ceb70b6056ab1849cbbba53f658b4453982a6f44b4a05e19676361dd",
+      "bytes": 370954
+    },
+    {
+      "file": "shaker.wav",
+      "source_path": "Idiophones/Struck Idiophones/Shaker, Large/LShaker_Hit_rr1_Mid.wav",
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Idiophones/Struck%20Idiophones/Shaker%2C%20Large/LShaker_Hit_rr1_Mid.wav",
+      "git_blob": "f0ffc827c86a8a3d2566e0cb9a8b30eccb0aa04f",
+      "sha256": "0d3d62742a6c01ec8b8812faee945eaa2e75bfe02f83df3cc622ba7f00213ddf",
+      "bytes": 230676
+    }
+  ]
+}

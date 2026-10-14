@@ -1,0 +1,140 @@
+{
+	"engine": "4.7.2-stable (official)",
+	"failures": 0,
+	"platform": "Windows",
+	"policy": "Ordinary card099 returned-gathering/preventive sanitation setup through 3500s, split into zero/one/four shared climate workers. Turn climate off before front; assign selected effort at observed warm Nursery, retain ordinary gathering/cleanup/guest responses. Existing rain stays active. No injected stores, temperature or paid jobs. Midfront command/save continuation checked.",
+	"rows": [
+		{
+			"cooling_water": 0.0,
+			"final": {
+				"carers": 0,
+				"emerged": 32,
+				"known_sources": 7,
+				"nursery": "developed",
+				"thermal": {
+					"condition": "steady",
+					"larval_rate": 1.0
+				},
+				"water": 91.68406,
+				"workers": 66
+			},
+			"hot_seconds": 279.0,
+			"response_at": 3705.0,
+			"response_workers": 0,
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"warm_seconds": 219.75
+		},
+		{
+			"cooling_water": 1.60313,
+			"final": {
+				"carers": 1,
+				"emerged": 32,
+				"known_sources": 7,
+				"nursery": "developed",
+				"thermal": {
+					"condition": "steady",
+					"larval_rate": 1.0
+				},
+				"water": 85.87968,
+				"workers": 66
+			},
+			"hot_seconds": 0.0,
+			"response_at": 3705.0,
+			"response_workers": 1,
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"warm_seconds": 14.75
+		},
+		{
+			"cooling_water": 1.60565,
+			"final": {
+				"carers": 4,
+				"emerged": 32,
+				"known_sources": 7,
+				"nursery": "developed",
+				"thermal": {
+					"condition": "steady",
+					"larval_rate": 1.0
+				},
+				"water": 85.87716,
+				"workers": 66
+			},
+			"hot_seconds": 0.0,
+			"response_at": 3705.0,
+			"response_workers": 4,
+			"save_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"warm_seconds": 5.75
+		},
+		{
+			"cooling_water": 0.0,
+			"final": {
+				"carers": 0,
+				"emerged": 32,
+				"known_sources": 7,
+				"nursery": "developed",
+				"thermal": {
+					"condition": "steady",
+					"larval_rate": 1.0
+				},
+				"water": 122.95156,
+				"workers": 64
+			},
+			"hot_seconds": 282.0,
+			"response_at": 3705.0,
+			"response_workers": 0,
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"warm_seconds": 219.75
+		},
+		{
+			"cooling_water": 1.60313,
+			"final": {
+				"carers": 1,
+				"emerged": 32,
+				"known_sources": 7,
+				"nursery": "developed",
+				"thermal": {
+					"condition": "steady",
+					"larval_rate": 1.0
+				},
+				"water": 117.14718,
+				"workers": 64
+			},
+			"hot_seconds": 0.0,
+			"response_at": 3705.0,
+			"response_workers": 1,
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"warm_seconds": 14.75
+		},
+		{
+			"cooling_water": 1.60565,
+			"final": {
+				"carers": 4,
+				"emerged": 32,
+				"known_sources": 7,
+				"nursery": "developed",
+				"thermal": {
+					"condition": "steady",
+					"larval_rate": 1.0
+				},
+				"water": 117.14466,
+				"workers": 64
+			},
+			"hot_seconds": 0.0,
+			"response_at": 3705.0,
+			"response_workers": 4,
+			"save_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"warm_seconds": 5.75
+		}
+	]
+}

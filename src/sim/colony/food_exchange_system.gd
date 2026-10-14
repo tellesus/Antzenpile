@@ -18,7 +18,7 @@ func start(pile_id: String) -> bool:
 	var pile: PileState = _run.colony.piles[pile_id]
 	if pile.food_exchange_state != "primitive":
 		return _reject("Food Exchange is already developing or complete")
-	if pile.workers_available < CONFIG.workers_required:
+	if pile.workers_assignable < CONFIG.workers_required:
 		return _reject("Four available workers required")
 	var costs: Dictionary = CONFIG.costs()
 	for resource_id: String in costs:
@@ -27,7 +27,7 @@ func start(pile_id: String) -> bool:
 	var commitment: String = "food_exchange:" + pile_id
 	if not pile.workers.create_commitment(commitment, "internal", pile_id):
 		return _reject("Food Exchange labor unavailable")
-	if not pile.workers.allocate(commitment, CONFIG.workers_required):
+	if not pile.allocate_workers(commitment, CONFIG.workers_required):
 		pile.workers.retire_commitment(commitment)
 		return _reject("Could not reserve workers")
 	if not pile.consume_resources(costs):

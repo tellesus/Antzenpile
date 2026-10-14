@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SiteDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/world/site_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+id = ""
+display_name = "Possible shelter"
+cues = "Occupants and safety unknown"
+tradeoff = "Ordinary preparation and local care"
+heat_exposure = 1
+moisture_offset = 0
+preparation_ticks = 480
+extra_carbohydrate = 0

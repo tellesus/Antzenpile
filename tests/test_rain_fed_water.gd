@@ -22,6 +22,7 @@ func run(test: Object) -> bool:
 	if not game.dispatch_scout("home", PI) or not _until(game, func() -> bool: return game.run.knowledge.nodes.has("known:carb_sheltered"), 220.0):
 		test.check(false, "Sheltered carbohydrate report arrives")
 		return true
+	test.check(game.set_trail_workers(carb_route.id, 13) and _until(game, func() -> bool: return game.run.colony.piles.home.workers_assignable >= 5, 100), "Rain fixture recalls two workers to retain existing brood care before adding another route")
 	test.check(game.create_trail("home", "known:carb_sheltered"), "Sheltered route can establish the first rain trigger")
 	test.check(_until(game, func() -> bool: return game.run.rain.phase == "raining", 100.0), "Ordinary sheltered and exposed traffic begins rain")
 	test.check(is_equal_approx(source.quantity, 0.1) and water_route.status == "depleted" and game.run.knowledge.temporal_hint("known:water_01").last_return_empty, "First rain tick refills physical water without refreshing memory or route")

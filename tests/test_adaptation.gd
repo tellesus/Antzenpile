@@ -141,7 +141,7 @@ func _test_ui(test: Object) -> void:
 	test.get_root().add_child(ui)
 	ui.selected_id = "adaptation"
 	ui._status = root.inward_status("home")
-	ui.adaptation_command = root.start_adaptation
+	ui.adaptation_command = root.queue_adaptation
 	test.check(not ui._status.has("world") and not ui._status.has("position") and ui._adaptation_rect("lean").size == Vector2(260, 44) and ui._adaptation_rect("load").size == Vector2(260, 44), "Adaptation UI receives detached colony facts and touch-sized choices")
 	var touch := InputEventScreenTouch.new()
 	touch.pressed = true
@@ -150,7 +150,8 @@ func _test_ui(test: Object) -> void:
 	test.check(ui.web_selection == "load" and pile.trial_cohort() == null, "Touch selects Load without purchasing brood")
 	touch.position = ui._adaptation_rect("load").get_center()
 	ui._unhandled_input(touch)
-	test.check(pile.trial_cohort() != null and pile.trial_cohort().adaptation_id == "load" and ui._feedback == "Adaptation brood started", "Touch choice starts a semantic trial without direct UI mutation")
+	test.check(pile.trial_cohort() == null and pile.queued_adaptation == "load" and ui._feedback.contains("changeable until laid"), "Touch choice queues a semantic trial without immediate laying")
+	root.simulation.advance(0.25)
 	ui._status = root.inward_status("home")
 	var before: Dictionary = root.simulation.run.to_dict()
 	test.check(not ui.activate_at(ui._adaptation_rect("lean").get_center()) and root.simulation.run.to_dict() == before, "Active trial hides further choice actions")

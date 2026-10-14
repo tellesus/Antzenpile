@@ -1,0 +1,1154 @@
+[
+  {
+    "original": "README.md",
+    "archived": "docs/archive/pre_1_0/overview/README.md",
+    "category": "overview",
+    "original_blob": "c6d06287ebb80af5e43efe7e3f777eebea6ace62"
+  },
+  {
+    "original": "docs/ARCHITECTURE.md",
+    "archived": "docs/archive/pre_1_0/contracts/ARCHITECTURE.md",
+    "category": "contracts",
+    "original_blob": "f2c7c0185c5c334c24e9f40457e8c57f342e28df"
+  },
+  {
+    "original": "docs/BALANCE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/BALANCE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "e263fa1a29749365e233b9402ff209ff1c728685"
+  },
+  {
+    "original": "docs/BROOD_HEALTH_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/BROOD_HEALTH_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "b9c699cddcd4ca29255dc169e7861437b32dd100"
+  },
+  {
+    "original": "docs/COMBAT_CONFLICT_REVIEW.md",
+    "archived": "docs/archive/pre_1_0/reviews/COMBAT_CONFLICT_REVIEW.md",
+    "category": "reviews",
+    "original_blob": "97eb88dd5043386343087441d582080f037c79bf"
+  },
+  {
+    "original": "docs/COMBAT_COUNTERPLAY_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/COMBAT_COUNTERPLAY_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "cb71e31982e3d3f396ac102589c4aa0e10679ded"
+  },
+  {
+    "original": "docs/CONTAMINATED_FOOD_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/CONTAMINATED_FOOD_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "f50299526d799a52eb9b1999c22ef7b574f7156e"
+  },
+  {
+    "original": "docs/DATA_MODEL.md",
+    "archived": "docs/archive/pre_1_0/contracts/DATA_MODEL.md",
+    "category": "contracts",
+    "original_blob": "137efc6621b6e030d6b5fd5e0875e3bcbd389953"
+  },
+  {
+    "original": "docs/DAUGHTER_DEFENSE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DAUGHTER_DEFENSE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "00d4a83c6511e6759daeddf30dd0713f0ed44f95"
+  },
+  {
+    "original": "docs/DAUGHTER_EXPLORATION_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DAUGHTER_EXPLORATION_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "d076ef9e66a2be7bc9a24eebb6f0947c9f679477"
+  },
+  {
+    "original": "docs/DAUGHTER_GATHERING_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DAUGHTER_GATHERING_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "709615e44a270ffd95953849d44eafed6548e53d"
+  },
+  {
+    "original": "docs/DAUGHTER_INDEPENDENCE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DAUGHTER_INDEPENDENCE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "b347883bbc3c4a3ed684b4ce802d5bee643df594"
+  },
+  {
+    "original": "docs/DAUGHTER_JOURNEY_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DAUGHTER_JOURNEY_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "390c07492110777b949d39a418c8788e0e4ccec4"
+  },
+  {
+    "original": "docs/DAUGHTER_OUTWARD_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DAUGHTER_OUTWARD_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "2172b96c6d169f7d7d9695518bd850a6a53e8d73"
+  },
+  {
+    "original": "docs/DAUGHTER_PILE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DAUGHTER_PILE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "d164e071cc4d33bbd083abd8a67f711c62622c6b"
+  },
+  {
+    "original": "docs/DAUGHTER_SCOUT_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DAUGHTER_SCOUT_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "75d4ea185e549102d80534cf968a0efeca57f1bc"
+  },
+  {
+    "original": "docs/DECISIONS.md",
+    "archived": "docs/archive/pre_1_0/contracts/DECISIONS.md",
+    "category": "contracts",
+    "original_blob": "64731d39b743663819125528869d465a8d89cbe1"
+  },
+  {
+    "original": "docs/DESKTOP_RELEASE_PATH.md",
+    "archived": "docs/archive/pre_1_0/plans/DESKTOP_RELEASE_PATH.md",
+    "category": "plans",
+    "original_blob": "8c4c6200ebf0509852f630363656a8e6f5515de2"
+  },
+  {
+    "original": "docs/DISTURBANCE_FIGHTING_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/DISTURBANCE_FIGHTING_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "a77913652c23d9c8763abf8965a66a0c24b3dbb9"
+  },
+  {
+    "original": "docs/ECOLOGY_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/ECOLOGY_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "5826dd4d6b39e354fa51c4683612cc659d2792b5"
+  },
+  {
+    "original": "docs/EXPANDED_COLONY_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/EXPANDED_COLONY_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "63e1b708e2444363e7421d947bed7fea7baecc02"
+  },
+  {
+    "original": "docs/EXPLORATION_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/EXPLORATION_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "74623cd8b8f0d37a0f6d9367cfd0d50816b00e03"
+  },
+  {
+    "original": "docs/FOUNDING_CAMP_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/FOUNDING_CAMP_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "82ab48cdf1b024ac36ae60953ee75d0ca493fc7c"
+  },
+  {
+    "original": "docs/GAMEPLAY_REVIEW_2026_10_04.md",
+    "archived": "docs/archive/pre_1_0/reviews/GAMEPLAY_REVIEW_2026_10_04.md",
+    "category": "reviews",
+    "original_blob": "f01b8cfc865afe663db96fe0babec8cffe0b81de"
+  },
+  {
+    "original": "docs/GARDEN_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/GARDEN_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "a89aab58421308b7c36774a8307563e429da45dd"
+  },
+  {
+    "original": "docs/GRAPHICS_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/GRAPHICS_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "87ac2da25531d204ece1611306fe2d813ab9198f"
+  },
+  {
+    "original": "docs/GRAPHICS_PASS_NOTES.md",
+    "archived": "docs/archive/pre_1_0/reviews/GRAPHICS_PASS_NOTES.md",
+    "category": "reviews",
+    "original_blob": "8251e1e2307af92d9e94a1372f48785bc5f409b0"
+  },
+  {
+    "original": "docs/HOT_DRY_ECOLOGY_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/HOT_DRY_ECOLOGY_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "36de6e5f3083578489c930302fb13b1de80229fa"
+  },
+  {
+    "original": "docs/HUMIDITY_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/HUMIDITY_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "8d044215ee005430adfe96505a355d06e9dc694a"
+  },
+  {
+    "original": "docs/INTERFACE_REVIEW_PLAN.md",
+    "archived": "docs/archive/pre_1_0/plans/INTERFACE_REVIEW_PLAN.md",
+    "category": "plans",
+    "original_blob": "6683bdf89b601b2abed3c60df66633dc10b01ca2"
+  },
+  {
+    "original": "docs/JOURNEY_DEFENSE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/JOURNEY_DEFENSE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "f7bbe3f8f748f5c12933c94d978e4bc5b6fbb189"
+  },
+  {
+    "original": "docs/MUSIC_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/MUSIC_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "11cf2b00fb19f109e94a16fb6fbfcc40d1571021"
+  },
+  {
+    "original": "docs/NEST_SITE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/NEST_SITE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "68b43f01bd36ff0c98a8a3abfd5a3c3b82cec713"
+  },
+  {
+    "original": "docs/NURSERY_EXPANSION_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/NURSERY_EXPANSION_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "774bad62b891aaa80ea61b517f29d8efad10b86f"
+  },
+  {
+    "original": "docs/NURSERY_HEAT_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/NURSERY_HEAT_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "49342d2626247eafeac26d5a80b805c8f454d35a"
+  },
+  {
+    "original": "docs/PARENT_SUPPLY_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/PARENT_SUPPLY_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "2028ae66acce5cf595f22c0ddfb4bf2b926e1038"
+  },
+  {
+    "original": "docs/POST_SLICE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/POST_SLICE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "5ce288db6c8c72cc4e483b7399a44febbfbc4e0e"
+  },
+  {
+    "original": "docs/POST_SLICE_PLAN.md",
+    "archived": "docs/archive/pre_1_0/plans/POST_SLICE_PLAN.md",
+    "category": "plans",
+    "original_blob": "2963e375a44a9416fef7c1447812630b167ed52d"
+  },
+  {
+    "original": "docs/REINFORCED_DAUGHTER_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/REINFORCED_DAUGHTER_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "53865ac863fe76def9bb37fd9800c081e6f7199e"
+  },
+  {
+    "original": "docs/REPRODUCTIVE_INVESTMENT_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/REPRODUCTIVE_INVESTMENT_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "6eb9593f2926df5d9f71340c8204b8d2cd6c5c38"
+  },
+  {
+    "original": "docs/SANITATION_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/SANITATION_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "04e54b8529542386217e7db5035da5ef40948881"
+  },
+  {
+    "original": "docs/SCOUT_CAUTION_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/SCOUT_CAUTION_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "36818f812597ef7a249d490ef9f5f0a9d8f467af"
+  },
+  {
+    "original": "docs/SCOUT_SURVIVAL_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/SCOUT_SURVIVAL_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "54653140e0fd6df3f4076b4512069312a8ee3143"
+  },
+  {
+    "original": "docs/SLICE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/SLICE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "6f04ef7850daa969bc49d88338601d415c67664d"
+  },
+  {
+    "original": "docs/SOURCE_CHOICE_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/SOURCE_CHOICE_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "76c69309d8f8349cccc65379e29c3bc2e2bb0b77"
+  },
+  {
+    "original": "docs/STANDING_BROOD_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/STANDING_BROOD_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "7a6454112019159c7a27adaec56e6c867fb50e90"
+  },
+  {
+    "original": "docs/SUPPORTED_DAUGHTER_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/SUPPORTED_DAUGHTER_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "110ddc5d5c1871e7b10865736e5e5cc03df73389"
+  },
+  {
+    "original": "docs/TEXTURED_ART_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/TEXTURED_ART_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "40fffa420a2d640ce4a6f471b3ba5ecdd1ad22ca"
+  },
+  {
+    "original": "docs/THREAT_MANAGEMENT_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/THREAT_MANAGEMENT_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "5c5d6f828efcd6b4e1e6d26046b34129b6a5cbbc"
+  },
+  {
+    "original": "docs/UI_RULES.md",
+    "archived": "docs/archive/pre_1_0/contracts/UI_RULES.md",
+    "category": "contracts",
+    "original_blob": "08e51c788ef3c6d544d137cdeae7aa2b2ec899fb"
+  },
+  {
+    "original": "docs/VERTICAL_SLICE.md",
+    "archived": "docs/archive/pre_1_0/plans/VERTICAL_SLICE.md",
+    "category": "plans",
+    "original_blob": "8971959e3df0faf89d13e4537778fd7de5c287a5"
+  },
+  {
+    "original": "docs/VISION.md",
+    "archived": "docs/archive/pre_1_0/plans/VISION.md",
+    "category": "plans",
+    "original_blob": "16461069d3441b381b320f4a681b201c5b3fa6e6"
+  },
+  {
+    "original": "docs/WORKER_REINFORCEMENT_EVALUATION.md",
+    "archived": "docs/archive/pre_1_0/reviews/WORKER_REINFORCEMENT_EVALUATION.md",
+    "category": "reviews",
+    "original_blob": "90d5791cab24191d44835d18788248399ef40588"
+  },
+  {
+    "original": "docs/art/WEB_CHAT_ASSET_BRIEF.md",
+    "archived": "docs/archive/pre_1_0/art/WEB_CHAT_ASSET_BRIEF.md",
+    "category": "art",
+    "original_blob": "55033db5b4481bccd6651b762f7da124c84144c9"
+  },
+  {
+    "original": "docs/art/WEB_CHAT_START_PROMPT.md",
+    "archived": "docs/archive/pre_1_0/art/WEB_CHAT_START_PROMPT.md",
+    "category": "art",
+    "original_blob": "4427dd38d880413952c3cc1612226e41f684e7b4"
+  },
+  {
+    "original": "docs/tasks/001_project_bootstrap.md",
+    "archived": "docs/archive/pre_1_0/tasks/001_project_bootstrap.md",
+    "category": "tasks",
+    "original_blob": "9acdd38e3c154ac37055232bdffc658845d35ca1"
+  },
+  {
+    "original": "docs/tasks/002_simulation_clock.md",
+    "archived": "docs/archive/pre_1_0/tasks/002_simulation_clock.md",
+    "category": "tasks",
+    "original_blob": "9d6114001700631170fa39eb7215b93eff7c8fa5"
+  },
+  {
+    "original": "docs/tasks/003_seeded_run_state.md",
+    "archived": "docs/archive/pre_1_0/tasks/003_seeded_run_state.md",
+    "category": "tasks",
+    "original_blob": "3f1b57b6e1f2db2ef07d9c5aeec1df0580e4bb8b"
+  },
+  {
+    "original": "docs/tasks/004_hidden_world.md",
+    "archived": "docs/archive/pre_1_0/tasks/004_hidden_world.md",
+    "category": "tasks",
+    "original_blob": "f952c27473cc38aca44e6c05d9d102d3bb548433"
+  },
+  {
+    "original": "docs/tasks/005_home_pile_worker_ledger.md",
+    "archived": "docs/archive/pre_1_0/tasks/005_home_pile_worker_ledger.md",
+    "category": "tasks",
+    "original_blob": "f3a8085fe9ad84a7ea8d0db18ff4f9184f8dd11d"
+  },
+  {
+    "original": "docs/tasks/006_debug_world_view.md",
+    "archived": "docs/archive/pre_1_0/tasks/006_debug_world_view.md",
+    "category": "tasks",
+    "original_blob": "f58ce70b7c30c1da19d7277bd02742bb4c6dceae"
+  },
+  {
+    "original": "docs/tasks/007_scout_mission_agent.md",
+    "archived": "docs/archive/pre_1_0/tasks/007_scout_mission_agent.md",
+    "category": "tasks",
+    "original_blob": "4fe3c457703cbcb98f604088e45be254b9916fea"
+  },
+  {
+    "original": "docs/tasks/008_scout_discovery_observations.md",
+    "archived": "docs/archive/pre_1_0/tasks/008_scout_discovery_observations.md",
+    "category": "tasks",
+    "original_blob": "3726c034b442990a6b6a13bed852e3024e19d9fd"
+  },
+  {
+    "original": "docs/tasks/009_knowledge_base_known_nodes.md",
+    "archived": "docs/archive/pre_1_0/tasks/009_knowledge_base_known_nodes.md",
+    "category": "tasks",
+    "original_blob": "ac81839608ace0afb6084eacf7f73386af3a6143"
+  },
+  {
+    "original": "docs/tasks/010_perceived_signals.md",
+    "archived": "docs/archive/pre_1_0/tasks/010_perceived_signals.md",
+    "category": "tasks",
+    "original_blob": "a8eee465c1a0f064c5038b60d9285e4969c6a9e9"
+  },
+  {
+    "original": "docs/tasks/011_outward_prototype.md",
+    "archived": "docs/archive/pre_1_0/tasks/011_outward_prototype.md",
+    "category": "tasks",
+    "original_blob": "19525bc2960cbe6b90b8a7072f2e96b1be1d3559"
+  },
+  {
+    "original": "docs/tasks/012_trail_creation_worker_allocation.md",
+    "archived": "docs/archive/pre_1_0/tasks/012_trail_creation_worker_allocation.md",
+    "category": "tasks",
+    "original_blob": "0397e785b778c618dd1d20715ebf9f349d9ac1e0"
+  },
+  {
+    "original": "docs/tasks/013_transit_cohorts_resource_delivery.md",
+    "archived": "docs/archive/pre_1_0/tasks/013_transit_cohorts_resource_delivery.md",
+    "category": "tasks",
+    "original_blob": "99f041fc642665d8d22d2fb6e37acb3ba9182912"
+  },
+  {
+    "original": "docs/tasks/014_pheromone_reinforcement_decay.md",
+    "archived": "docs/archive/pre_1_0/tasks/014_pheromone_reinforcement_decay.md",
+    "category": "tasks",
+    "original_blob": "d1694dc09f721822f078c5704198d5cda88cd779"
+  },
+  {
+    "original": "docs/tasks/015_route_familiarity.md",
+    "archived": "docs/archive/pre_1_0/tasks/015_route_familiarity.md",
+    "category": "tasks",
+    "original_blob": "361d62f611d22a9ade0b026dd327e4d4be5e9cb7"
+  },
+  {
+    "original": "docs/tasks/016_brood_worker_growth.md",
+    "archived": "docs/archive/pre_1_0/tasks/016_brood_worker_growth.md",
+    "category": "tasks",
+    "original_blob": "f6d54be57539751241bca22339ac221a9a22eea9"
+  },
+  {
+    "original": "docs/tasks/017_inward_prototype.md",
+    "archived": "docs/archive/pre_1_0/tasks/017_inward_prototype.md",
+    "category": "tasks",
+    "original_blob": "cc96298dfd99d74c6440d32989635da42fdc9e0a"
+  },
+  {
+    "original": "docs/tasks/018_food_exchange_development.md",
+    "archived": "docs/archive/pre_1_0/tasks/018_food_exchange_development.md",
+    "category": "tasks",
+    "original_blob": "832230de8fb865862f7f4913b5b9cce9c00d839c"
+  },
+  {
+    "original": "docs/tasks/019_music_stem_state.md",
+    "archived": "docs/archive/pre_1_0/tasks/019_music_stem_state.md",
+    "category": "tasks",
+    "original_blob": "2c92dbeb25784e28ed6a6e029cb9fb4892b02ed8"
+  },
+  {
+    "original": "docs/tasks/020_rain.md",
+    "archived": "docs/archive/pre_1_0/tasks/020_rain.md",
+    "category": "tasks",
+    "original_blob": "dec7fb83bbe458a680e35c24ca85d02bca7d9e2c"
+  },
+  {
+    "original": "docs/tasks/021_save_load.md",
+    "archived": "docs/archive/pre_1_0/tasks/021_save_load.md",
+    "category": "tasks",
+    "original_blob": "1a86935296b5493e30a4ab25d50d96e641df95f8"
+  },
+  {
+    "original": "docs/tasks/022_vertical_slice_integration.md",
+    "archived": "docs/archive/pre_1_0/tasks/022_vertical_slice_integration.md",
+    "category": "tasks",
+    "original_blob": "c0998d6bf6286b635eb6dde61d4b788e49b9532a"
+  },
+  {
+    "original": "docs/tasks/023_persistent_scout_search.md",
+    "archived": "docs/archive/pre_1_0/tasks/023_persistent_scout_search.md",
+    "category": "tasks",
+    "original_blob": "a3ad57e6560cea31ba0e281075e1312d921635d9"
+  },
+  {
+    "original": "docs/tasks/024_rain_water_collection.md",
+    "archived": "docs/archive/pre_1_0/tasks/024_rain_water_collection.md",
+    "category": "tasks",
+    "original_blob": "498d8d8c0af5524601c6f8e6e4ff6a73e3144c75"
+  },
+  {
+    "original": "docs/tasks/025_repeat_brood_cycle.md",
+    "archived": "docs/archive/pre_1_0/tasks/025_repeat_brood_cycle.md",
+    "category": "tasks",
+    "original_blob": "458bca0d4fabba823ced841123a3ca618f8f8ee9"
+  },
+  {
+    "original": "docs/tasks/026_extended_colony_integration.md",
+    "archived": "docs/archive/pre_1_0/tasks/026_extended_colony_integration.md",
+    "category": "tasks",
+    "original_blob": "0879fa78115b6aa947b425d59168501b40edc169"
+  },
+  {
+    "original": "docs/tasks/027_periodic_resource_ecology.md",
+    "archived": "docs/archive/pre_1_0/tasks/027_periodic_resource_ecology.md",
+    "category": "tasks",
+    "original_blob": "621064c0cd94fb55b60b242d754fdd4664e180e4"
+  },
+  {
+    "original": "docs/tasks/028_recheck_depleted_trail.md",
+    "archived": "docs/archive/pre_1_0/tasks/028_recheck_depleted_trail.md",
+    "category": "tasks",
+    "original_blob": "6e5d5c9769b998d16ba7d6f36ff246b90189fe87"
+  },
+  {
+    "original": "docs/tasks/029_route_energy_demand.md",
+    "archived": "docs/archive/pre_1_0/tasks/029_route_energy_demand.md",
+    "category": "tasks",
+    "original_blob": "992a6ce17f96d318fd169d61025af864102dd92c"
+  },
+  {
+    "original": "docs/tasks/030_nursery_capacity_and_care.md",
+    "archived": "docs/archive/pre_1_0/tasks/030_nursery_capacity_and_care.md",
+    "category": "tasks",
+    "original_blob": "f9907dce088362c901674909cb8abb0333256ca7"
+  },
+  {
+    "original": "docs/tasks/031_nursery_development.md",
+    "archived": "docs/archive/pre_1_0/tasks/031_nursery_development.md",
+    "category": "tasks",
+    "original_blob": "aea55c340867f682a5b756bf5b953dd5426520c8"
+  },
+  {
+    "original": "docs/tasks/032_episodic_exterior_resource.md",
+    "archived": "docs/archive/pre_1_0/tasks/032_episodic_exterior_resource.md",
+    "category": "tasks",
+    "original_blob": "90c6b7ee87712c36cc60ddb19b1f64ef35a10976"
+  },
+  {
+    "original": "docs/tasks/033_evidence_of_recurrence.md",
+    "archived": "docs/archive/pre_1_0/tasks/033_evidence_of_recurrence.md",
+    "category": "tasks",
+    "original_blob": "8d8340c76c10b14947ebb323876b142c433450c1"
+  },
+  {
+    "original": "docs/tasks/034_storage_throughput_decision.md",
+    "archived": "docs/archive/pre_1_0/tasks/034_storage_throughput_decision.md",
+    "category": "tasks",
+    "original_blob": "7c3f67a8bfb90c445d618c94f1e8c93abb701f17"
+  },
+  {
+    "original": "docs/tasks/035_recurring_environmental_pressure.md",
+    "archived": "docs/archive/pre_1_0/tasks/035_recurring_environmental_pressure.md",
+    "category": "tasks",
+    "original_blob": "1a3b7a2ef0967fbe6ed2f3bf43447ae58daf5a30"
+  },
+  {
+    "original": "docs/tasks/036_systems_integration_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/036_systems_integration_review.md",
+    "category": "tasks",
+    "original_blob": "1ec73dfca526f7edc7d3143622ba1781f79168db"
+  },
+  {
+    "original": "docs/tasks/037_scout_capacity_and_source_signals.md",
+    "archived": "docs/archive/pre_1_0/tasks/037_scout_capacity_and_source_signals.md",
+    "category": "tasks",
+    "original_blob": "fa03bbf1d41addf09eaa05d54911f8eeb718334e"
+  },
+  {
+    "original": "docs/tasks/038_trail_side_discovery.md",
+    "archived": "docs/archive/pre_1_0/tasks/038_trail_side_discovery.md",
+    "category": "tasks",
+    "original_blob": "42d582921936f1dc504167db5b933c05964f95af"
+  },
+  {
+    "original": "docs/tasks/039_first_adaptation_choice.md",
+    "archived": "docs/archive/pre_1_0/tasks/039_first_adaptation_choice.md",
+    "category": "tasks",
+    "original_blob": "4ebce7a2effffad0593eda5ea96e9fdcd917e30b"
+  },
+  {
+    "original": "docs/tasks/040_inward_stock_and_adaptation_clarity.md",
+    "archived": "docs/archive/pre_1_0/tasks/040_inward_stock_and_adaptation_clarity.md",
+    "category": "tasks",
+    "original_blob": "441f8f4cad17a01b8b7035faa38657abd58b5dd5"
+  },
+  {
+    "original": "docs/tasks/041_source_recovery_audit.md",
+    "archived": "docs/archive/pre_1_0/tasks/041_source_recovery_audit.md",
+    "category": "tasks",
+    "original_blob": "94db0be27e6613867febc411e4c106afeb8821a3"
+  },
+  {
+    "original": "docs/tasks/042_rain_fed_water_source.md",
+    "archived": "docs/archive/pre_1_0/tasks/042_rain_fed_water_source.md",
+    "category": "tasks",
+    "original_blob": "0df32ce054f4e219181413d1e52176b60f49bf69"
+  },
+  {
+    "original": "docs/tasks/043_honeydew_mutualism_simulation.md",
+    "archived": "docs/archive/pre_1_0/tasks/043_honeydew_mutualism_simulation.md",
+    "category": "tasks",
+    "original_blob": "70d480a92dad9e1d318d944ceb938bdacbef6657"
+  },
+  {
+    "original": "docs/tasks/044_honeydew_mutualism_controls.md",
+    "archived": "docs/archive/pre_1_0/tasks/044_honeydew_mutualism_controls.md",
+    "category": "tasks",
+    "original_blob": "b354461e360f2e4d4a0f21008ad2dd20f1fc6064"
+  },
+  {
+    "original": "docs/tasks/045_worker_mortality_accounting.md",
+    "archived": "docs/archive/pre_1_0/tasks/045_worker_mortality_accounting.md",
+    "category": "tasks",
+    "original_blob": "6099ab074a4a5fb814d2342dd2c93701d1687fa4"
+  },
+  {
+    "original": "docs/tasks/046_first_predator_interaction.md",
+    "archived": "docs/archive/pre_1_0/tasks/046_first_predator_interaction.md",
+    "category": "tasks",
+    "original_blob": "28af7dd4f13569aa6dd36946e3dbede0f354d7f2"
+  },
+  {
+    "original": "docs/tasks/047_early_visual_quality_proof.md",
+    "archived": "docs/archive/pre_1_0/tasks/047_early_visual_quality_proof.md",
+    "category": "tasks",
+    "original_blob": "e61ba579403bf9abb3912185ea202a7585320d9b"
+  },
+  {
+    "original": "docs/tasks/048_rival_network_contact.md",
+    "archived": "docs/archive/pre_1_0/tasks/048_rival_network_contact.md",
+    "category": "tasks",
+    "original_blob": "64217d6b0fe7ae18318018a3b4c63a21b74abc94"
+  },
+  {
+    "original": "docs/tasks/049_first_rival_swarm.md",
+    "archived": "docs/archive/pre_1_0/tasks/049_first_rival_swarm.md",
+    "category": "tasks",
+    "original_blob": "bfcb1b3443d957ab342bd4a8b1662abbc2dd2554"
+  },
+  {
+    "original": "docs/tasks/050_deceptive_nest_guest.md",
+    "archived": "docs/archive/pre_1_0/tasks/050_deceptive_nest_guest.md",
+    "category": "tasks",
+    "original_blob": "7e7bfe427e2324778cd0031721c6f0c00cefb494"
+  },
+  {
+    "original": "docs/tasks/051_combined_ecology_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/051_combined_ecology_review.md",
+    "category": "tasks",
+    "original_blob": "58dfc3a6c3517c6a0335f242e880cd9795387832"
+  },
+  {
+    "original": "docs/tasks/052_observed_adaptation_web.md",
+    "archived": "docs/archive/pre_1_0/tasks/052_observed_adaptation_web.md",
+    "category": "tasks",
+    "original_blob": "c4f6479620b13c5b2fbbd2c0548849f39e25099b"
+  },
+  {
+    "original": "docs/tasks/053_adaptation_selection_clarity.md",
+    "archived": "docs/archive/pre_1_0/tasks/053_adaptation_selection_clarity.md",
+    "category": "tasks",
+    "original_blob": "913170d8551bc3869673213d0bacf3576f0d02c2"
+  },
+  {
+    "original": "docs/tasks/054_scout_departure_memory.md",
+    "archived": "docs/archive/pre_1_0/tasks/054_scout_departure_memory.md",
+    "category": "tasks",
+    "original_blob": "27286042ff84e48a95086834b47cab475cb0b87a"
+  },
+  {
+    "original": "docs/tasks/055_returned_loss_evidence.md",
+    "archived": "docs/archive/pre_1_0/tasks/055_returned_loss_evidence.md",
+    "category": "tasks",
+    "original_blob": "016633c8716d6fffdc0c2cb9f85148c2dabca1b6"
+  },
+  {
+    "original": "docs/tasks/056_genetic_repertoire_foundation.md",
+    "archived": "docs/archive/pre_1_0/tasks/056_genetic_repertoire_foundation.md",
+    "category": "tasks",
+    "original_blob": "bcfb5eac65733620bacb94ae797e3f71760e204c"
+  },
+  {
+    "original": "docs/tasks/057_pressure_revealed_trail_chemistry.md",
+    "archived": "docs/archive/pre_1_0/tasks/057_pressure_revealed_trail_chemistry.md",
+    "category": "tasks",
+    "original_blob": "fb2f08e9f1cc27a03dc624008721574b63d339fc"
+  },
+  {
+    "original": "docs/tasks/058_recognition_security_tolerance.md",
+    "archived": "docs/archive/pre_1_0/tasks/058_recognition_security_tolerance.md",
+    "category": "tasks",
+    "original_blob": "22fbb98f3cbc2dcbefae2c78ed9db5c560343afe"
+  },
+  {
+    "original": "docs/tasks/059_balance_gameplay_pass.md",
+    "archived": "docs/archive/pre_1_0/tasks/059_balance_gameplay_pass.md",
+    "category": "tasks",
+    "original_blob": "6e48e7242b3247df417eded467f1bd90799d35c0"
+  },
+  {
+    "original": "docs/tasks/060_standing_exploration.md",
+    "archived": "docs/archive/pre_1_0/tasks/060_standing_exploration.md",
+    "category": "tasks",
+    "original_blob": "a9a6be2c193139d690ab44eba0c242902bef8896"
+  },
+  {
+    "original": "docs/tasks/061_collective_search.md",
+    "archived": "docs/archive/pre_1_0/tasks/061_collective_search.md",
+    "category": "tasks",
+    "original_blob": "a025c7fd8c3031e178646bb2e0cc3f78d95e4c7d"
+  },
+  {
+    "original": "docs/tasks/062_trail_supported_exploration.md",
+    "archived": "docs/archive/pre_1_0/tasks/062_trail_supported_exploration.md",
+    "category": "tasks",
+    "original_blob": "f449b8309c1caf815e63707da20bc5e9dde09cf7"
+  },
+  {
+    "original": "docs/tasks/063_source_recovery_controls.md",
+    "archived": "docs/archive/pre_1_0/tasks/063_source_recovery_controls.md",
+    "category": "tasks",
+    "original_blob": "189b75671b0f81dead6f25c609925dd92a95ef02"
+  },
+  {
+    "original": "docs/tasks/064_midden_sanitation.md",
+    "archived": "docs/archive/pre_1_0/tasks/064_midden_sanitation.md",
+    "category": "tasks",
+    "original_blob": "6d29ad5160830b9f17335acad06109914d0caedf"
+  },
+  {
+    "original": "docs/tasks/065_remembered_sources.md",
+    "archived": "docs/archive/pre_1_0/tasks/065_remembered_sources.md",
+    "category": "tasks",
+    "original_blob": "52c26ee7a43bacf7f7f151029e6cd16ad460ce16"
+  },
+  {
+    "original": "docs/tasks/066_nursery_humidity_care.md",
+    "archived": "docs/archive/pre_1_0/tasks/066_nursery_humidity_care.md",
+    "category": "tasks",
+    "original_blob": "8764f8e6e8493a6d2106236c33b9788b5a9b0086"
+  },
+  {
+    "original": "docs/tasks/067_internal_activity_attention.md",
+    "archived": "docs/archive/pre_1_0/tasks/067_internal_activity_attention.md",
+    "category": "tasks",
+    "original_blob": "42955e6085eb3258a1f9c2a77816a2318d82db05"
+  },
+  {
+    "original": "docs/tasks/068_functional_chamber_music.md",
+    "archived": "docs/archive/pre_1_0/tasks/068_functional_chamber_music.md",
+    "category": "tasks",
+    "original_blob": "bf1e831d4a7d491b5fe9c567d3557eb0351c3a0f"
+  },
+  {
+    "original": "docs/tasks/069_audio_preferences.md",
+    "archived": "docs/archive/pre_1_0/tasks/069_audio_preferences.md",
+    "category": "tasks",
+    "original_blob": "80efa33ca86b351fa17901e4c83059c3fe84554e"
+  },
+  {
+    "original": "docs/tasks/070_new_colony_controls.md",
+    "archived": "docs/archive/pre_1_0/tasks/070_new_colony_controls.md",
+    "category": "tasks",
+    "original_blob": "4a6a87928b0ff0f204f63bc9d1494f4b95429c44"
+  },
+  {
+    "original": "docs/tasks/071_garden_edge_scenario.md",
+    "archived": "docs/archive/pre_1_0/tasks/071_garden_edge_scenario.md",
+    "category": "tasks",
+    "original_blob": "3e0acce23a7d2724da9c7b9b35dc06d2696289e1"
+  },
+  {
+    "original": "docs/tasks/072_returned_discovery_notice.md",
+    "archived": "docs/archive/pre_1_0/tasks/072_returned_discovery_notice.md",
+    "category": "tasks",
+    "original_blob": "ae4d742aec942b17a994d9de5b7fdb3863cce043"
+  },
+  {
+    "original": "docs/tasks/073_optional_colony_guide.md",
+    "archived": "docs/archive/pre_1_0/tasks/073_optional_colony_guide.md",
+    "category": "tasks",
+    "original_blob": "323d1057a9c948a0b57227b6c03eb7fc87e76735"
+  },
+  {
+    "original": "docs/tasks/074_functional_state_art.md",
+    "archived": "docs/archive/pre_1_0/tasks/074_functional_state_art.md",
+    "category": "tasks",
+    "original_blob": "4de08a1128e2c8a3adb74f69bda36cdd585b61f4"
+  },
+  {
+    "original": "docs/tasks/075_expanded_colony_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/075_expanded_colony_review.md",
+    "category": "tasks",
+    "original_blob": "f223b9ab7ca9bb335738cb5ccc5acb3a63bce404"
+  },
+  {
+    "original": "docs/tasks/076_known_pressure_attention.md",
+    "archived": "docs/archive/pre_1_0/tasks/076_known_pressure_attention.md",
+    "category": "tasks",
+    "original_blob": "129d1ed1414b574e739e59f91f8f12e33773bda3"
+  },
+  {
+    "original": "docs/tasks/077_nursery_expansion.md",
+    "archived": "docs/archive/pre_1_0/tasks/077_nursery_expansion.md",
+    "category": "tasks",
+    "original_blob": "7d05e7d5a372c5038f590f0e5029176ac7eac677"
+  },
+  {
+    "original": "docs/tasks/078_local_nutrition_clarity.md",
+    "archived": "docs/archive/pre_1_0/tasks/078_local_nutrition_clarity.md",
+    "category": "tasks",
+    "original_blob": "84208a307907919e87f3894fb930803aecc34c53"
+  },
+  {
+    "original": "docs/tasks/079_standing_brood_intent.md",
+    "archived": "docs/archive/pre_1_0/tasks/079_standing_brood_intent.md",
+    "category": "tasks",
+    "original_blob": "91129c60ba17dbabffee63c7253651ab3ea85db3"
+  },
+  {
+    "original": "docs/tasks/080_contaminated_food.md",
+    "archived": "docs/archive/pre_1_0/tasks/080_contaminated_food.md",
+    "category": "tasks",
+    "original_blob": "f7f5ac4439df44c901127a4b99e571c68498f211"
+  },
+  {
+    "original": "docs/tasks/081_returned_supply_evidence.md",
+    "archived": "docs/archive/pre_1_0/tasks/081_returned_supply_evidence.md",
+    "category": "tasks",
+    "original_blob": "01f1aaa69b290483f2e9bc3118154b645c645769"
+  },
+  {
+    "original": "docs/tasks/082_sensory_caption_spacing.md",
+    "archived": "docs/archive/pre_1_0/tasks/082_sensory_caption_spacing.md",
+    "category": "tasks",
+    "original_blob": "de8ada2ef1e24d9049630a7c3a3be16de7fee7b9"
+  },
+  {
+    "original": "docs/tasks/083_journey_investigation.md",
+    "archived": "docs/archive/pre_1_0/tasks/083_journey_investigation.md",
+    "category": "tasks",
+    "original_blob": "55fb9d15ebf95b8b4cfdb7f17a51158209a8ae00"
+  },
+  {
+    "original": "docs/tasks/084_ambusher_defensive_swarm.md",
+    "archived": "docs/archive/pre_1_0/tasks/084_ambusher_defensive_swarm.md",
+    "category": "tasks",
+    "original_blob": "eca9f56d1c1dde60be9ca41f3db293d4e7951e33"
+  },
+  {
+    "original": "docs/tasks/085_interface_actions_and_input.md",
+    "archived": "docs/archive/pre_1_0/tasks/085_interface_actions_and_input.md",
+    "category": "tasks",
+    "original_blob": "4005dd5fa26779e82038ef6aabb3dad4c6fad294"
+  },
+  {
+    "original": "docs/tasks/086_interface_guidance_and_history.md",
+    "archived": "docs/archive/pre_1_0/tasks/086_interface_guidance_and_history.md",
+    "category": "tasks",
+    "original_blob": "220800262078523aab4d9ef35b2a5a9d706d521c"
+  },
+  {
+    "original": "docs/tasks/087_interface_readability_and_navigation.md",
+    "archived": "docs/archive/pre_1_0/tasks/087_interface_readability_and_navigation.md",
+    "category": "tasks",
+    "original_blob": "85d93da82653ce5045aceb1c84209e5e337eea2b"
+  },
+  {
+    "original": "docs/tasks/088_release_graphics_proof.md",
+    "archived": "docs/archive/pre_1_0/tasks/088_release_graphics_proof.md",
+    "category": "tasks",
+    "original_blob": "a20f3c415fc437edeae04560012fa12c9f0dc41c"
+  },
+  {
+    "original": "docs/tasks/089_textured_colony_art.md",
+    "archived": "docs/archive/pre_1_0/tasks/089_textured_colony_art.md",
+    "category": "tasks",
+    "original_blob": "75d20dc7c682e0f82a35277604978c75fc6869c2"
+  },
+  {
+    "original": "docs/tasks/090_web_chat_art_handoff.md",
+    "archived": "docs/archive/pre_1_0/tasks/090_web_chat_art_handoff.md",
+    "category": "tasks",
+    "original_blob": "0f3d1f8bbd43c075ca676f2f99f6ed73cbef20ad"
+  },
+  {
+    "original": "docs/tasks/091_returned_art_integration.md",
+    "archived": "docs/archive/pre_1_0/tasks/091_returned_art_integration.md",
+    "category": "tasks",
+    "original_blob": "7a58d8709b68cdf34a28d62af993c5a6cb25c89f"
+  },
+  {
+    "original": "docs/tasks/092_warm_layered_music.md",
+    "archived": "docs/archive/pre_1_0/tasks/092_warm_layered_music.md",
+    "category": "tasks",
+    "original_blob": "204aa5e7821a36cd19abdb6a246160a8be916191"
+  },
+  {
+    "original": "docs/tasks/093_soften_repeating_percussion.md",
+    "archived": "docs/archive/pre_1_0/tasks/093_soften_repeating_percussion.md",
+    "category": "tasks",
+    "original_blob": "edd3e419754bff0d63c72baec9d9f8dc20e783f9"
+  },
+  {
+    "original": "docs/tasks/094_queued_adaptation_choice.md",
+    "archived": "docs/archive/pre_1_0/tasks/094_queued_adaptation_choice.md",
+    "category": "tasks",
+    "original_blob": "de96c729b3c89c29a06e55c604f67ee9f4ab8ae0"
+  },
+  {
+    "original": "docs/tasks/095_layered_colony_material.md",
+    "archived": "docs/archive/pre_1_0/tasks/095_layered_colony_material.md",
+    "category": "tasks",
+    "original_blob": "c60b7c76b470c675d7405f3e1bc20f98bf6f7990"
+  },
+  {
+    "original": "docs/tasks/096_outward_material_and_smoke.md",
+    "archived": "docs/archive/pre_1_0/tasks/096_outward_material_and_smoke.md",
+    "category": "tasks",
+    "original_blob": "3a2a4d559c285eb92031d79af4c5f1fbf0779c94"
+  },
+  {
+    "original": "docs/tasks/097_scout_survivability.md",
+    "archived": "docs/archive/pre_1_0/tasks/097_scout_survivability.md",
+    "category": "tasks",
+    "original_blob": "1058ebecc2caff0c5173ddbc2f7667a39ed308a5"
+  },
+  {
+    "original": "docs/tasks/098_learned_scout_caution.md",
+    "archived": "docs/archive/pre_1_0/tasks/098_learned_scout_caution.md",
+    "category": "tasks",
+    "original_blob": "a2639cf6116e74b352f726b3d255e552fa11e9e2"
+  },
+  {
+    "original": "docs/tasks/099_local_brood_health.md",
+    "archived": "docs/archive/pre_1_0/tasks/099_local_brood_health.md",
+    "category": "tasks",
+    "original_blob": "67f1d91c1bad47330c3d9406240a8cfd04e7c8d4"
+  },
+  {
+    "original": "docs/tasks/100_nursery_heat.md",
+    "archived": "docs/archive/pre_1_0/tasks/100_nursery_heat.md",
+    "category": "tasks",
+    "original_blob": "1a88c88165f0d2a40074a71b069f8b55be9eb348"
+  },
+  {
+    "original": "docs/tasks/101_hot_dry_ecology.md",
+    "archived": "docs/archive/pre_1_0/tasks/101_hot_dry_ecology.md",
+    "category": "tasks",
+    "original_blob": "4b950bb5834f743a770c9b5f917f7fd487ce79fd"
+  },
+  {
+    "original": "docs/tasks/102_returned_nest_sites.md",
+    "archived": "docs/archive/pre_1_0/tasks/102_returned_nest_sites.md",
+    "category": "tasks",
+    "original_blob": "d4be2f72172fdee79a8b6a8e4b1273d87838ada1"
+  },
+  {
+    "original": "docs/tasks/103_reproductive_investment.md",
+    "archived": "docs/archive/pre_1_0/tasks/103_reproductive_investment.md",
+    "category": "tasks",
+    "original_blob": "b8d057ca84a25376ec84e5c8409558bf07a53d96"
+  },
+  {
+    "original": "docs/tasks/104_physical_founding_camp.md",
+    "archived": "docs/archive/pre_1_0/tasks/104_physical_founding_camp.md",
+    "category": "tasks",
+    "original_blob": "5fa885856faa374cb032178d9d7e74d686c2fa94"
+  },
+  {
+    "original": "docs/tasks/105_first_daughter_pile.md",
+    "archived": "docs/archive/pre_1_0/tasks/105_first_daughter_pile.md",
+    "category": "tasks",
+    "original_blob": "e8d98e9d0f8105d57a3f69c6a6ef1d43afb0e675"
+  },
+  {
+    "original": "docs/tasks/106_parent_supply_transport.md",
+    "archived": "docs/archive/pre_1_0/tasks/106_parent_supply_transport.md",
+    "category": "tasks",
+    "original_blob": "f1ed2ba89d5a998498e69e75a266d4682357cc75"
+  },
+  {
+    "original": "docs/tasks/107_supported_daughter_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/107_supported_daughter_review.md",
+    "category": "tasks",
+    "original_blob": "ac897a9a11e83eb179bc62481d4d150ee843145c"
+  },
+  {
+    "original": "docs/tasks/108_daughter_resource_gathering.md",
+    "archived": "docs/archive/pre_1_0/tasks/108_daughter_resource_gathering.md",
+    "category": "tasks",
+    "original_blob": "15392c4ba543b7b8de54e8a2eeeaf6c45f9555fe"
+  },
+  {
+    "original": "docs/tasks/109_daughter_scout_rechecks.md",
+    "archived": "docs/archive/pre_1_0/tasks/109_daughter_scout_rechecks.md",
+    "category": "tasks",
+    "original_blob": "dbcf62b089c4e97301df0a79b71966aa2e42a94c"
+  },
+  {
+    "original": "docs/tasks/110_daughter_outward_attention.md",
+    "archived": "docs/archive/pre_1_0/tasks/110_daughter_outward_attention.md",
+    "category": "tasks",
+    "original_blob": "4183911b3f2971f0508515fc4c4f05deaf1bf5cc"
+  },
+  {
+    "original": "docs/tasks/111_daughter_standing_exploration.md",
+    "archived": "docs/archive/pre_1_0/tasks/111_daughter_standing_exploration.md",
+    "category": "tasks",
+    "original_blob": "01be9cbcd1ff0588044c5c67834406b89371c435"
+  },
+  {
+    "original": "docs/tasks/112_daughter_journey_surveys.md",
+    "archived": "docs/archive/pre_1_0/tasks/112_daughter_journey_surveys.md",
+    "category": "tasks",
+    "original_blob": "29fb1adbca5f43d16a27d5343ef6dd7f15a90497"
+  },
+  {
+    "original": "docs/tasks/113_daughter_defensive_response.md",
+    "archived": "docs/archive/pre_1_0/tasks/113_daughter_defensive_response.md",
+    "category": "tasks",
+    "original_blob": "28508d912a79c6b58dc27dfd82878c6ea0b24951"
+  },
+  {
+    "original": "docs/tasks/114_daughter_independence_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/114_daughter_independence_review.md",
+    "category": "tasks",
+    "original_blob": "2710b3f93a5c9584b08422b92c4d5f2e766f7a8a"
+  },
+  {
+    "original": "docs/tasks/115_daughter_worker_reinforcement.md",
+    "archived": "docs/archive/pre_1_0/tasks/115_daughter_worker_reinforcement.md",
+    "category": "tasks",
+    "original_blob": "3a9d166dc02fbc4ea6a7b4e3df1fd602c9efcbe5"
+  },
+  {
+    "original": "docs/tasks/116_reinforced_daughter_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/116_reinforced_daughter_review.md",
+    "category": "tasks",
+    "original_blob": "ebf87e71ff08dc2f97340418b03a6383c6b4e06c"
+  },
+  {
+    "original": "docs/tasks/117_colony_network_guidance.md",
+    "archived": "docs/archive/pre_1_0/tasks/117_colony_network_guidance.md",
+    "category": "tasks",
+    "original_blob": "13d0e6b1e3821ea9a53f0cf22f893821f339aca4"
+  },
+  {
+    "original": "docs/tasks/118_combat_conflict_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/118_combat_conflict_review.md",
+    "category": "tasks",
+    "original_blob": "bccbd6fb4ab95749052e144a2b9503b9bc61e4b8"
+  },
+  {
+    "original": "docs/tasks/119_conflict_counterplay_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/119_conflict_counterplay_review.md",
+    "category": "tasks",
+    "original_blob": "3d8f9cb7f84c5bae8f0a6a71cd2a5e875e8e395b"
+  },
+  {
+    "original": "docs/tasks/120_nursery_harm_response.md",
+    "archived": "docs/archive/pre_1_0/tasks/120_nursery_harm_response.md",
+    "category": "tasks",
+    "original_blob": "ad80841a918ac982f3c982f144cc18e8354838bd"
+  },
+  {
+    "original": "docs/tasks/121_returned_defensive_pressure.md",
+    "archived": "docs/archive/pre_1_0/tasks/121_returned_defensive_pressure.md",
+    "category": "tasks",
+    "original_blob": "822e00ac08a9199b02c31e6fd9b59cf03d4b0a1d"
+  },
+  {
+    "original": "docs/tasks/122_rival_counterplay.md",
+    "archived": "docs/archive/pre_1_0/tasks/122_rival_counterplay.md",
+    "category": "tasks",
+    "original_blob": "29a4106c334c2fda9a32ca97163ba45aca67285b"
+  },
+  {
+    "original": "docs/tasks/123_conflict_settlement_recovery.md",
+    "archived": "docs/archive/pre_1_0/tasks/123_conflict_settlement_recovery.md",
+    "category": "tasks",
+    "original_blob": "9dbd3358189dcd10e8abc082bbd37cacd7405279"
+  },
+  {
+    "original": "docs/tasks/124_persistent_conflict_management.md",
+    "archived": "docs/archive/pre_1_0/tasks/124_persistent_conflict_management.md",
+    "category": "tasks",
+    "original_blob": "a0f7316a5c0c1bc53bc4fb2648dcede002bd468d"
+  },
+  {
+    "original": "docs/tasks/125_edible_threat_recovery.md",
+    "archived": "docs/archive/pre_1_0/tasks/125_edible_threat_recovery.md",
+    "category": "tasks",
+    "original_blob": "25ce035d6370639a8758d8d692e782106c54e8e3"
+  },
+  {
+    "original": "docs/tasks/126_investigated_alternate_approaches.md",
+    "archived": "docs/archive/pre_1_0/tasks/126_investigated_alternate_approaches.md",
+    "category": "tasks",
+    "original_blob": "758aeee1676f36a416f74c5b8258b26154a39dd6"
+  },
+  {
+    "original": "docs/tasks/127_honeydew_danger_variety.md",
+    "archived": "docs/archive/pre_1_0/tasks/127_honeydew_danger_variety.md",
+    "category": "tasks",
+    "original_blob": "382ad8d3f4db363fbc036542c0341d05c060a2b4"
+  },
+  {
+    "original": "docs/tasks/128_brood_care_safeguard.md",
+    "archived": "docs/archive/pre_1_0/tasks/128_brood_care_safeguard.md",
+    "category": "tasks",
+    "original_blob": "bb034f7cea949d259ba00bfd1761b4b870459fde"
+  },
+  {
+    "original": "docs/tasks/129_surface_disturbance.md",
+    "archived": "docs/archive/pre_1_0/tasks/129_surface_disturbance.md",
+    "category": "tasks",
+    "original_blob": "c67c0ac53ac7f66730d287724c7d747505a2d2f4"
+  },
+  {
+    "original": "docs/tasks/130_brood_fighting_trait.md",
+    "archived": "docs/archive/pre_1_0/tasks/130_brood_fighting_trait.md",
+    "category": "tasks",
+    "original_blob": "5ae9e92e550b3d042fad68809dbc11fe901174f3"
+  },
+  {
+    "original": "docs/tasks/131_daughter_return_supplies.md",
+    "archived": "docs/archive/pre_1_0/tasks/131_daughter_return_supplies.md",
+    "category": "tasks",
+    "original_blob": "72095cab729b539646e8ec6c36c4844e4710b569"
+  },
+  {
+    "original": "docs/tasks/132_desktop_release_gap_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/132_desktop_release_gap_review.md",
+    "category": "tasks",
+    "original_blob": "7f54b0e98728af88f25ec0be771107b135368410"
+  },
+  {
+    "original": "docs/tasks/133_post_run_history_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/133_post_run_history_review.md",
+    "category": "tasks",
+    "original_blob": "62730f2234377f3e0869891b8a4f00abf7550dbb"
+  },
+  {
+    "original": "docs/tasks/134_gameplay_consultancy_review.md",
+    "archived": "docs/archive/pre_1_0/tasks/134_gameplay_consultancy_review.md",
+    "category": "tasks",
+    "original_blob": "6cdbacd1b26753e6ea856d56aa4da44613997b47"
+  },
+  {
+    "original": "docs/tasks/135_order_and_recovery_clarity.md",
+    "archived": "docs/archive/pre_1_0/tasks/135_order_and_recovery_clarity.md",
+    "category": "tasks",
+    "original_blob": "347c5b4ef12d8c830197fdb843af46b3c22e11d6"
+  },
+  {
+    "original": "docs/tasks/136_direct_conflict_response.md",
+    "archived": "docs/archive/pre_1_0/tasks/136_direct_conflict_response.md",
+    "category": "tasks",
+    "original_blob": "8bfaa1d47a9434d5863d7755f8d200b1bf8ae47b"
+  },
+  {
+    "original": "docs/tasks/137_release_readiness_update.md",
+    "archived": "docs/archive/pre_1_0/tasks/137_release_readiness_update.md",
+    "category": "tasks",
+    "original_blob": "fde893f6b0203e1565b8b10497800e4e40821561"
+  }
+]

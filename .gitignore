@@ -5,3 +5,5 @@ builds/
 exports/
 export_credentials.cfg
 *.tmp
+# CC0 authoring recordings are fetched by pinned checksum, not runtime assets.
+/tools/music/samples/

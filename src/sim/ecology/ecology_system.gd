@@ -21,45 +21,16 @@ func _init(run_state: RunState) -> void:
 
 
 func start_tending(pile_id: String) -> bool:
-	if pile_id != "home" or not _run.colony.piles.has(pile_id) or not _run.world.nodes.has(HONEYDEW.source_id) or _run.honeydew.relationship != "exploited":
-		return _reject("Honeydew producers have not been exploited")
-	var route: TrailRouteState = _run.trails.find_route(pile_id, "known:" + HONEYDEW.source_id)
-	if route == null or route.delivered_total <= 0.0:
-		return _reject("A loaded honeydew return is required")
-	var pile: PileState = _run.colony.piles[pile_id]
-	var share: float = _run.recognition_share(pile_id)
-	var required: int = AdaptationRules.protection_workers(HONEYDEW.protection_workers, share)
-	if pile.workers_available < required:
-		return _reject("Not enough workers to protect the producers")
-	var commitment: String = "honeydew:" + pile_id
-	if not pile.workers.create_commitment(commitment, "other", HONEYDEW.source_id):
-		return _reject("Protection commitment unavailable")
-	if not pile.workers.allocate(commitment, required):
-		assert(pile.workers.retire_commitment(commitment))
-		return _reject("Could not commit protection workers")
-	_run.honeydew.relationship = "tended"
-	_run.honeydew.protection_workers = required
-	_run.honeydew.recognition_share = share
-	pile.recognition_experience = true
-	last_error = ""
-	return true
-
-
+	var service:=ProducerServiceSystem.new(_run)
+	var count: int=AdaptationRules.protection_workers(HONEYDEW.protection_workers,_run.recognition_share(pile_id)) if _run.colony.piles.has(pile_id) else HONEYDEW.protection_workers
+	var accepted: bool=service.set_target(pile_id,count);last_error=service.last_error;return accepted
 func stop_tending(pile_id: String) -> bool:
-	if pile_id != "home" or not _run.colony.piles.has(pile_id) or _run.honeydew.relationship != "tended":
-		return _reject("No tended honeydew relationship")
-	var pile: PileState = _run.colony.piles[pile_id]
-	var commitment: String = "honeydew:" + pile_id
-	assert(pile.workers.release(commitment, _run.honeydew.protection_workers))
-	assert(pile.workers.retire_commitment(commitment))
-	_run.honeydew.relationship = "exploited"
-	_run.honeydew.protection_workers = 0
-	_run.honeydew.recognition_share = 0.0
-	last_error = ""
-	return true
-
+	var service:=ProducerServiceSystem.new(_run);var accepted: bool=service.set_target(pile_id,0);last_error=service.last_error;return accepted
+func set_tending_target(pile_id: String, target: Variant) -> bool:
+	var service:=ProducerServiceSystem.new(_run);var accepted: bool=service.set_target(pile_id,target);last_error=service.last_error;return accepted
 
 func tick(_delta: float) -> void:
+	ProducerServiceSystem.new(_run).tick()
 	var now: int = _run.clock.tick_count
 	if not ScenarioCatalog.uses_backyard_ecology(_run.scenario_id):
 		return
@@ -74,7 +45,8 @@ func _tick_nectar(now: int) -> void:
 	if now < PULSE.first_tick or (now - PULSE.first_tick) % PULSE.interval_ticks != 0:
 		return
 	var node: WorldNodeState = _run.world.nodes[PULSE.source_id]
-	var added: float = minf(PULSE.quantity, maxf(0.0, PULSE.capacity - node.quantity))
+	var multiplier: float = HeatSystem.CONFIG.dry_producer_multiplier if HeatSystem.hot_dry(_run) else 1.0
+	var added: float = minf(PULSE.quantity * multiplier, maxf(0.0, PULSE.capacity - node.quantity))
 	if added <= 0.0:
 		return
 	node.quantity += added
@@ -108,11 +80,14 @@ func _tick_honeydew(now: int) -> void:
 			state.relationship = "exploited"
 	if now <= 0 or now % HONEYDEW.interval_ticks != 0:
 		return
-	var tended: bool = state.relationship == "tended"
-	state.condition = minf(100.0, state.condition + HONEYDEW.protected_gain_per_interval) if tended else maxf(HONEYDEW.minimum_condition, state.condition - HONEYDEW.pressure_loss_per_interval)
+	var effort: float=0.0
+	for party: ProducerServiceState in state.services.values():effort+=party.contribution()
+	effort=minf(2.0,effort)
+	state.condition=clampf(state.condition+HONEYDEW.protected_gain_per_interval*effort-HONEYDEW.pressure_loss_per_interval*(1.0-minf(1.0,effort)),HONEYDEW.minimum_condition,100.0)
 	var node: WorldNodeState = _run.world.nodes[HONEYDEW.source_id]
-	var rate: float = HONEYDEW.tended_output if tended else HONEYDEW.untended_output
-	var produced: float = roundf(rate * state.condition * 1000.0) / 100000.0
+	var rate: float=HONEYDEW.untended_output+(HONEYDEW.tended_output-HONEYDEW.untended_output)*effort
+	var multiplier: float = HeatSystem.CONFIG.dry_producer_multiplier if HeatSystem.hot_dry(_run) else 1.0
+	var produced: float = roundf(rate * state.condition * multiplier * 1000.0) / 100000.0
 	var added: float = minf(produced, maxf(0.0, HONEYDEW.source_capacity - node.quantity))
 	if added <= 0.0:
 		return

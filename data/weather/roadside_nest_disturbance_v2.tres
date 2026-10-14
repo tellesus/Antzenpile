@@ -1,0 +1,5 @@
+[gd_resource type="Resource" script_class="NestDisturbanceDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/weather/nest_disturbance_definition.gd" id="1"]
+[resource]
+script = ExtResource("1")
+warning_tick = 8400

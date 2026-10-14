@@ -59,7 +59,7 @@ func restart_after_load() -> void:
 	nursery_gain = state.nursery_gain
 	midden_gain = state.midden_gain
 	_update_growth_volume()
-	# Both play calls enter the same audio mix frame and retain their own phase.
+	# All play calls enter the same audio mix frame and retain their own phase.
 	if DisplayServer.get_name() != "headless":
 		for player: AudioStreamPlayer in _music_players(): player.play(0.0)
 

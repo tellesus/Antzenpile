@@ -211,7 +211,7 @@ func _test_ui(test: Object) -> void:
 	var view := View.new()
 	test.get_root().add_child(view)
 	view.status_provider = func() -> Dictionary: return root.inward_status("home")
-	view.adaptation_command = root.start_adaptation
+	view.adaptation_command = root.queue_adaptation
 	view._process(0.0)
 	view.selected_id = "adaptation"
 	var before: Dictionary = root.simulation.run.to_dict()
@@ -228,6 +228,8 @@ func _test_ui(test: Object) -> void:
 	view.web_selection = "persistent"
 	test.check(root.simulation.run.to_dict() == before and view._can_choose_adaptation(), "Candidate inspection is free and has one contextual action")
 	test.check(view.activate_at(view._adaptation_rect("persistent").get_center()), "Shared mouse/touch action targets the selected chemistry trait")
+	test.check(root.simulation.run.colony.piles.home.queued_adaptation == "persistent" and root.simulation.run.colony.piles.home.trial_cohort() == null, "Chemistry selection queues without laying immediately")
+	root.simulation.advance(0.25)
 	view._process(0.0)
 	test.check(not view._can_choose_adaptation() and root.simulation.run.colony.piles.home.trial_cohort().adaptation_id == "persistent", "Contextual command starts biology and disables duplicate purchase")
 	view.free()

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SiteDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/world/site_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+id = "root"
+display_name = "Root shelter"
+cues = "Covered opening · damp soil"
+tradeoff = "More preparation; damper wet periods"
+heat_exposure = 0.75
+moisture_offset = 100000
+preparation_ticks = 600
+extra_carbohydrate = 2
+ground_exposure = 0.75

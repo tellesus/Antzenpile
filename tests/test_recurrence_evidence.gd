@@ -47,6 +47,8 @@ func run(test: Object) -> bool:
 	test.check(copy.restore_snapshot(midflight), "Investigation in flight restores")
 	var legacy_agent: Dictionary = midflight.duplicate(true)
 	legacy_agent.scouts[0].erase("investigation_source_id")
+	for memory: Dictionary in legacy_agent.scout_missions:
+		memory.erase("target_knowledge_id") # This departure fact did not exist in the legacy schema.
 	var old_scout := Controller.new()
 	test.check(old_scout.restore_snapshot(legacy_agent) and old_scout.run.scouts.values()[0].investigation_source_id.is_empty(), "Older version-5 scout snapshots default to a frontier mission")
 	test.check(_until(game, func() -> bool: return game.run.scouts.is_empty(), 80.0), "Empty known-source investigation returns home")

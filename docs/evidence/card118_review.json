@@ -1,0 +1,1678 @@
+{
+	"checks": 118,
+	"duplicate_reinforcement_result": {
+		"accepted": false,
+		"reason": "No further reinforcement can be dispatched"
+	},
+	"failures": 0,
+	"guest": [
+		{
+			"action": "prompt",
+			"alarm_count": 0,
+			"cleared_after": 36.25,
+			"duration": 260,
+			"foreign_attention": {},
+			"guest": {
+				"observation": "purged",
+				"rejection_active": false,
+				"reported_losses": 1,
+				"total_reported_losses": 1,
+				"workers_committed": -1,
+				"workers_required": 4
+			},
+			"guest_affects_attention": false,
+			"initial_time": 1260.0,
+			"seed": 5050,
+			"total_encounter_losses": 1,
+			"warning_attention": {
+				"causes": [
+					"CARB"
+				],
+				"organ": "nursery",
+				"title": "CHECK NURSERY"
+			}
+		},
+		{
+			"action": "delayed",
+			"alarm_count": 0,
+			"cleared_after": 102.25,
+			"duration": 260,
+			"foreign_attention": {
+				"causes": [
+					"CARB"
+				],
+				"organ": "nursery",
+				"title": "CHECK NURSERY"
+			},
+			"guest": {
+				"observation": "purged",
+				"rejection_active": false,
+				"reported_losses": 2,
+				"total_reported_losses": 2,
+				"workers_committed": -1,
+				"workers_required": 4
+			},
+			"guest_affects_attention": false,
+			"initial_time": 1260.0,
+			"seed": 5050,
+			"total_encounter_losses": 2,
+			"warning_attention": {
+				"causes": [
+					"CARB"
+				],
+				"organ": "nursery",
+				"title": "CHECK NURSERY"
+			}
+		},
+		{
+			"action": "untreated",
+			"alarm_count": 0,
+			"cleared_after": -1.0,
+			"duration": 260,
+			"foreign_attention": {},
+			"guest": {
+				"observation": "foreign",
+				"rejection_active": false,
+				"reported_losses": 5,
+				"total_reported_losses": 5,
+				"workers_committed": -1,
+				"workers_required": 4
+			},
+			"guest_affects_attention": false,
+			"initial_time": 1260.0,
+			"seed": 5050,
+			"total_encounter_losses": 5,
+			"warning_attention": {
+				"causes": [
+					"CARB"
+				],
+				"organ": "nursery",
+				"title": "CHECK NURSERY"
+			}
+		}
+	],
+	"pending_reinforcement_offered": true,
+	"rival": [
+		{
+			"action": "unchanged",
+			"assigned": 3,
+			"assigned_before_command": 4,
+			"assigned_on_command": 4,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 725.25,
+			"net_cargo": 72.0,
+			"reports": [
+				{
+					"elapsed": 10.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 74.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 85.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 148.5,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 160.25,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 222.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 235.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 297.0,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 309.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 371.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 387.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 447.5,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 7
+				},
+				{
+					"elapsed": 455.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 7
+				},
+				{
+					"elapsed": 520.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 8
+				},
+				{
+					"elapsed": 524.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 8
+				},
+				{
+					"elapsed": 588.5,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 9
+				},
+				{
+					"elapsed": 595.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 9
+				}
+			],
+			"returned_losses": 2,
+			"rival_remaining": 6,
+			"seed": 3048,
+			"summary": [
+				{
+					"active_workers": 3,
+					"allocated_workers": 3,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 1312.0,
+					"conflict_report": "withdrew",
+					"delivered_total": 81.86727,
+					"desired_workers": 5,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 1,
+					"foreign_reports": 72,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 1320.25,
+					"last_loss_time": 736.0,
+					"last_witness_time": 736.0,
+					"missing_workers": 0,
+					"pheromone_strength": 0.5416796751,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.75,
+						"last_amount": 1.0,
+						"last_at": 1307.75
+					},
+					"recovery_ready": true,
+					"reported_losses": 2,
+					"resume_on_report": false,
+					"route_familiarity": 0.5122635471,
+					"status": "active"
+				}
+			],
+			"swarm_serial": 9,
+			"target": 5
+		},
+		{
+			"action": "reinforce",
+			"assigned": 1,
+			"assigned_before_command": 4,
+			"assigned_on_command": 8,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 725.25,
+			"net_cargo": 36.0,
+			"reports": [
+				{
+					"elapsed": 10.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 74.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 106.75,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 181.0,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 206.0,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 280.25,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 311.25,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 385.5,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 416.0,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 490.25,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 521.25,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 595.5,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 7
+				}
+			],
+			"returned_losses": 8,
+			"rival_remaining": 5,
+			"seed": 3048,
+			"summary": [
+				{
+					"active_workers": 1,
+					"allocated_workers": 1,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 1312.75,
+					"conflict_report": "contested",
+					"delivered_total": 45.86727,
+					"desired_workers": 9,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 2,
+					"foreign_reports": 38,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 1320.75,
+					"last_loss_time": 832.0,
+					"last_witness_time": 832.0,
+					"missing_workers": 3,
+					"pheromone_strength": 0.1510554488,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.75,
+						"last_amount": 1.0,
+						"last_at": 1305.0
+					},
+					"recovery_ready": true,
+					"reported_losses": 8,
+					"resume_on_report": false,
+					"route_familiarity": 0.2585547185,
+					"status": "active"
+				}
+			],
+			"swarm_serial": 7,
+			"target": 9
+		},
+		{
+			"action": "reinforce_twice",
+			"assigned": 8,
+			"assigned_before_command": 4,
+			"assigned_on_command": 12,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 725.25,
+			"net_cargo": 90.0,
+			"reports": [
+				{
+					"elapsed": 10.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 74.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 110.5,
+					"losses": 5,
+					"report": "secured",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 166.75,
+					"losses": 5,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 177.5,
+					"losses": 5,
+					"report": "secured",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 235.5,
+					"losses": 5,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 244.0,
+					"losses": 5,
+					"report": "secured",
+					"swarm_serial": 4
+				}
+			],
+			"returned_losses": 5,
+			"rival_remaining": 2,
+			"seed": 3048,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 8,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 960.25,
+					"conflict_report": "secured",
+					"delivered_total": 99.86727,
+					"desired_workers": 13,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 3,
+					"foreign_reports": 30,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 999.75,
+					"last_loss_time": 835.75,
+					"last_witness_time": 835.75,
+					"missing_workers": 0,
+					"pheromone_strength": 0.0684173317,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.75,
+						"last_amount": 1.0,
+						"last_at": 980.25
+					},
+					"recovery_ready": false,
+					"reported_losses": 5,
+					"resume_on_report": false,
+					"route_familiarity": 0.5506115274,
+					"status": "depleted"
+				}
+			],
+			"swarm_serial": 4,
+			"target": 13
+		},
+		{
+			"action": "reinforce_three",
+			"assigned": 12,
+			"assigned_before_command": 4,
+			"assigned_on_command": 16,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 725.25,
+			"net_cargo": 90.0,
+			"reports": [
+				{
+					"elapsed": 10.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 74.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 110.5,
+					"losses": 5,
+					"report": "secured",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 166.75,
+					"losses": 5,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 177.5,
+					"losses": 5,
+					"report": "secured",
+					"swarm_serial": 3
+				}
+			],
+			"returned_losses": 5,
+			"rival_remaining": 2,
+			"seed": 3048,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 12,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 892.0,
+					"conflict_report": "secured",
+					"delivered_total": 99.86727,
+					"desired_workers": 17,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 2,
+					"foreign_reports": 29,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 924.25,
+					"last_loss_time": 835.75,
+					"last_witness_time": 835.75,
+					"missing_workers": 0,
+					"pheromone_strength": 0.0389953105,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.75,
+						"last_amount": 2.0,
+						"last_at": 904.0
+					},
+					"recovery_ready": false,
+					"reported_losses": 5,
+					"resume_on_report": false,
+					"route_familiarity": 0.5479685285,
+					"status": "depleted"
+				}
+			],
+			"swarm_serial": 3,
+			"target": 17
+		},
+		{
+			"action": "withdraw",
+			"assigned": 0,
+			"assigned_before_command": 4,
+			"assigned_on_command": 4,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 725.25,
+			"net_cargo": 1.0,
+			"reports": [
+				{
+					"elapsed": 8.5,
+					"losses": 1,
+					"report": "withdrew",
+					"swarm_serial": 1
+				}
+			],
+			"returned_losses": 1,
+			"rival_remaining": 6,
+			"seed": 3048,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 0,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 725.5,
+					"conflict_report": "withdrew",
+					"delivered_total": 10.86727,
+					"desired_workers": 0,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 1,
+					"foreign_reports": 4,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 744.75,
+					"last_loss_time": 733.75,
+					"last_witness_time": 733.75,
+					"missing_workers": 0,
+					"pheromone_strength": 0.0032336625,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.75,
+						"last_amount": 1.0,
+						"last_at": 744.75
+					},
+					"recovery_ready": true,
+					"reported_losses": 1,
+					"resume_on_report": false,
+					"route_familiarity": 0.0545245674,
+					"status": "inactive"
+				}
+			],
+			"swarm_serial": 1,
+			"target": 0
+		},
+		{
+			"action": "unchanged",
+			"assigned": 3,
+			"assigned_before_command": 4,
+			"assigned_on_command": 4,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 724.25,
+			"net_cargo": 70.0,
+			"reports": [
+				{
+					"elapsed": 11.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 72.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 84.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 145.5,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 158.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 218.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 231.25,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 291.0,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 304.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 364.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 373.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 437.0,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 7
+				},
+				{
+					"elapsed": 446.25,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 7
+				},
+				{
+					"elapsed": 509.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 8
+				},
+				{
+					"elapsed": 519.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 8
+				},
+				{
+					"elapsed": 582.5,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 9
+				},
+				{
+					"elapsed": 592.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 9
+				}
+			],
+			"returned_losses": 2,
+			"rival_remaining": 6,
+			"seed": 3030,
+			"summary": [
+				{
+					"active_workers": 3,
+					"allocated_workers": 3,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 1308.75,
+					"conflict_report": "withdrew",
+					"delivered_total": 79.8705,
+					"desired_workers": 5,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 1,
+					"foreign_reports": 66,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 1317.0,
+					"last_loss_time": 735.75,
+					"last_witness_time": 735.75,
+					"missing_workers": 0,
+					"pheromone_strength": 0.506583772,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.25,
+						"last_amount": 2.0,
+						"last_at": 1300.75
+					},
+					"recovery_ready": true,
+					"reported_losses": 2,
+					"resume_on_report": false,
+					"route_familiarity": 0.4971840695,
+					"status": "active"
+				}
+			],
+			"swarm_serial": 9,
+			"target": 5
+		},
+		{
+			"action": "reinforce",
+			"assigned": 1,
+			"assigned_before_command": 4,
+			"assigned_on_command": 8,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 724.25,
+			"net_cargo": 35.0,
+			"reports": [
+				{
+					"elapsed": 11.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 72.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 115.5,
+					"losses": 6,
+					"report": "withdrew",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 188.25,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 215.25,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 288.0,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 320.0,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 384.0,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 400.25,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 473.0,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 500.0,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 572.75,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 7
+				}
+			],
+			"returned_losses": 8,
+			"rival_remaining": 3,
+			"seed": 3030,
+			"summary": [
+				{
+					"active_workers": 1,
+					"allocated_workers": 1,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 1289.0,
+					"conflict_report": "contested",
+					"delivered_total": 44.8705,
+					"desired_workers": 9,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 1,
+					"foreign_reports": 37,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 1297.0,
+					"last_loss_time": 843.0,
+					"last_witness_time": 735.75,
+					"missing_workers": 6,
+					"pheromone_strength": 0.1306375227,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.25,
+						"last_amount": 1.0,
+						"last_at": 1281.25
+					},
+					"recovery_ready": true,
+					"reported_losses": 8,
+					"resume_on_report": false,
+					"route_familiarity": 0.25152978130000003,
+					"status": "active"
+				}
+			],
+			"swarm_serial": 7,
+			"target": 9
+		},
+		{
+			"action": "reinforce_twice",
+			"assigned": 6,
+			"assigned_before_command": 4,
+			"assigned_on_command": 12,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 724.25,
+			"net_cargo": 90.0,
+			"reports": [
+				{
+					"elapsed": 11.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 72.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 118.75,
+					"losses": 7,
+					"report": "secured",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 175.5,
+					"losses": 7,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 184.25,
+					"losses": 7,
+					"report": "secured",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 248.25,
+					"losses": 7,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 260.75,
+					"losses": 7,
+					"report": "secured",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 317.5,
+					"losses": 7,
+					"report": "contested",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 326.25,
+					"losses": 7,
+					"report": "secured",
+					"swarm_serial": 5
+				}
+			],
+			"returned_losses": 7,
+			"rival_remaining": 2,
+			"seed": 3030,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 6,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 1041.75,
+					"conflict_report": "secured",
+					"delivered_total": 99.8705,
+					"desired_workers": 13,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 2,
+					"foreign_reports": 32,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 1041.75,
+					"last_loss_time": 843.0,
+					"last_witness_time": 843.0,
+					"missing_workers": 1,
+					"pheromone_strength": 0.09826202440000001,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.25,
+						"last_amount": 3.0,
+						"last_at": 1023.0
+					},
+					"recovery_ready": false,
+					"reported_losses": 7,
+					"resume_on_report": false,
+					"route_familiarity": 0.5706199187000001,
+					"status": "depleted"
+				}
+			],
+			"swarm_serial": 5,
+			"target": 13
+		},
+		{
+			"action": "reinforce_three",
+			"assigned": 10,
+			"assigned_before_command": 4,
+			"assigned_on_command": 16,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 724.25,
+			"net_cargo": 90.0,
+			"reports": [
+				{
+					"elapsed": 11.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 72.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 118.75,
+					"losses": 7,
+					"report": "secured",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 175.5,
+					"losses": 7,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 184.25,
+					"losses": 7,
+					"report": "secured",
+					"swarm_serial": 3
+				}
+			],
+			"returned_losses": 7,
+			"rival_remaining": 2,
+			"seed": 3030,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 10,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 899.75,
+					"conflict_report": "secured",
+					"delivered_total": 99.8705,
+					"desired_workers": 17,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 3,
+					"foreign_reports": 31,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 946.5,
+					"last_loss_time": 843.0,
+					"last_witness_time": 843.0,
+					"missing_workers": 0,
+					"pheromone_strength": 0.047093334300000005,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.25,
+						"last_amount": 4.0,
+						"last_at": 927.5
+					},
+					"recovery_ready": false,
+					"reported_losses": 7,
+					"resume_on_report": false,
+					"route_familiarity": 0.5569450576,
+					"status": "depleted"
+				}
+			],
+			"swarm_serial": 3,
+			"target": 17
+		},
+		{
+			"action": "withdraw",
+			"assigned": 0,
+			"assigned_before_command": 4,
+			"assigned_on_command": 4,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 724.25,
+			"net_cargo": 1.0,
+			"reports": [
+				{
+					"elapsed": 8.5,
+					"losses": 1,
+					"report": "withdrew",
+					"swarm_serial": 1
+				}
+			],
+			"returned_losses": 1,
+			"rival_remaining": 6,
+			"seed": 3030,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 0,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 724.5,
+					"conflict_report": "withdrew",
+					"delivered_total": 10.8705,
+					"desired_workers": 0,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 1,
+					"foreign_reports": 4,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 743.25,
+					"last_loss_time": 732.75,
+					"last_witness_time": 732.75,
+					"missing_workers": 0,
+					"pheromone_strength": 0.0032371797,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 689.25,
+						"last_amount": 1.0,
+						"last_at": 743.25
+					},
+					"recovery_ready": true,
+					"reported_losses": 1,
+					"resume_on_report": false,
+					"route_familiarity": 0.0545320418,
+					"status": "inactive"
+				}
+			],
+			"swarm_serial": 1,
+			"target": 0
+		},
+		{
+			"action": "unchanged",
+			"assigned": 3,
+			"assigned_before_command": 4,
+			"assigned_on_command": 4,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 727.25,
+			"net_cargo": 76.0,
+			"reports": [
+				{
+					"elapsed": 9.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 70.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 77.25,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 138.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 145.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 206.5,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 213.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 274.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 282.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 345.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 350.25,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 410.0,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 7
+				},
+				{
+					"elapsed": 418.5,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 7
+				},
+				{
+					"elapsed": 479.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 8
+				},
+				{
+					"elapsed": 486.75,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 8
+				},
+				{
+					"elapsed": 547.75,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 9
+				},
+				{
+					"elapsed": 555.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 9
+				}
+			],
+			"returned_losses": 2,
+			"rival_remaining": 6,
+			"seed": 482817,
+			"summary": [
+				{
+					"active_workers": 3,
+					"allocated_workers": 3,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 1274.0,
+					"conflict_report": "withdrew",
+					"delivered_total": 85.8579,
+					"desired_workers": 5,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 1,
+					"foreign_reports": 81,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 1323.25,
+					"last_loss_time": 736.25,
+					"last_witness_time": 736.25,
+					"missing_workers": 0,
+					"pheromone_strength": 0.5900496101,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 690.75,
+						"last_amount": 1.0,
+						"last_at": 1323.25
+					},
+					"recovery_ready": true,
+					"reported_losses": 2,
+					"resume_on_report": false,
+					"route_familiarity": 0.5377954621000001,
+					"status": "active"
+				}
+			],
+			"swarm_serial": 9,
+			"target": 5
+		},
+		{
+			"action": "reinforce",
+			"assigned": 1,
+			"assigned_before_command": 4,
+			"assigned_on_command": 8,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 727.25,
+			"net_cargo": 57.0,
+			"reports": [
+				{
+					"elapsed": 9.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 70.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 77.25,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 138.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 177.25,
+					"losses": 4,
+					"report": "withdrew",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 238.25,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 254.5,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 315.5,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 331.75,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 5
+				},
+				{
+					"elapsed": 394.75,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 411.0,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 6
+				},
+				{
+					"elapsed": 472.0,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 7
+				},
+				{
+					"elapsed": 488.25,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 7
+				},
+				{
+					"elapsed": 549.25,
+					"losses": 8,
+					"report": "contested",
+					"swarm_serial": 8
+				},
+				{
+					"elapsed": 565.5,
+					"losses": 8,
+					"report": "withdrew",
+					"swarm_serial": 8
+				}
+			],
+			"returned_losses": 8,
+			"rival_remaining": 4,
+			"seed": 482817,
+			"summary": [
+				{
+					"active_workers": 1,
+					"allocated_workers": 1,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 1284.5,
+					"conflict_report": "withdrew",
+					"delivered_total": 66.8579,
+					"desired_workers": 9,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 1,
+					"foreign_reports": 46,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 1313.25,
+					"last_loss_time": 909.25,
+					"last_witness_time": 736.25,
+					"missing_workers": 6,
+					"pheromone_strength": 0.181819114,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 690.75,
+						"last_amount": 1.0,
+						"last_at": 1313.25
+					},
+					"recovery_ready": true,
+					"reported_losses": 8,
+					"resume_on_report": false,
+					"route_familiarity": 0.37622430770000004,
+					"status": "active"
+				}
+			],
+			"swarm_serial": 8,
+			"target": 9
+		},
+		{
+			"action": "reinforce_twice",
+			"assigned": 8,
+			"assigned_before_command": 4,
+			"assigned_on_command": 12,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 727.25,
+			"net_cargo": 90.0,
+			"reports": [
+				{
+					"elapsed": 9.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 70.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 77.25,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 138.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 178.0,
+					"losses": 5,
+					"report": "secured",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 235.0,
+					"losses": 5,
+					"report": "contested",
+					"swarm_serial": 4
+				},
+				{
+					"elapsed": 246.25,
+					"losses": 5,
+					"report": "secured",
+					"swarm_serial": 4
+				}
+			],
+			"returned_losses": 5,
+			"rival_remaining": 2,
+			"seed": 482817,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 8,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 960.5,
+					"conflict_report": "secured",
+					"delivered_total": 99.8579,
+					"desired_workers": 13,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 2,
+					"foreign_reports": 31,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 982.75,
+					"last_loss_time": 905.25,
+					"last_witness_time": 905.25,
+					"missing_workers": 1,
+					"pheromone_strength": 0.0531666977,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 690.75,
+						"last_amount": 8.0,
+						"last_at": 946.25
+					},
+					"recovery_ready": false,
+					"reported_losses": 5,
+					"resume_on_report": false,
+					"route_familiarity": 0.5429238126,
+					"status": "depleted"
+				}
+			],
+			"swarm_serial": 4,
+			"target": 13
+		},
+		{
+			"action": "reinforce_three",
+			"assigned": 12,
+			"assigned_before_command": 4,
+			"assigned_on_command": 16,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 727.25,
+			"net_cargo": 90.0,
+			"reports": [
+				{
+					"elapsed": 9.0,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 1
+				},
+				{
+					"elapsed": 70.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 77.25,
+					"losses": 2,
+					"report": "withdrew",
+					"swarm_serial": 2
+				},
+				{
+					"elapsed": 138.25,
+					"losses": 2,
+					"report": "contested",
+					"swarm_serial": 3
+				},
+				{
+					"elapsed": 178.0,
+					"losses": 5,
+					"report": "secured",
+					"swarm_serial": 3
+				}
+			],
+			"returned_losses": 5,
+			"rival_remaining": 2,
+			"seed": 482817,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 12,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 892.25,
+					"conflict_report": "secured",
+					"delivered_total": 99.8579,
+					"desired_workers": 17,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 2,
+					"foreign_reports": 34,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 905.25,
+					"last_loss_time": 905.25,
+					"last_witness_time": 905.25,
+					"missing_workers": 1,
+					"pheromone_strength": 0.0281264676,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 690.75,
+						"last_amount": 1.0,
+						"last_at": 865.5
+					},
+					"recovery_ready": false,
+					"reported_losses": 5,
+					"resume_on_report": false,
+					"route_familiarity": 0.5302457759,
+					"status": "depleted"
+				}
+			],
+			"swarm_serial": 3,
+			"target": 17
+		},
+		{
+			"action": "withdraw",
+			"assigned": 0,
+			"assigned_before_command": 4,
+			"assigned_on_command": 4,
+			"duration": 600,
+			"initial_private_losses": 1,
+			"initial_time": 727.25,
+			"net_cargo": 1.0,
+			"reports": [
+				{
+					"elapsed": 8.5,
+					"losses": 1,
+					"report": "withdrew",
+					"swarm_serial": 1
+				}
+			],
+			"returned_losses": 1,
+			"rival_remaining": 6,
+			"seed": 482817,
+			"summary": [
+				{
+					"active_workers": 0,
+					"allocated_workers": 0,
+					"ambusher_addressed": false,
+					"attack_reports": 0,
+					"checking_workers": 0,
+					"conflict_observed_at": 727.5,
+					"conflict_report": "withdrew",
+					"delivered_total": 10.8579,
+					"desired_workers": 0,
+					"destination_knowledge_id": "known:carb_exposed",
+					"energy_limited": false,
+					"fighting_reports": 1,
+					"foreign_reports": 4,
+					"founding_intent": false,
+					"id": "route_1",
+					"last_foreign_time": 747.75,
+					"last_loss_time": 735.75,
+					"last_witness_time": 735.75,
+					"missing_workers": 0,
+					"pheromone_strength": 0.0032267033,
+					"purpose": "food",
+					"receipt": {
+						"earlier_unrecorded": false,
+						"first_at": 690.75,
+						"last_amount": 1.0,
+						"last_at": 747.75
+					},
+					"recovery_ready": true,
+					"reported_losses": 1,
+					"resume_on_report": false,
+					"route_familiarity": 0.0545096338,
+					"status": "inactive"
+				}
+			],
+			"swarm_serial": 1,
+			"target": 0
+		}
+	]
+}

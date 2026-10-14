@@ -17,6 +17,7 @@ const Guest = preload("res://src/sim/ecology/guest_system.gd")
 const Rival = preload("res://src/sim/ecology/rival_system.gd")
 const Predator = preload("res://src/sim/ecology/predator_system.gd")
 const Ecology = preload("res://src/sim/ecology/ecology_system.gd")
+const TRAIL_CONFIG=preload("res://data/trails/default_trails.tres")
 var run: RunState
 var scouting: RefCounted
 var trails: RefCounted
@@ -28,12 +29,25 @@ var humidity: RefCounted
 var adaptation: RefCounted
 var rain: RainSystem
 var ecology: EcologySystem
+var brood_care: BroodCareRelief
 var swarm: SwarmSystem
 var guest: GuestSystem
 var rival: RivalSystem
+var surface_impact: SurfaceImpactSystem
 var predator: PredatorSystem
 var journey_response: JourneyResponseSystem
 var food_toxicity: FoodToxicitySystem
+var brood_health: BroodHealthSystem
+var heat: HeatSystem
+var daughter_supply: InterpileSupplySystem
+var supply: InterpileSupplySystem
+var reinforcement: WorkerReinforcementSystem
+var founding: FoundingSystem
+var reproduction: ReproductionSystem
+var queens: QueenSystem
+var investments: RefCounted
+var chambers: RefCounted
+var reports: ReportSystem
 
 
 func _init(seed_value: int = 482817, scenario: String = "backyard_slice") -> void:
@@ -64,118 +78,217 @@ func _attach_run(next_run: RunState) -> void:
 	predator = Predator.new(run)
 	journey_response = JourneyResponseSystem.new(run)
 	trails = Trails.new(run, predator, rival)
+	surface_impact = SurfaceImpactSystem.new(run, trails.apply_loss)
+	trails.surface_impact = surface_impact
 	swarm = Swarm.new(run, trails.apply_loss)
 	trails.swarm = swarm
-	brood = Brood.new(run)
+	adaptation = Adaptation.new(run)
+	reproduction = ReproductionSystem.new(run)
+	queens=QueenSystem.new(run)
+	investments=preload("res://src/sim/colony/investment_system.gd").new(run,adaptation,reproduction)
+	brood = Brood.new(run, adaptation,investments)
 	food_toxicity = FoodToxicitySystem.new(run)
+	brood_health = BroodHealthSystem.new(run, brood.lose_one)
+	heat = HeatSystem.new(run)
+	supply = InterpileSupplySystem.new(run)
+	daughter_supply = InterpileSupplySystem.new(run,"satellite_1")
+	reinforcement = WorkerReinforcementSystem.new(run)
+	founding = FoundingSystem.new(run)
 	guest = Guest.new(run, brood.lose_one)
 	food_exchange = FoodExchange.new(run)
 	nursery = Nursery.new(run)
+	chambers=preload("res://src/sim/colony/chamber_system.gd").new(run)
 	sanitation = Sanitation.new(run)
 	humidity = Humidity.new(run)
-	adaptation = Adaptation.new(run)
 	rain = Rain.new(run)
 	ecology = Ecology.new(run)
+	reports = preload("res://src/sim/knowledge/report_system.gd").new(run)
+	reports.prime()
+	journey_response.recruitment.jobs = {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"supplies":supply,"daughter_supplies":daughter_supply,"rejection":guest}
+	brood_care = BroodCareRelief.new(run, {"climate":humidity,"cleanup":sanitation,"aphids":ecology,"gatherers":trails,"scouts":scouting,"response":journey_response,"supplies":supply,"daughter_supplies":daughter_supply,"rejection":guest})
 	run.clock.tick.connect(_tick)
+	if run.history.frames.is_empty(): run.history.record(run,true)
 
 
 func dispatch_scout(origin_id: String, bearing: Variant = null) -> bool:
+	if run.history.ended: return false
 	return scouting.dispatch(origin_id, bearing)
 
 
-func set_exploration(target: Variant) -> bool:
-	return scouting.set_effort(target)
+func recall_scout(id: String) -> bool:
+	if run.history.ended: return false
+	return scouting.recall(id)
 
 
-func set_exploration_bias(bearing: Variant) -> bool:
-	return scouting.set_bias(bearing)
+func set_exploration(target: Variant, origin_id: String = "home") -> bool:
+	if run.history.ended: return false
+	return scouting.set_effort(target, origin_id)
 
 
-func set_investigation_priority(knowledge_id: String, enabled: bool) -> bool:
-	return scouting.set_priority(knowledge_id, enabled)
+func set_exploration_bias(bearing: Variant, origin_id: String = "home") -> bool:
+	if run.history.ended: return false
+	return scouting.set_bias(bearing, origin_id)
+
+
+func set_investigation_priority(knowledge_id: String, enabled: bool, origin_id: String = "home") -> bool:
+	if run.history.ended: return false
+	return scouting.set_priority(knowledge_id, enabled, origin_id)
 
 
 func investigate_known_source(origin_id: String, knowledge_id: String) -> bool:
+	if run.history.ended: return false
 	return scouting.dispatch_investigation(origin_id, knowledge_id)
 
 
 func advance(real_delta: float) -> bool:
+	if run.history.ended: return false
 	return run.clock.advance(real_delta)
 
 
 func toggle_pause() -> void:
+	if run.history.ended: return
 	run.clock.paused = not run.clock.paused
 
 
 func set_time_scale(value: int) -> bool:
+	if run.history.ended: return false
 	return run.clock.set_time_scale(value)
 
 
-func create_trail(origin_id: String, knowledge_id: String) -> bool:
-	return trails.create_route(origin_id, knowledge_id)
+func create_trail(origin_id: String, knowledge_id: String, count: Variant = TRAIL_CONFIG.initial_workers) -> bool:
+	if run.history.ended: return false
+	return trails.create_route(origin_id, knowledge_id,count)
 
 
 func set_trail_workers(route_id: String, target: Variant) -> bool:
+	if run.history.ended: return false
 	return trails.set_workers(route_id, target)
 
 
 func recheck_trail(route_id: String) -> bool:
+	if run.history.ended: return false
 	return trails.recheck(route_id)
 
 
 func start_food_exchange(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return food_exchange.start(pile_id)
 
 
 func start_brood(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return brood.start(pile_id)
 
 
 func set_brood_intent(pile_id: String, intent: Variant) -> bool:
+	if run.history.ended: return false
 	return brood.set_intent(pile_id, intent)
 
 
 func start_nursery_development(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return nursery.start(pile_id)
 
 
 func start_nursery_expansion(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return nursery.start_expansion(pile_id)
 
 
 func set_sanitation_workers(pile_id: String, target: Variant) -> bool:
+	if run.history.ended: return false
 	return sanitation.set_workers(pile_id, target)
 
 
 func start_midden(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return sanitation.start(pile_id)
 
 
 func set_humidity_workers(pile_id: String, target: Variant) -> bool:
+	if run.history.ended: return false
 	return humidity.set_workers(pile_id, target)
 
 
 func start_adaptation(pile_id: String, trait_id: String) -> bool:
+	if run.history.ended: return false
 	return adaptation.start(pile_id, trait_id)
 
 
+func queue_adaptation(pile_id: String, trait_id: Variant) -> bool:
+	if run.history.ended: return false
+	return adaptation.queue_choice(pile_id, trait_id)
+
+
 func start_honeydew_tending(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return ecology.start_tending(pile_id)
 
 
+func set_honeydew_target(pile_id: String, target: Variant) -> bool:
+	if run.history.ended:return false
+	return ecology.set_tending_target(pile_id,target)
+
 func stop_honeydew_tending(pile_id: String) -> bool:
+	if run.history.ended: return false
 	return ecology.stop_tending(pile_id)
 
 
 func start_guest_rejection() -> bool:
+	if run.history.ended: return false
 	return guest.start_rejection()
 
 
+func send_daughter_workers() -> bool:
+	if run.history.ended: return false
+	return reinforcement.start()
+
+func recall_daughter_workers() -> bool:
+	if run.history.ended: return false
+	return reinforcement.recall()
+
+func set_daughter_supply(enabled: Variant, source_id: String = "home") -> bool:
+	if run.history.ended: return false
+	return (supply if source_id == "home" else daughter_supply).set_enabled(enabled) if source_id in ["home","satellite_1"] else false
+
+
+func establish_daughter(knowledge_id: String, origin_id: String="home") -> bool:
+	if run.history.ended: return false
+	return founding.establish(knowledge_id,origin_id)
+
+
+func start_founding(knowledge_id: String, origin_id: String="home") -> bool:
+	if run.history.ended: return false
+	return founding.start(knowledge_id,origin_id)
+
+
+func start_reproduction(pile_id: String) -> bool:
+	if run.history.ended: return false
+	return reproduction.start(pile_id)
+
+func queue_reproduction(pile_id: String, enabled: Variant=true) -> bool:
+	if run.history.ended: return false
+	return investments.queue_reproduction(pile_id,enabled)
+
+func order_chamber(pile_id: String, chamber_id: Variant, cancel: bool=false) -> bool:
+	if run.history.ended: return false
+	return chambers.order(pile_id,chamber_id,cancel)
+
+func prioritize_investment(pile_id: String, kind: Variant) -> bool:
+	if run.history.ended: return false
+	return investments.prioritize(pile_id,kind)
+
+
 func stop_guest_rejection() -> bool:
+	if run.history.ended: return false
 	return guest.stop_rejection()
 
 
 func _tick(delta: float) -> void:
+	if run.history.ended: return
+	if not run.reports.initialized: reports.prime()
+	surface_impact.tick()
+	predator.tick()
 	scouting.tick(delta)
 	if not run.delivered_observations.is_empty():
 		if not run.knowledge.consume(run.delivered_observations, run.simulation_time):
@@ -185,12 +298,103 @@ func _tick(delta: float) -> void:
 	trails.tick(delta)
 	journey_response.tick()
 	swarm.tick()
-	rain.tick(delta)
+	var wet_seconds: float=rain.tick(delta)
+	WaterSourceSystem.new(run).tick(delta,wet_seconds)
 	ecology.tick(delta)
 	food_exchange.tick(delta)
 	nursery.tick(delta)
+	chambers.tick()
+	RefugeSystem.new(run).tick()
+	NestDisturbanceSystem.new(run).tick()
 	sanitation.tick()
 	humidity.tick()
+	heat.tick()
 	guest.tick()
+	brood_health.tick()
+	queens.tick()
 	brood.tick(delta)
+	reproduction.tick()
+	founding.tick()
+	for connection: ConnectionTrafficState in run.all_connections():
+		for id: String in [connection.parent_id,connection.child_id]:
+			InterpileSupplySystem.new(run,id,connection.route_id).tick()
+			StoreRescueSystem.new(run,id,connection.route_id).tick()
+			RoyalRescueSystem.new(run,id,connection.route_id).tick()
+			FinalDepartureSystem.new(run,id,connection.route_id).tick()
+		for id: String in [connection.parent_id,connection.child_id]:WorkerReinforcementSystem.new(run,id,connection.route_id).tick()
+		for id: String in [connection.parent_id,connection.child_id]:QueenRelocationSystem.new(run,id,connection.route_id).tick()
+		for id: String in [connection.parent_id,connection.child_id]:BroodRescueSystem.new(run,id,connection.route_id).tick()
 	food_toxicity.tick(delta)
+	reports.capture()
+	run.history.record(run)
+
+
+func end_run() -> bool:
+	if run.history.ended: return false
+	run.history.record(run,true)
+	run.history.ended=true
+	run.clock.paused=true
+	return true
+
+
+func review_snapshot() -> Dictionary:
+	if not run.history.ended: return {}
+	return {"accomplishment":run.accomplishment.to_dict(),"history":run.history.review_dict(),"bounds":[run.world.bounds.position.x,run.world.bounds.position.y,run.world.bounds.size.x,run.world.bounds.size.y],"terrain":run.world.terrain.duplicate(true),"scenario":run.scenario_id,"seed":str(run.run_seed)}
+
+func set_queen_care(pile_id: String, target: Variant) -> bool:
+	if run.history.ended: return false
+	return queens.set_care(pile_id,target)
+func replace_queen(pile_id: String, cancel: bool=false) -> bool:
+	if run.history.ended: return false
+	return queens.cancel_replacement(pile_id) if cancel else queens.start_replacement(pile_id)
+
+func connection_order(route_id: String, source_id: String, action: String, count: int=8, cohort_uid: String="") -> Dictionary:
+	if run.history.ended:return {"accepted":false,"reason":"Run has ended"}
+	var connection: ConnectionTrafficState=run.connection_for(route_id)
+	if connection==null or connection.target(source_id).is_empty():return {"accepted":false,"reason":"Choose an established adjacent connection"}
+	if action=="open" and (run.colony.piles[source_id].relinquished or run.colony.piles[connection.target(source_id)].relinquished):return {"accepted":false,"reason":"One endpoint has been relinquished"}
+	if action in ["close","open"]:
+		if connection.closed==(action=="close"):return {"accepted":false,"reason":"Connection already closed" if connection.closed else "Connection already open"}
+		if action=="close":
+			for id: String in [connection.parent_id,connection.child_id]:
+				if connection.supplies[id].enabled:
+					var stopped: bool=InterpileSupplySystem.new(run,id,route_id).set_enabled(false);assert(stopped)
+		connection.closed=action=="close";connection.policy_actor=source_id;connection.policy_tick=run.clock.tick_count
+		return {"accepted":true,"reason":""}
+	var accepted: bool=false;var reason: String="Unknown connection order"
+	if action in ["supply","stop_supply"]:
+		var system:=InterpileSupplySystem.new(run,source_id,route_id)
+		accepted=system.set_enabled(action=="supply");reason=system.last_error
+	elif action in ["final_departure","recall_departure"]:
+		var system:=FinalDepartureSystem.new(run,source_id,route_id)
+		accepted=system.start() if action=="final_departure" else system.recall();reason=system.last_error
+	elif action in ["rescue_royals","recall_royals"]:
+		var system:=RoyalRescueSystem.new(run,source_id,route_id)
+		accepted=system.start(count) if action=="rescue_royals" else system.recall();reason=system.last_error
+	elif action in ["rescue_stores","recall_stores"]:
+		var system:=StoreRescueSystem.new(run,source_id,route_id)
+		accepted=system.start(cohort_uid,count) if action=="rescue_stores" else system.recall();reason=system.last_error
+	elif action in ["rescue_brood","recall_brood"]:
+		var system:=BroodRescueSystem.new(run,source_id,route_id,cohort_uid)
+		accepted=system.start(count) if action=="rescue_brood" else system.recall();reason=system.last_error
+	elif action in ["relocate_queen","recall_queen"]:
+		var system:=QueenRelocationSystem.new(run,source_id,route_id)
+		accepted=system.start(count) if action=="relocate_queen" else system.recall();reason=system.last_error
+	elif action in ["migrate","recall"]:
+		var system:=WorkerReinforcementSystem.new(run,source_id,route_id)
+		accepted=system.start(count) if action=="migrate" else system.recall();reason=system.last_error
+	return {"accepted":accepted,"reason":reason}
+
+func connection_summaries(pile_id: String, settlers: int=8, cohort_uid: String="") -> Array[Dictionary]:
+	var result: Array[Dictionary]=[]
+	for connection: ConnectionTrafficState in run.all_connections():
+		if connection.target(pile_id).is_empty():continue
+		var owner: String=connection.payer_id
+		var choices: Array[Dictionary]=[]
+		for cohort: BroodCohort in run.colony.piles[pile_id].brood_cohorts:choices.append({"uid":cohort.uid(pile_id),"stage":cohort.stage,"count":cohort.count,"trial":cohort.adaptation_trial})
+		result.append({"departure":FinalDepartureSystem.new(run,pile_id,connection.route_id).summary(),"assigned_departure":FinalDepartureSystem.new(run,owner,connection.route_id).summary(),"closed":connection.closed,"royals":RoyalRescueSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_royals":RoyalRescueSystem.new(run,owner,connection.route_id).summary(settlers),"stores":StoreRescueSystem.new(run,pile_id,connection.route_id).summary_for(cohort_uid if cohort_uid in PileState.RESOURCE_IDS else "water",settlers),"assigned_stores":StoreRescueSystem.new(run,owner,connection.route_id).summary_for(),"cohorts":choices,"id":connection.route_id,"source_id":pile_id,"source_name":run.colony.piles[pile_id].display_title(),"destination_id":connection.target(pile_id),"destination_name":run.colony.piles[connection.target(pile_id)].display_title(),"payer_id":owner,"payer_name":run.colony.piles[owner].display_title(),"busy":connection.busy() or run.colony.piles[pile_id].relinquished and not connection.evacuations[pile_id].current().is_empty(),"supply":InterpileSupplySystem.new(run,pile_id,connection.route_id).summary(),"migration":WorkerReinforcementSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_supply":InterpileSupplySystem.new(run,owner,connection.route_id).summary(),"brood":BroodRescueSystem.new(run,pile_id,connection.route_id,cohort_uid).summary(settlers),"assigned_brood":BroodRescueSystem.new(run,owner,connection.route_id).summary(settlers),"queen":QueenRelocationSystem.new(run,pile_id,connection.route_id).summary(settlers),"assigned_queen":QueenRelocationSystem.new(run,owner,connection.route_id).summary(settlers),"assigned_migration":WorkerReinforcementSystem.new(run,owner,connection.route_id).summary(settlers),"available":run.colony.piles[pile_id].workers_assignable})
+		var cue: Dictionary=connection.supplies[pile_id].last_residue_report
+		if connection.stores[pile_id].last_residue_report.get("received_at",0.0)>cue.get("received_at",0.0):cue=connection.stores[pile_id].last_residue_report
+		result.back().residue_report=CargoResidueState.known_report(cue)
+		if not cue.is_empty():result.back().time=run.simulation_time
+	return result

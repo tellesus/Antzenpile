@@ -10,6 +10,12 @@ var available: int:
 	get: return _available
 var lost_total: int:
 	get: return _lost_total
+var transferred_in: int:
+	get: return _transferred_in
+var transferred_out: int:
+	get: return _transferred_out
+var _transferred_in: int=0
+var _transferred_out: int=0
 var last_error: String = ""
 var _total: int = 0
 var _available: int = 0
@@ -87,9 +93,23 @@ func remove_living_workers(pool: String, amount: Variant, reason: String) -> boo
 	return _success()
 
 
+func move_to(destination: WorkerLedger, source_pool: String, destination_pool: String, amount: Variant, reason: String) -> bool:
+	if destination==null or destination==self or not valid_count(amount) or reason.strip_edges().is_empty() or count(source_pool)<0 or destination.count(destination_pool)<0:
+		return _reject("Transfer requires two ledgers, known pools and an integer count")
+	var value: int=int(amount)
+	if count(source_pool)<value or destination.total>MAX_COUNT-value or _transferred_out>MAX_COUNT-value or destination._transferred_in>MAX_COUNT-value:
+		return _reject("Transfer exceeds available workers or snapshot range")
+	if value>0:
+		_set_count(source_pool,count(source_pool)-value); _total-=value; _transferred_out+=value
+		destination._set_count(destination_pool,destination.count(destination_pool)+value); destination._total+=value; destination._transferred_in+=value
+		_population_reason=reason; destination._population_reason=reason
+	var accepted: bool=destination._success(); assert(accepted)
+	return _success()
+
+
 func invariant_holds() -> bool:
 	var sum: int = _available
-	if not valid_count(_total) or not valid_count(_available) or not valid_count(_lost_total):
+	if not valid_count(_total) or not valid_count(_available) or not valid_count(_lost_total) or not valid_count(_transferred_in) or not valid_count(_transferred_out):
 		return false
 	for entry: Dictionary in _commitments.values():
 		if not valid_count(entry.count) or int(entry.count) > MAX_COUNT - sum:
@@ -99,8 +119,11 @@ func invariant_holds() -> bool:
 
 
 func to_dict() -> Dictionary:
-	return {"total": _total, "available": _available, "lost_total": _lost_total,
+	var record: Dictionary={"total": _total, "available": _available, "lost_total": _lost_total,
 		"commitments": _commitments.duplicate(true), "population_reason": _population_reason}
+	if _transferred_in>0 or _transferred_out>0:
+		record.transferred_in=_transferred_in; record.transferred_out=_transferred_out
+	return record
 
 
 func restore(data: Dictionary) -> bool:
@@ -109,6 +132,8 @@ func restore(data: Dictionary) -> bool:
 	var losses: Variant = data.get("lost_total", 0)
 	if not valid_count(losses):
 		return _reject("Invalid cumulative loss count")
+	var incoming: Variant=data.get("transferred_in",0); var outgoing: Variant=data.get("transferred_out",0)
+	if not valid_count(incoming) or not valid_count(outgoing): return _reject("Invalid worker transfer history")
 	var entries: Dictionary = {}
 	var sum: int = int(data.available)
 	for id: Variant in data.commitments:
@@ -123,6 +148,7 @@ func restore(data: Dictionary) -> bool:
 		entries[id] = {"kind": entry.kind, "owner_id": entry.owner_id, "count": int(entry.count)}
 	if sum != int(data.total):
 		return _reject("Worker conservation failed")
+	_transferred_in=int(incoming); _transferred_out=int(outgoing)
 	_total = int(data.total)
 	_available = int(data.available)
 	_lost_total = int(losses)

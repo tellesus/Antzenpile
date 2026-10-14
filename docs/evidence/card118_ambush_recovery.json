@@ -1,0 +1,98 @@
+[
+	{
+		"defended": {
+			"net_cargo": 20.0,
+			"rival_workers": 6,
+			"travel_losses": 0
+		},
+		"defense": {
+			"lost": 4,
+			"observed_at": 473.25,
+			"outcome": "secured",
+			"received_at": 483.0,
+			"sent": 12
+		},
+		"seed": 3043,
+		"untreated": {
+			"net_cargo": 10.0,
+			"rival_workers": 6,
+			"travel_losses": 4
+		},
+		"withdrawal": {
+			"lost": 0,
+			"observed_at": 429.25,
+			"outcome": "withdrew",
+			"received_at": 435.25,
+			"sent": 12
+		},
+		"withdrawn": {
+			"net_cargo": 10.0,
+			"rival_workers": 6,
+			"travel_losses": 4
+		}
+	},
+	{
+		"defended": {
+			"net_cargo": 2.0,
+			"rival_workers": 3,
+			"travel_losses": 0
+		},
+		"defense": {
+			"lost": 1,
+			"observed_at": 866.25,
+			"outcome": "secured",
+			"received_at": 876.0,
+			"sent": 12
+		},
+		"seed": 591,
+		"untreated": {
+			"net_cargo": 4.0,
+			"rival_workers": 6,
+			"travel_losses": 4
+		},
+		"withdrawal": {
+			"lost": 0,
+			"observed_at": 834.25,
+			"outcome": "withdrew",
+			"received_at": 840.25,
+			"sent": 12
+		},
+		"withdrawn": {
+			"net_cargo": 4.0,
+			"rival_workers": 6,
+			"travel_losses": 4
+		}
+	},
+	{
+		"defended": {
+			"net_cargo": 1.0,
+			"rival_workers": 5,
+			"travel_losses": 0
+		},
+		"defense": {
+			"lost": 0,
+			"observed_at": 850.25,
+			"outcome": "secured",
+			"received_at": 860.0,
+			"sent": 12
+		},
+		"seed": 482817,
+		"untreated": {
+			"net_cargo": 9.0,
+			"rival_workers": 2,
+			"travel_losses": 4
+		},
+		"withdrawal": {
+			"lost": 0,
+			"observed_at": 822.25,
+			"outcome": "withdrew",
+			"received_at": 828.25,
+			"sent": 12
+		},
+		"withdrawn": {
+			"net_cargo": 9.0,
+			"rival_workers": 2,
+			"travel_losses": 4
+		}
+	}
+]

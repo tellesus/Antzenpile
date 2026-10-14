@@ -1,0 +1,392 @@
+{
+	"failures": 0,
+	"trials": [
+		{
+			"action": "avoid",
+			"alarm": false,
+			"allocated": 0,
+			"delivered": 0.0,
+			"desired": 0,
+			"duration": 500,
+			"encounters": 0,
+			"followup_issued": false,
+			"latest": "withdrew",
+			"reports": [],
+			"returned_losses": 0,
+			"rival_mobilizations": 0,
+			"seed": 3048
+		},
+		{
+			"action": "retry",
+			"alarm": false,
+			"allocated": 5,
+			"delivered": 89.0,
+			"desired": 13,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": false,
+			"latest": "secured",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 55.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 67.25,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 79.25,
+					"report": "reinforced"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 12.0,
+					"received_after": 127.0,
+					"report": "secured"
+				}
+			],
+			"returned_losses": 8,
+			"rival_mobilizations": 1,
+			"seed": 3048
+		},
+		{
+			"action": "reinforce_after_pressure",
+			"alarm": false,
+			"allocated": 9,
+			"delivered": 89.0,
+			"desired": 17,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": true,
+			"latest": "secured",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 55.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 67.25,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 79.25,
+					"report": "reinforced"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 12.0,
+					"received_after": 127.0,
+					"report": "secured"
+				}
+			],
+			"returned_losses": 8,
+			"rival_mobilizations": 1,
+			"seed": 3048
+		},
+		{
+			"action": "withdraw_after_pressure",
+			"alarm": false,
+			"allocated": 0,
+			"delivered": 27.0,
+			"desired": 0,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": true,
+			"latest": "withdrew",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 55.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 67.25,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 75.75,
+					"report": "withdrew"
+				}
+			],
+			"returned_losses": 2,
+			"rival_mobilizations": 1,
+			"seed": 3048
+		},
+		{
+			"action": "avoid",
+			"alarm": false,
+			"allocated": 0,
+			"delivered": 0.0,
+			"desired": 0,
+			"duration": 500,
+			"encounters": 0,
+			"followup_issued": false,
+			"latest": "withdrew",
+			"reports": [],
+			"returned_losses": 0,
+			"rival_mobilizations": 0,
+			"seed": 3030
+		},
+		{
+			"action": "retry",
+			"alarm": false,
+			"allocated": 5,
+			"delivered": 89.0,
+			"desired": 13,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": false,
+			"latest": "secured",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 54.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 68.5,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 80.5,
+					"report": "reinforced"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 11.5,
+					"received_after": 127.75,
+					"report": "secured"
+				}
+			],
+			"returned_losses": 8,
+			"rival_mobilizations": 1,
+			"seed": 3030
+		},
+		{
+			"action": "reinforce_after_pressure",
+			"alarm": false,
+			"allocated": 14,
+			"delivered": 89.0,
+			"desired": 17,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": true,
+			"latest": "secured",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 54.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 68.5,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 80.5,
+					"report": "reinforced"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 11.5,
+					"received_after": 107.75,
+					"report": "secured"
+				}
+			],
+			"returned_losses": 3,
+			"rival_mobilizations": 1,
+			"seed": 3030
+		},
+		{
+			"action": "withdraw_after_pressure",
+			"alarm": false,
+			"allocated": 0,
+			"delivered": 27.0,
+			"desired": 0,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": true,
+			"latest": "withdrew",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 54.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 68.5,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 77.0,
+					"report": "withdrew"
+				}
+			],
+			"returned_losses": 2,
+			"rival_mobilizations": 1,
+			"seed": 3030
+		},
+		{
+			"action": "avoid",
+			"alarm": false,
+			"allocated": 0,
+			"delivered": 0.0,
+			"desired": 0,
+			"duration": 500,
+			"encounters": 0,
+			"followup_issued": false,
+			"latest": "withdrew",
+			"reports": [],
+			"returned_losses": 0,
+			"rival_mobilizations": 0,
+			"seed": 482817
+		},
+		{
+			"action": "retry",
+			"alarm": false,
+			"allocated": 3,
+			"delivered": 80.0,
+			"desired": 13,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": false,
+			"latest": "secured",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 57.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 65.25,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 77.25,
+					"report": "reinforced"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 13.0,
+					"received_after": 134.0,
+					"report": "secured"
+				}
+			],
+			"returned_losses": 10,
+			"rival_mobilizations": 1,
+			"seed": 482817
+		},
+		{
+			"action": "reinforce_after_pressure",
+			"alarm": false,
+			"allocated": 8,
+			"delivered": 89.0,
+			"desired": 17,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": true,
+			"latest": "secured",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 57.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 65.25,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 77.25,
+					"report": "reinforced"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 13.0,
+					"received_after": 130.0,
+					"report": "secured"
+				}
+			],
+			"returned_losses": 9,
+			"rival_mobilizations": 1,
+			"seed": 482817
+		},
+		{
+			"action": "withdraw_after_pressure",
+			"alarm": false,
+			"allocated": 0,
+			"delivered": 27.0,
+			"desired": 0,
+			"duration": 500,
+			"encounters": 1,
+			"followup_issued": true,
+			"latest": "withdrew",
+			"reports": [
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 57.25,
+					"report": "contested"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 65.25,
+					"report": "holding"
+				},
+				{
+					"encounter": 2,
+					"observation_age": 8.25,
+					"received_after": 73.75,
+					"report": "withdrew"
+				}
+			],
+			"returned_losses": 2,
+			"rival_mobilizations": 1,
+			"seed": 482817
+		}
+	]
+}

@@ -11,17 +11,33 @@ static func positions(size: Vector2) -> Dictionary:
 	return {"foraging": origin + Vector2(width * 0.50, height * 0.25),
 		"lean": origin + Vector2(width * 0.27, height * 0.50),
 		"load": origin + Vector2(width * 0.73, height * 0.50),
+		"fighter": origin + Vector2(width * 0.50, height * 0.65),
+		"efficient_nurses": origin + Vector2(width * 0.50, height * 0.65),
+		"heat_resilience": origin + Vector2(width * 0.27, height * 0.50),
+		"moisture_resilience": origin + Vector2(width * 0.73, height * 0.50),
 		"security": origin + Vector2(width * 0.27, height * 0.50),
 		"tolerance": origin + Vector2(width * 0.73, height * 0.50),
-		"persistent": origin + Vector2(width * 0.27, height * 0.84),
+		"persistent": origin + Vector2(width * 0.27, height * 0.50),
+		"rapid_repair": origin + Vector2(width * 0.73, height * 0.50),
 		"honeydew": origin + Vector2(width * 0.73, height * 0.84)}
 
 static func visible_nodes(status: Dictionary, family: String = "foraging") -> Array[String]:
+	if family=="chemistry":
+		var chemistry_nodes: Array[String]=["foraging"]
+		for id: String in ["persistent","rapid_repair"]:
+			if status.get("adaptation_options",{}).has(id): chemistry_nodes.append(id)
+		return chemistry_nodes
+	if family=="environment":
+		var environment_nodes: Array[String] = ["foraging"]
+		for id: String in BroodEnvironment.TRAITS:
+			if status.get("adaptation_options",{}).has(id): environment_nodes.append(id)
+		return environment_nodes
+	if family=="care" and status.get("adaptation_options",{}).has("efficient_nurses"): return ["foraging","efficient_nurses"]
+	if family == "combat" and status.get("adaptation_options", {}).has("fighter"):
+		return ["foraging", "fighter"]
 	if family == "recognition" and status.get("adaptation_options", {}).has("security"):
 		return ["foraging", "security", "tolerance"]
 	var result: Array[String] = ["foraging", "lean", "load"]
-	if status.get("adaptation_options", {}).has("persistent"):
-		result.append("persistent")
 	if not status.get("honeydew", {}).is_empty():
 		result.append("honeydew")
 	return result
@@ -34,9 +50,17 @@ static func node_at(at: Vector2, size: Vector2, status: Dictionary, family: Stri
 	return ""
 
 static func trait_state(status: Dictionary, id: String) -> String:
+	if status.get("adaptation_queue", {}).get("trait_id", "") == id:
+		return "Queued · next brood"
 	if status.get("adaptation_trial", {}).get("adaptation_id", "") == id:
 		return "Growing trial brood"
-	if id in ["persistent", "security", "tolerance"]:
+	if id in ["lean","load"] and status.get("adaptation_options",{}).has(id):
+		var option: Dictionary=status.adaptation_options[id]
+		if option.get("inherited",false): return "Inherited · %d adult carriers" % option.get("expressed",0)
+		var other: String="load" if id=="lean" else "lean"
+		if status.adaptation_options.get(other,{}).get("inherited",false) or status.get("adaptation_trial",{}).get("adaptation_id","")==other: return "Other branch chosen"
+		if option.get("available",false): return "Available · queue maternal brood"
+	if id in ["persistent", "security", "tolerance", "fighter","efficient_nurses","heat_resilience","moisture_resilience","rapid_repair"]:
 		var option: Dictionary = status.get("adaptation_options", {}).get(id, {})
 		if option.get("inherited", false):
 			return "Inherited · %d adult carriers" % option.get("expressed", 0)
@@ -44,17 +68,51 @@ static func trait_state(status: Dictionary, id: String) -> String:
 			var other: String = "tolerance" if id == "security" else "security"
 			if status.get("adaptation_options", {}).get(other, {}).get("inherited", false) or status.get("adaptation_trial", {}).get("adaptation_id", "") == other:
 				return "Other branch chosen"
+		if option.get("available", false): return "Available · queue next brood"
+		if id=="rapid_repair" and not status.get("repair_candidate",false): return "Needs later brood to reach pupae"
+		if id in BroodEnvironment.TRAITS and id not in status.get("environment_candidates",[]): return "Needs exposed larvae to reach pupae"
+		if id=="efficient_nurses" and not status.get("care_candidate",false): return "Needs supported brood emergence"
 		return "Candidate · variation observed" if status.get("adaptation_trial", {}).is_empty() else "Another trial is growing"
 	if status.get("adaptation_repertoire", "") == id:
 		return "Inherited · %d adult carriers" % status.get("adapted_workers", 0)
-	if status.get("adaptation_trial", {}).get("adaptation_id", "") in ["persistent", "security", "tolerance"]:
+	if status.get("adaptation_repertoire", "") != "" or status.get("adaptation_trial", {}).get("adaptation_id", "") in ["lean", "load"]:
+		return "Other branch chosen"
+	if status.get("adaptation_options", {}).get(id, {}).get("available", false):
+		return "Available · queue next brood"
+	if status.get("adaptation_trial", {}).get("adaptation_id", "") in ["persistent", "security", "tolerance", "fighter"]:
 		return "Another trial is growing"
 	if status.get("adaptation_repertoire", "") != "" or not status.get("adaptation_trial", {}).is_empty():
 		return "Other branch chosen"
 	return "Brood trial available"
 
 static func title(id: String) -> String:
-	return {"foraging": "Colony repertoire", "lean": "Lean Foragers", "load": "Load Bearers", "persistent": "Persistent chemistry", "security": "Foreign Chemical Sensitivity", "tolerance": "Flexible Recognition Envelope", "honeydew": "Honeydew relationship"}.get(id, "Trait")
+	return TraitCatalog.DEFINITIONS[id].title if TraitCatalog.DEFINITIONS.has(id) else {"foraging":"Colony repertoire","honeydew":"Honeydew relationship"}.get(id,"Trait")
+
+
+static func short_title(id: String) -> String:
+	return TraitCatalog.DEFINITIONS[id].short_title if TraitCatalog.DEFINITIONS.has(id) and not TraitCatalog.DEFINITIONS[id].short_title.is_empty() else title(id)
+
+static func families(status: Dictionary) -> Array[String]:
+	var result: Array[String]=["foraging"]
+	if status.get("adaptation_options",{}).has("security"): result.append("recognition")
+	if status.get("adaptation_options",{}).has("fighter"): result.append("combat")
+	if status.get("adaptation_options",{}).has("efficient_nurses"): result.append("care")
+	if status.get("adaptation_options",{}).has("heat_resilience") or status.get("adaptation_options",{}).has("moisture_resilience"): result.append("environment")
+	if status.get("adaptation_options",{}).has("persistent") or status.get("adaptation_options",{}).has("rapid_repair"): result.append("chemistry")
+	return result
+static func next_family(status: Dictionary, current: String) -> String:
+	var list: Array[String]=families(status);return list[(list.find(current)+1)%list.size()]
+
+
+static func queue_wait(status: Dictionary) -> String:
+	var waiting: String = status.get("adaptation_queue", {}).get("waiting", "none")
+	if waiting == "ready":
+		return "Ready · resume to lay" if status.get("paused", false) else "Ready · lays on next tick"
+	return {"space": "Waiting for Nursery space", "trial": "Waiting for current trial to finish",
+		"priority":"Reproductives have next priority",
+		"nurses": "Waiting for two available nurses", "population": "Population limit reached",
+		"carbohydrate": "Waiting for trial carbs", "protein": "Waiting for trial protein",
+		"water": "Waiting for trial water", "unavailable": "Trait unavailable"}.get(waiting, "")
 
 
 static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected: String, phase: float, family: String = "foraging") -> void:
@@ -69,7 +127,7 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 			if ecological or id == "persistent":
 				view.draw_line(centers.foraging + Vector2(0, 84), centers[id] - Vector2(0, 36), Color(color, 0.24), 1.0, true)
 			else:
-				var direction: float = -1.0 if id in ["lean", "security"] else 1.0
+				var direction: float = -1.0 if id in ["lean", "security", "heat_resilience", "persistent"] else 1.0
 				var start: Vector2 = centers.foraging + Vector2(direction * 34, 0)
 				var control: Vector2 = centers.foraging + Vector2(direction * 160, 10)
 				var finish: Vector2 = centers[id] - Vector2(0, 34)
@@ -82,10 +140,13 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 		var boundary: PackedVector2Array = Art.membrane(at, 28, phase * 0.18 + at.x * 0.01, 0.72 if ecological else 1.0)
 		view.draw_colored_polygon(boundary, Color(color, 0.07))
 		view.draw_polyline(boundary.slice(1, 27), Color(color, 0.48), 1.2, true)
-		if state.begins_with("Inherited"):
+		if state.begins_with("Inherited") or state.begins_with("Queen lineage"):
 			view.draw_circle(at, 18.0, Color(color, 0.15))
 		elif state == "Growing trial brood":
 			view.draw_arc(at, 33.0, -PI * 0.5, PI * 0.8, 24, Color(color, 0.72), 1.5, true)
+		elif state == "Queued · next brood":
+			view.draw_arc(at, 33.0, 0.0, PI * 0.4, 12, Color("d9c5a5"), 2.0, true)
+			view.draw_arc(at, 33.0, PI, PI * 1.4, 12, Color("d9c5a5"), 2.0, true)
 		if ecological:
 			for offset: int in [-1, 1]:
 				view.draw_arc(at + Vector2(offset * 7, 0), 7, 0.1, 4.6, 18, Color(color, 0.6), 1.0, true)
@@ -96,7 +157,7 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 		if id == selected:
 			view.draw_arc(at, 39, 0.0, 0.65, 12, Color("dce5d9"), 1.0, true)
 			view.draw_arc(at, 39, PI, PI + 0.65, 12, Color("dce5d9"), 1.0, true)
-		var label: String = "Recognition repertoire" if id == "foraging" and family == "recognition" else title(id)
+		var label: String = family.capitalize()+" repertoire" if id=="foraging" and family!="foraging" else title(id)
 		view._label(at + Vector2(0, 45), label, color, 15, HORIZONTAL_ALIGNMENT_CENTER)
 		var subtitle: String = "Genes and ecological experience" if id == "foraging" else trait_state(status, id) if not ecological else "Ecological · tending active" if status.honeydew.relationship == "tended" else "Ecological · harvested" if status.honeydew.relationship == "exploited" else "Ecological · source observed"
 		view._label(at + Vector2(0, 64), subtitle, Color(color, 0.75), 12, HORIZONTAL_ALIGNMENT_CENTER)

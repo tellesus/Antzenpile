@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/trait_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+id = "rapid_repair"
+title = "Rapid Trail Repair"
+family = "chemistry"
+benefit = "Up to 50% more fresh scent on worn trails"
+tradeoff = "Carriers need 15% more journey food"
+evidence = "Returned worn-trail report, then brood pupation"
+carbohydrate = 14.0
+protein = 16.0
+water = 8.0
+repair_gain = 0.5
+worn_scent_threshold = 0.5
+repair_food = 0.15

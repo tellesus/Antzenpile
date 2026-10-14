@@ -21,6 +21,8 @@ func run(test: Object) -> bool:
 		return true
 	var view: OutwardView = View.new()
 	test.get_root().add_child(view)
+	root._outward_view=view
+	view.effort_command=root.set_effort
 	view.honeydew_start_command = root.start_honeydew_tending
 	view.honeydew_stop_command = root.stop_honeydew_tending
 	view.trail_create_command = root.create_trail_for
@@ -30,11 +32,14 @@ func run(test: Object) -> bool:
 	view._signals = root.sensory_snapshot("home")
 	view._status = root.outward_status("home")
 	view.selected_id = "signal:known:aphid_01"
-	test.check(view._is_honeydew(view._selected_signal()) and view._signal_title_for(view._selected_signal()) == "Honeydew trace" and view._status.honeydew.relationship == "unknown", "Returned scout evidence names the producer without revealing its condition")
+	test.check(view._is_honeydew(view._selected_signal()) and view._signal_title_for(view._selected_signal()).begins_with("Aphid honeydew ") and view._selected_signal().source_type=="aphid_honeydew" and view._status.honeydew.relationship == "unknown", "A close returned sample names and labels the producer without revealing its condition")
 	test.check(view._button_at(view._honeydew_button_rect().get_center()).is_empty(), "Protection is not offered before a loaded trail return")
 	var before: Dictionary = game.run.to_dict()
 	view._run_command("honeydew_start")
-	test.check(game.run.to_dict() == before and not view._feedback.is_empty(), "Semantic command still rejects premature protection")
+	test.check(view.effort_draft.opened and game.run.to_dict()==before,"Unfunded service inspection opens only a free draft")
+	view._run_command("effort_commit")
+	test.check(game.run.to_dict()==before and not view._feedback.is_empty(),"Explicit premature attendant ORDER still rejects atomically")
+	view._run_command("effort_back")
 	test.check(game.create_trail("home", "known:aphid_01"), "Known producer accepts normal trail investment")
 	var route: TrailRouteState = game.run.trails.routes.route_1
 	for step: int in 800:
@@ -48,22 +53,26 @@ func run(test: Object) -> bool:
 		return true
 	view._status = root.outward_status("home")
 	var protect: Rect2 = view._honeydew_button_rect()
-	test.check(view._button_at(protect.get_center()) == "honeydew_start" and protect.size == Vector2(260, 44), "Loaded return offers a touch-sized Protect producers action")
+	test.check(view._button_at(protect.get_center()) == "honeydew_start" and protect.size == Vector2(260, 44), "Loaded return offers a touch-sized Choose attendants action")
 	var worker_before: int = game.run.colony.piles.home.workers_available
-	view._pointer_press(protect.get_center(), "mouse")
-	test.check(game.run.honeydew.relationship == "tended" and game.run.colony.piles.home.workers_available == worker_before - 6 and view._feedback == "Producers tended", "Mouse control reserves tending workers")
+	view._pointer_press(protect.get_center(),"mouse")
+	test.check(view.effort_draft.opened and game.run.colony.piles.home.workers_available==worker_before,"Mouse selection leaves all workers uncommitted")
+	view._run_command("effort_commit")
+	test.check(game.run.honeydew.relationship=="tended" and game.run.colony.piles.home.workers_available==worker_before-6,"Explicit ORDER alone reserves actual attendants and travel")
 	view._status = root.outward_status("home")
 	test.check(view._button_at(protect.get_center()) == "honeydew_stop" and view._status.honeydew.protection_workers == 6 and not view._status.honeydew.has("condition") and not view._status.honeydew.has("output"), "Tended context shows committed labor without hidden biology or forecast")
-	view._pointer_press(protect.get_center(), "touch")
-	test.check(game.run.honeydew.relationship == "exploited" and game.run.colony.piles.home.workers_available == worker_before and view._feedback == "Tending withdrawn", "Touch control releases the same six workers")
+	view._pointer_press(protect.get_center(),"touch")
+	view._run_command("effort_zero");view._run_command("effort_commit")
+	test.check(game.run.honeydew.relationship=="exploited" and game.run.colony.piles.home.workers_available==worker_before,"Touch zero-target ORDER returns the same zero-distance party once")
 	var start: Dictionary = root.start_honeydew_tending("known:aphid_01")
 	test.check(start.accepted and root.stop_honeydew_tending("known:aphid_01").accepted, "Root semantic callbacks share controller validation")
 	var pile: PileState = game.run.colony.piles.home
 	var spare: int = pile.workers_available
 	test.check(pile.workers.create_commitment("test_busy", "other", "test") and pile.workers.allocate("test_busy", spare - 5), "Fixture reserves other labor to exercise shortage")
 	view._status = root.outward_status("home")
-	view._pointer_press(protect.get_center(), "mouse")
-	test.check(view._feedback == "Not enough available workers to tend producers" and game.run.honeydew.relationship == "exploited" and pile.workers.count("honeydew:home") == -1, "Insufficient labor gives a concise rejection without partial commitment")
+	view._pointer_press(protect.get_center(),"mouse");view._run_command("effort_commit")
+	test.check(view._feedback.contains("available") and game.run.honeydew.relationship=="exploited" and pile.workers.count("honeydew:home")==-1,"Insufficient labor rejects actual ORDER without a partial commitment")
+	view._run_command("effort_back")
 	test.check(pile.workers.release("test_busy", spare - 5) and pile.workers.retire_commitment("test_busy"), "Fixture releases unrelated commitment")
 	for size: Vector2 in [Vector2(1280, 720), Vector2(900, 600)]:
 		var x: float = size.x - 300.0

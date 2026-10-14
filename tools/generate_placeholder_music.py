@@ -1,4 +1,7 @@
-"""Rebuild the two original, phase-matched prototype loops with Python's stdlib."""
+"""Historical task-019 prototype; not the current soundtrack authoring command.
+
+Current four-layer music: tools/music/compose_colony_music.py.
+"""
 
 from math import pi, sin
 from pathlib import Path
@@ -9,7 +12,7 @@ import wave
 RATE = 22_050
 DURATION = 8
 FRAMES = RATE * DURATION
-OUT = Path(__file__).resolve().parents[1] / "assets" / "audio"
+OUT = Path(__file__).resolve().parents[1] / "builds" / "historical_music_019"
 
 
 def render(name: str, tones: tuple[tuple[int, float], ...]) -> None:

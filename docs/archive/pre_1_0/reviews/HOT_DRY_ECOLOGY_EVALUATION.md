@@ -1,0 +1,11 @@
+> **ARCHIVE ONLY — frozen 2026-10-04.** Historical record; not an active plan, current contract or implementation instruction. Use the [current documentation](../../../README.md). Original path: `docs/HOT_DRY_ECOLOGY_EVALUATION.md`. Historical status and recommendations below apply only to their recorded build.
+
+# Hot/dry ecology — card 101
+
+Current hot, rain-free air mildly evaporates the exposed water source and reduces **new** nectar/honeydew production to 75%. Rain ends the gate, cools air and still physically refills water. Home stores do not evaporate. OUTWARD senses current air at Home without predicting weather or updating remote source knowledge.
+
+Two ordinary paid card-100 colonies (Backyard/Garden Edge, seed 482817) continue from their observed warm-front snapshots. Real worker commitments gather the two remembered alternative carbohydrate producers, with one climate worker and existing rechecks, cleanup and guest responses. No injected food/weather, removed hazards or free jobs. Every tick matches a JSON-restored continuation and conserves workers. [Raw pulse evidence](../../../evidence/card101_ecology.json).
+
+In both settings, the actual nectar pulse at 3,900 seconds was nine during hot/dry conditions, returning to twelve at 4,200 after the gate eased. Available honeydew pulses were 1.125 during the gate, subject to its existing condition/capacity. Both colonies retained seven known sources and usable Home water; eventual exterior depletion combines real gathering and evaporation and does not identify their shares. The focused physical test isolates evaporation separately. These are examples of interaction, not a broad resource-balance result.
+
+11 focused checks cover physical output, unchanged producer condition, evaporation bound, Home-store/unknown-source boundaries, stale returned memories, actual rain refill and quiet/current Home cues. Final full suite: **6,234 checks, zero failures/script errors**. Final import/Main 90-frame smoke and graphical probe exited cleanly; [standard/compact cue](../../../evidence/card101_home_air_900.png) retains movement instructions and paused state. No mobile or human usability claim. No saved fields or random stream were added.

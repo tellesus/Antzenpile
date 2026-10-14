@@ -1,0 +1,311 @@
+{
+	"failures": 0,
+	"rows": [
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": 1565.5,
+			"first_resource_times": {
+				"carbohydrate": 318.5,
+				"protein": 338.5,
+				"water": 350.75
+			},
+			"known_missing": 1,
+			"known_sources": 7,
+			"physical_scout_losses": 3,
+			"policy": "general",
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"workers": 37
+		},
+		{
+			"away": 2,
+			"exact_saved_continuation": true,
+			"first_missing_at": 1565.5,
+			"first_resource_times": {
+				"carbohydrate": 318.5,
+				"protein": 338.5,
+				"water": 350.75
+			},
+			"known_missing": 1,
+			"known_sources": 7,
+			"physical_scout_losses": 2,
+			"policy": "respond_to_absence",
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"workers": 38
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": -1.0,
+			"first_resource_times": {
+				"carbohydrate": 318.5,
+				"protein": 338.5,
+				"water": 350.75
+			},
+			"known_missing": 0,
+			"known_sources": 7,
+			"physical_scout_losses": 0,
+			"policy": "cleared_counterfactual",
+			"scenario": "backyard_slice",
+			"seed": 482817,
+			"workers": 40
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": 1632.25,
+			"first_resource_times": {
+				"carbohydrate": 322.5,
+				"protein": 563.0,
+				"water": 330.5
+			},
+			"known_missing": 1,
+			"known_sources": 7,
+			"physical_scout_losses": 3,
+			"policy": "general",
+			"scenario": "backyard_slice",
+			"seed": 104729,
+			"workers": 37
+		},
+		{
+			"away": 2,
+			"exact_saved_continuation": true,
+			"first_missing_at": 1632.25,
+			"first_resource_times": {
+				"carbohydrate": 322.5,
+				"protein": 563.0,
+				"water": 330.5
+			},
+			"known_missing": 1,
+			"known_sources": 7,
+			"physical_scout_losses": 2,
+			"policy": "respond_to_absence",
+			"scenario": "backyard_slice",
+			"seed": 104729,
+			"workers": 38
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": -1.0,
+			"first_resource_times": {
+				"carbohydrate": 322.5,
+				"protein": 563.0,
+				"water": 330.5
+			},
+			"known_missing": 0,
+			"known_sources": 7,
+			"physical_scout_losses": 0,
+			"policy": "cleared_counterfactual",
+			"scenario": "backyard_slice",
+			"seed": 104729,
+			"workers": 40
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": 1000.75,
+			"first_resource_times": {
+				"carbohydrate": 318.5,
+				"protein": 334.5,
+				"water": 362.75
+			},
+			"known_missing": 2,
+			"known_sources": 7,
+			"physical_scout_losses": 3,
+			"policy": "general",
+			"scenario": "backyard_slice",
+			"seed": 8675309,
+			"workers": 37
+		},
+		{
+			"away": 2,
+			"exact_saved_continuation": true,
+			"first_missing_at": 1000.75,
+			"first_resource_times": {
+				"carbohydrate": 318.5,
+				"protein": 334.5,
+				"water": 362.75
+			},
+			"known_missing": 2,
+			"known_sources": 7,
+			"physical_scout_losses": 2,
+			"policy": "respond_to_absence",
+			"scenario": "backyard_slice",
+			"seed": 8675309,
+			"workers": 38
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": -1.0,
+			"first_resource_times": {
+				"carbohydrate": 318.5,
+				"protein": 334.5,
+				"water": 362.75
+			},
+			"known_missing": 0,
+			"known_sources": 7,
+			"physical_scout_losses": 0,
+			"policy": "cleared_counterfactual",
+			"scenario": "backyard_slice",
+			"seed": 8675309,
+			"workers": 40
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": 750.5,
+			"first_resource_times": {
+				"carbohydrate": 328.5,
+				"protein": 344.5,
+				"water": 330.5
+			},
+			"known_missing": 4,
+			"known_sources": 7,
+			"physical_scout_losses": 4,
+			"policy": "general",
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"workers": 36
+		},
+		{
+			"away": 2,
+			"exact_saved_continuation": true,
+			"first_missing_at": 750.5,
+			"first_resource_times": {
+				"carbohydrate": 328.5,
+				"protein": 344.5,
+				"water": 330.5
+			},
+			"known_missing": 2,
+			"known_sources": 7,
+			"physical_scout_losses": 3,
+			"policy": "respond_to_absence",
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"workers": 37
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": -1.0,
+			"first_resource_times": {
+				"carbohydrate": 328.5,
+				"protein": 344.5,
+				"water": 330.5
+			},
+			"known_missing": 0,
+			"known_sources": 7,
+			"physical_scout_losses": 0,
+			"policy": "cleared_counterfactual",
+			"scenario": "garden_edge",
+			"seed": 482817,
+			"workers": 40
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": 720.25,
+			"first_resource_times": {
+				"carbohydrate": 332.5,
+				"protein": 556.75,
+				"water": 332.5
+			},
+			"known_missing": 5,
+			"known_sources": 7,
+			"physical_scout_losses": 6,
+			"policy": "general",
+			"scenario": "garden_edge",
+			"seed": 104729,
+			"workers": 34
+		},
+		{
+			"away": 2,
+			"exact_saved_continuation": true,
+			"first_missing_at": 720.25,
+			"first_resource_times": {
+				"carbohydrate": 332.5,
+				"protein": 556.75,
+				"water": 332.5
+			},
+			"known_missing": 1,
+			"known_sources": 7,
+			"physical_scout_losses": 2,
+			"policy": "respond_to_absence",
+			"scenario": "garden_edge",
+			"seed": 104729,
+			"workers": 38
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": -1.0,
+			"first_resource_times": {
+				"carbohydrate": 332.5,
+				"protein": 631.0,
+				"water": 332.5
+			},
+			"known_missing": 0,
+			"known_sources": 7,
+			"physical_scout_losses": 0,
+			"policy": "cleared_counterfactual",
+			"scenario": "garden_edge",
+			"seed": 104729,
+			"workers": 40
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": 1027.0,
+			"first_resource_times": {
+				"carbohydrate": 334.5,
+				"protein": 546.5,
+				"water": 326.5
+			},
+			"known_missing": 3,
+			"known_sources": 7,
+			"physical_scout_losses": 5,
+			"policy": "general",
+			"scenario": "garden_edge",
+			"seed": 8675309,
+			"workers": 35
+		},
+		{
+			"away": 2,
+			"exact_saved_continuation": true,
+			"first_missing_at": 1027.0,
+			"first_resource_times": {
+				"carbohydrate": 334.5,
+				"protein": 546.5,
+				"water": 326.5
+			},
+			"known_missing": 4,
+			"known_sources": 7,
+			"physical_scout_losses": 4,
+			"policy": "respond_to_absence",
+			"scenario": "garden_edge",
+			"seed": 8675309,
+			"workers": 36
+		},
+		{
+			"away": 5,
+			"exact_saved_continuation": true,
+			"first_missing_at": -1.0,
+			"first_resource_times": {
+				"carbohydrate": 334.5,
+				"protein": 546.5,
+				"water": 326.5
+			},
+			"known_missing": 0,
+			"known_sources": 7,
+			"physical_scout_losses": 0,
+			"policy": "cleared_counterfactual",
+			"scenario": "garden_edge",
+			"seed": 8675309,
+			"workers": 40
+		}
+	]
+}

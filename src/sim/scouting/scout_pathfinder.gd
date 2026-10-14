@@ -37,6 +37,16 @@ func path(start: Vector2, destination: Vector2) -> Array[Vector2]:
 	return result
 
 
+func path_from_origin(start: Vector2, destination: Vector2, world: WorldState) -> Array[Vector2]:
+	# A founded entrance may lie between graph cells. Preserve its real location;
+	# only the short entrance edge departs from the cardinal grid.
+	var result: Array[Vector2] = []
+	if not start.is_finite() or not is_finite(travel_cost(world,start)): return result
+	result = path(start.round(),destination)
+	if not result.is_empty() and result[0] != start: result.push_front(start)
+	return result
+
+
 static func travel_cost(world: WorldState, position: Vector2) -> float:
 	if not world.bounds.has_point(position):
 		return INF

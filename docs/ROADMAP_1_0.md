@@ -1,0 +1,136 @@
+# Antzenpile 1.0 roadmap
+
+Current plan, 2026-10-05. Supersedes the archived post-slice, interface and desktop release plans. The [systems bible](SYSTEMS_BIBLE.md) owns rules; its [catalogs](README.md) own concrete content; [current build](CURRENT_BUILD.md) owns implemented status. This roadmap owns order and release gates.
+
+## The release promise
+
+A player can learn an uncertain world, feed and develop a colony, make inherited tradeoffs, raise reproductives, establish a useful nest network, survive a crisis through real counterplay, and continue its lineage beyond the first queen/nest. Biological accomplishments and genuine unrecoverable failure have clear endings/review without forcing a fixed session duration.
+
+The release foundation is a small complete game: generational continuity; multiple independently staffed piles with physical connections; four ecological roles (partners, competitors, huntable predators, unassailable disturbances); ten concrete resource profiles and ten trait choices; functional chamber growth and recovery. Counts describe a content/design coverage target, not an arbitrary gameplay cap. Parameters may change after focused evidence, with rationale recorded.
+
+Windows desktop comes first. Keep touch-sized controls. Mobile, a fixed session-length target, detailed mating flights, latent-genome drift, large species catalogs and campaign travel are Post 1.0. No paid playtesting or new paid tooling; existing art/music gets its final pass after systems settle.
+
+## Milestone order
+
+M0 is complete in [card 138](tasks/138_roadmap_and_systems_bible.md): 14 system families, 46 catalog IDs mapped, 854 local links and 192 archive records checked. M1's source/report/gathering/comparison foundations work; remaining suitable staffing follows its family owners. M2 core and the ten-trait M3 web are complete; M4 local viability/replacement, daughter reproduction and maternal lineage are complete; M5 completed with returned shelter profiles, additional working piles and daughter-origin founding; two-way direct connection supplies/migration work after 155; physical laying-queen relocation works after 156; worker-brood rescue works after157; finite store rescue works after158; active/ready reproductive rescue works after159; explicit traffic closure works after160 and final departure/abandonment after161. M5 is complete; M6 water162, flexible per-pile producer service163 and supported stationary predator witnesses164 and roaming beetle165 and gathering residue166 and connection cargo residue167 and supported heavy passage168 and refuge/local ground crisis169 are complete; rival economic continuity170 is complete; M7 continuity, fresh complete-run strategies and physical-review integrity are implemented/headlessly verified through174. M8 presentation/player balance and M9 final release acceptance remain pending. None of their missing features exists merely because it is listed here. Expand one independently useful card at a time, with a player outcome, owning state/commands, knowledge projection, save rules and verification. Do not create unused frameworks for later milestones.
+
+| Milestone | Player outcome and required scope | Dependencies | Exit evidence |
+| --- | --- | --- | --- |
+| M0 — One current design | New bible/roadmap/catalogs, implementation baseline, current technical references, archive-only history and working navigation. | Actual 136/137 build and accepted player scope. | Catalog/system/milestone coverage, link/status/archive checks; no runtime changes. |
+| M1 — Understand and direct work | Concrete known-source identities, stable readable labels, flexible ordinary gathering/tending/care where appropriate, shared order/wait/cancel language, persistent returned/local reports, competing warnings and scout-priority summary. Consistent activation feedback starts with this next interface pass. | Current ledger, knowledge, trails and source definitions. | No hidden identity/stock/loss leak; exact saved orders/labels; mouse/touch semantic paths; player can retrieve simultaneous reports at four speeds. |
+| M2 — Schedule growth and develop organs | Queen reproduction queue works with Auto Brood; visible, cancellable next-investment priority; real space/nurses/food gates. Modular chamber/project records; Reproductive Alcove and Ventilation Gallery. Food Exchange handles resource yield bundles. Evaluate a Food Cache only under its explicit bottleneck gate. | M1 orders/source identities; current brood/project/care owners. | Queue is not starved by automatic laying; paid projects preserve existing care/occupancy; cancel/lock behavior saves exactly; concrete foods enter the same three nutrient stores without duplication. |
+| M3 — Meaningful adaptation web | Definition-driven six existing traits plus Efficient Nurses, Heat Resilience, Moisture Resilience and Rapid Trail Repair; evidence/compatibility/tradeoff details and current expression. | M2 cost/care/food contracts; existing phenotype ledger. | Each new trait has a useful pressure and a real cost; mixed cohorts/counts and captured travel traits reconcile; no instant adult conversion or universal best choice. |
+| M4 — Queens and reproductive continuity | Queen viability, paid replacement, fertile young-queen establishment using aggregate mating, daughter reproductive groups and inherited reproductive lineage. Reuse queued scheduling and simple trait bundles. | M2 queue, M3 trait definitions; existing founding/reproduction. | Same lineage crosses a queen generation; failure/withdrawal refunds only real unspent/returned assets; no copied queens/males/traits or accidental sterilization of viable saves. |
+| M5 — A useful nest network | Multiple site profiles/piles, founding from an established daughter, local ownership/jobs, connections with shared segments where needed, deliberate supplies/migration/closure. Paid worker/queen evacuation and abandonment operate before lethal network hazards ship. | M4 portable viable queens/lineages; M1 reports; current route and ledger foundations. | Home plus two daughters and a later-generation founding work; transport conserves workers/queens/cargo/traits; isolation and interruption recover through real travel; expansion has practical value. |
+| M6 — Ecological variety and crisis | Complete source profiles; partner/rival content families; stationary arthropod plus roaming beetle hunter; generic heavy traffic upgraded with supported witness cues; localized tainted ground and a surface/nest disturbance. Refuge Chamber supports preparation/evacuation. | M1 source/report rules, M3 expression, M5 isolation/evacuation. | Every hazard has a discoverable symptom and usable response; no instant toxin/species recognition; predator relocation is physical; transport/nest hazard and recovery conserve assets across saves. |
+| M7 — Complete runs and balance | Integrate Backyard/Garden Edge/Roadside with distinct sites/resources/risks and opening→growth→expansion→crisis→continuity chapters. Define recoverable/queenless/isolated/unrecoverable states; biological accomplishment and voluntary continuation/review. | M4–M6 implemented. | Purposeful paired player-directed runs compare Home growth, adaptations, fighting/avoidance and expansion; genuine failure accounts for brood, queens, all piles and unresolved returns; no false extinction or hidden-event ending. |
+| M8 — Final presentation | Final graphics/music, type-specific source/threat impressions, evolving chamber/web presentation, concise onboarding, accessible text and responsive controls. Retain the accepted circle and refine its feel with player feedback. | Systems/content stable through M7. | Player graphical/audio checks of standard/compact and mature/network/crisis states; controls communicate accepted/queued/rejected actions and ages; no new gameplay inferred from art. |
+| M9 — Ship Windows 1.0 | Reproducible export/package, separate saves/settings, content/asset inventory, upgrade/corruption handling, measured final performance and release regressions. | M8 complete; pinned engine/templates available. | Clean-machine player launch/start/resume/save/review/exit; defined desktop/resolution measurements at 1×–64×; mature network/long-run/resource bounds; full suite and release checklist recorded. |
+
+## Content coverage by milestone
+
+| Family and entry IDs | Milestone and status |
+| --- | --- |
+| RES-NECTAR, RES-HONEYDEW, RES-INSECT, RES-HUNT, RES-PUDDLE | M1 identifies existing physical foundations; M2 normalizes yield handling. |
+| RES-FRUIT, RES-SEED, RES-CRUMBS, RES-DEW, RES-SEEP | M2 supports profiles; M6 authors/completes distinct behavior. Crumbs already have a temporary-source foundation. |
+| CH-QUEEN, CH-NURSERY, CH-EXCHANGE, CH-ENTRANCE, CH-MIDDEN | M2 refactors existing functionality without silently changing costs. |
+| CH-REPRODUCTIVE, CH-VENTILATION | M2 implemented144/145; each solves a stated scheduling/climate decision. |
+| CH-REFUGE | M6 after M5 physical rescue exists. |
+| CH-CACHE | M2 bottleneck experiment; Gated 1.0, excluded as a release blocker if no concrete decision is demonstrated. |
+| AT-LEAN, AT-LOAD, AT-PERSISTENT, AT-SECURITY, AT-TOLERANCE, AT-MANDIBLES | M3 registry/web migration of existing effects/IDs. |
+| AT-NURSES, AT-HEAT, AT-MOISTURE, AT-REPAIR | M3 new inherited tradeoffs, then M4 lineage integration. |
+| ECO-APHIDS, ECO-RIVAL, ECO-AMBUSH, ECO-GUEST, ECO-HEAT, ECO-RAIN | Existing foundations; M6 modular definitions/content and M7 balance. |
+| ECO-ROAMER, ECO-TAINT, ECO-HEAVY, ECO-NEST | M6 planned complete behaviors; generic contamination/impact foundations are partial. |
+| SITE-LOAM, SITE-ROOT, SITE-STONE, SITE-EDGE | M5 distinct returned sites; M6 climate/hazard integration. |
+| SC-BACKYARD, SC-GARDEN, SC-ROADSIDE | M7 upgrades the three existing settings; M8/M9 finish/test them. |
+
+Ten resources/traits mean named distinct entries using common rules, not ten independent simulation engines. A catalog variant reuses the same tested state transitions. Physical object instances receive knowledge-owned identities only after evidence returns.
+
+## Next bounded card
+
+**M1-A complete:** [139 returned resource identity](tasks/139_returned_resource_identity.md), five source profiles, delayed sample identification, stable knowledge labels and atomic old-save fallback. Full gate 8,805 checks/0; import/Main/headless source drawing passed. Mixed yields and remaining profiles are still future work.
+
+**M1-B complete:** [140 reports/needs/feedback](tasks/140_reports_needs_and_feedback.md), a bounded delivered/local journal, grouped receipts, saved read state, free navigation, simultaneous needs and common control cues. Final full 9,043/0, import/Main/headless drawing passed.
+
+**M1-C complete:** [141 flexible gathering commitments](tasks/141_flexible_gathering_orders.md), whole initial/edited targets, care-protected unsent staffing, explicit draft/ORDER and real recall at both piles. Full 9,089/0; import/Main/headless drawing passed. Casualty deficits never silently create replacement intent.
+
+**M1-D complete:** [142 source comparison and scout intent](tasks/142_source_comparison_and_scout_intent.md), knowledge-based sorts, historical intake/target/wait comparison, compact Home/Daughter browsers and named scout priorities/actual local waits. Full 9,126/0; import/Main/headless drawing passed. Existing binary aphid tending remains partial until producer effort is generalized; internal effort controls will be rounded out with M2 organs.
+
+**M2-A complete:** [143 reproductive investment queue](tasks/143_reproductive_investment_queue.md), saved editable reproductive/adaptation priority, structural versus funding waits, Auto Brood continuation, immutable paid groups and local reports. Full 9,168/0; import/Main/headless drawing passed.
+
+**M2-B complete:** [144 Reproductive Alcove](tasks/144_reproductive_alcove.md), first modular paid organ project, care-protected queue/funding/cancel, independent pile ownership and eight exclusive reproductive spaces. Full 9,208/0; import/Main/headless drawing passed. First funded reproductive saves also have validated interval dates.
+
+**M2-C complete:** [145 Ventilation Gallery and local effort](tasks/145_ventilation_and_local_effort.md), paid bounded staffed regulation and whole climate/cleanup/scout targets with free drafts/suggestions, existing care/water/dispatch owners and presets. Full 9,249/0; import/Main/headless drawing passed.
+
+**M2-D complete:** [146 mixed-food cargo and ripe fruit](tasks/146_mixed_food_cargo.md), captured yields/bulk, real single harvest/travel/return, nutrient receipts/grouping and multi-filter same route; Garden Edge fruit supplies C/W. Full 9,283/0; import/Main/headless drawing passed.
+
+**M2-E complete:** [147 seeds/picnic food](tasks/147_seeds_and_picnic_food.md), actual finite heavy seeds and timed crumbs using captured C/P recipes, known carrying/fuel guard and old-world fallback. Full 9,300/0; import/Main/headless drawing passed. Cache gate found no current buffering decision, so CH-CACHE is excluded from release blockers.
+
+**M3-A complete:** [148 trait definitions and Efficient Nurses](tasks/148_trait_definitions_and_efficient_nurses.md), seven immutable entries, actual care expression/feeding tradeoff, observed eligibility and family/cost/queue/expression presentation. Full 9,323/0; import/Main/headless drawing passed.
+
+**M3-B complete:** [149 environmental brood traits](tasks/149_environmental_brood_traits.md), local larval exposure/surviving pupation, inherited moderate-heat/dry relief with developmental/carbohydrate costs, exact reproductive progression and Environment family. Full 9,377/0; import/Main/headless drawing passed.
+
+**M3-C complete:** [150 Rapid Trail Repair](tasks/150_rapid_trail_repair.md), returned weak-corridor evidence and later pupation, captured carrier deposition/fuel cost, bounded combined chemistry and a distinct free Chemistry family. Full 9,414/0; import/Main/headless drawing passed.
+
+**M4-A complete:** [151 queen viability/replacement](tasks/151_queen_viability_and_replacement.md), locally observed weakening and paid care, queenless funded-brood continuation, real ready-group establishment/cancellation and retained Continuity reports. Full 9,458/0; import/Main/headless drawing passed.
+
+**M4-B complete:** [152 maternal lineage/daughter reproduction](tasks/152_maternal_lineage_and_daughter_reproduction.md), queen-owned bundles independent of immigrants, captured ancestry, paid daughter trial/reproduction with Auto Brood and a real successor generation. Full 9,495/0; import/Main/headless drawing passed.
+
+**M5-A complete:** [153 returned site profiles](tasks/153_returned_site_profiles.md), four distinct shelter/preparation/climate profiles, two alternatives per new setting, historical cues, paid preparation and unknown-site physical pack/report handling. Full 9,602/0; import/Main/headless drawing passed.
+
+**M5-B complete:** [154 additional piles/daughter founding](tasks/154_additional_piles_and_daughter_founding.md), real later-generation settlement, independent named local work/scouting and reconciled migration/paid-group/history saves. Original supplies/settlers remain correct during new founding. Full 9,645/0; import/Main/headless drawing passed.
+
+**M5-C complete:** [155 connection transport/migration](tasks/155_connection_transport_and_migration.md), two-way adjacent supplies and whole settlers with an actual messenger, captured migrant bundles, one physical shared slot, preserved first-link aliases and explicit free draft/ORDER/returned journal. Full 9,697/0; import/Main/headless drawing passed.
+
+**M5-D queen entry complete:** [156 physical queen relocation](tasks/156_physical_queen_relocation.md), one actual mother/escorts/provisions, reserved return/receiving slots, retained maternal lineage/old funded brood, actual arrival/recall and reported success/failure. Full 9,763/0; import/Main/headless drawing passed.
+
+**M5-D worker-brood entry complete:** [157 physical brood rescue](tasks/157_physical_brood_rescue.md), ordinary/trial eggs/feeding larvae/pupae, real carriers/carers/feeding, reserved body/group/trial room, immutable original UID/mother/inheritance/past loss and actual arrival/return/reported custody. Full9,847/0; import/Main/headless drawing passed.
+
+**M5-D store entry complete:** [158 finite store rescue](tasks/158_finite_store_rescue.md), one real nutrient pack with eight returning carriers, carrying-trait capacity, physical contaminated recall and delayed separate receipt. Full9,966/0; import/Main/headless drawing passed.
+
+**M5-D reproductive entry complete:** [159 reproductive-group rescue](tasks/159_reproductive_group_rescue.md), paid immature/ready young queen/males, real nurses/carriers/feeding, protected slots/space and original identity through actual maturation/succession/onward founding. Full10,059/0; import/Main/headless drawing passed.
+
+**M5-E complete:** [160 connection closure](tasks/160_connection_closure.md), explicit close/reopen policy, stopped repeating/waiting supplies, preserved paid owners/recall/report and independent local/other-edge continuation. Full10,131/0; import/Main/headless drawing passed.
+
+**M5-F complete:** [161 final departure/abandonment](tasks/161_final_departure_and_abandonment.md), staged lineage rescue then a real zero-messenger whole-workforce/empty departure, exact leftovers, actual recall/reactivation and receiver-owned confirmation with frozen source knowledge. Full10,183/0; import/Main/headless drawing passed. **M5 is complete.**
+
+**M6-A complete:** [162 dew/seep](tasks/162_dew_and_sheltered_seep.md), ten source profiles, bounded wet/dry/renewing water, original openings preserved, physical harvest/returned knowledge and old-world isolation. Full10,235/0; import/Main/headless source/browser drawing passed.
+
+**M6-B complete:** [163 flexible producer tending](tasks/163_flexible_producer_tending.md), paid per-pile attendants, bounded actual support, captured recognition and physical withdrawal/reassignment with free effort controls. Full10,296/0; import/Main/headless drawing passed.
+
+**M6-C complete:** [164 supported stationary predator witnesses](tasks/164_supported_predator_witnesses.md), authored physical identity and privately captured/actually returned spider-like outline in conflict controls and Reports. Full10,323/0; import/Main/headless drawing passed.
+
+**M6-D complete:** [165 roaming beetle hunter](tasks/165_roaming_beetle_hunter.md), fresh Garden Edge physical patrol/feeding pauses, dated returning sightings, real clear/hunt/retreat and carcass location. Full10,681/0; import/Main/headless drawing passed.
+
+**M6-E complete:** [166 residue ground/cargo](tasks/166_residue_ground_and_returned_cargo.md), fresh Roadside physical contact, once-coated actual cargo, dated returned cue and useful stop/investigate/safer-food recovery. Full10,717/0; import/Main/headless drawing passed.
+
+**M6-F complete:** [167 connection residue/cargo](tasks/167_residue_on_connection_cargo.md), real supply/store coating, retained finite recall, independent dated payer receipts and useful closure. Full10,753/0; import/Main/headless drawing passed.
+
+**M6-G complete:** [168 supported heavy passage](tasks/168_supported_heavy_passage.md), actual close distinct-passage evidence, dated large-animal/dog-like impressions and proper avoidance. Full10,784/0; import/Main/headless drawing passed.
+
+**M6-H complete:** [169 refuge/local ground crisis](tasks/169_refuge_and_local_ground_crisis.md), actual shared named shelter, paid carers/preparation, local warning/impact/settlement, site cover and recovery. Full10,842/0; import/Main/headless drawing passed.
+
+**M6-I complete:** [170 rival economic continuity](tasks/170_rival_economic_continuity.md), actual home reserve refill/withdrawal, paid bounded brood and dated encounter settlement. Full10,881/0; import/Main/headless drawing passed.
+
+**M7-A complete:** [171 run continuity/accomplishment](tasks/171_run_continuity_and_accomplishment.md), approved cross-pile/paid-journey paths, delayed confirmed failure, actual successor offspring and free status/voluntary review. Full10,925/0; import/Main/headless drawing passed.
+
+**M7-B complete:** [172 integrated runs/balance](tasks/172_integrated_scenario_runs_and_balance.md), fresh three-setting arcs, actual three-nest Garden lineage, practical producer/packet choices, versioned Roadside warning and prepared/rescued recovery. Full10,959/0; import/Main/headless drawing passed. [Evidence](evidence/card172_complete_runs.md).
+
+**M7-C complete:** [173 late connection pressure](tasks/173_late_connection_pressure.md), practical fresh-world contact/returned cue, real closure/finite recall/local recovery and preserved old cargo definitions. Full10,978/0; import/Main/headless drawing passed.
+
+**M7-D complete:** [174 physical-review integrity](tasks/174_physical_review_integrity.md), actual sampled moving-threat/active-zone context, strict bounded saves and honest old-sample omission. Full11,000/0; import/Main/headless drawing passed.
+
+**M1–M7 systems beta implemented and headlessly verified.** [175](tasks/175_windows_systems_beta_package.md) supplies a portable Windows beta for actual player review; M8 final presentation/balance feedback and M9 final distribution/performance/clean-machine gates remain. Player graphical/feel checks defer to the systems beta (A88).
+
+## Release acceptance and cost discipline
+
+- M1–M7 deliver game decisions before art/audio production expands. Each card includes useful presentation and headless verification; these are not separate invisible simulation-only handoffs by default.
+- Use targeted semantic scenarios and saved twins while iterating, then the full headless suite after final runtime code. Run only gates affected by subsequent changes. Documentation-only cards use link/coverage/consistency checks.
+- The player supplies specific visual/feel/audio and clean-machine checks. No computer-use/screen monitoring, hired testers or large parameter sweeps.
+- Measure performance using bounded in-game logs/probes and player runs; headless correctness does not prove renderer or audio quality. Choose stated desktop hardware before claiming a performance gate.
+- Use existing immutable Godot definitions and typed owners. Catalog modularity does not authorize addons, a universal scripting/effect language, individual worker simulation or paid assets.
+- Review values when a meaningful choice is absent. Record the observed problem, bounded adjustment and comparison. Do not impose a surplus cap to justify a chamber or force a fixed run duration.
+
+## Deliberately after 1.0
+
+Mobile packaging/device optimization; detailed mating flights, individual genomes, latent-trait drift/reselection; large animal/species catalogs and detailed human behavior; beneficial-guest diplomacy; large automated logistics empires; comprehensive annual seasons/campaign/destination travel; fungi/seed-processing industry and arbitrary new currencies. These remain visible longer-term options, not unfinished release requirements. Strong evidence or a direct player instruction can change this boundary in Decisions and the roadmap together.

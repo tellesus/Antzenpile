@@ -1,0 +1,97 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"available_after": 96,
+			"available_before": 88,
+			"cost": 1.96756,
+			"duration": 86.75,
+			"harvest": 1.13729,
+			"local_workers_released": true,
+			"new_ambush_kills": 0,
+			"no_parent_defense_deaths": true,
+			"outcome": {
+				"lost": 0,
+				"observed_at": 5837.75,
+				"outcome": "secured",
+				"received_at": 5869.0,
+				"sent": 16
+			},
+			"parent_dispatch_unchanged": true,
+			"passed": true,
+			"private_loss_ticks": 0,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"available_after": 94,
+			"available_before": 96,
+			"cost": 1.97623,
+			"duration": 94.25,
+			"harvest": 1.28475,
+			"local_workers_released": true,
+			"new_ambush_kills": 0,
+			"no_parent_defense_deaths": true,
+			"outcome": {
+				"lost": 2,
+				"observed_at": 6936.0,
+				"outcome": "secured",
+				"received_at": 6967.0,
+				"sent": 16
+			},
+			"parent_dispatch_unchanged": true,
+			"passed": true,
+			"private_loss_ticks": 204,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591
+		},
+		{
+			"available_after": 80,
+			"available_before": 80,
+			"cost": 1.97257,
+			"duration": 86.75,
+			"harvest": 1.27813,
+			"local_workers_released": true,
+			"new_ambush_kills": 0,
+			"no_parent_defense_deaths": true,
+			"outcome": {
+				"lost": 0,
+				"observed_at": 6273.25,
+				"outcome": "secured",
+				"received_at": 6304.5,
+				"sent": 16
+			},
+			"parent_dispatch_unchanged": true,
+			"passed": true,
+			"private_loss_ticks": 0,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		},
+		{
+			"available_after": 111,
+			"available_before": 112,
+			"cost": 1.92672,
+			"duration": 89.25,
+			"harvest": 2.42429,
+			"local_workers_released": true,
+			"new_ambush_kills": 0,
+			"no_parent_defense_deaths": true,
+			"outcome": {
+				"lost": 1,
+				"observed_at": 6034.5,
+				"outcome": "secured",
+				"received_at": 6065.0,
+				"sent": 16
+			},
+			"parent_dispatch_unchanged": true,
+			"passed": true,
+			"private_loss_ticks": 138,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591
+		}
+	]
+}

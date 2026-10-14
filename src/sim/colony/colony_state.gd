@@ -38,10 +38,15 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 	if not data.has("piles") or not data.piles is Array:
 		return false
 	var restored: Dictionary[String, PileState] = {}
+	var queen_ids: Dictionary={}
 	for value: Variant in data.piles:
 		var pile := Pile.new()
 		if not value is Dictionary or not pile.restore(value) or restored.has(pile.id) or not bounds.has_point(pile.position):
 			return false
+		var queen_id: String=pile.queen.queen_id(pile.id)
+		if pile.queen.count>0:
+			if queen_ids.has(queen_id): return false
+			queen_ids[queen_id]=true
 		restored[pile.id] = pile
 	if not restored.has("home") or restored.home.position != home_position:
 		return false
@@ -50,11 +55,19 @@ func restore(data: Dictionary, bounds: Rect2, home_position: Vector2) -> bool:
 		return false
 	var required: int = INITIAL_HOME_WORKERS + restored.home.brood_matured_total
 	var losses: int = restored.home.workers.lost_total
-	if losses < required and restored.home.workers_total < required - losses:
+	if restored.home.workers_total+losses+restored.home.workers.transferred_out < required+restored.home.workers.transferred_in:
 		return false
+	var incoming: int=0; var outgoing: int=0
+	var gene_in: Dictionary={}; var gene_out: Dictionary={}
+	for pile: PileState in restored.values():
+		incoming+=pile.workers.transferred_in; outgoing+=pile.workers.transferred_out
+		for key: String in pile.genetics.imported: gene_in[key]=gene_in.get(key,0)+pile.genetics.imported[key]
+		for key: String in pile.genetics.exported: gene_out[key]=gene_out.get(key,0)+pile.genetics.exported[key]
+		if not pile.foundation.is_empty() and pile.workers_total+pile.workers.lost_total+pile.workers.transferred_out!=pile.brood_matured_total+pile.workers.transferred_in: return false
+	if incoming!=outgoing or gene_in!=gene_out: return false
 	for pile: PileState in restored.values():
 		for commitment_id: String in pile.workers.to_dict().commitments:
-			for prefix: String in ["sanitation:", "midden:", "humidity:"]:
+			for prefix: String in ["sanitation:", "midden:", "humidity:", "reproduction:", "queen_care:", "queen_replacement:"]:
 				if commitment_id.begins_with(prefix) and commitment_id != prefix + pile.id:
 					return false
 			if commitment_id.begins_with("food_exchange:") and commitment_id != "food_exchange:" + pile.id:

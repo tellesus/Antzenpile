@@ -1,0 +1,51 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[COMPLETE RUN] Backyard events={ "organs": 202.0, "growth": 362.0, "trial": 922.0, "reproductives": 1862.0, "daughter": 2032.0, "continuity": 2472.0 } final=2472.0 piles=2
+[COMPLETE RUN] Garden events={ "growth": 362.0, "organs": 442.0, "trial": 852.0, "reproductives": 2072.0, "daughter": 2272.0, "continuity": 2882.0, "network": 4752.0 } final=4752.0 piles=3
+[COMPLETE RUN] Roadside Refuge events={ "organs": 202.0, "growth": 362.0, "trial": 922.0, "reproductives": 1862.0, "daughter": 2092.0, "continuity": 2532.0 } final=2532.0 piles=2
+[COMPLETE RUN] Roadside rescue events={ "organs": 172.0, "growth": 362.0, "reproductives": 1862.0, "daughter": 2002.0, "continuity": 2752.0 } final=2752.0 piles=2
+[HISTORY] four-hour slot bytes=267057 frames=105 events=8
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[CLOCK] 1x: 256 ticks / 64.00s
+[CLOCK] 4x: 256 ticks / 64.00s
+[CLOCK] 16x: 256 ticks / 64.00s
+[CLOCK] 64x: 256 ticks / 64.00s
+[RUN] seed=482817 scenario=backyard_slice continuation matched
+[WORLD] water_dew (28.0, 4.0) quantity=2
+[WORLD] water_seep (2.0, 2.0) quantity=4
+[WORLD] nest_site_01 (5.0, 5.0) quantity=1
+[WORLD] nest_site_02 (36.0, 4.0) quantity=1
+[WORLD] carb_exposed (30.0, 20.0) quantity=100
+[WORLD] carb_sheltered (10.0, 20.0) quantity=100
+[WORLD] protein_01 (15.0, 30.0) quantity=100
+[WORLD] protein_picnic (25.0, 23.0) quantity=0
+[WORLD] water_01 (25.0, 10.0) quantity=100
+[WORLD] aphid_01 (35.0, 33.0) quantity=20
+[WORLD] rival_food_01 (28.0, 38.0) quantity=0
+[COLONY] home=(20,20) queens=1 initial_workers=40; 1000 transfers conserved workers
+[SCOUT] deterministic missions, cap, pathing, return accounting and snapshot continuation verified
+[SCOUT] distant water report at 203.25s, known-source pass-through and exhausted-ground return verified
+[SENSE] broad radius 2.23m narrowed to 0.65m; confirmation at 0.79m without point contact
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[ECOLOGY-BRANCH] reinforced_player_losses=2 reinforced_rival_losses=0 withdrawn_player_losses=1 withdrawn_rival_losses=0
+[ECOLOGY-REVIEW] events=["196.50s five source reports delivered", "238.25s six workers tending honeydew", "321.25s honeydew mortality reported", "512.75s Nursery developed", "725.25s contested crossing reported", "825.25s reinforcement branch resolved; comparison withdrew", "1196.50s Lean Foragers expressed", "1259.75s guest-associated nursery loss observed", "1334.75s guest purged; exact saved continuation"] final=1334.75 player_living=53 player_lost=3 rival_lost=0 brood_lost=1 stores={ "carbohydrate": 94.14271, "protein": 76.35775, "water": 107.09625 } available=32
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[SLICE] carb=18.25s rain=40.00s build=40.00s protein=46.50s developed=100.00s emergence=360.00s routes=3 signals=3
+[EXTENDED] develop=40.00s first=360.00s water_stall=620.25s water_known=666.50s second=790.00s workers=56 stores={ "carbohydrate": 177.16545, "protein": 94.52, "water": 26.2 }
+[POST-SLICE] rain1=40.00 nursery_start=88.75 nursery_done=178.75 picnic_report=493.25 rain2_done=759.50 final=1064.25 brood=16 workers=56 available=36 routes=5 reports=7 nursery_stores={ "carbohydrate": 8.30773, "protein": 3.0, "water": 2.45 } final_stores={ "carbohydrate": 156.09141, "protein": 110.52, "water": 95.2 }
+[GENETICS] first rain comparison candidate=true
+[RECOGNITION] candidate time=855.5
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+Tests: 11003 checks, 0 failures

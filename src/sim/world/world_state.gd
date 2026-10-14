@@ -38,16 +38,26 @@ func restore(data: Dictionary, definition_ids: Array[String]) -> bool:
 			return _reject("Empty/duplicate node ID")
 		if not value.definition_id is String or not definition_ids.has(value.definition_id):
 			return _reject("Unknown resource definition")
+		var source_type: Variant = value.get("source_type", "")
+		var site: Variant=value.get("site_profile","")
+		if not SiteCatalog.accepts(site,value.definition_id): return _reject("Unknown or incompatible site profile")
+		if not SourceCatalog.accepts(source_type, value.definition_id): return _reject("Unknown or incompatible source type")
 		if not _numbers(value.position, 2) or not _number(value.quantity) or value.quantity < 0.0:
 			return _reject("Invalid node position/quantity")
+		var source_profile: SourceProfile=SourceCatalog.PROFILES.get(source_type)
+		if source_profile is WaterSourceProfile and value.quantity>source_profile.capacity:return _reject("Small-water source exceeds its authored capacity")
 		var position := Vector2(value.position[0], value.position[1])
 		if not area.has_point(position) or typeof(value.active) != TYPE_BOOL or not value.properties is Dictionary:
 			return _reject("Node outside bounds or invalid active/properties")
+		if value.definition_id == "nest_site" and value.quantity not in [0.0, 1.0]:
+			return _reject("Nest-site availability must be zero or one")
 		var contamination: Variant = value.properties.get("contaminant_fraction",0.0)
 		if not _number(contamination) or contamination < 0 or contamination > 1 or (contamination > 0 and value.definition_id != "carbohydrate"): return _reject("Invalid food contamination")
 		var node := WorldNode.new()
 		node.id = value.id
 		node.definition_id = value.definition_id
+		node.source_type = source_type
+		node.site_profile=site
 		node.position = position
 		node.quantity = value.quantity
 		node.active = value.active

@@ -1,0 +1,61 @@
+{
+	"passed": true,
+	"rows": [
+		{
+			"departed_at": 5760.0,
+			"dispatched": true,
+			"final_workers": 113,
+			"gathering_order": true,
+			"local_missions": 1,
+			"missing_at": -1.0,
+			"passed": true,
+			"recalled": true,
+			"returned_at": 6959.75,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 482817
+		},
+		{
+			"departed_at": 6850.0,
+			"dispatched": true,
+			"final_workers": 121,
+			"gathering_order": true,
+			"local_missions": 1,
+			"missing_at": -1.0,
+			"passed": true,
+			"recalled": true,
+			"returned_at": 8049.75,
+			"saved_exact": true,
+			"scenario": "backyard_slice",
+			"seed": 591
+		},
+		{
+			"departed_at": 6195.0,
+			"dispatched": true,
+			"final_workers": 105,
+			"gathering_order": true,
+			"local_missions": 1,
+			"missing_at": -1.0,
+			"passed": true,
+			"recalled": true,
+			"returned_at": 7394.75,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 482817
+		},
+		{
+			"departed_at": 5955.0,
+			"dispatched": true,
+			"final_workers": 137,
+			"gathering_order": true,
+			"local_missions": 1,
+			"missing_at": -1.0,
+			"passed": true,
+			"recalled": true,
+			"returned_at": 7154.75,
+			"saved_exact": true,
+			"scenario": "garden_edge",
+			"seed": 591
+		}
+	]
+}

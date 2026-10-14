@@ -1,0 +1,160 @@
+class_name ReportSystem
+extends RefCounted
+## Observe only delivered route/knowledge records and visible local progress.
+var _run: RunState
+func _init(run: RunState) -> void: _run=run
+
+func prime() -> void:
+	if _run.reports.initialized: return
+	_run.reports.since=_run.simulation_time
+	capture(false);_run.reports.initialized=true
+
+func capture(recording: bool = true) -> void:
+	var journal: ReportJournal=_run.reports;var time: float=_run.simulation_time
+	var accomplishment: LineageAccomplishment=_run.accomplishment
+	if journal.changed("lineage/generation",accomplishment.generation) and accomplishment.generation>0:
+		journal.add("lineage",accomplishment.pile_id,accomplishment.pile_id,accomplishment.tick*SimulationClock.TICK_INTERVAL,time,"grown",accomplishment.generation,accomplishment.count,recording)
+	var failed: bool=RunContinuity.failed(_run)
+	if journal.changed("continuity/failed",int(failed)) and failed:journal.add("continuity","home","home",time,time,"unrecoverable",0,0,recording)
+	var source_ids: Array=_run.knowledge.nodes.keys();source_ids.sort()
+	for source_id: String in source_ids:
+		var node: KnownNode=_run.knowledge.nodes[source_id]
+		if journal.changed("source/"+node.id,node.last_delivered_at):
+			var delivery: Dictionary=_run.knowledge.latest_delivery(node.id)
+			if delivery.is_empty(): continue
+			journal.add("source",delivery.evidence.origin_pile,node.id,delivery.evidence.observed_at,delivery.received_at,"site:"+delivery.evidence.site_profile if not delivery.evidence.site_profile.is_empty() else node.source_type,0 if _run.knowledge.temporal_hint(node.id).get("last_return_empty",false) else 1,0,recording)
+	var route_ids: Array=_run.trails.routes.keys();route_ids.sort()
+	for route_id: String in route_ids:
+		var route: TrailRouteState=_run.trails.routes[route_id]
+		if route.purpose=="food" and journal.changed("gathering/"+route.id,route.desired_workers): journal.add("gathering",route.origin_pile,route.id,time,time,"target",route.desired_workers,0,recording)
+		if not route.nutrient_receipts.is_empty():
+			for id: String in PileState.RESOURCE_IDS:
+				if not route.nutrient_receipts.has(id): continue
+				var receipt: Dictionary=route.nutrient_receipts[id]
+				if journal.changed("intake/"+route.id+"/"+id,receipt.last_at): journal.add("intake",route.origin_pile,route.id,receipt.last_at,receipt.last_at,id,receipt.last_amount,receipt.last_amount,recording)
+		elif not route.receipt.is_empty() and journal.changed("intake/"+route.id,route.receipt.last_at) and route.purpose=="food":
+			journal.add("intake",route.origin_pile,route.id,route.receipt.last_at,route.receipt.last_at,_run.knowledge.nodes[route.destination_knowledge_id].definition_id,route.receipt.last_amount,route.receipt.last_amount,recording)
+		var previous: int=int(journal.seen.get("loss/"+route.id,0))
+		if journal.changed("loss/"+route.id,route.reported_losses) and route.reported_losses>previous:
+			journal.add("loss",route.origin_pile,route.id,route.last_loss_time,route.last_loss_time,"reported",route.reported_losses-previous,route.reported_losses,recording)
+		if not route.conflict_report.is_empty() and journal.changed("conflict/"+route.id,route.conflict_received_at):
+			journal.add("conflict",route.origin_pile,route.id,route.conflict_observed_at,route.conflict_received_at,route.conflict_report,0,0,recording)
+		if route.passage_memory.count>0 and journal.changed("passage/"+route.id,route.passage_memory.impression()):
+			journal.add("passage",route.origin_pile,route.id,route.passage_memory.observed_at,route.passage_memory.received_at,route.passage_memory.impression(),0,0,recording)
+		if not route.residue_report.is_empty() and journal.changed("ground/"+route.id,route.residue_report.received_at):
+			journal.add("ground",route.origin_pile,route.id,route.residue_report.observed_at,route.residue_report.received_at,"residue",0,0,recording)
+	for connection: ConnectionTrafficState in _run.all_connections():
+		for payer: String in [connection.parent_id,connection.child_id]:
+			for family: String in ["supplies","stores"]:
+				var state: InterpileSupplyState=connection.supplies[payer] if family=="supplies" else connection.stores[payer]
+				var cue: Dictionary=state.last_residue_report
+				if not cue.is_empty() and journal.changed("link_ground/"+connection.route_id+"/"+payer+"/"+family,cue.received_at):journal.add("link_ground",payer,connection.route_id,cue.observed_at,cue.received_at,"residue",0,0,recording)
+	for id: String in _run.nest_disturbance.records:
+		var record: Dictionary=_run.nest_disturbance.records[id]
+		for stage: String in ["warned","impacted","settled"]:
+			if record[stage]>0 and journal.changed("nest_crisis/"+id+"/"+stage,record[stage]):journal.add("nest_crisis",id,id,record[stage]*SimulationClock.TICK_INTERVAL,record[stage]*SimulationClock.TICK_INTERVAL,{"warned":"warning","impacted":"impact","settled":"settled"}[stage],record.workers,record.brood,recording)
+	for id: String in _run.refuges:
+		var shelter: RefugeState=_run.refuges[id]
+		var previous: String=str(journal.seen.get("refuge/"+id,""))
+		if journal.changed("refuge/"+id,shelter.phase+":"+shelter.priority+":"+str(shelter.started_tick)):
+			var detail: String="none" if shelter.phase=="none" and (previous.begins_with("preparing:") or previous.begins_with("ready:")) else shelter.priority if shelter.phase=="none" else shelter.phase
+			journal.add("refuge",id,id,time,time,detail,RefugeState.WORKERS if shelter.phase!="none" else 0,shelter.reserved_space(),recording)
+	var response: JourneyResponseState=_run.journey_response
+	for kind: String in ["survey","pressure","defense","approach"]:
+		var records: Dictionary=response.reports if kind=="survey" else response.pressure.reports if kind=="pressure" else response.defense.outcomes if kind=="defense" else response.approach.reports
+		var record_ids: Array=records.keys();record_ids.sort()
+		for id: String in record_ids:
+			var report: Dictionary=records[id]
+			if not journal.changed(kind+"/"+id,report.received_at): continue
+			var detail: String=report.finding if kind=="survey" else report.pressure if kind=="pressure" else report.get("goal","clear")+":"+report.outcome if kind=="defense" else report.outcome
+			if kind=="survey" and report.get("predator_profile", "") != "": detail += ":" + report.predator_profile
+			journal.add(kind,_run.trails.routes[id].origin_pile,id,report.get("observed_at",report.received_at),report.received_at,detail,report.get("lost",report.get("acknowledged_sent",report.get("length",0))),report.get("sent",0),recording)
+	var order_ids: Array=response.orders.targets.keys();order_ids.sort()
+	for id: String in order_ids:
+		var target: int=response.orders.targets[id];var goal: String=response.orders.goals.get(id,"clear")
+		if journal.changed("order/"+id,str(target)+":"+goal): journal.add("order",_run.trails.routes[id].origin_pile,id,time,time,goal,target,0,recording)
+	if response.active() and journal.changed("dispatch/"+response.route_id,str(response.departed_at)+":"+str(response.defense.sent)):
+		journal.add("dispatch",response.origin_id(_run.trails),response.route_id,time,time,response.defense.mode,response.defense.sent,0,recording)
+	var pile_ids: Array=_run.colony.piles.keys();pile_ids.sort()
+	for pile_id: String in pile_ids:
+		var pile: PileState=_run.colony.piles[pile_id]
+		var queen_status: String=QueenSystem.new(_run).summary(pile.id).status
+		var queen_previous: Variant=journal.seen.get("queen/"+pile.id)
+		if journal.changed("queen/"+pile.id,queen_status) and (queen_status in ["weakened","lost","replacing","relocating","relocated"] or queen_previous in ["weakened","lost","replacing","relocating","relocated"]): journal.add("queen",pile.id,pile.id,time,time,queen_status,pile.queen.generation,0,recording)
+		if journal.changed("investment/"+pile.id,",".join(pile.investments.priority)+"/"+pile.queued_adaptation): journal.add("investment",pile.id,pile.id,time,time,pile.investments.first() if not pile.investments.priority.is_empty() else "none",pile.investments.priority.size(),0,recording)
+		if pile.reproduction.phase!="none" and journal.changed("investment/"+pile.id+"/laid",pile.reproduction.laid_tick): journal.add("investment",pile.id,pile.id,time,time,"reproduction_laid",0,0,recording)
+		var trial: BroodCohort=pile.trial_cohort()
+		if trial!=null and journal.changed("investment/"+pile.id+"/trial",trial.id): journal.add("investment",pile.id,pile.id,time,time,"adaptation_laid",0,0,recording)
+		for detail: String in ["emerged","lost"]:
+			var value: int=pile.brood_matured_total if detail=="emerged" else pile.brood_lost_total
+			var key: String="brood/"+pile.id+"/"+detail;var before: int=int(journal.seen.get(key,0))
+			if journal.changed(key,value) and value>before: journal.add("brood",pile.id,pile.id,time,time,detail,value-before,value,recording)
+		var trait_ids: Array=pile.genetics.established.duplicate();trait_ids.sort()
+		for trait_id: String in trait_ids:
+			if journal.changed("trait/"+pile.id+"/"+trait_id,1): journal.add("trait",pile.id,trait_id,time,time,"established",0,0,recording)
+		_project(pile.id,"nursery",pile.nursery_state,"developed",time,recording)
+		_project(pile.id,"expansion",pile.nursery_expansion_state,"developed",time,recording)
+		_project(pile.id,"exchange",pile.food_exchange_state,"developed",time,recording)
+		_project(pile.id,"midden",pile.midden.state,"developed",time,recording)
+		_project(pile.id,"reproduction",pile.reproduction.phase,"ready",time,recording)
+		var chamber_ids: Array=ChamberCatalog.DEFINITIONS.keys();chamber_ids.sort()
+		for id: String in chamber_ids:
+			var phase: String=pile.chambers.projects[id].phase if pile.chambers.projects.has(id) else "unbuilt"
+			var key: String="chamber/"+pile.id+"/"+id;var previous: Variant=journal.seen.get(key)
+			if journal.changed(key,phase) and (phase!="unbuilt" or previous!=null and previous!="unbuilt"): journal.add("chamber",pile.id,id,time,time,"canceled" if phase=="unbuilt" else phase,0,0,recording)
+	for camp: FoundingState in _run.all_foundings():
+		if camp.reported_tick<=0:continue
+		var received: float=camp.reported_tick*SimulationClock.TICK_INTERVAL
+		if camp.phase in ["ready","failed","established"] and journal.changed("camp/"+camp.route_id,str(received)+":"+camp.phase):journal.add("camp",camp.origin_pile,camp.route_id,received,received,camp.phase,0,0,recording)
+	for id: String in _run.honeydew.services:
+		var service: ProducerServiceState=_run.honeydew.services[id];var now: float=_run.simulation_time
+		if journal.changed("producer/"+id+"/target",service.known_target()):journal.add("producer",id,"known:"+HoneydewState.CONFIG.source_id,now,now,"target",service.known_target(),0,recording)
+		if service.last_returned_tick>0 and journal.changed("producer/"+id+"/return",service.last_returned_tick):
+			var received: float=service.last_returned_tick*SimulationClock.TICK_INTERVAL
+			journal.add("producer",id,"known:"+HoneydewState.CONFIG.source_id,received,received,service.last_result,0,0,recording)
+	for connection: ConnectionTrafficState in _run.all_connections():
+		if not connection.policy_actor.is_empty() and journal.changed("connection/"+connection.route_id,str(connection.policy_tick)+":"+str(connection.closed)):
+			var received: float=connection.policy_tick*SimulationClock.TICK_INTERVAL
+			journal.add("connection",connection.policy_actor,connection.route_id,received,received,"closed" if connection.closed else "opened",0,0,recording)
+		for origin: String in [connection.parent_id,connection.child_id]:
+			var supply: InterpileSupplyState=connection.supplies[origin]
+			var key: String="supplies/"+origin+("" if connection.legacy else "/"+connection.route_id)
+			if supply.trips_reported>0 and journal.changed(key,supply.last_reported_tick):
+				var received: float=supply.last_reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("supplies",origin,connection.target(origin),received,received,"returned",supply.receipt().last_amount,0,recording)
+			var stores: StoreTransportState=connection.stores[origin]
+			if stores.trips_reported>0 and journal.changed("store_rescue/"+origin+"/"+connection.route_id,stores.last_reported_tick):
+				var report: Dictionary=stores.manifests[stores.trips_reported-1];var received: float=report.reported*SimulationClock.TICK_INTERVAL
+				journal.add("store_rescue",origin,connection.target(origin),received,received,("delivered:" if report.arrived>0 else "returned:")+report.resource,report.amount,0,recording)
+			var migration: WorkerReinforcementState=connection.migrations[origin]
+			if migration.trips_reported>0 and journal.changed("migration/"+origin+"/"+connection.route_id,migration.last_reported_tick):
+				var received: float=migration.last_reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("migration",origin,connection.target(origin),received,received,"returned",migration.last_settled,migration.reported_workers(),recording)
+
+			var queen_transport: QueenTransportState=connection.queens[origin]
+			if queen_transport.movement.trips_reported>0 and journal.changed("relocation/"+origin+"/"+connection.route_id,queen_transport.movement.last_reported_tick):
+				var received: float=queen_transport.movement.last_reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("relocation",origin,connection.target(origin),received,received,"delivered" if queen_transport.current().arrived_tick>0 else queen_transport.current().reason if not queen_transport.current().reason.is_empty() else "returned",queen_transport.movement.last_settled,queen_transport.movement.reported_arrivals(),recording)
+
+			var final_party: EvacuationTransportState=connection.evacuations[origin]
+			if not final_party.current().is_empty():
+				var record: Dictionary=final_party.current();var departure: float=record.departed_tick*SimulationClock.TICK_INTERVAL
+				if journal.changed("departure/"+origin+"/"+connection.route_id,record.sequence):journal.add("departure",origin,connection.target(origin),departure,departure,"departed",record.workers,0,recording)
+				if record.arrived_tick>0 and record.workers>0 and journal.changed("evacuation/"+origin+"/"+connection.route_id+"/arrival",record.arrived_tick):
+					var received: float=record.arrived_tick*SimulationClock.TICK_INTERVAL
+					journal.add("evacuation",connection.target(origin),origin,received,received,"arrived",record.workers,0,recording)
+				if record.returned_tick>0 and journal.changed("evacuation/"+origin+"/"+connection.route_id+"/return",record.returned_tick):
+					var received: float=record.returned_tick*SimulationClock.TICK_INTERVAL
+					journal.add("evacuation",origin,connection.target(origin),received,received,record.reason if not record.reason.is_empty() else "returned",record.workers,0,recording)
+			var royal_transport: RoyalTransportState=connection.royals[origin]
+			if royal_transport.movement.trips_reported>0 and journal.changed("royal_rescue/"+origin+"/"+connection.route_id,royal_transport.movement.last_reported_tick):
+				var report: Dictionary=royal_transport.last_report();var received: float=report.reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("royal_rescue",origin,connection.target(origin),received,received,"delivered" if report.arrived_tick>0 else report.reason if not report.reason.is_empty() else "returned",1 if report.arrived_tick>0 else 0,0,recording)
+			var brood_transport: BroodTransportState=connection.broods[origin]
+			if brood_transport.movement.trips_reported>0 and journal.changed("brood_rescue/"+origin+"/"+connection.route_id,brood_transport.movement.last_reported_tick):
+				var report: Dictionary=brood_transport.last_report();var received: float=report.reported_tick*SimulationClock.TICK_INTERVAL
+				journal.add("brood_rescue",origin,connection.target(origin),received,received,"delivered" if report.arrived_tick>0 else report.reason if not report.reason.is_empty() else "returned",report.body.count,0,recording)
+
+func _project(pile: String, key: String, value: String, complete: String, time: float, recording: bool) -> void:
+	if _run.reports.changed(key+"/"+pile,value) and value==complete:
+		_run.reports.add("project",pile,"nursery" if key in ["nursery","expansion"] else "food_exchange" if key=="exchange" else "queen" if key=="reproduction" else key,time,time,"expanded" if key=="expansion" else complete,0,0,recording)

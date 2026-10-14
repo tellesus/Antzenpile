@@ -12,11 +12,11 @@ func _init(run_state: RunState) -> void:
 	_run = run_state
 
 
-func tick(delta: float) -> void:
+func tick(delta: float) -> float:
 	var state: RainState = _run.rain
 	if state.phase == "finished":
 		if _run.clock.tick_count < state.next_start_tick:
-			return
+			return 0.0
 		state.phase = "raining"
 		state.elapsed_seconds = 0.0
 		state.next_start_tick = 0
@@ -30,7 +30,7 @@ func tick(delta: float) -> void:
 			sheltered = sheltered or segment.exposure <= CONFIG.sheltered_max_exposure
 			exposed = exposed or segment.exposure >= CONFIG.exposed_min_exposure
 		if not sheltered or not exposed:
-			return
+			return 0.0
 		state.phase = "raining"
 		rain_started.emit()
 	for segment: TrailSegmentState in _run.trails.segments.values():
@@ -45,6 +45,7 @@ func tick(delta: float) -> void:
 		state.phase = "finished"
 		state.fronts_completed += 1
 		state.next_start_tick = _run.clock.tick_count + CONFIG.dry_interval_ticks
+	return raining_seconds
 
 
 func _refill_exterior_water(raining_seconds: float) -> void:
@@ -55,5 +56,5 @@ func _refill_exterior_water(raining_seconds: float) -> void:
 	var added: float = minf(CONFIG.exterior_water_per_second * raining_seconds, maxf(0.0, CONFIG.exterior_water_capacity - source.quantity))
 	if added <= 0.0:
 		return
-	source.quantity = minf(CONFIG.exterior_water_capacity, snappedf(source.quantity + added, 0.00001))
+	source.quantity = minf(CONFIG.exterior_water_capacity, float(String.num(source.quantity + added, 5)))
 	source.active = true

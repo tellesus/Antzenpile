@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ChamberDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/chamber_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+id = "ventilation_gallery"
+display_name = "Ventilation Gallery"
+description = "Up to 50% more regulation per climate worker and water"
+workers = 4
+duration_ticks = 360
+carbohydrate = 24.0
+protein = 12.0
+water = 8.0
+climate_gain_percent = 150

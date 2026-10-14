@@ -1,42 +1,88 @@
 class_name SourceMemory
 extends RefCounted
 const Copy = preload("res://src/presentation/interface_text.gd")
+const SORTS: Array[String]=["label","recent","intake","labor","risk"]
+const SORT_NAMES: Dictionary={"label":"LABEL","recent":"RECENT REPORT","intake":"TOTAL INTAKE","labor":"WORKER TARGET","risk":"ALARM FIRST"}
 ## Returned memories only; browsing never validates current world availability.
 
-static func entries(signals: Array[Dictionary], status: Dictionary, category: String) -> Array[Dictionary]:
+static func entries(signals: Array[Dictionary], status: Dictionary, category: String, order: String="label") -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for signal_data: Dictionary in signals:
-		if signal_data.category != category:
-			continue
+		if signal_data.category not in ["carbohydrate","protein","water","nest_site"]: continue
 		var route: Dictionary = {}
 		for trail: Dictionary in status.get("trails", []):
 			if trail.destination_knowledge_id == signal_data.source_knowledge_id:
 				route = trail
 				break
+		var nutrients: Dictionary=route.get("nutrient_receipts",{})
+		if signal_data.category!=category and category not in SourceCatalog.roles(signal_data.get("source_type",""),signal_data.category) and not nutrients.has(category): continue
+		var category_receipt: Dictionary=nutrients.get(category,{})
+		var total: float=category_receipt.get("total",route.get("delivered_total",0.0) if signal_data.category==category else 0.0)
 		var hint: Dictionary = status.get("temporal_hints", {}).get(signal_data.source_knowledge_id, {})
 		var reported_empty: bool = hint.get("last_return_empty", route.get("status", "") == "depleted")
-		var state: String = "Reported empty" if reported_empty else "Previously delivered" if route.get("delivered_total", 0.0) > 0 else "Trace reported"
+		var state: String = "Reported empty" if reported_empty else "Previously delivered" if total > 0 else "Trace reported"
+		if category == "nest_site": state = "Last recheck unconfirmed" if reported_empty else "Possible shelter reported"
 		result.append({"id": signal_data.id, "knowledge_id": signal_data.source_knowledge_id, "category": category,
+			"site_profile":signal_data.get("site_profile",""),"source_type":signal_data.get("source_type",""),"memory_label":signal_data.get("memory_label",""),
 			"bearing": signal_data.get("bearing"), "age": signal_data.age, "state": state,
 			"workers": route.get("allocated_workers", 0),
-			"receipt": route.get("receipt", {}).duplicate(true),
-			"delivered_total": route.get("delivered_total", 0.0),
-			"danger": route.get("reported_losses", 0) > 0 and not route.get("ambusher_addressed",false) or route.get("foreign_reports", 0) > 0,
+			"waiting_workers":route.get("waiting_workers",0),
+			"route_id": route.get("id", ""), "route_status": route.get("status", "none"), "desired_workers": route.get("desired_workers", 0),
+			"receipt": category_receipt.duplicate(true) if not category_receipt.is_empty() else route.get("receipt", {}).duplicate(true) if signal_data.category==category else {},
+			"delivered_total": total,
+			"danger": route.get("journey_alarm",route.get("reported_losses", 0) > 0 and not route.get("ambusher_addressed",false) or route.get("foreign_reports", 0) > 0),
 			"honeydew": status.get("honeydew", {}).get("knowledge_id", "") == signal_data.source_knowledge_id})
-	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.knowledge_id < b.knowledge_id)
+	sort_entries(result,order)
 	return result
+
+static func sort_entries(result: Array, order: String) -> void:
+	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		match order:
+			"recent": if a.age!=b.age: return a.age<b.age
+			"intake": if a.delivered_total!=b.delivered_total: return a.delivered_total>b.delivered_total
+			"labor": if a.desired_workers!=b.desired_workers: return a.desired_workers>b.desired_workers
+			"risk": if a.danger!=b.danger: return a.danger
+			"label":
+				var left: int=_label_order(a.get("memory_label",""));var right: int=_label_order(b.get("memory_label",""))
+				if left!=right: return left<right
+		return a.knowledge_id<b.knowledge_id)
+
+static func _label_order(label: String) -> int:
+	var order: int=0
+	for index: int in label.length(): order=order*26+label.unicode_at(index)-64
+	return order
+
+static func next_sort(order: String) -> String: return SORTS[(SORTS.find(order)+1)%SORTS.size()]
+static func staffing_label(entry: Dictionary) -> String:
+	return "Target %d · %d assigned · %d wait" % [entry.get("desired_workers",0),entry.get("workers",0),entry.get("waiting_workers",0)]
+static func intake_label(entry: Dictionary) -> String:
+	return "Received %.1f total · historical intake" % entry.get("delivered_total",0) if entry.get("delivered_total",0)>0 else "No intake yet · yield unproven"
+
+static func bundle_label(route: Dictionary) -> String:
+	var parts: Array[String]=[]
+	for id: String in PileState.RESOURCE_IDS:
+		if route.get("nutrient_receipts",{}).has(id): parts.append("%.1f %s" % [route.nutrient_receipts[id].total,Copy.resource(id)])
+	return "Intake: "+" · ".join(parts)
 
 
 static func display_name(entry: Dictionary) -> String:
-	# A stable memory tag, independent of page/filter/order and hidden source names.
-	var tag: String = str(entry.get("knowledge_id", "")).sha256_text().left(4).to_upper()
-	return ("Honeydew" if entry.get("honeydew", false) else Copy.resource(entry.get("category", "")).capitalize()) + " #" + tag
+	var type: String = entry.get("source_type", "")
+	var name: String = SourceCatalog.PROFILES[type].display_name if SourceCatalog.PROFILES.has(type) else "Aphid honeydew" if entry.get("honeydew",false) else "Protein remains" if entry.get("knowledge_id",entry.get("source_knowledge_id",""))=="known:ambusher_carcass" else {"carbohydrate":"Sweet trace","protein":"Protein trace","water":"Water trace","nest_site":"Shelter memory"}.get(entry.get("category",""),"Unidentified trace")
+	if SiteCatalog.DEFINITIONS.has(entry.get("site_profile","")): name=SiteCatalog.get_profile(entry.site_profile).display_name
+	var label: String = entry.get("memory_label", "")
+	return name + (" " + label if not label.is_empty() else "")
+
+static func description(entry: Dictionary) -> String:
+	var type: String = entry.get("source_type", "")
+	if SiteCatalog.DEFINITIONS.has(entry.get("site_profile","")): return SiteCatalog.get_profile(entry.site_profile).cues
+	return SourceCatalog.PROFILES[type].description if SourceCatalog.PROFILES.has(type) else "Identity unconfirmed · return a sample"
 
 
-static func receipt_label(entry: Dictionary, time: float) -> String:
+static func receipt_label(entry: Dictionary, time: float, destination: String = "home") -> String:
+	if entry.get("category") == "nest_site": return "Occupants and safety unknown"
 	var receipt: Dictionary = entry.get("receipt", {})
 	if receipt.is_empty():
-		return "Delivery dates unrecorded" if entry.get("delivered_total", 0.0) > 0 else "No delivery home yet"
+		return "Delivery dates unrecorded" if entry.get("delivered_total", 0.0) > 0 else "No delivery %s yet" % destination
 	return "Delivered %.1f %s · %s ago" % [receipt.last_amount, Copy.resource(entry.get("category", "")), Copy.duration(time - receipt.last_at)]
 
 
@@ -47,7 +93,24 @@ static func first_receipt_label(entry: Dictionary, time: float) -> String:
 
 
 static func defense_label(outcome: Dictionary) -> String:
+	if outcome.get("goal", "clear") == "hunt" and outcome.get("outcome", "") == "secured": return "Predator killed · protein reported"
 	return {"secured": "Ambusher driven off", "withdrew": "Defenders withdrew", "not_found": "No ambusher found"}.get(outcome.get("outcome", ""), "No defensive return yet")
+
+static func predator_name(profile: String) -> String:
+	return "Spider-like predator" if profile == "wolf_spider" else "Beetle-like hunter" if profile=="beetle_hunter" else "Predatory arthropod"
+
+static func passage_name(impression: String) -> String:
+	return "Dog-like passage" if impression=="dog_like" else "Large animal passage" if impression=="large_animal" else "Surface disturbance"
+
+static func predator_addressed(route: Dictionary, state: Dictionary) -> bool:
+	var outcome: Dictionary=state.get("outcomes",{}).get(route.get("id",""),{})
+	return outcome.get("outcome", "")=="secured" and outcome.get("received_at",0.0)>=state.get("reports",{}).get(route.get("id",""),{}).get("received_at",0.0) and route.get("last_loss_time",0.0)<=outcome.get("received_at",0.0)
+
+static func survey_label(report: Dictionary) -> String:
+	var profile: String = report.get("predator_profile", "")
+	if report.get("finding", "") in ["ambush", "mixed"] and profile != "":
+		return predator_name(profile) + (" and foreign ants" if report.finding == "mixed" else " witnessed")
+	return {"ambush":"Predator witnessed", "mixed":"Predator and foreign ants", "foreign":"Foreign ants witnessed", "surface":"Heavy impact witnessed", "residue":"Strange ground residue witnessed", "inconclusive":"Cause remains uncertain"}.get(report.get("finding", ""), "Survey returned")
 
 
 static func defense_is_latest(outcome: Dictionary, route: Dictionary) -> bool:

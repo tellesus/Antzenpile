@@ -1,0 +1,13 @@
+> **ARCHIVE ONLY — frozen 2026-10-04.** Historical record; not an active plan, current contract or implementation instruction. Use the [current documentation](../../../README.md). Original path: `docs/tasks/068_functional_chamber_music.md`. Historical status and recommendations below apply only to their recorded build.
+
+# 068 — Functional chamber music
+
+Status: complete. Depends on 067 and the phase-matched audio foundation 019. Original additive-music discussion and Part 7 §§109–110/132: development assembles a synchronized arrangement, broad condition changes contribution, immediate information cues remain separate.
+
+Outcome: developed Nursery adds a soft melodic voice; developed Midden adds a quiet wooden pulse alongside existing base/Food Exchange. Nursery condition gently thins its contribution from approved care/food/climate/refuse evidence. INWARD attention modestly foregrounds the selected musical organ, without switching tracks or revealing hidden guests. Keep four persistent synchronized eight-second loops, real-time three-second fades, phase-zero reload, no gameplay/audio serialization, unchanged returned-loss cue, headless silence. Original authored prototype audio, no new dependencies or composer/runtime randomness. These remain a composition proof rather than finished soundtrack.
+
+Verify: developed-only musical rewards, mixed condition and recovery, selected attention, no hidden-state/clock/RNG mutation, equal frames/rates and seamless boundary/headroom, pause/speed/fade/reload/player reuse. Graphical audio probe measures continuing phase through changes and reload; import/Main and final suite. Next bounded follow-up: independent Music/Information Cue volume controls from Part 7 §132, preserving visual equivalents and muted play.
+
+Evidence: focused suites 84/0; final full suite 5,027/0; import/Main passed. Windows playback probe: zero inter-stem phase spread at development, focused strain, through the eight-second wrap while paused at 64x, and after reload; simulation snapshots equal. Four 176,400-frame/22,050-Hz loops; new stems zero boundary sample discontinuity. Full authored mix peak 0.11514 before -4 dB gain (18.78 dB headroom); no clipping. Host permission/certificate warnings only. Subjective listening/composition review and Android playback unverified.
+
+Changed groups: detached function/condition/attention intent, four-player mix/reload; original Nursery/Midden audio plus reproducible stdlib authoring source; behavioral/playback probes and contracts. Handoff: Nursery contribution 55-100% by known condition; selected organ retains its intent, others receive 85%. Prototype composition defaults. Next 069 independent volume controls.

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TraitDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://src/sim/colony/trait_definition.gd" id="definition"]
+[resource]
+script = ExtResource("definition")
+id = "heat_resilience"
+title = "Heat Resilience"
+family = "environment"
+benefit = "Half the warm-larva slowdown"
+tradeoff = "Comfortable larvae develop 10% slower"
+evidence = "Warm-exposed larvae survive to pupation"
+carbohydrate = 14.0
+protein = 16.0
+water = 8.0
+warm_relief = 0.5
+comfortable_rate = 0.9
