@@ -33,6 +33,8 @@ The player authorizes continued implementation from the new roadmap without feed
 
 ## How decisions change
 
+M8 validation176 (2026-10-14): the player authorizes running and visually inspecting PR #2 in Work, including rendered captures and presentation-only fixes. This supersedes the earlier headless-only/deferred-graphics limits for this bounded pass. Saturated neon, conspicuous soft glow and wispy evidence-supported forms are the accepted art direction in [Visual Overhaul Direction](VISUAL_OVERHAUL_DIRECTION.md); the old restrained-effects wording is superseded. Preserve knowledge boundaries and visual caps. Linux/software-rendered evidence does not establish Windows RX 6650 XT performance or final player acceptance.
+
 M7 tuning172: fresh Roadside ground definition `ground_v2` moves the actual warning from1800 to2100 simulated seconds, retaining the180-second response window, footprint and loss rules. Fresh ordinary first-daughter reports at2002–2092 otherwise followed the old1980 impact, preventing useful pre-impact network rescue. Existing enabled three-field saves retain `ground_v1`; absent old events stay disabled. This is measured provisional content tuning, not a session-duration target. [Evidence](evidence/card172_complete_runs.md).
 
 M2 storage gate ([147](tasks/147_seeds_and_picnic_food.md)): current mixed/episodic arrivals have no store capacity or processing wait. No buffering decision is demonstrated; CH-CACHE stays out of 1.0 blockers without artificial caps/spoilage. Revisit only with evidence. This applies A87's explicit gated-content rule.

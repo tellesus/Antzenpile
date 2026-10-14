@@ -7,6 +7,7 @@ const SWARM_CONFIG = preload("res://data/ecology/default_swarm.tres")
 const UIStyle = preload("res://src/presentation/organic_ui.gd")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
+const TrailGlow = preload("res://src/presentation/outward/trail_glow.gd")
 const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd")
 const LossEvidence = preload("res://src/presentation/returned_loss_evidence.gd")
 const Copy = preload("res://src/presentation/interface_text.gd")
@@ -695,15 +696,15 @@ func _draw_trails(size: Vector2) -> void:
 		var color: Color = Art.color_for(stroke.category)
 		if stroke.ghost:
 			# Learned direction outlives scent; keep the ghost subtle but visible.
-			draw_polyline(stroke.points, Color(color, 0.025 + 0.035 * strength), 5.0, true)
+			Art.filament(self, stroke.points, Color(color, 0.035 + 0.05 * strength), 9.0, TrailGlow.texture(), false)
 			draw_polyline(stroke.points, Color(color.lightened(0.15), 0.07 + 0.06 * strength), 1.0, true)
 		else:
 			# Strong neon on near-black: wide translucent chemical aura,
 			# textured filament, middle halo, then a bright narrow core.
 			# All layers derive from approved route chemistry, not hidden world.
-			draw_polyline(stroke.points, Color(color, 0.045 + 0.070 * strength), 25.0, true)
+			Art.filament(self, stroke.points, Color(color, 0.18 + 0.25 * strength), 40.0, TrailGlow.texture(), false)
 			Art.filament(self, stroke.points, Color(color, 0.26 + 0.32 * strength), 24.0)
-			draw_polyline(stroke.points, Color(color, 0.10 + 0.18 * strength), 6.0, true)
+			Art.filament(self, stroke.points, Color(color, 0.24 + 0.35 * strength), 12.0, TrailGlow.texture(), false)
 			draw_polyline(stroke.points, Color(color.lightened(0.55), 0.61 + 0.25 * strength), 1.65, true)
 	for path: Dictionary in Scent.paths(routes, _placed, size):
 		if path.ghost:
