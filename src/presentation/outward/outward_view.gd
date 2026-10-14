@@ -694,10 +694,17 @@ func _draw_trails(size: Vector2) -> void:
 		var strength: float = clampf(stroke.strength, 0.0, 1.0)
 		var color: Color = Art.color_for(stroke.category)
 		if stroke.ghost:
-			draw_polyline(stroke.points, Color(color, 0.06 + 0.05 * strength), 0.85, true)
+			# Learned direction outlives scent; keep the ghost subtle but visible.
+			draw_polyline(stroke.points, Color(color, 0.025 + 0.035 * strength), 5.0, true)
+			draw_polyline(stroke.points, Color(color.lightened(0.15), 0.07 + 0.06 * strength), 1.0, true)
 		else:
-			Art.filament(self, stroke.points, Color(color, 0.16 + 0.20 * strength), 16.0)
-			draw_polyline(stroke.points, Color(color.lightened(0.18), 0.16 + 0.5 * strength), 1.1, true)
+			# Strong neon on near-black: wide translucent chemical aura,
+			# textured filament, middle halo, then a bright narrow core.
+			# All layers derive from approved route chemistry, not hidden world.
+			draw_polyline(stroke.points, Color(color, 0.045 + 0.070 * strength), 25.0, true)
+			Art.filament(self, stroke.points, Color(color, 0.26 + 0.32 * strength), 24.0)
+			draw_polyline(stroke.points, Color(color, 0.10 + 0.18 * strength), 6.0, true)
+			draw_polyline(stroke.points, Color(color.lightened(0.55), 0.61 + 0.25 * strength), 1.65, true)
 	for path: Dictionary in Scent.paths(routes, _placed, size):
 		if path.ghost:
 			continue
@@ -717,7 +724,10 @@ func _draw_trails(size: Vector2) -> void:
 		for reserved: Rect2 in _caption_blocks:
 			obscured = obscured or reserved.intersects(ant_bounds)
 		if obscured: continue
-		Art.ant(self, rep.position, rep.direction, Color(Art.color_for(rep.category).lightened(0.25), 0.62), _animation_time, 0.82)
+		var ant_color: Color = Art.color_for(rep.category)
+		draw_circle(rep.position, 8.5, Color(ant_color, 0.09))
+		draw_circle(rep.position, 4.3, Color(ant_color, 0.17))
+		Art.ant(self, rep.position, rep.direction, Color(ant_color.lightened(0.28), 0.83), _animation_time, 0.82)
 	for marker: Dictionary in Scent.alarm_markers(routes, _placed, size):
 		var at: Vector2 = marker.center
 		draw_arc(at, 8.0, 0.0, 2.2, 16, Color(0.82, 0.39, 0.27, 0.5), 1.3, true)
