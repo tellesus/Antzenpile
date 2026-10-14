@@ -23,12 +23,12 @@ static func impression_gain(signal_data: Dictionary, empty: bool) -> float:
 
 static func color_for(category: String) -> Color:
 	match category:
-		"carbohydrate": return Color("dcb477")
-		"water": return Color("7fbfcf")
-		"protein": return Color("b8a1cf")
-		"nest_site": return Color("b9c5a1")
-		"threat": return Color("c58d79")
-	return Color("a0b1ae")
+		"carbohydrate": return Color("ffc05b")
+		"water": return Color("5ce8ff")
+		"protein": return Color("c993ff")
+		"nest_site": return Color("b2f59b")
+		"threat": return Color("ff7681")
+	return Color("a9cbbe")
 
 
 static func membrane(center: Vector2, radius: float, phase: float, squash: float = 0.8) -> PackedVector2Array:
@@ -116,7 +116,7 @@ static func nursery_earth(canvas: Node2D, at: Vector2, focus: float) -> void:
 	canvas.draw_texture_rect(EARTH, Rect2(at + Vector2(-48,-34), Vector2(96,68)), false, Color(1,1,1,lerpf(0.72,1.0,focus)))
 
 
-static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, width: float, texture: Texture2D = FILAMENT) -> void:
+static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, width: float, texture: Texture2D = FILAMENT, draw_core: bool = true) -> void:
 	if points.size() < 2: return
 	var edges := PackedVector2Array()
 	var uv := PackedVector2Array()
@@ -127,7 +127,8 @@ static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, w
 			edges.append(points[index] + tangent.normalized().orthogonal()*width*0.5*side)
 			uv.append(Vector2(float(index)/(points.size()-1), 0.0 if side == 1 else 1.0))
 	canvas.draw_polygon(edges, PackedColorArray([color]), uv, texture)
-	canvas.draw_polyline(points, Color(color.lightened(0.3),color.a*0.85), 0.8, true)
+	if draw_core:
+		canvas.draw_polyline(points, Color(color.lightened(0.3),color.a*0.85), 0.8, true)
 
 
 static func home_entrance(canvas: Node2D, center: Vector2) -> void:

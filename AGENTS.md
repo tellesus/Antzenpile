@@ -17,7 +17,7 @@ Translate the current design into code; do not invent major game systems during 
 - Aggregate workers, brood, and trail travelers. Scouts are the capped, individually simulated exception. Every worker transfer goes through the authoritative ledger.
 - Keep TrailRoute and TrailSegment separate, even with one segment per prototype route. Pheromone and familiarity are distinct.
 - OUTWARD is a rotating 2D sensory panorama, not a physical camera or minimap. INWARD is an abstract functional network, not a tunnel floorplan.
-- Darkness is information. Preserve negative space, thin luminous trails, capped visual representatives, restrained effects, and readability without bloom.
+- Darkness is information. Preserve negative space, capped visual representatives and readability without bloom. The player's M8 direction explicitly calls for saturated neon cores, conspicuous soft glow and flowing chemical wisps against black; see `docs/VISUAL_OVERHAUL_DIRECTION.md`.
 
 ## Finish each task
 
