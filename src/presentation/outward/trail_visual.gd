@@ -10,25 +10,43 @@ const CACHE_LIMIT: int = 12
 static var _geometry_cache: Dictionary = {}
 
 
+static func home_start(viewport: Vector2, route_id: String) -> Vector2:
+	# Several faint paths emerge around the known home mouth instead of making
+	# identical straight-looking rays. This is purely presentation geometry.
+	var home := Vector2(viewport.x * 0.5, viewport.y * 0.78 - 18.0)
+	var hash_value: int = abs(route_id.hash())
+	var spread: float = float(hash_value % 19 - 9) / 9.0
+	return home + Vector2(spread * 14.0, sin(float(hash_value % 67) * 0.22) * 3.0)
+
+
 static func geometry(start: Vector2, finish: Vector2, route_id: String) -> Dictionary:
 	var key: String = "%s|%s|%s" % [route_id, start, finish]
 	if _geometry_cache.has(key): return _geometry_cache[key]
 	var points := PackedVector2Array()
 	var delta: Vector2 = finish - start
-	var side: Vector2 = delta.normalized().orthogonal()
-	var phase: float = float(abs(route_id.hash()) % 1000) / 97.0
-	var amplitude: float = minf(30.0, delta.length() * 0.065)
+	var distance: float = delta.length()
+	var side: Vector2 = delta.normalized().orthogonal() if distance > 0.001 else Vector2.RIGHT
+	var hash_value: int = abs(route_id.hash())
+	var phase: float = float(hash_value % 1000) / 97.0
+	var bias: float = float(hash_value % 17 - 8) / 8.0
+	# A distinct departure tangent and a broad outer sweep give each memory a
+	# curved approach. Low-amplitude filaments add chemical turbulence without
+	# implying an actual physical path across hidden terrain.
+	var first_control: Vector2 = start + Vector2(bias * 16.0, -clampf(distance * 0.22, 22.0, 78.0))
+	var second_control: Vector2 = finish - delta * 0.19 + Vector2(bias * 12.0, -minf(32.0, distance * 0.09))
+	var ripple: float = minf(12.0, distance * 0.024)
 	for step: int in STEPS + 1:
 		var t: float = float(step) / STEPS
-		# Several spatial scales, anchored ends. These bends are scent, not terrain.
-		var bend: float = sin(t * 11.0 + phase) * 0.65 + sin(t * 27.0 - phase * 0.7) * 0.28 + sin(t * 61.0 + phase * 1.3) * 0.12
-		points.append(start.lerp(finish, t) + side * bend * amplitude * sin(PI * t))
+		var inv: float = 1.0 - t
+		var curve: Vector2 = start * (inv * inv * inv) + first_control * (3.0 * inv * inv * t) + second_control * (3.0 * inv * t * t) + finish * (t * t * t)
+		var curl: float = sin(t * 12.0 + phase) * 0.76 + sin(t * 29.0 - phase * 0.7) * 0.24
+		points.append(curve + side * curl * ripple * pow(sin(PI * t), 2.0))
 	points[0] = start
 	points[STEPS] = finish
 	var branches: Array[PackedVector2Array] = []
 	for index: int in 3:
 		var first: int = 10 + index * 12
-		var sign_value: float = 1.0 if (index + abs(route_id.hash()) % 2) % 2 == 0 else -1.0
+		var sign_value: float = 1.0 if (index + hash_value % 2) % 2 == 0 else -1.0
 		var tangent: Vector2 = (points[first + 1] - points[first]).normalized()
 		var at: Vector2 = points[first]
 		branches.append(PackedVector2Array([at, at + tangent * 6.0 + side * sign_value * 6.0,
@@ -38,7 +56,6 @@ static func geometry(start: Vector2, finish: Vector2, route_id: String) -> Dicti
 	var result: Dictionary = {"points": points, "branches": branches}
 	_geometry_cache[key] = result
 	return result
-
 
 static func paths(routes: Array, placed: Array[Dictionary], viewport: Vector2) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -62,7 +79,7 @@ static func paths(routes: Array, placed: Array[Dictionary], viewport: Vector2) -
 			if entry.signal.get("category") == "threat": continue
 			if entry.signal.source_knowledge_id != destination_id:
 				continue
-			var start := Vector2(viewport.x * 0.5, viewport.y * 0.78 - 18.0)
+			var start: Vector2 = home_start(viewport, str(route.get("id", destination_id)))
 			var finish: Vector2 = entry.center + Vector2(0.0, entry.radius * 0.45)
 			var shape: Dictionary = geometry(start, finish, str(route.get("id", destination_id)))
 			result.append({"points": shape.points, "branches": shape.branches, "strength": strength, "chemical": chemical, "ghost": ghost,
@@ -87,7 +104,6 @@ static func strokes(routes: Array, placed: Array[Dictionary], viewport: Vector2)
 
 static func alarm_markers(routes: Array, placed: Array[Dictionary], viewport: Vector2) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	var home := Vector2(viewport.x * 0.5, viewport.y * 0.78 - 18.0)
 	for route: Dictionary in routes:
 		if not route.get("journey_alarm",route.get("reported_losses",0)>0 and not route.get("ambusher_addressed",false)) or result.size() >= MAX_LINKS:
 			continue
@@ -96,7 +112,8 @@ static func alarm_markers(routes: Array, placed: Array[Dictionary], viewport: Ve
 			if entry.signal.source_knowledge_id == route.destination_knowledge_id:
 				# A route association, not an estimate of the hidden attack location.
 				var finish: Vector2 = entry.center + Vector2(0, entry.radius * 0.45)
-				var shape: Dictionary = geometry(home, finish, str(route.get("id", route.destination_knowledge_id)))
+				var route_id: String = str(route.get("id", route.destination_knowledge_id))
+				var shape: Dictionary = geometry(home_start(viewport, route_id), finish, route_id)
 				var at: Vector2 = shape.points[int(STEPS * 0.32)]
 				result.append({"id": entry.id, "center": at})
 				break
