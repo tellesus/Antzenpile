@@ -1,5 +1,7 @@
 # 176 — Run and inspect the neon trail proof
 
+Integration update: the player's subsequent [177](177_main_consolidation.md) request merged PR #2 and the systems beta into `main`. Earlier draft/merge recommendations below are historical; final visual acceptance remains follow-up work.
+
 Player outcome: PR #2 has an actual Godot 4.7.2 runtime and rendered visual baseline before further M8 effects are built. Scope is presentation validation and corrections to reproducible trail defects; simulation, gameplay, music and the later UI redesign remain unchanged.
 
 Use the `visual/neon-trails-ux-direction-20261014` branch. Import resources, exercise the affected art/projection contracts, run Main, capture strong/weak/ghost/multiple trails at 1920×1080, 1280×720 and 900×600, and inspect entrance geometry, saturation, ant readability, pause and selected contexts. Distinguish detached presentation stress fixtures from real returned knowledge. Run the full headless suite after final runtime changes.

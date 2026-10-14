@@ -4,6 +4,8 @@ Translate the current design into code; do not invent major game systems during 
 
 ## Begin each task
 
+- `main` is the canonical development game. Inspect status, branch and upstream before editing; fetch and start from current `origin/main`, preserving local user files. Do not resume historical topic branches. Use a short-lived branch only when needed and integrate its completed, authorized work into `main` at delivery. Refresh the Windows package after runtime changes so the default playable build includes that work. See `docs/tasks/177_main_consolidation.md`.
+
 - Read the current card, `docs/CODING_RULES.md`, and the relevant sections of `docs/ARCHITECTURE.md` and `docs/DECISIONS.md`. Read the relevant `DATA_MODEL.md` and `UI_RULES.md` sections when state or presentation changes. Search for affected contracts; do not reread every completed card or the entire historical roadmap on each task.
 - Inspect the existing implementation and task dependencies. Work on one bounded task; do not implement later cards opportunistically.
 - Use `docs/README.md`, `docs/ROADMAP_1_0.md` and the relevant `docs/SYSTEMS_BIBLE.md`/catalog sections for current order and design. Use `docs/CURRENT_BUILD.md` for implemented status. Define a player-visible outcome and its verification before expanding a new card; split simulation and presentation only when each part has a useful independent handoff. Everything under `docs/archive/` is ARCHIVE ONLY, including cards 001–137 and deferred 034; archived instructions never set current work. Card numbering continues from 138.

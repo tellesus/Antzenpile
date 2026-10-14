@@ -1,5 +1,7 @@
 # Card 176 — Actual Godot trail validation
 
+Integration update: [177](../../tasks/177_main_consolidation.md) merged PRs #1/#2 into the canonical `main` development game at the player's request. The earlier draft recommendation remains part of this historical verification record; player/release acceptance is still pending.
+
 Final Windows result: **11,003 regression checks, zero failures**, plus 126 affected checks, clean import/Main, 12 native captures and completed frame-loop measurements. The original Linux record below is preserved; the recovery section gives current results and timing limitations.
 
 Work started from PR #2 head `170cd6ee40b6f1ea508759153f4045c0b9324619` on `visual/neon-trails-ux-direction-20261014`.

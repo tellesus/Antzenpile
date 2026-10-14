@@ -2,6 +2,10 @@
 
 Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly verified M1–M7 build for player review. Extract the complete ZIP and open `Antzenpile/Antzenpile.exe`; keep its `.pck` beside it. The editor, Python and authoring tools are not needed to play. This is not the final Windows 1.0 release.
 
+## Current playable baseline
+
+Use current `main`. PRs #1 and #2 are merged; the local latest package includes both the systems beta and recovered soft neon trails. `builds/windows-beta-latest.json` is the canonical build pointer. Launch its `launch` path or extract the stable latest ZIP; named older export folders remain historical snapshots. The main-consolidation package audits 623 resources and passes the extracted release/PCK gates. Final player acceptance remains separate.
+
 ## Rebuild from a checkout
 
 Python 3.11+ and Git are authoring requirements only. Use the pinned **standard Godot 4.7.2 Windows console editor** and matching standard export templates from the [official release](https://github.com/godotengine/godot-builds/releases/tag/4.7.2-stable). Extract `windows_release_x86_64.exe` and `version.txt` into a local template folder. The script checks version and the release-template SHA-256; it makes no downloads.
