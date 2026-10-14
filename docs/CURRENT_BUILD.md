@@ -35,7 +35,7 @@ Remaining work is tracked here instead of on dormant branches:
 
 ## Latest actual verification
 
-[179](tasks/179_living_chemical_clouds.md): flowing OUTWARD chemical materials, actual returned spider/beetle memory masks, observation-age fade and pause-aware internal motion. 11,026 full checks/zero failures;542 focused/zero; pinned import/Main and native multi-resolution input/knowledge captures pass. [Native timing and limits](evidence/card179/README.md). Menus/dispatch/music and player/release acceptance remain pending.
+[179](tasks/179_living_chemical_clouds.md): flowing OUTWARD chemical materials, actual returned spider/beetle memory masks, observation-age fade and pause-aware internal motion. 11,026 full checks/zero failures;542 focused/zero; pinned import/Main and native multi-resolution input/knowledge captures pass. [Native timing and limits](evidence/card179/README.md). The refreshed committed-main Windows package audits634 resources and passes extracted release/PCK and native packed-cloud gates. Menus/dispatch/music and player/release acceptance remain pending.
 
 [Card176](tasks/176_neon_trail_runtime_validation.md), now integrated into `main` by [177](tasks/177_main_consolidation.md), preserves the original five neon-trail proof commits and recovers the staged soft-edge correction and captures. Godot 4.7.2 Windows/RX 6650 XT: 11,003 full checks/zero failures, targeted 126/zero, clean import/Main, 12 native captures and two 60-second 1080p halo/control frame-loop samples. [Evidence and timing limitations](evidence/card176/README.md). This is the first bounded M8 visual proof; broader cloud/ant art, UI, music and final player/packaged-game acceptance remain pending.
 

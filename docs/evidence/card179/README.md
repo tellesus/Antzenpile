@@ -38,3 +38,13 @@ Run pinned Godot graphically with `--audio-driver Dummy --script res://tests/pro
 The material consumes explicit view-owned time rather than engine `TIME`, which [Godot documents as unaffected by pause](https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/canvas_item_shader.html#global-built-ins). Noise has an independent fixed seed. Each current visible memory owns its material; normal projection consumes returned report identity/age, never physical predator state.
 
 Remaining visual work includes inward organs, ant art, further supported species/source forms and arc-length trail motion. Menus, dispatch simplification and music remain separate. Card178's specific player save failure remains unresolved by these generic regression/package gates.
+
+## Committed-main Windows package
+
+Revision`3813ae2526e49c01a736e0d7f47fdc3f1d1a6585`, 634 exported resources. Isolated import/export/inventory/extraction, actual extracted release Main and packed save-resume/settings/review checks pass. [Metadata](windows_build.json), [package log](windows_package.log), [native packed-material log](windows_packed_clouds.log).
+
+`tools/package/chemical_smoke.gd` is an external authoring probe, excluded from the package. Run the pinned editor with `--main-pack path/Antzenpile.pck --audio-driver Dummy --script path/tools/package/chemical_smoke.gd -- output.png` to capture six controlled1920×1080 material quads, including both species masks, without mutating the actual run. This verifies the unchanged PCK on RX6650XT; it does not exercise release-template physical input or audio.
+
+The first additional native probe incorrectly entered GameRoot’s editor-only debug lifecycle against the release PCK, which correctly excludes debug code. [Initial failed probe log](windows_packed_clouds_first_attempt.log) is retained. The corrected external probe instantiates the packed OUTWARD renderer directly and uses an unattached GameRoot only for approved status projection; the unchanged PCK then passes cleanly. No production runtime or package was changed to fix this authoring-probe issue.
+
+`SHA256.json` fingerprints normalized Git-blob contents, so text line-ending conversion on Windows does not change the reference bytes. PNGs remain exact native capture bytes.

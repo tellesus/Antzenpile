@@ -4,16 +4,16 @@
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
+    "path": "docs/evidence/card179/README.md",
+    "sha256": "56321c8b19a861ef4482b51bc060a661847781bb497ae6cf20fab48a3d686c68"
+  },
+  {
     "path": "docs/evidence/card179/clouds_1920.png",
     "sha256": "8c3413af82d49ebe3e36989cbe9063df53c246323d0ff5115b5919a3e42707b1"
   },
   {
     "path": "docs/evidence/card179/private_survey_1920.png",
     "sha256": "1557cd7e9f3eed6655cdd704cdc9b20153f7d90d4616dec51425decd245c3454"
-  },
-  {
-    "path": "docs/evidence/card179/README.md",
-    "sha256": "708eeb9ae8c3c77e07b296353fc1cc0f6c392d58dee082b166c8c2473df98bc8"
   },
   {
     "path": "docs/evidence/card179/returned_beetle_1920.png",
@@ -36,20 +36,36 @@
     "sha256": "05fb54bea6f41b95d48a1ff6b23bef3af9ab4e0188bbe35af66fee3a67abd9f6"
   },
   {
+    "path": "docs/evidence/card179/windows_build.json",
+    "sha256": "8b8aa60e67c66bceab36bd9af75b4beffc26f78edaa5fb3d2ce309a6d5da3903"
+  },
+  {
     "path": "docs/evidence/card179/windows_import-result.txt",
-    "sha256": "477d37207232a1d0e2a195e574d7bdb03a220d9d9820b5cd28a3ec6412cb428e"
+    "sha256": "088e012871f909d908edc73e01a238c7cf6929d3dea543dd04240a049faf55bf"
   },
   {
     "path": "docs/evidence/card179/windows_import.log",
-    "sha256": "b728de0c23f24d9aa31bc7608b177d7ca13857d7c3aca862a08506d00675123b"
+    "sha256": "f15ffd4c558b01611d562c8c257508942bdc2dc542124f423ae2a592a46edfa6"
   },
   {
     "path": "docs/evidence/card179/windows_main-result.txt",
-    "sha256": "a911ebc795d91ebbe95cc3f098f12546d61efa06e6b1ba0e2ae6d4b87ca93004"
+    "sha256": "224cdc50ad829d83fbf9476798ba4c2e057742eb09ebbd278f49f4c39a45e5f6"
   },
   {
     "path": "docs/evidence/card179/windows_main.log",
-    "sha256": "175b8eb128112293a52de2cc62bdce057c0811e78607f1d19951e6518ded0ce2"
+    "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card179/windows_package.log",
+    "sha256": "8b8aa60e67c66bceab36bd9af75b4beffc26f78edaa5fb3d2ce309a6d5da3903"
+  },
+  {
+    "path": "docs/evidence/card179/windows_packed_clouds.log",
+    "sha256": "600539c18ffc80cc2ba528b21135ed4081480d28e0b950843fc75870189e47be"
+  },
+  {
+    "path": "docs/evidence/card179/windows_packed_clouds_first_attempt.log",
+    "sha256": "65955644693d7a383f95bcde1e31e2b0dee8a3b379b3e84e140fe83df553ba90"
   },
   {
     "path": "docs/evidence/card179/windows_performance.json",
@@ -57,34 +73,34 @@
   },
   {
     "path": "docs/evidence/card179/windows_profile-result.txt",
-    "sha256": "95ad675458673957de6dfe0150896718bc0d62a05cdfd3ec051615260d9412ca"
+    "sha256": "f740857ae8666467c80eb933d3ecc76eb623868448cc9743f7995584e7253ec6"
   },
   {
     "path": "docs/evidence/card179/windows_profile.log",
-    "sha256": "5995a1d485a83531050e0642cb20a9ef6059bb52333b0fb383e1d2d1a87ec1b4"
+    "sha256": "6ab61890fbade186d604e96e584006c8f6b72c79dc0ca6a69e305c1902fe8f34"
   },
   {
     "path": "docs/evidence/card179/windows_regression-result.txt",
-    "sha256": "4c482d4de876f3f13c7352444c4975df99dc7383d25168979660df276e0f7016"
+    "sha256": "8d37cc902504e33e304d9995c08e88ecc8c01231ef6abc8a35daa473f0b9aadf"
   },
   {
     "path": "docs/evidence/card179/windows_regression.log",
-    "sha256": "7d34746a2eaa43ce1b7ea2058322c2f1a58f12edd6715d4b491adde082c718d4"
+    "sha256": "0a9ecb4548e880e287122889b8f4e666bdd42448eee395bcb12ab3ef891bd32c"
   },
   {
     "path": "docs/evidence/card179/windows_render-result.txt",
-    "sha256": "f2f2c26056373eb738b28c9cf24ba4ab0e979f21bcd5561c30e69137b451e911"
+    "sha256": "5cdbcedc6e9f61c84fb4d67274eb824f34015e854a8ba230a37aeab5c868c688"
   },
   {
     "path": "docs/evidence/card179/windows_render.log",
-    "sha256": "4768d3808c6aabea01d26fdc4cf25165a65fb86be15f125a422094622ef919c5"
+    "sha256": "98e512ae92f7008a5dead5726ba2a94a7eb5418805188f58a400db0c6a197394"
   },
   {
     "path": "docs/evidence/card179/windows_targeted-result.txt",
-    "sha256": "da9c59eef241d6e44d0eac602fe5147904ea35bf3c7337197216f85448b1efb9"
+    "sha256": "be520bd73ebefa82783b936a9e87c22133ed8cc4c6c8994eb0a5556463cae3ac"
   },
   {
     "path": "docs/evidence/card179/windows_targeted.log",
-    "sha256": "3035ea867b312a5183da4cb028d9fe30d78d3b9a224a365d9f11a68aefda411c"
+    "sha256": "fcf4a893977a7156109c052a7c5a569f150965e026c66162af61c0ada456ad43"
   }
 ]
