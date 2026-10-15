@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -29,6 +30,13 @@ def checked(command, *, cwd=ROOT, env=None, log=None):
     if result.returncode or "SCRIPT ERROR:" in output or "ERROR:" in output:
         raise RuntimeError(f"Command failed ({result.returncode}); see {log or output}")
     return output.strip()
+
+
+def completed_import_fault(error, output):
+    # Godot colors progress labels even when stdout is redirected on Windows.
+    plain = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", output)
+    return ("(3221225477)" in str(error) and "[ DONE ] reimport" in plain
+            and "[ DONE ] loading_editor_layout" in plain and "ERROR:" not in plain)
 
 
 def main():
@@ -86,8 +94,7 @@ def main():
         first_log = (work / "import.log").read_text(encoding="utf-8")
         # Observed pinned Windows editor teardown fault after a complete cold import.
         # Only this exact exit may retry once; parse/import failures remain fatal.
-        if ("(3221225477)" not in str(error) or "[ DONE ] reimport" not in first_log
-                or "ERROR:" in first_log):
+        if not completed_import_fault(error, first_log):
             raise
         import_retried = True
         checked([*common, "--editor", "--import"], env=env, log=work / "import-retry.log")

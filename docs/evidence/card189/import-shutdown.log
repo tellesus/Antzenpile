@@ -1,0 +1,421 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (204 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | AudioController[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | AudioPreferences[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | MusicState[39m[0m
+[   1% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   1% ] [90m[1mupdate_scripts_classes[22m | LineageAccomplishment[39m[0m
+[   2% ] [90m[1mupdate_scripts_classes[22m | RunContinuity[39m[0m
+[   2% ] [90m[1mupdate_scripts_classes[22m | RunHistory[39m[0m
+[   3% ] [90m[1mupdate_scripts_classes[22m | RunState[39m[0m
+[   3% ] [90m[1mupdate_scripts_classes[22m | SaveBuild[39m[0m
+[   4% ] [90m[1mupdate_scripts_classes[22m | SaveService[39m[0m
+[   4% ] [90m[1mupdate_scripts_classes[22m | SimulationClock[39m[0m
+[   5% ] [90m[1mupdate_scripts_classes[22m | SimulationController[39m[0m
+[   5% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   6% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   6% ] [90m[1mupdate_scripts_classes[22m | AdaptationWeb[39m[0m
+[   7% ] [90m[1mupdate_scripts_classes[22m | ChamberArt[39m[0m
+[   7% ] [90m[1mupdate_scripts_classes[22m | ChamberContents[39m[0m
+[   8% ] [90m[1mupdate_scripts_classes[22m | ChamberControls[39m[0m
+[   8% ] [90m[1mupdate_scripts_classes[22m | ColonyActivity[39m[0m
+[   9% ] [90m[1mupdate_scripts_classes[22m | ConnectionControls[39m[0m
+[   9% ] [90m[1mupdate_scripts_classes[22m | DaughterGathering[39m[0m
+[  10% ] [90m[1mupdate_scripts_classes[22m | InwardView[39m[0m
+[  10% ] [90m[1mupdate_scripts_classes[22m | RefugeControls[39m[0m
+[  11% ] [90m[1mupdate_scripts_classes[22m | ChemicalCloud[39m[0m
+[  11% ] [90m[1mupdate_scripts_classes[22m | ChemicalField[39m[0m
+[  12% ] [90m[1mupdate_scripts_classes[22m | ConflictImpression[39m[0m
+[  12% ] [90m[1mupdate_scripts_classes[22m | ConflictPopover[39m[0m
+[  13% ] [90m[1mupdate_scripts_classes[22m | OutwardProjection[39m[0m
+[  13% ] [90m[1mupdate_scripts_classes[22m | OutwardView[39m[0m
+[  14% ] [90m[1mupdate_scripts_classes[22m | ScoutTraceVisual[39m[0m
+[  14% ] [90m[1mupdate_scripts_classes[22m | SourceMemory[39m[0m
+[  15% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  15% ] [90m[1mupdate_scripts_classes[22m | TrailVisual[39m[0m
+[  16% ] [90m[1mupdate_scripts_classes[22m | ActivationFeedback[39m[0m
+[  16% ] [90m[1mupdate_scripts_classes[22m | AudioSettings[39m[0m
+[  17% ] [90m[1mupdate_scripts_classes[22m | ColonyControls[39m[0m
+[  17% ] [90m[1mupdate_scripts_classes[22m | ColonyPressure[39m[0m
+[  18% ] [90m[1mupdate_scripts_classes[22m | EffortDraft[39m[0m
+[  18% ] [90m[1mupdate_scripts_classes[22m | GatheringDraft[39m[0m
+[  19% ] [90m[1mupdate_scripts_classes[22m | InterfaceText[39m[0m
+[  19% ] [90m[1mupdate_scripts_classes[22m | OrganicUI[39m[0m
+[  20% ] [90m[1mupdate_scripts_classes[22m | PerceivedSignal[39m[0m
+[  20% ] [90m[1mupdate_scripts_classes[22m | PerceptionConfig[39m[0m
+[  20% ] [90m[1mupdate_scripts_classes[22m | PerceptionModel[39m[0m
+[  21% ] [90m[1mupdate_scripts_classes[22m | ReportControls[39m[0m
+[  21% ] [90m[1mupdate_scripts_classes[22m | ReportCopy[39m[0m
+[  22% ] [90m[1mupdate_scripts_classes[22m | ReturnedDiscovery[39m[0m
+[  22% ] [90m[1mupdate_scripts_classes[22m | ReturnedLossEvidence[39m[0m
+[  23% ] [90m[1mupdate_scripts_classes[22m | RunReview[39m[0m
+[  23% ] [90m[1mupdate_scripts_classes[22m | SensoryArt[39m[0m
+[  24% ] [90m[1mupdate_scripts_classes[22m | AdaptationRules[39m[0m
+[  24% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | BroodCareRelief[39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | BroodCohort[39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | BroodConfig[39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | BroodEnvironment[39m[0m
+[  27% ] [90m[1mupdate_scripts_classes[22m | BroodHealthConfig[39m[0m
+[  27% ] [90m[1mupdate_scripts_classes[22m | BroodHealthState[39m[0m
+[  28% ] [90m[1mupdate_scripts_classes[22m | BroodHealthSystem[39m[0m
+[  28% ] [90m[1mupdate_scripts_classes[22m | BroodRescueSystem[39m[0m
+[  29% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  29% ] [90m[1mupdate_scripts_classes[22m | BroodTransportState[39m[0m
+[  30% ] [90m[1mupdate_scripts_classes[22m | ChamberCatalog[39m[0m
+[  30% ] [90m[1mupdate_scripts_classes[22m | ChamberDefinition[39m[0m
+[  31% ] [90m[1mupdate_scripts_classes[22m | ChamberProject[39m[0m
+[  31% ] [90m[1mupdate_scripts_classes[22m | ChamberSet[39m[0m
+[  32% ] [90m[1mupdate_scripts_classes[22m | ChamberSystem[39m[0m
+[  32% ] [90m[1mupdate_scripts_classes[22m | ColonyState[39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | ConnectionTrafficState[39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | EvacuationTransportState[39m[0m
+[  34% ] [90m[1mupdate_scripts_classes[22m | FightingTraitConfig[39m[0m
+[  34% ] [90m[1mupdate_scripts_classes[22m | FinalDepartureSystem[39m[0m
+[  35% ] [90m[1mupdate_scripts_classes[22m | FoodExchangeConfig[39m[0m
+[  35% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  36% ] [90m[1mupdate_scripts_classes[22m | FoodToxicityConfig[39m[0m
+[  36% ] [90m[1mupdate_scripts_classes[22m | FoodToxicityState[39m[0m
+[  37% ] [90m[1mupdate_scripts_classes[22m | FoodToxicitySystem[39m[0m
+[  37% ] [90m[1mupdate_scripts_classes[22m | FoundingCampSystem[39m[0m
+[  38% ] [90m[1mupdate_scripts_classes[22m | FoundingConfig[39m[0m
+[  38% ] [90m[1mupdate_scripts_classes[22m | FoundingState[39m[0m
+[  39% ] [90m[1mupdate_scripts_classes[22m | FoundingSystem[39m[0m
+[  39% ] [90m[1mupdate_scripts_classes[22m | GeneticRepertoire[39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | HumidityConfig[39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | HumidityState[39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  41% ] [90m[1mupdate_scripts_classes[22m | InterpileSupplyConfig[39m[0m
+[  41% ] [90m[1mupdate_scripts_classes[22m | InterpileSupplyState[39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | InterpileSupplySystem[39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | InvestmentIntent[39m[0m
+[  43% ] [90m[1mupdate_scripts_classes[22m | InvestmentSystem[39m[0m
+[  43% ] [90m[1mupdate_scripts_classes[22m | NurseryDevelopmentConfig[39m[0m
+[  44% ] [90m[1mupdate_scripts_classes[22m | NurseryDevelopmentSystem[39m[0m
+[  44% ] [90m[1mupdate_scripts_classes[22m | PileState[39m[0m
+[  45% ] [90m[1mupdate_scripts_classes[22m | QueenConfig[39m[0m
+[  45% ] [90m[1mupdate_scripts_classes[22m | QueenRelocationSystem[39m[0m
+[  46% ] [90m[1mupdate_scripts_classes[22m | QueenState[39m[0m
+[  46% ] [90m[1mupdate_scripts_classes[22m | QueenSystem[39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | QueenTransportState[39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | RecognitionDefinition[39m[0m
+[  48% ] [90m[1mupdate_scripts_classes[22m | RefugeState[39m[0m
+[  48% ] [90m[1mupdate_scripts_classes[22m | RefugeSystem[39m[0m
+[  49% ] [90m[1mupdate_scripts_classes[22m | ReproductionConfig[39m[0m
+[  49% ] [90m[1mupdate_scripts_classes[22m | ReproductionState[39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | ReproductionSystem[39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | ResourceStorageConfig[39m[0m
+[  51% ] [90m[1mupdate_scripts_classes[22m | RoyalRescueSystem[39m[0m
+[  51% ] [90m[1mupdate_scripts_classes[22m | RoyalTransportState[39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | SanitationConfig[39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | SanitationState[39m[0m
+[  53% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  53% ] [90m[1mupdate_scripts_classes[22m | StoreRescueSystem[39m[0m
+[  54% ] [90m[1mupdate_scripts_classes[22m | StoreTransportState[39m[0m
+[  54% ] [90m[1mupdate_scripts_classes[22m | TemperatureState[39m[0m
+[  55% ] [90m[1mupdate_scripts_classes[22m | TrailChemistryDefinition[39m[0m
+[  55% ] [90m[1mupdate_scripts_classes[22m | TraitCatalog[39m[0m
+[  56% ] [90m[1mupdate_scripts_classes[22m | TraitDefinition[39m[0m
+[  56% ] [90m[1mupdate_scripts_classes[22m | WorkerLedger[39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | WorkerReinforcementState[39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | WorkerReinforcementSystem[39m[0m
+[  58% ] [90m[1mupdate_scripts_classes[22m | CargoResidueState[39m[0m
+[  58% ] [90m[1mupdate_scripts_classes[22m | ConflictRecruitment[39m[0m
+[  59% ] [90m[1mupdate_scripts_classes[22m | ConnectionResidueState[39m[0m
+[  59% ] [90m[1mupdate_scripts_classes[22m | EcologySystem[39m[0m
+[  60% ] [90m[1mupdate_scripts_classes[22m | GuestDefinition[39m[0m
+[  60% ] [90m[1mupdate_scripts_classes[22m | GuestState[39m[0m
+[  60% ] [90m[1mupdate_scripts_classes[22m | GuestSystem[39m[0m
+[  61% ] [90m[1mupdate_scripts_classes[22m | HoneydewDefinition[39m[0m
+[  61% ] [90m[1mupdate_scripts_classes[22m | HoneydewState[39m[0m
+[  62% ] [90m[1mupdate_scripts_classes[22m | JourneyApproachState[39m[0m
+[  62% ] [90m[1mupdate_scripts_classes[22m | JourneyDefenseState[39m[0m
+[  63% ] [90m[1mupdate_scripts_classes[22m | JourneyOrders[39m[0m
+[  63% ] [90m[1mupdate_scripts_classes[22m | JourneyPressureState[39m[0m
+[  64% ] [90m[1mupdate_scripts_classes[22m | JourneyResponseConfig[39m[0m
+[  64% ] [90m[1mupdate_scripts_classes[22m | JourneyResponseState[39m[0m
+[  65% ] [90m[1mupdate_scripts_classes[22m | JourneyResponseSystem[39m[0m
+[  65% ] [90m[1mupdate_scripts_classes[22m | PredatorCarcass[39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | PredatorCatalog[39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | PredatorDefinition[39m[0m
+[  67% ] [90m[1mupdate_scripts_classes[22m | PredatorMotionState[39m[0m
+[  67% ] [90m[1mupdate_scripts_classes[22m | PredatorState[39m[0m
+[  68% ] [90m[1mupdate_scripts_classes[22m | PredatorSystem[39m[0m
+[  68% ] [90m[1mupdate_scripts_classes[22m | ProducerServiceState[39m[0m
+[  69% ] [90m[1mupdate_scripts_classes[22m | ProducerServiceSystem[39m[0m
+[  69% ] [90m[1mupdate_scripts_classes[22m | ResidueContactState[39m[0m
+[  70% ] [90m[1mupdate_scripts_classes[22m | ResidueDefinition[39m[0m
+[  70% ] [90m[1mupdate_scripts_classes[22m | ResidueZoneState[39m[0m
+[  71% ] [90m[1mupdate_scripts_classes[22m | ResourcePulseDefinition[39m[0m
+[  71% ] [90m[1mupdate_scripts_classes[22m | RivalContinuityState[39m[0m
+[  72% ] [90m[1mupdate_scripts_classes[22m | RivalDefinition[39m[0m
+[  72% ] [90m[1mupdate_scripts_classes[22m | RivalReinforcementState[39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | RivalState[39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | RivalSystem[39m[0m
+[  74% ] [90m[1mupdate_scripts_classes[22m | SwarmConfig[39m[0m
+[  74% ] [90m[1mupdate_scripts_classes[22m | SwarmState[39m[0m
+[  75% ] [90m[1mupdate_scripts_classes[22m | SwarmSystem[39m[0m
+[  75% ] [90m[1mupdate_scripts_classes[22m | TemporaryResourceDefinition[39m[0m
+[  76% ] [90m[1mupdate_scripts_classes[22m | KnowledgeBase[39m[0m
+[  76% ] [90m[1mupdate_scripts_classes[22m | KnowledgeConfig[39m[0m
+[  77% ] [90m[1mupdate_scripts_classes[22m | KnownNode[39m[0m
+[  77% ] [90m[1mupdate_scripts_classes[22m | PassageMemory[39m[0m
+[  78% ] [90m[1mupdate_scripts_classes[22m | ReportJournal[39m[0m
+[  78% ] [90m[1mupdate_scripts_classes[22m | ReportSystem[39m[0m
+[  79% ] [90m[1mupdate_scripts_classes[22m | ScoutMissionMemory[39m[0m
+[  79% ] [90m[1mupdate_scripts_classes[22m | ExplorationState[39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | Observation[39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | ScoutAgent[39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  81% ] [90m[1mupdate_scripts_classes[22m | ScoutConfig[39m[0m
+[  81% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  82% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  82% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  83% ] [90m[1mupdate_scripts_classes[22m | TrailConfig[39m[0m
+[  83% ] [90m[1mupdate_scripts_classes[22m | TrailDetour[39m[0m
+[  84% ] [90m[1mupdate_scripts_classes[22m | TrailNetwork[39m[0m
+[  84% ] [90m[1mupdate_scripts_classes[22m | TrailRouteState[39m[0m
+[  85% ] [90m[1mupdate_scripts_classes[22m | TrailSegmentState[39m[0m
+[  85% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  86% ] [90m[1mupdate_scripts_classes[22m | TransitCohort[39m[0m
+[  86% ] [90m[1mupdate_scripts_classes[22m | HeatConfig[39m[0m
+[  87% ] [90m[1mupdate_scripts_classes[22m | HeatSystem[39m[0m
+[  87% ] [90m[1mupdate_scripts_classes[22m | NestDisturbanceDefinition[39m[0m
+[  88% ] [90m[1mupdate_scripts_classes[22m | NestDisturbanceState[39m[0m
+[  88% ] [90m[1mupdate_scripts_classes[22m | NestDisturbanceSystem[39m[0m
+[  89% ] [90m[1mupdate_scripts_classes[22m | PassageWitnessState[39m[0m
+[  89% ] [90m[1mupdate_scripts_classes[22m | RainConfig[39m[0m
+[  90% ] [90m[1mupdate_scripts_classes[22m | RainState[39m[0m
+[  90% ] [90m[1mupdate_scripts_classes[22m | RainSystem[39m[0m
+[  91% ] [90m[1mupdate_scripts_classes[22m | SurfaceImpactConfig[39m[0m
+[  91% ] [90m[1mupdate_scripts_classes[22m | SurfaceImpactState[39m[0m
+[  92% ] [90m[1mupdate_scripts_classes[22m | SurfaceImpactSystem[39m[0m
+[  92% ] [90m[1mupdate_scripts_classes[22m | WaterSourceSystem[39m[0m
+[  93% ] [90m[1mupdate_scripts_classes[22m | ResourceDefinition[39m[0m
+[  93% ] [90m[1mupdate_scripts_classes[22m | ScenarioCatalog[39m[0m
+[  94% ] [90m[1mupdate_scripts_classes[22m | ScenarioDefinition[39m[0m
+[  94% ] [90m[1mupdate_scripts_classes[22m | SiteCatalog[39m[0m
+[  95% ] [90m[1mupdate_scripts_classes[22m | SiteDefinition[39m[0m
+[  95% ] [90m[1mupdate_scripts_classes[22m | SourceCatalog[39m[0m
+[  96% ] [90m[1mupdate_scripts_classes[22m | SourceProfile[39m[0m
+[  96% ] [90m[1mupdate_scripts_classes[22m | TerrainDefinition[39m[0m
+[  97% ] [90m[1mupdate_scripts_classes[22m | WaterSourceProfile[39m[0m
+[  97% ] [90m[1mupdate_scripts_classes[22m | WorldLoader[39m[0m
+[  98% ] [90m[1mupdate_scripts_classes[22m | WorldNodeDefinition[39m[0m
+[  98% ] [90m[1mupdate_scripts_classes[22m | WorldNodeState[39m[0m
+[  99% ] [90m[1mupdate_scripts_classes[22m | WorldState[39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (62 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | base_loop.wav[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | growth_loop.wav[39m[0m
+[   3% ] [90m[1m_update_scan_actions[22m | midden_loop.wav[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | nursery_loop.wav[39m[0m
+[   6% ] [90m[1m_update_scan_actions[22m | returned_alarm.wav[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | returned_discovery.wav[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | dog_like.svg[39m[0m
+[  11% ] [90m[1m_update_scan_actions[22m | foreign_ants.svg[39m[0m
+[  12% ] [90m[1m_update_scan_actions[22m | large_animal.svg[39m[0m
+[  14% ] [90m[1m_update_scan_actions[22m | site_edge.svg[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | site_loam.svg[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | site_root.svg[39m[0m
+[  19% ] [90m[1m_update_scan_actions[22m | site_stone.svg[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | crumbs_memory.svg[39m[0m
+[  22% ] [90m[1m_update_scan_actions[22m | dew_memory.svg[39m[0m
+[  23% ] [90m[1m_update_scan_actions[22m | fruit_memory.svg[39m[0m
+[  25% ] [90m[1m_update_scan_actions[22m | honeydew_memory.svg[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | nectar_memory.svg[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | puddle_memory.svg[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | remains_memory.svg[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | seeds_memory.svg[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | seep_memory.svg[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | beetle_memory.svg[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | spider_memory.svg[39m[0m
+[  38% ] [90m[1m_update_scan_actions[22m | bridge.png[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | entrance_body.png[39m[0m
+[  41% ] [90m[1m_update_scan_actions[22m | entrance_front.png[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | entrance_rear.png[39m[0m
+[  44% ] [90m[1m_update_scan_actions[22m | local_home.png[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | nursery_developed_body.png[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | nursery_developed_front.png[39m[0m
+[  49% ] [90m[1m_update_scan_actions[22m | nursery_developed_rear.png[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | nursery_primitive_body.png[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | nursery_primitive_front.png[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | nursery_primitive_rear.png[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | queen_body.png[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | queen_front.png[39m[0m
+[  58% ] [90m[1m_update_scan_actions[22m | queen_rear.png[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | scent_smoke.png[39m[0m
+[  61% ] [90m[1m_update_scan_actions[22m | substrate.png[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | entrance_shell.png[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | functional_fiber_strip.png[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | nursery_developed.png[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | nursery_expansion_lobe.png[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | nursery_primitive.png[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | queen_shell.png[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | brood_egg.png[39m[0m
+[  74% ] [90m[1m_update_scan_actions[22m | brood_larva.png[39m[0m
+[  76% ] [90m[1m_update_scan_actions[22m | brood_pupa.png[39m[0m
+[  77% ] [90m[1m_update_scan_actions[22m | chamber.png[39m[0m
+[  79% ] [90m[1m_update_scan_actions[22m | chemical_cloud.png[39m[0m
+[  80% ] [90m[1m_update_scan_actions[22m | home_entrance.png[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | queen.png[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | nursery_earth.svg[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | scent_cloud.svg[39m[0m
+[  87% ] [90m[1m_update_scan_actions[22m | water_impression.svg[39m[0m
+[  88% ] [90m[1m_update_scan_actions[22m | worker_scent.png[39m[0m
+[  90% ] [90m[1m_update_scan_actions[22m | worker_walk.png[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | organ_membrane_v2.png[39m[0m
+[  93% ] [90m[1m_update_scan_actions[22m | vapor_v2.png[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | worker_scent_v3.png[39m[0m
+[  96% ] [90m[1m_update_scan_actions[22m | worker_walk_v3.png[39m[0m
+[92m[ DONE ][39m [1m_update_scan_actions[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (62 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   1% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   3% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   4% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   6% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   7% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   9% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  11% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  12% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  14% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  15% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  17% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  19% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  20% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  22% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  23% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  25% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  26% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  28% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  30% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  31% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  33% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  34% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  36% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  38% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  39% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  41% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  42% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  44% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  46% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  47% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  49% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  50% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  52% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  53% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  55% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  57% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  58% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  60% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  61% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  63% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  65% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  66% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  68% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  69% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  71% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  73% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  74% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  76% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  77% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  79% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  80% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  82% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  84% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  85% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  87% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  88% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  90% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  92% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  93% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  95% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  96% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing pre-reimport operations...[39m[0m
+[   0% ] [90m[1mreimport[22m | nursery_developed_rear.png[39m[0m
+[   1% ] [90m[1mreimport[22m | nursery_primitive_body.png[39m[0m
+[   3% ] [90m[1mreimport[22m | nursery_primitive_front.png[39m[0m
+[   4% ] [90m[1mreimport[22m | nursery_primitive_rear.png[39m[0m
+[   6% ] [90m[1mreimport[22m | queen_body.png[39m[0m
+[   7% ] [90m[1mreimport[22m | queen_front.png[39m[0m
+[   9% ] [90m[1mreimport[22m | queen_rear.png[39m[0m
+[  11% ] [90m[1mreimport[22m | scent_smoke.png[39m[0m
+[  12% ] [90m[1mreimport[22m | substrate.png[39m[0m
+[  14% ] [90m[1mreimport[22m | entrance_shell.png[39m[0m
+[  15% ] [90m[1mreimport[22m | functional_fiber_strip.png[39m[0m
+[  17% ] [90m[1mreimport[22m | nursery_developed.png[39m[0m
+[  19% ] [90m[1mreimport[22m | nursery_expansion_lobe.png[39m[0m
+[  20% ] [90m[1mreimport[22m | nursery_primitive.png[39m[0m
+[  22% ] [90m[1mreimport[22m | queen_shell.png[39m[0m
+[  23% ] [90m[1mreimport[22m | brood_egg.png[39m[0m
+[  25% ] [90m[1mreimport[22m | brood_larva.png[39m[0m
+[  26% ] [90m[1mreimport[22m | brood_pupa.png[39m[0m
+[  28% ] [90m[1mreimport[22m | chamber.png[39m[0m
+[  30% ] [90m[1mreimport[22m | chemical_cloud.png[39m[0m
+[  31% ] [90m[1mreimport[22m | home_entrance.png[39m[0m
+[  33% ] [90m[1mreimport[22m | queen.png[39m[0m
+[  34% ] [90m[1mreimport[22m | nursery_earth.svg[39m[0m
+[  36% ] [90m[1mreimport[22m | scent_cloud.svg[39m[0m
+[  38% ] [90m[1mreimport[22m | water_impression.svg[39m[0m
+[  39% ] [90m[1mreimport[22m | worker_scent.png[39m[0m
+[  41% ] [90m[1mreimport[22m | worker_walk.png[39m[0m
+[  42% ] [90m[1mreimport[22m | organ_membrane_v2.png[39m[0m
+[  44% ] [90m[1mreimport[22m | vapor_v2.png[39m[0m
+[  46% ] [90m[1mreimport[22m | worker_scent_v3.png[39m[0m
+[  47% ] [90m[1mreimport[22m | worker_walk_v3.png[39m[0m
+[  49% ] [90m[1mreimport[22m | dog_like.svg[39m[0m
+[  50% ] [90m[1mreimport[22m | foreign_ants.svg[39m[0m
+[  52% ] [90m[1mreimport[22m | large_animal.svg[39m[0m
+[  53% ] [90m[1mreimport[22m | site_edge.svg[39m[0m
+[  55% ] [90m[1mreimport[22m | site_loam.svg[39m[0m
+[  57% ] [90m[1mreimport[22m | site_root.svg[39m[0m
+[  58% ] [90m[1mreimport[22m | site_stone.svg[39m[0m
+[  60% ] [90m[1mreimport[22m | crumbs_memory.svg[39m[0m
+[  61% ] [90m[1mreimport[22m | dew_memory.svg[39m[0m
+[  63% ] [90m[1mreimport[22m | fruit_memory.svg[39m[0m
+[  65% ] [90m[1mreimport[22m | honeydew_memory.svg[39m[0m
+[  66% ] [90m[1mreimport[22m | nectar_memory.svg[39m[0m
+[  68% ] [90m[1mreimport[22m | nursery_developed_front.png[39m[0m
+[  69% ] [90m[1mreimport[22m | nursery_developed_body.png[39m[0m
+[  71% ] [90m[1mreimport[22m | local_home.png[39m[0m
+[  73% ] [90m[1mreimport[22m | entrance_rear.png[39m[0m
+[  74% ] [90m[1mreimport[22m | entrance_front.png[39m[0m
+[  76% ] [90m[1mreimport[22m | entrance_body.png[39m[0m
+[  77% ] [90m[1mreimport[22m | bridge.png[39m[0m
+[  79% ] [90m[1mreimport[22m | spider_memory.svg[39m[0m
+[  80% ] [90m[1mreimport[22m | beetle_memory.svg[39m[0m
+[  82% ] [90m[1mreimport[22m | seep_memory.svg[39m[0m
+[  84% ] [90m[1mreimport[22m | seeds_memory.svg[39m[0m
+[  85% ] [90m[1mreimport[22m | remains_memory.svg[39m[0m
+[  87% ] [90m[1mreimport[22m | puddle_memory.svg[39m[0m
+[  88% ] [90m[1mreimport[22m | nursery_developed_rear.png[39m[0m
+[  90% ] [90m[1mreimport[22m | nursery_primitive_body.png[39m[0m
+[  92% ] [90m[1mreimport[22m | nursery_primitive_front.png[39m[0m
+[  93% ] [90m[1mreimport[22m | nursery_primitive_rear.png[39m[0m
+[  95% ] [90m[1mreimport[22m | queen_body.png[39m[0m
+[  96% ] [90m[1mreimport[22m | queen_front.png[39m[0m
+[  98% ] [90m[1mreimport[22m | Finalizing Asset Import...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (62 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing post-reimport operations...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m

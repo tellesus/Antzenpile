@@ -1,7 +1,7 @@
 [
   {
     "path": "docs/evidence/card189/README.md",
-    "sha256": "afebf871fdb82861c3c707fff1e60ae34f23b211f8a0c0463680d30fcfaacb73"
+    "sha256": "9f87e16da84f0f5c6109cdc85b00dbcb20114c944a83523f8b2cd2540c032899"
   },
   {
     "path": "docs/evidence/card189/external-result.txt",
@@ -18,6 +18,10 @@
   {
     "path": "docs/evidence/card189/import-result.txt",
     "sha256": "4ddaf7716f5a8feeb038e57a44132ea9db76ec5872ddc8db978115e4163d536b"
+  },
+  {
+    "path": "docs/evidence/card189/import-shutdown.log",
+    "sha256": "dd21898794b93dc8083ba1914a1fa25dc170c1c63d596c68967ef5b302633a81"
   },
   {
     "path": "docs/evidence/card189/import.log",
