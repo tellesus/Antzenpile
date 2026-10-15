@@ -24,7 +24,7 @@ Import, export, inventory, archive extraction and extracted release Main are che
 
 ## Saves and player acceptance
 
-The package uses `%APPDATA%\Godot\app_userdata\Antzenpile`, with `saves/slot_1.json` and separate `audio_preferences.cfg`. It shares development-build paths. Back up that folder before testing an existing save; packaging probes never access it.
+The package uses `%APPDATA%\Godot\app_userdata\Antzenpile`, with `saves/slot_1.json` and separate `audio_preferences.cfg`. It shares development-build paths. Create a new colony after changing builds; saves are supported only by their producing build. Old-save preservation/migration work is tabled until true release preparation. Packaging probes use isolated user data.
 
 Actual native graphics/audio/feel and desktop performance remain unverified by these headless gates. Under [A88](DECISIONS.md), player beta feedback precedes final M8 presentation/balance decisions and M9 release acceptance. Try start/gather/develop/queue a trait, returned conflict/recovery, daughter continuation, save/reload, End Run and exit. Report confusing controls, visual/audio issues, or slowdown with Windows/CPU/GPU/resolution and time speed. Mature/network/crisis states and another-machine launch remain explicit acceptance checks.
 

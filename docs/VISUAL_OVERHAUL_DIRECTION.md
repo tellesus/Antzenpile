@@ -26,3 +26,5 @@
 
 ## Evidence to capture on workstation
 Record Godot 4.7.2 build, Compatibility renderer, GPU, window resolution, 1% low frame time and median FPS over 60 seconds, graphics settings and screenshot/state fixture; repeat with glow on/off and 6 active trails. Check pause visual-clock behavior separately.
+
+M8 context188 extends the living source/predator material with four shelter and three supported animal/foreign impressions. Original code-authored mipmapped SVGs dissolve into saturated vapor and share existing clock/confidence/age. Current remaining presentation work is context/onboarding/interface polish, followed by the separate music overhaul and integrated review; completed historical proof instructions do not reopen old branches.

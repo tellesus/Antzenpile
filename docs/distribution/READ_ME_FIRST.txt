@@ -13,8 +13,10 @@ that revealed run cannot resume, and End Run does not overwrite your save.
 
 Saves: %APPDATA%\Godot\app_userdata\Antzenpile\saves\slot_1.json
 Sound settings: the same Antzenpile folder, audio_preferences.cfg.
-The beta shares these paths with development builds. Copy the Antzenpile
-user-data folder before trying an existing save you want to keep.
+The beta shares these paths with development builds. Saves load only in the
+same build that created them. Start a new colony after changing builds.
+Previous-build save preservation and migration are tabled until true release
+preparation; they are not goals of this development beta.
 
 What to try: start a colony, gather and develop it, queue an adaptation,
 respond to a returned warning, continue into a daughter nest, save/reload,

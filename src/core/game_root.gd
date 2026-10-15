@@ -482,7 +482,7 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		var report: Dictionary = simulation.run.journey_response.reports[id]
 		var impact: Dictionary = simulation.run.trails.routes[id].impact_report
 		if not impact.is_empty() and report.received_at <= impact.received_at: continue
-		if report.finding not in ["ambush","mixed","surface","residue"]: continue
+		if report.finding not in ["ambush","mixed","surface","residue","foreign"]: continue
 		if simulation.run.trails.routes[id].passage_memory.count>0 and simulation.run.trails.routes[id].passage_memory.received_at>=report.received_at:continue
 		if simulation.run.trails.routes[id].residue_report.get("received_at",0.0)>report.received_at:continue
 		var route: TrailRouteState = simulation.run.trails.routes[id]
@@ -490,8 +490,11 @@ func sensory_snapshot(pile_id: String) -> Array[Dictionary]:
 		var segment: TrailSegmentState = simulation.run.trails.segments[route.segment_id]
 		var offset: Vector2 = segment.start.lerp(segment.end,report.fraction) - origin
 		if report.has("estimated_position"): offset = Vector2(report.estimated_position[0],report.estimated_position[1]) - origin
+		# Foreign-only reports have no captured contact position. Show the known
+		# journey's broad course, with uncertainty spanning it, never an enemy point.
+		if report.finding=="foreign":offset=segment.start.lerp(segment.end,0.5)-origin
 		result.append({"id":"threat:" + id,"source_knowledge_id":route.destination_knowledge_id,"category":"threat",
-			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":3.0,
+			"bearing":fposmod(offset.angle(),TAU),"estimated_distance":offset.length(),"uncertainty_radius":maxf(3.0,segment.start.distance_to(segment.end)*0.5) if report.finding=="foreign" else 3.0,
 			"confidence":0.75,"confidence_label":"likely","strength":0.3,"age":simulation.run.simulation_time - report.observed_at,
 			"risk":"reported_attack","threat_kind":report.finding,
 			"predator_profile":report.get("predator_profile", "") if report.finding in ["ambush", "mixed"] else "",

@@ -12,7 +12,7 @@ The original local slot and a private byte-for-byte copy remain untouched and un
 
 Verify current fresh/scenario, mature active jobs, daughter supplies and armed-search snapshots; actual save → End Run → review controls → load → exact continuation, failed-save retention and failed-load atomicity. Run focused and final full/import/Main/native/packed gates. Measure save validation cost on the target Windows machine. This is current-build reliability evidence, not recovery of the original failure.
 
-Verification: 11652 checks, 0 failures; focused 187 checks, 0 failures; import/Main and six native review flows pass. [Evidence](../evidence/card178/README.md). Publication/Windows delivery pending.
+Verification: 11652 checks, 0 failures; focused 187 checks, 0 failures; import/Main and six native review flows pass. [Evidence](../evidence/card178/README.md). Publication and Windows delivery are recorded below.
 
 Runtime `760aa23188f5f776d26cef44a02c2c1f8965570d`; 662 audited resources. Isolated import/export/inventory/extraction, headless/native release startup and packed save/settings/review pass. Native unchanged-PCK current-save checks pass: actual scouts/gathering, save, invalid replacement retaining last good slot, ended-review overwrite prevention, touch playback/load and exact40-second continued state. Direct17-ant unsurveyed search/private contact/return remains verified. Full: 11652 checks, 0 failures; focused: 187 checks, 0 failures. ZIP SHA256 `b59c1c14bc7c47cf6680b5cec27f849a4d2ddd6eff4754ad8c76d09fa8e6d807`. Both main checkouts match and all109 original local files are preserved. Human audio/feel, physical touch and clean-machine acceptance remain separate.
 

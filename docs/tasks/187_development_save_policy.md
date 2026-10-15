@@ -6,7 +6,7 @@ Player instruction: backwards compatibility is not a development goal or priorit
 
 [Save policy](../SAVE_POLICY.md) is authoritative across instructions, design, roadmap, technical references, catalogs and completed-card history. [Current goals](../DEVELOPMENT_GOALS.md) record the remaining ordered work. Historical evidence stays factual and is not an active compatibility requirement. No old-file recovery or migration is authorized as current work.
 
-Next: attach a deterministic producing-build identity to the disk envelope, reject absent/different build identity before state restoration, and keep same-build save/restart/review/load/continuation and failed-load atomicity. Identify editor/runtime content and exported package builds reproducibly; avoid a manual schema bump standing in for build identity. No migration adapter or schema weakening. Verify focused admission/current-flow checks, final full/import/Main and the unified committed-main Windows package.
+Implemented: a deterministic producing-build identity in the disk envelope rejects absent/different identity before state restoration, while same-build save/restart/review/load/continuation and failed-load atomicity remain. Editor/runtime content and exported builds are identified reproducibly. No manual schema bump substitutes for build identity; no migration adapter or schema weakening was added. Focused admission/current-flow, final full/import/Main and unified committed-main Windows checks passed.
 
 Implemented exact-build envelope admission and deterministic editor/package identities. 11656 checks, 0 failures; focused 191 checks, 0 failures; import/Main, six native review flows and two separate-process restart checks pass. [Evidence](../evidence/card187/README.md).
 

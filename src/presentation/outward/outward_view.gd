@@ -1372,6 +1372,7 @@ func _threat_caption(signal_data: Dictionary) -> String:
 		return Memories.predator_name(signal_data.predator_profile) + " memory"
 	if signal_data.get("threat_kind", "") == "surface": return Memories.passage_name(signal_data.get("passage_impression",""))+" memory"
 	if signal_data.get("threat_kind", "") == "residue":return "Strange ground residue memory"
+	if signal_data.get("threat_kind", "") == "foreign":return "Foreign ant scent memory"
 	return "Ambush memory" if record.get("outcome","") == "secured" else "Ambush trace"
 
 func _can_mobilize(route: Dictionary) -> bool:

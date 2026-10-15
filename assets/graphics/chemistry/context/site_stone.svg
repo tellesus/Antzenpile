@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<!-- Original returned sensory archetype, not physical geometry, population or live identity. -->
+<defs><radialGradient id="body"><stop stop-color="white" stop-opacity=".38"/><stop offset=".72" stop-color="white" stop-opacity=".22"/><stop offset="1" stop-color="white" stop-opacity=".05"/></radialGradient></defs>
+<g fill="none" stroke="white" stroke-opacity=".64" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"><path d="M113 248 L157 172 L244 145 L343 166 L401 238 L375 268 L307 249 L225 259 L164 280 Z" fill="url(#body)"/><path d="M123 252 L193 226 L269 231 L322 210 L389 236 M160 178 L193 226 L169 268 M248 150 L269 230 M345 170 L321 208 M178 301 Q246 277 325 296 M156 327 Q244 307 357 328 M199 353 Q251 367 309 347"/><path d="M214 278 L205 313 M293 268 L310 313 M147 229 L161 215 M337 247 L355 252" opacity=".45"/></g></svg>

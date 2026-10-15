@@ -1,0 +1,86 @@
+[
+  {
+    "path": "docs/evidence/card188/README.md",
+    "sha256": "4ca192e899481d9ca593c71453a27e21f64cc03f16c40232324dbf799836e059"
+  },
+  {
+    "path": "docs/evidence/card188/actual_dog_900.png",
+    "sha256": "0390ad50afe4f7eed3c23d2c01beac94267d59b6f35403e2eb9a11c12504142e"
+  },
+  {
+    "path": "docs/evidence/card188/actual_foreign_900.png",
+    "sha256": "8530c4e4316e274310964ce576db847c17e3f60c8dfbbca9a3fac744e2d66c2f"
+  },
+  {
+    "path": "docs/evidence/card188/animals_1280.png",
+    "sha256": "2ae1772c21feca044c2e0233a537373acdb08a769b3695043f00a944138d1a5c"
+  },
+  {
+    "path": "docs/evidence/card188/external-result.txt",
+    "sha256": "8fd7378f9e5caa6e63be58ac2521c2fbc6087566e008e1bd37938b2b0b133910"
+  },
+  {
+    "path": "docs/evidence/card188/external.log",
+    "sha256": "30e6c6c67f133ce0ca623ba741a5b2e3c1162d77e2be04a5c9dff247a5924219"
+  },
+  {
+    "path": "docs/evidence/card188/import-result.txt",
+    "sha256": "cf62bb65d375b0c120d6e167dc2c4c5dcee05e7c40e26fa110208fb43d3b68f7"
+  },
+  {
+    "path": "docs/evidence/card188/import.log",
+    "sha256": "f15ffd4c558b01611d562c8c257508942bdc2dc542124f423ae2a592a46edfa6"
+  },
+  {
+    "path": "docs/evidence/card188/main-result.txt",
+    "sha256": "ea8e23d4defad3e95c7d022f43291ec61efec28edeb32cbbd369c219c846728e"
+  },
+  {
+    "path": "docs/evidence/card188/main.log",
+    "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card188/profile-result.txt",
+    "sha256": "3e869c212b7d4ab2785c912d248f50cbf730f2697b9692d80088341d00d03f9d"
+  },
+  {
+    "path": "docs/evidence/card188/profile.log",
+    "sha256": "a0cc7b22924aec1589262d62fc6d1e65753ba78bac47bf05133b903f6f7ea6bb"
+  },
+  {
+    "path": "docs/evidence/card188/regression-result.txt",
+    "sha256": "217fa774c1d3417194721ce0e0e98cfb8f16ae980a4fa3e77496383a595b7c9f"
+  },
+  {
+    "path": "docs/evidence/card188/regression.log",
+    "sha256": "00892ef748f85fb09d740a27ec6256b19d0e2a76e5b9940e608b7b313027c22f"
+  },
+  {
+    "path": "docs/evidence/card188/render-result.txt",
+    "sha256": "227b70f0e67d20ee4cf854866b5a4c9633ded04a4f98b994692f2f194b9d0645"
+  },
+  {
+    "path": "docs/evidence/card188/render.log",
+    "sha256": "361163547ab8931f2f4507fc80d1221c810c5bd12aa8c5693302b614681cb3cb"
+  },
+  {
+    "path": "docs/evidence/card188/shelters_1280.png",
+    "sha256": "72d1a922f229e7c1626e146aa5e66865039421611259b3a85d4878c9df2bd39c"
+  },
+  {
+    "path": "docs/evidence/card188/stale.png",
+    "sha256": "25bb73773c9ea5caa049ffff0fdcb1b83bce355c667abef3198979251173b9e3"
+  },
+  {
+    "path": "docs/evidence/card188/targeted-result.txt",
+    "sha256": "1c288e3ce1b1cdc25e2193ee54828024096725be6262ad5d02db51f8a9c2178a"
+  },
+  {
+    "path": "docs/evidence/card188/targeted.log",
+    "sha256": "01021cc14c2c9f9d1950cac1e8f923cbda29728745a1ab0423a3484d2e3e5f42"
+  },
+  {
+    "path": "docs/evidence/card188/windows_performance.json",
+    "sha256": "6ddf73e9e8b035cebaa256cc093d365802985e24bdff059ccc618728c763ce90"
+  }
+]

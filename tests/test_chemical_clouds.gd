@@ -26,7 +26,7 @@ func run(test: Object) -> bool:
 	signal_data.confidence = 0.75
 	for kind: String in ["surface", "residue", "foreign", ""]:
 		signal_data.threat_kind = kind
-		test.check(Cloud.appearance(signal_data, false).identity.is_empty(), "Non-predator evidence cannot borrow a predator mask: " + kind)
+		test.check(Cloud.appearance(signal_data, false).identity not in ["wolf_spider","beetle_hunter"], "Non-predator evidence cannot borrow a predator mask: " + kind)
 	signal_data.threat_kind = "mixed"
 	signal_data.predator_profile = "beetle_hunter"
 	test.check(Cloud.appearance(signal_data, false).identity == "beetle_hunter", "Mixed returned evidence retains its actually witnessed beetle")
