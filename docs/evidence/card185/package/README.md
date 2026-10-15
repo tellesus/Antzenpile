@@ -1,0 +1,3 @@
+# Main Windows threat-inspection delivery
+
+Runtime `b07a8d98408f14841074d2da66446000c50dfa97`; 662 audited resources. Isolated committed-runtime import/export/inventory/extraction, headless/native release startup and packed save/settings/review pass. Native unchanged-PCK inspection checks an actual returned spider, stale replacement, pause, mouse/touch draft editing and a paid 17-ant response receipt. Packaged gathering editing/commit/receipt passes. Full suite: 11530 checks, 0 failures; 1418 focused checks/zero. ZIP SHA256 `b8c155cc660f5b28a091e81dff7ed835a0137d1f806c75a21ec801698f4b55ad`. Both main checkouts match and all 109 original local files are preserved. Human visual/audio/feel, physical touchscreen and final clean-machine/release acceptance remain open.

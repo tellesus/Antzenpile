@@ -14,3 +14,5 @@ Two 60-second native editor frame-loop samples; VSync disabled, Dummy audio, an 
 | Closed | 509.9 | 2.452 | 375.5 | 3.80 |
 
 Desktop scheduling/outliers remain part of these measurements; no cause or final performance acceptance is inferred. Human visual/feel, physical touchscreen and clean-machine/release acceptance remain open. Simulation, saves, knowledge, ledger and audio are unchanged. Existing save report178 remains open. Package evidence follows publication.
+
+[Published Windows build and native unchanged-PCK evidence](package/README.md).

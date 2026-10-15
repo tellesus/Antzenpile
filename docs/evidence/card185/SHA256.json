@@ -1,7 +1,7 @@
 [
   {
     "path": "docs/evidence/card185/README.md",
-    "sha256": "a8be7a82eb734fc2e77d25d4473ef14c3ba7d1ed0b85a5dd303d6b08be595006"
+    "sha256": "ab88cf2968200fa531d58d75f3a023ff13fae2b09e8034edcc6b82e0326a02bf"
   },
   {
     "path": "docs/evidence/card185/beetle_1280.png",
@@ -26,6 +26,42 @@
   {
     "path": "docs/evidence/card185/motion-pixels.json",
     "sha256": "631fa44fce698f140ec11e720a3791141f0121521bb9b1acef84b2a5e01b9119"
+  },
+  {
+    "path": "docs/evidence/card185/package/README.md",
+    "sha256": "b083683b42d3172a13849ce822c23bd0d2e53d1646cc756ad4e2826d90828453"
+  },
+  {
+    "path": "docs/evidence/card185/package/gathering_900.png",
+    "sha256": "0878a35d53ff94af0493bae6f4feabdbf6d65cc44a6aeb340da0843876e3d37f"
+  },
+  {
+    "path": "docs/evidence/card185/package/inspection_900.png",
+    "sha256": "b1997887613e3241a6ce595ab6bc89c436ef3ff2295e9d3f7f0252fbe39f6129"
+  },
+  {
+    "path": "docs/evidence/card185/package/package.log",
+    "sha256": "dc78c851f22d96751dd81b5521c776dca47fd2ffa1de091ef487759453be8dce"
+  },
+  {
+    "path": "docs/evidence/card185/package/packed-gathering.log",
+    "sha256": "10eebc1292d6811fc747ead95e83233b16e916d46bdee7dfb9a9b519542466a8"
+  },
+  {
+    "path": "docs/evidence/card185/package/packed-inspection.log",
+    "sha256": "aaacf845e39320fcc0a973df71e4acbb50ade2e42fa89314a4fc813cb2d1265a"
+  },
+  {
+    "path": "docs/evidence/card185/package/release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card185/package/release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
+  },
+  {
+    "path": "docs/evidence/card185/package/windows_build.json",
+    "sha256": "dc78c851f22d96751dd81b5521c776dca47fd2ffa1de091ef487759453be8dce"
   },
   {
     "path": "docs/evidence/card185/profile-result.txt",

@@ -122,7 +122,7 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 
 **M1–M7 systems beta implemented and headlessly verified.** [175](tasks/175_windows_systems_beta_package.md) supplies a portable Windows beta for actual player review; M8 final presentation/balance feedback and M9 final distribution/performance/clean-machine gates remain. Player graphical/feel checks defer to the systems beta (A88).
 
-**M8 bounded progress:** living chemical clouds 179, luminous INWARD art/Escape menu 180, gathering clarity 181, [combat recruitment182](tasks/182_clear_combat_recruitment.md) and [luminous worker motion183](tasks/183_luminous_worker_motion.md) are integrated into main and the Windows beta. [Returned source impressions 184](tasks/184_returned_source_impressions.md) now cover all ten established source types. Next: remaining threat/site forms and context polish, followed by the separate music overhaul. Player visual/audio/feel and M9 release acceptance remain open.
+**M8 bounded progress:** living chemical clouds 179, luminous INWARD art/Escape menu 180, gathering clarity 181, [combat recruitment182](tasks/182_clear_combat_recruitment.md) and [luminous worker motion183](tasks/183_luminous_worker_motion.md) are integrated into main and the Windows beta. [Returned source impressions 184](tasks/184_returned_source_impressions.md) now cover all ten established source types. [Threat inspection185](tasks/185_luminous_threat_inspection.md) now shares the living returned-evidence art and readable report layout. Next: remaining animal/site forms, followed by the separate music overhaul. Player visual/audio/feel and M9 release acceptance remain open.
 
 ## Release acceptance and cost discipline
 
