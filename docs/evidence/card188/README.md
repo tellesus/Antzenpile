@@ -16,3 +16,5 @@ Pinned Godot4.7.2.stable.official.ed1daf0bf, Compatibility/OpenGL, RX6650XT/Ryze
 | Abstract | 319.0 | 3.570 | 258.5 | 5.112 |
 
 Human visual/audio/feel, physical touchscreen and clean-machine acceptance remain separate. Same-build-only save policy applies; no old-save compatibility work was performed.
+
+[Published Windows package evidence](package/README.md).

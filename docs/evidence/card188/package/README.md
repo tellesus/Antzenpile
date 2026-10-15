@@ -1,0 +1,3 @@
+# Returned-context Windows delivery
+
+Runtime `7d2cbeb1ac1e0de6b8b9476ba0c641cf48ad72c9`; 678 audited resources. Isolated import/export/inventory/extraction, actual headless/native release startup and unchanged-PCK checks pass: real returned foreign survey, all seven mask/material bindings, mouse/touch, current save/review/retention and two-process same-build continuation. Full: 12176 checks, 0 failures; focused: 1413 checks, 0 failures. ZIP SHA256 `ff8814cbb76fcccd49bfd68224fafb2d8617537405cb52983cfac0e8c4858ff1`; producing save identity `windows-489218c522280fdb3c5da06df532b3d386093cf08c5178331bf02afe8398409b`. Both main checkouts match and109 original local files remain unchanged. Human visual/audio/feel, physical touch and clean-machine acceptance remain separate.

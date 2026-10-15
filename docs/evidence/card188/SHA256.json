@@ -1,7 +1,7 @@
 [
   {
     "path": "docs/evidence/card188/README.md",
-    "sha256": "4ca192e899481d9ca593c71453a27e21f64cc03f16c40232324dbf799836e059"
+    "sha256": "3ecf04a3335d117579bd5dd3fed08290139e6dffd6ffa2d8b70b4ae0a7cdcd86"
   },
   {
     "path": "docs/evidence/card188/actual_dog_900.png",
@@ -38,6 +38,54 @@
   {
     "path": "docs/evidence/card188/main.log",
     "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card188/package/README.md",
+    "sha256": "ed0d64c3886cc055c2ad10e42cdd5bc178e003eb6bcb1fa1fd99aba3cf8d90ea"
+  },
+  {
+    "path": "docs/evidence/card188/package/context_900.png",
+    "sha256": "8884b748d2a40a8d62f80fd4397a7880bb0b4c2fd0bdaecd76629afff34bcbbf"
+  },
+  {
+    "path": "docs/evidence/card188/package/context_animals_900.png",
+    "sha256": "0014d73e3f499bcc40d0146d5b934ca83e70832310ff520a232669794448cbb1"
+  },
+  {
+    "path": "docs/evidence/card188/package/context_shelters_900.png",
+    "sha256": "ba049d6916b5af0f1514470ebd0af2074fd549c07fa02c92ac2d2afacd4227e3"
+  },
+  {
+    "path": "docs/evidence/card188/package/package.log",
+    "sha256": "e4629164d3d6d3c6c59b7117773df39c717af1f055c601123ec8ba50a980134a"
+  },
+  {
+    "path": "docs/evidence/card188/package/packed-context.log",
+    "sha256": "30e6c6c67f133ce0ca623ba741a5b2e3c1162d77e2be04a5c9dff247a5924219"
+  },
+  {
+    "path": "docs/evidence/card188/package/packed-restart-load.log",
+    "sha256": "d4f0b4a681a10cfc6003e04b62092d57fc63aa559fc9fb53d1275ac465ea6592"
+  },
+  {
+    "path": "docs/evidence/card188/package/packed-restart-save.log",
+    "sha256": "1a73979f735466ea28abefcf618771e51c4060b15f04d52a8d1a61aca64c43f8"
+  },
+  {
+    "path": "docs/evidence/card188/package/packed-save-review.log",
+    "sha256": "4d2f59a28b733fb386f96c1ea325c00a63058e7b6b9053a7a2265def00bf424c"
+  },
+  {
+    "path": "docs/evidence/card188/package/release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card188/package/release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
+  },
+  {
+    "path": "docs/evidence/card188/package/windows_build.json",
+    "sha256": "e4629164d3d6d3c6c59b7117773df39c717af1f055c601123ec8ba50a980134a"
   },
   {
     "path": "docs/evidence/card188/profile-result.txt",
