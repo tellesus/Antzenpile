@@ -23,6 +23,11 @@ func save(run: RunState) -> bool:
 		"payload": payload, "sha256": payload.sha256_text()}, "", true, true)
 	if document.to_utf8_buffer().size() > MAX_FILE_BYTES:
 		return _reject("Save exceeds slot size limit")
+	# Validate the exact JSON the loader will see before touching the last good slot.
+	var snapshot: Variant = JSON.parse_string(payload)
+	var candidate := RunState.new()
+	if not snapshot is Dictionary or not candidate.restore(snapshot):
+		return _reject("Could not validate this run; save slot left unchanged")
 	var absolute: String = ProjectSettings.globalize_path(path)
 	if DirAccess.make_dir_recursive_absolute(absolute.get_base_dir()) != OK:
 		return _reject("Could not create save folder")

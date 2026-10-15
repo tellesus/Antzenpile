@@ -70,6 +70,15 @@ func run(test: Object) -> bool:
 	var replaced_ok: bool = service.load_into(replacement)
 	test.check(replaced_ok and replacement.run.to_dict() == updated, "Loading after overwrite returns the latest run")
 	var stable: Dictionary = replacement.run.to_dict()
+	var good_document: String = FileAccess.get_file_as_string(SLOT)
+	var route: TrailRouteState = game.run.trails.routes.route_1
+	var segment_id: String = route.segment_id
+	route.segment_id = "missing_segment"
+	var invalid_live: Dictionary = game.run.to_dict().duplicate(true)
+	test.check(not service.save(game.run) and service.last_error == "Could not validate this run; save slot left unchanged" and FileAccess.get_file_as_string(SLOT) == good_document and not FileAccess.file_exists(SLOT + ".tmp"), "An unrestorable current run cannot replace the last good save or leave a temporary file")
+	test.check(game.run.to_dict() == invalid_live, "Save preflight does not repair or mutate a rejected live run")
+	test.check(service.load_into(replacement) and replacement.run.to_dict() == stable, "The last good slot still restores after rejected replacement")
+	route.segment_id = segment_id
 	var envelope: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SLOT))
 	envelope.file_version = 99
 	_write(JSON.stringify(envelope))
