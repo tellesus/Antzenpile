@@ -1,7 +1,7 @@
 [
   {
     "path": "docs/evidence/card186/README.md",
-    "sha256": "8ca6ff96ddc5bd492f59bd2499d2fe73dbd017e9f67b9485cc070a199bd8814d"
+    "sha256": "4c01a5c0356693f0e520519d24fdce227020b83f216ef6ee86ecb12ddc2d87e3"
   },
   {
     "path": "docs/evidence/card186/draft_off_900.png",
@@ -26,6 +26,46 @@
   {
     "path": "docs/evidence/card186/main.log",
     "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card186/package/README.md",
+    "sha256": "3f01e62e96fb284090b2a57fff3992c330a631acd96bc1ac5a075bb606fa515d"
+  },
+  {
+    "path": "docs/evidence/card186/package/gathering_900.png",
+    "sha256": "f34b2633b9df8c4c805b670873deb72f693eefef2df0ad985465b28565159e7a"
+  },
+  {
+    "path": "docs/evidence/card186/package/package.log",
+    "sha256": "5643fa0a01f01d8c3600040565178c6309fa2fc0e2669dd461136022c18130f0"
+  },
+  {
+    "path": "docs/evidence/card186/package/packed-gathering.log",
+    "sha256": "10eebc1292d6811fc747ead95e83233b16e916d46bdee7dfb9a9b519542466a8"
+  },
+  {
+    "path": "docs/evidence/card186/package/packed-search.log",
+    "sha256": "072d9be257da85de26a7aa8ba7a689b91ac48a2afa4a1b46606c116bf50b927d"
+  },
+  {
+    "path": "docs/evidence/card186/package/release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card186/package/release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
+  },
+  {
+    "path": "docs/evidence/card186/package/search_900.png",
+    "sha256": "749dcade4e90060bfe48e2d6488435b8c6c9f454aa2a3e81fc66745a77070c22"
+  },
+  {
+    "path": "docs/evidence/card186/package/search_returned_900.png",
+    "sha256": "0dd149b04e29e6efbeae6abc752e5c71a07a64b8cd6cc3d95a5ef7349acfeb69"
+  },
+  {
+    "path": "docs/evidence/card186/package/windows_build.json",
+    "sha256": "5643fa0a01f01d8c3600040565178c6309fa2fc0e2669dd461136022c18130f0"
   },
   {
     "path": "docs/evidence/card186/private_encounter_900.png",

@@ -4,7 +4,7 @@ Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly ve
 
 ## Current playable baseline
 
-Use current `main`. PRs #1/#2 are merged. The latest package includes visual work179–180, gathering181, combat182, worker motion183, source impressions184 and [luminous threat inspection185](tasks/185_luminous_threat_inspection.md), with 662 audited resources. `builds/windows-beta-latest.json` identifies its runtime/launch path. Isolated export/extraction, release startup and packed save/settings/review pass. Native unchanged-PCK returned/stale/pause inspection, mouse/touch response editing/commit and gathering probes pass. Physical touchscreen, human visual/audio/feel, timing outliers and clean-machine/final release acceptance remain separate; old named exports are historical.
+Use current `main`. PRs #1/#2 are merged. The latest package includes visual work179–185 and [optional armed search/plain borrowing186](tasks/186_armed_search_and_worker_borrowing.md), with 662 audited resources. `builds/windows-beta-latest.json` identifies its runtime/launch path. Isolated export/extraction, release startup and packed save/settings/review pass. Native unchanged-PCK direct search after actual losses, private contact, returned identity/outcome, valid save and gathering checks pass. Human visual/audio/balance/feel, physical touch, timing outliers and clean-machine/final release acceptance remain separate.
 
 ## Rebuild from a checkout
 
