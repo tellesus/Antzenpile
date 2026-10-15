@@ -6,7 +6,7 @@ Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly ve
 
 ## Current playable baseline
 
-Use current `main`. PRs #1/#2 are merged. The latest package includes visual work179–185 and [optional armed search/plain borrowing186](tasks/186_armed_search_and_worker_borrowing.md), with 662 audited resources. Current-build save validation178 also preflights serialized state and verifies native save/review/load/retention/continuation. `builds/windows-beta-latest.json` identifies its runtime/launch path. Isolated export/extraction, release startup and packed save/settings/review pass. Native unchanged-PCK direct search after actual losses, private contact, returned identity/outcome, valid save and gathering checks pass. Human visual/audio/balance/feel, physical touch, timing outliers and clean-machine/final release acceptance remain separate.
+Use current `main`. PRs #1/#2 are merged. The latest package includes visual work179–185 and [optional armed search/plain borrowing186](tasks/186_armed_search_and_worker_borrowing.md), with 664 audited resources. Same-build save admission187 is included; begin a new colony after changing builds. Current-build save validation178 also preflights serialized state and verifies native save/review/load/retention/continuation. `builds/windows-beta-latest.json` identifies its runtime/launch path. Isolated export/extraction, release startup and packed save/settings/review pass. Native unchanged-PCK direct search after actual losses, private contact, returned identity/outcome, valid save and gathering checks pass. Human visual/audio/balance/feel, physical touch, timing outliers and clean-machine/final release acceptance remain separate.
 
 ## Rebuild from a checkout
 

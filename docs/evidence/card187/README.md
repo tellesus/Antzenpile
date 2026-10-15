@@ -9,3 +9,5 @@ Editor play identifies engine plus authored project/src/data/scenes/assets conte
 Full: 11656 checks, 0 failures; focused: 191 checks, 0 failures; import/Main pass. Separate editor processes save and reload/continue exactly with the same content identity. Six native mouse/touch review/playback/load flows pass with current-build files. Different/missing identities reject atomically even with an invalid payload. No old-save recovery or migration matrix was run. Existing historical implementation branches are incidental, unsupported code.
 
 Windows package and process-restart verification follows committed publication. Human clean-machine/audio/feel acceptance remains separate.
+
+[Windows package and restart evidence](package/README.md).

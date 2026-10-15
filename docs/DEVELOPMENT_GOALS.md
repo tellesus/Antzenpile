@@ -2,7 +2,7 @@
 
 Player-authorized continuing work, updated 2026-10-15. Continue through bounded cards without routine feedback pauses. Use canonical `main`, publish verified work there, refresh one current Windows playtest build, and preserve unrelated local files.
 
-1. Enforce the [development save policy](SAVE_POLICY.md): same-build save/load only; old-save preservation, recovery and migration are tabled until true release preparation. Current save validation/review/continuation178 is verified; producing-build admission187 is next.
+1. Enforce the [development save policy](SAVE_POLICY.md): same-build save/load only; old-save preservation, recovery and migration are tabled until true release preparation. Current validation/review/continuation178 and producing-build admission187 are verified and delivered.
 2. Finish M8 visual presentation: remaining returned animal/foreign-ant/site impressions and context/onboarding/interface polish. Keep strong neon, rich texture and flowing wisps on black, with representation limited by actual returned evidence. Fix the rival staffing explanation and review-map caption bounds identified during current checks.
 3. Finish the separate music overhaul and exit/audio cleanup: richer, characterful adaptive stems that remain enjoyable when looped. Preserve the distinction between automated checks and human listening/feel acceptance.
 4. Review integrated gameplay and interface after those revisions. Address concrete incoherence, confusing controls and missing counterplay within the established game; do not invent Post-1.0 systems.
