@@ -512,6 +512,8 @@ func _run_conflict_command(command: String) -> void:
 	if not blocked.is_empty(): show_feedback(blocked, true); return
 	match command:
 		"conflict_send": conflict.start_edit(route, _status)
+		"draft_less_many": conflict.amount = maxi(1, conflict.amount - 5)
+		"draft_more_many": conflict.amount = mini(conflict.limit(route, _status), conflict.amount + 5)
 		"draft_less": conflict.amount = maxi(1, conflict.amount - 1)
 		"draft_more": conflict.amount = mini(conflict.limit(route, _status), conflict.amount + 1)
 		"draft_suggest": conflict.amount = conflict.suggestion(route, _status)
@@ -527,7 +529,7 @@ func _run_conflict_command(command: String) -> void:
 			var result: Dictionary = journey_command.call(action, route.id)
 			activation.outcome(result)
 			if result.get("accepted",false): conflict.editing = false
-			show_feedback("Order accepted · recruits and reports travel" if result.get("accepted",false) else result.get("reason","Order unavailable"),not result.get("accepted",false))
+			show_feedback(conflict.receipt(result),not result.get("accepted",false))
 		"conflict_reports": conflict.history_open = not conflict.history_open; conflict.editing = false
 		"conflict_close": selected_id = ""; journey_open = false; conflict.reset()
 		"conflict_retreat":

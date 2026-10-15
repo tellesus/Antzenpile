@@ -1147,7 +1147,16 @@ func respond_to_journey(action: String, route_id: String) -> Dictionary:
 			accepted = system.set_force(route_id, int(known.workers) + system.CONFIG.reinforcement_workers)
 		"recall": accepted = system.recall() if simulation.run.journey_response.route_id == route_id else false
 		"cancel": system.cancel_order(route_id); accepted = true
-	return {"accepted":accepted,"queued":accepted and simulation.run.journey_response.orders.recruitment.has(route_id),"reason":system.last_error if not accepted else ""}
+	var result: Dictionary = {"accepted":accepted,"queued":accepted and simulation.run.journey_response.orders.recruitment.has(route_id),"reason":system.last_error if not accepted else ""}
+	if accepted:
+		var known: Dictionary = system.summary(inward_pile_id)
+		var entry: Dictionary = known.recruitment.get(route_id,{})
+		result.waiting = int(entry.get("requested",0))
+		result.ordered_total = int(known.force_orders.get(route_id,0))
+		if action.trim_prefix("all_").begins_with("gather_"):
+			for trail: Dictionary in trail_summaries(inward_pile_id):
+				if trail.id == route_id: result.ordered_total = int(trail.allocated_workers) + int(entry.requested) if not entry.is_empty() else maxi(int(trail.desired_workers),int(trail.allocated_workers))
+	return result
 
 
 func dispatch_facing(bearing: float) -> bool:

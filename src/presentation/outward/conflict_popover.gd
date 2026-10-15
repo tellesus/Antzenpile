@@ -38,7 +38,7 @@ func limit(route: Dictionary, status: Dictionary) -> int:
 	return maxi(1, int(status.get("workers_total",0)) - committed)
 
 func suggestion(route: Dictionary, status: Dictionary) -> int:
-	return mini(limit(route, status), CONFIG.reinforcement_workers) if own_party(route, status) or kind(route, status) == "gather" else CONFIG.defense_workers
+	return mini(limit(route, status), CONFIG.reinforcement_workers) if own_party(route, status) or kind(route, status) == "gather" else mini(limit(route, status), CONFIG.defense_workers)
 
 func start_edit(route: Dictionary, status: Dictionary) -> void:
 	editing = true; history_open = false
@@ -61,15 +61,17 @@ func layout(size: Vector2) -> Dictionary:
 		"conflict_reports":Rect2(left, center.y+55, 160, 44),
 		"journey_close":Rect2(right, center.y+55, 160, 44),
 		"conflict_close":Rect2(right+116, center.y-radius-62, 44, 44)}
-	var editor := Rect2(center.x+radius+12, center.y-156, 260, 312)
+	var editor := Rect2(center.x+radius+12, maxf(140, center.y-175), 320, 350)
 	if editing:
-		buttons.merge({"draft_less":Rect2(editor.position+Vector2(12,96),Vector2(56,44)),
-			"draft_suggest":Rect2(editor.position+Vector2(74,96),Vector2(112,44)),
-			"draft_more":Rect2(editor.position+Vector2(192,96),Vector2(56,44)),
-			"draft_goal":Rect2(editor.position+Vector2(12,146),Vector2(236,44)),
-			"draft_all":Rect2(editor.position+Vector2(12,196),Vector2(236,44)),
-			"draft_commit":Rect2(editor.position+Vector2(12,262),Vector2(156,44)),
-			"draft_back":Rect2(editor.position+Vector2(176,262),Vector2(72,44))})
+		buttons.merge({"draft_less_many":Rect2(editor.position+Vector2(12,116),Vector2(44,44)),
+			"draft_less":Rect2(editor.position+Vector2(62,116),Vector2(44,44)),
+			"draft_suggest":Rect2(editor.position+Vector2(112,116),Vector2(96,44)),
+			"draft_more":Rect2(editor.position+Vector2(214,116),Vector2(44,44)),
+			"draft_more_many":Rect2(editor.position+Vector2(264,116),Vector2(44,44)),
+			"draft_goal":Rect2(editor.position+Vector2(12,166),Vector2(296,44)),
+			"draft_all":Rect2(editor.position+Vector2(12,216),Vector2(296,44)),
+			"draft_commit":Rect2(editor.position+Vector2(12,302),Vector2(296,44)),
+			"draft_back":Rect2(editor.position+Vector2(264,6),Vector2(44,44))})
 	elif history_open:
 		buttons.draft_back = Rect2(editor.position+Vector2(12,262),Vector2(236,44))
 	var bounds := Rect2(Vector2(left, center.y-radius-62),Vector2(right+160-left, 2*radius+124))
@@ -144,30 +146,56 @@ func draw(view: Node2D, route: Dictionary, status: Dictionary, size: Vector2) ->
 	if editing: _draw_editor(view,positions,route,status)
 	elif history_open: _draw_history(view,positions,route,status)
 
+func preview(route: Dictionary, status: Dictionary) -> Dictionary:
+	# Counts are detached knowledge, including unreported travelers, never bodies.
+	var additional: bool = own_party(route,status) or draft_kind == "gather"
+	var sent: int = int(status.journey_response.get("workers",0)) if own_party(route,status) else int(route.get("allocated_workers",0)) if draft_kind == "gather" else 0
+	var entry: Dictionary = status.get("journey_response",{}).get("recruitment",{}).get(route.get("id"),{})
+	return {"additional":additional,"sent":sent,"total":sent+amount,"requested":amount,
+		"waiting":int(entry.get("requested",0)),"reserved":int(entry.get("reserved",0)),
+		"returning":int(entry.get("returning",0)),"available":int(status.get("available_workers",0)),
+		"action":"ADD %d ANTS" % amount if additional else "RECRUIT %d ANTS" % amount}
+
+func receipt(result: Dictionary) -> String:
+	if not result.get("accepted",false): return result.get("reason","Order unavailable")
+	var text: String = "%d ants ordered" % result.get("ordered_total",amount)
+	return text + (" · %d still recruiting" % result.waiting if result.get("waiting",0)>0 else " · awaiting their report")
+
 func _draw_editor(view: Node2D, positions: Dictionary, route: Dictionary, status: Dictionary) -> void:
 	var box: Rect2 = positions.editor
-	Style.surface(view,box,Color("172024")); Style.surface(view,box,Color("8e7160"),true)
-	_text(view,box.position+Vector2(130,23),"Choose the commitment",16,236)
-	_text(view,box.position+Vector2(130,46),"Trail first → nest → optional other jobs" if draft_kind=="defend" else "Gatherers stay; add local workers",12,236)
-	_text(view,box.position+Vector2(130,64),"%d free nest workers · carers held" % status.get("available_workers",0),12,236)
-	_text(view,box.position+Vector2(130,87),"%d additional ants" % amount if own_party(route,status) or draft_kind=="gather" else "%d ants for this attempt" % amount,15,236)
+	var plan: Dictionary = preview(route,status)
+	Style.surface(view,box,Color("111e29")); Style.surface(view,box,Color("568b9c"),true)
+	_text(view,box.position+Vector2(136,25),"PROPOSED ADDITION" if plan.additional else "PROPOSED RESPONSE",15,240,Color("7de5ee"))
+	_text(view,box.position+Vector2(160,49),"Already sent %d · ordered total %d" % [plan.sent,plan.total],13,296)
+	_text(view,box.position+Vector2(160,78),("+%d ants" if plan.additional else "%d ants") % amount,23,296,Color("d9fbff"))
+	_text(view,box.position+Vector2(160,101),"%d free at nest · carers & projects held" % plan.available,12,296)
+	_button(view,positions.buttons.draft_less_many,"−5")
 	_button(view,positions.buttons.draft_less,"−1")
 	_button(view,positions.buttons.draft_more,"+1")
-	_button(view,positions.buttons.draft_suggest,"SUGGEST %d" % suggestion(route,status),"Starting point, not certainty")
+	_button(view,positions.buttons.draft_more_many,"+5")
+	_button(view,positions.buttons.draft_suggest,"SET TO %d" % suggestion(route,status))
 	_button(view,positions.buttons.draft_goal,"HOLD THE JUNCTION" if draft_kind=="gather" else "HUNT FOR PROTEIN" if goal=="hunt" else "DRIVE PREDATOR AWAY", "Gathering workers also fight" if draft_kind=="gather" else "Locked for the sent party" if own_party(route,status) else "Tap to change · hunt adds risk")
-	_button(view,positions.buttons.draft_all,"ALL HANDS: ON" if all_hands else "ALL HANDS: OFF", "May pause other jobs" if all_hands else "Use alerted trail and free nest workers")
-	_text(view,box.position+Vector2(130,255),"Reduced jobs need reassignment" if all_hands else "Recalled ants must travel home first",12,236)
-	_button(view,positions.buttons.draft_commit,"ORDER %d ANTS" % amount)
-	_button(view,positions.buttons.draft_back,"BACK")
+	_button(view,positions.buttons.draft_all,"OTHER JOBS: ALLOWED" if all_hands else "OTHER JOBS: PROTECTED", "Reduced jobs need reassignment" if all_hands else "Alerted trail + free nest workers only")
+	var consequence: String = "May reduce cleanup, climate, gathering,"
+	var detail: String = "aphid care, scouts & supplies; care stays held."
+	if not all_hands:
+		consequence = "Recalled ants must reach home before joining."
+		detail = "%d waiting · %d at nest · %d returning" % [plan.waiting,plan.reserved,plan.returning] if plan.waiting>0 else "Arrival and outcome need a returned report."
+	_text(view,box.position+Vector2(160,279),consequence,12,296,Color("ffd083") if all_hands else Color("a4bdc5"))
+	_text(view,box.position+Vector2(160,295),detail,12,296,Color("ffd083") if all_hands else Color("a4bdc5"))
+	Style.surface(view,positions.buttons.draft_commit,Color("164757"))
+	Style.surface(view,positions.buttons.draft_commit,Color("69dceb"),true)
+	_text(view,positions.buttons.draft_commit.get_center()+Vector2(0,5),plan.action,16,280,Color("ddfcff"))
+	_button(view,positions.buttons.draft_back,"×")
 
 func _draw_history(view: Node2D, positions: Dictionary, route: Dictionary, status: Dictionary) -> void:
 	var box: Rect2 = positions.editor
 	Style.surface(view,box,Color("172024")); Style.surface(view,box,Color("8e7160"),true)
-	_text(view,box.position+Vector2(130,25),"Returned report history",16,236)
+	_text(view,box.position+Vector2(160,25),"Returned report history",16,296)
 	var lines: Array[String] = []
 	for record: Dictionary in _history_records(route,status): lines.append_array(record.lines)
 	if lines.is_empty(): lines.append("No survey or response has returned")
-	for i: int in lines.size(): _text(view,box.position+Vector2(130,52+i*15),lines[i],12,236)
+	for i: int in lines.size(): _text(view,box.position+Vector2(160,52+i*15),lines[i],12,296)
 	_button(view,positions.buttons.draft_back,"BACK TO CONFLICT")
 
 func _history_records(route: Dictionary, status: Dictionary) -> Array[Dictionary]:

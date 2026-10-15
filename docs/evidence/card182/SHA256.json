@@ -1,0 +1,70 @@
+[
+  {
+    "path": "docs/evidence/card182/README.md",
+    "sha256": "7520a2872de40f84b9f1d1a0a827fbf497f7609e92bbdd7b21962fce18ba7f6e"
+  },
+  {
+    "path": "docs/evidence/card182/import-result.txt",
+    "sha256": "4f7c92deb35a5e457480ff6264d9cd5a9170e456f2f04c1e5705dd2daeba9808"
+  },
+  {
+    "path": "docs/evidence/card182/import.log",
+    "sha256": "428225f149d967cc6d612d5133017ed6546e6e83f4f9cef8b7c0669b37b8b323"
+  },
+  {
+    "path": "docs/evidence/card182/initial_900.png",
+    "sha256": "486b9d11cbf09d2f6456aa4869cfd582a6c88c9f79b2743b8c5f332287834369"
+  },
+  {
+    "path": "docs/evidence/card182/junction_900.png",
+    "sha256": "00214a7ad094056aa18299a85f082cacb76d05b13bdd732b2d4d365823905cc1"
+  },
+  {
+    "path": "docs/evidence/card182/main-result.txt",
+    "sha256": "5d0333fbc285c940172c2ba418d9be3fca24a64e465557ea2185953b3c28bb93"
+  },
+  {
+    "path": "docs/evidence/card182/main.log",
+    "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card182/other_jobs_900.png",
+    "sha256": "3bf392f2f42266ea343c3d0f8d3d5f9b21d64c8b9e343f3fd0d7241fdfec37b1"
+  },
+  {
+    "path": "docs/evidence/card182/queued_900.png",
+    "sha256": "c07b15e9354dfd9ca2a5950db9fe71cb37d2fbf286d3e858cd35ca5ba428fd91"
+  },
+  {
+    "path": "docs/evidence/card182/regression-result.txt",
+    "sha256": "a7dd161489a582dc394108882be5599dfebbd536ad2fbbf0f9a5e4d2052d80e6"
+  },
+  {
+    "path": "docs/evidence/card182/regression.log",
+    "sha256": "0e64fe1617d313f3b182c659f7cd6f89efc4b44ece8e48c60cf1efeb97d070ce"
+  },
+  {
+    "path": "docs/evidence/card182/reinforce_1920.png",
+    "sha256": "626139d50988f7ee396ae6c199b12ab2f5077a2e6939c150aca670e7e6ddea2d"
+  },
+  {
+    "path": "docs/evidence/card182/reinforce_900.png",
+    "sha256": "ab57fcfa9d34261570dbcbba54faed727fd07e037f242cc708b06fa9bbcd3792"
+  },
+  {
+    "path": "docs/evidence/card182/render-result.txt",
+    "sha256": "6dbef5b791d9a994cd900b0c07a38fb7af00725297aa596039e8b16f3c5e6c9f"
+  },
+  {
+    "path": "docs/evidence/card182/render.log",
+    "sha256": "82c5e9ba867f6425ab4c525a9a548cda9012796dd7a165c160ffb70a7158298e"
+  },
+  {
+    "path": "docs/evidence/card182/targeted-result.txt",
+    "sha256": "f200438b089f5b7fe3c46b9a61515c52ab18d6863e6fee0834719697e511b764"
+  },
+  {
+    "path": "docs/evidence/card182/targeted.log",
+    "sha256": "578fbd3c41860e9adb465c8c98fbc063810e298c005f8ec5bebac32ee38ea06d"
+  }
+]
