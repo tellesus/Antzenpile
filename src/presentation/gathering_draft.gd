@@ -60,7 +60,7 @@ func draw(view: Node2D, size: Vector2, source_name: String, assigned: int, avail
 	Style.surface(view,counter,Color("15232d"))
 	_center(view,counter.position+Vector2(66,13),"PROPOSED TOTAL",10,124,Color("8fa1a8"))
 	_center(view,counter.position+Vector2(66,39),str(amount),25,124,Color("e9f6fa"))
-	for pair: Array in [["gather_less","−1"],["gather_suggest","SUGGEST %d" % mini(maximum,CONFIG.initial_workers)],["gather_more","+1"],["gather_less_many","−5"],["gather_more_many","+5"],["gather_back","×"]]:
+	for pair: Array in [["gather_less","−1"],["gather_suggest","SET TO %d" % mini(maximum,CONFIG.initial_workers)],["gather_more","+1"],["gather_less_many","−5"],["gather_more_many","+5"],["gather_back","×"]]:
 		var target: Rect2=rect(size,pair[0]);Style.surface(view,target,Color("26363e"))
 		_center(view,target.get_center()+Vector2(0,5),pair[1],14,target.size.x-12)
 	var change: Dictionary=preview(assigned,available)

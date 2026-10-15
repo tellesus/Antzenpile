@@ -17,3 +17,7 @@ Changed groups: GatheringDraft layout/copy, normal Home/Daughter integrations, k
 ## Delivery
 
 Runtime [475de58](https://github.com/tellesus/Antzenpile/commit/475de582aa4d7742d03563820628b060036c3081); 638 audited package resources. Both main checkouts updated, 109 local files preserved. Actual release startup and native unchanged-PCK free edit/commit/receipt pass. [Build evidence](../evidence/card181/README.md#published-main-and-windows-package).
+
+## Preset wording follow-up (2026-10-15)
+
+The player finds “Suggest 5” strange. Relabel the fixed count preset “SET TO 5” (or its actual capped count), to describe its action directly. It edits the proposed total; the primary commitment button still sends the order. No behavior, rules, layout or new tests change. 11,153 full checks/zero failures; 882 focused/zero;14 native layout/immutable-planning captures pass. Refreshed package pending. [Evidence](../evidence/card181/preset-wording/README.md).

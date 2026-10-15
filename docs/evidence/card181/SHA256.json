@@ -20,6 +20,38 @@
     "sha256": "a3701b0f7062b98c8ba81036fb3b4a146f06d5be9c29e883ee80f84e376a3ec3"
   },
   {
+    "path": "docs/evidence/card181/preset-wording/README.md",
+    "sha256": "721ad52a787b2959c292415011c3b29afdf7f48b4db11e4e99cdc597545c9a11"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/preset_900.png",
+    "sha256": "d8f9c86c4e35a0eba568eb0377d7337ce1c85bc38a877f5933a1a01987f3073c"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/regression-result.txt",
+    "sha256": "3b33037f6b5148aca328aae4c3f01a5cfc0ff5c747d166bfb7dd243be389eced"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/regression.log",
+    "sha256": "b28ca7ea8f9423a86ea8a1f38a6c02a1464bf2d101e529605373a8518abb791a"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/render-result.txt",
+    "sha256": "b9f5c2558b340ef5acea677d255c2020ae415422dc037f0ef6dacabcf02ae386"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/render.log",
+    "sha256": "0b1430b637574448018a046b0b8042bbe28685075c1b50247f4b706944dfe6ab"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/targeted-result.txt",
+    "sha256": "58a0feec9ac57dd9460e1693c28fa30fa90c1c352368ed11c5c6d47724b72d13"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/targeted.log",
+    "sha256": "d3c009cd80ae42967004824b583683a67972b2230b6a9d81b71919dfa2c70b14"
+  },
+  {
     "path": "docs/evidence/card181/queued_900.png",
     "sha256": "f62c9bfbd787148fb423f3c0e5028dc0daaa6c2338eee9eca999cb7b23e85429"
   },
