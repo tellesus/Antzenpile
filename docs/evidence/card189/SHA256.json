@@ -1,7 +1,7 @@
 [
   {
     "path": "docs/evidence/card189/README.md",
-    "sha256": "9f87e16da84f0f5c6109cdc85b00dbcb20114c944a83523f8b2cd2540c032899"
+    "sha256": "aace2b948801775ce37e8407c85a6497eb16cb108da86d7c6a0208a7203fdd49"
   },
   {
     "path": "docs/evidence/card189/external-result.txt",
@@ -38,6 +38,54 @@
   {
     "path": "docs/evidence/card189/menu_900.png",
     "sha256": "cdd73f612df16491f9d799127acebde9e5a6377a79208d55afe6e28d1a38e772"
+  },
+  {
+    "path": "docs/evidence/card189/package/README.md",
+    "sha256": "13b9561c7465a82c5a3ad296242aedeec67c2cde84f36baf2c320a3e078bd1bd"
+  },
+  {
+    "path": "docs/evidence/card189/package/interface_900.png",
+    "sha256": "225250b4c7755ed5206b9e67f2bf06b7fa2f85538574fcdfce6add0c6a3c2593"
+  },
+  {
+    "path": "docs/evidence/card189/package/interface_help_900.png",
+    "sha256": "536e206401d6eddd95b396756b7ec36555ce737e64ae0a4d577d41ae70451f27"
+  },
+  {
+    "path": "docs/evidence/card189/package/interface_review_900.png",
+    "sha256": "34928df298de8cad5e1dc72105e4a8068036705e9e6a3935c2ff904641fcde9b"
+  },
+  {
+    "path": "docs/evidence/card189/package/package.log",
+    "sha256": "22dc96190116b6daf8d9ec0147d1a4c9cda84900d545fb1cca6f909655e7e3a6"
+  },
+  {
+    "path": "docs/evidence/card189/package/packed-interface.log",
+    "sha256": "6f92bc600e9b1b0dfe3d19c8eb5cea57f3e34d296058f4fdadf72b6aad69b1af"
+  },
+  {
+    "path": "docs/evidence/card189/package/packed-restart-load.log",
+    "sha256": "4d567deb24c1c4ab58ca4fa95bfd78c1e555c34c70c43ae321cca2e10ac9ac58"
+  },
+  {
+    "path": "docs/evidence/card189/package/packed-restart-save.log",
+    "sha256": "177fde125ae3d4684575b7f001a26c7256f355dea24e9f9933bb6a918ccedaa4"
+  },
+  {
+    "path": "docs/evidence/card189/package/packed-save-review.log",
+    "sha256": "4d2f59a28b733fb386f96c1ea325c00a63058e7b6b9053a7a2265def00bf424c"
+  },
+  {
+    "path": "docs/evidence/card189/package/release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card189/package/release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
+  },
+  {
+    "path": "docs/evidence/card189/package/windows_build.json",
+    "sha256": "22dc96190116b6daf8d9ec0147d1a4c9cda84900d545fb1cca6f909655e7e3a6"
   },
   {
     "path": "docs/evidence/card189/regression-result.txt",

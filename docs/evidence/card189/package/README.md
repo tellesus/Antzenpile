@@ -1,0 +1,3 @@
+# Interface consistency Windows delivery
+
+Runtime `7a1cc312acb91293c07f9fb2aa375f7e635e6d4f`; 678 audited resources. Isolated import/export/inventory/extraction, actual headless/native release startup and unchanged-PCK checks pass: menu/build tag, free touch Help navigation, ended-review label bounds, current save/review/retention and two-process same-build continuation. Full: 12284 checks, 0 failures; focused: 747 checks, 0 failures. ZIP SHA256 `4aab1ab97a3f444a50a16a1a0d9a301c59e065f8e1c3be92f2d37781882946ca`; producing save identity `windows-35862862f19f5ce7baed4cef50810826ab75d3e4cead0f505406e9a3ee671fe2`. Both main checkouts match and109 original local files remain unchanged. Human visual/audio/feel, physical touch and clean-machine acceptance remain separate.
