@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[CURRENT SAVE] fresh backyard_slice bytes=14410 validation_and_write_ms=18.42
+[CURRENT SAVE] fresh garden_edge bytes=14644 validation_and_write_ms=17.33
+[CURRENT SAVE] fresh roadside bytes=15206 validation_and_write_ms=16.71
+[CURRENT SAVE] rain, cargo, scouts and chamber work bytes=53833 validation_and_write_ms=20.53
+[CURRENT SAVE] two nests with paid cargo outbound bytes=75220 validation_and_write_ms=24.47
+[CURRENT SAVE] armed search outbound bytes=90463 validation_and_write_ms=24.55
+[CURRENT SAVE] armed search fighting bytes=93595 validation_and_write_ms=24.48
+[CURRENT SAVE] armed search inbound bytes=114904 validation_and_write_ms=24.87
+[CURRENT SAVE] armed search idle bytes=118638 validation_and_write_ms=25.13
+Tests: 747 checks, 0 failures

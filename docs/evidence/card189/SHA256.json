@@ -1,0 +1,74 @@
+[
+  {
+    "path": "docs/evidence/card189/README.md",
+    "sha256": "afebf871fdb82861c3c707fff1e60ae34f23b211f8a0c0463680d30fcfaacb73"
+  },
+  {
+    "path": "docs/evidence/card189/external-result.txt",
+    "sha256": "6523c88ef67aee02a295a5e4be8917891c7ac01284fceab445a58a74a01c7789"
+  },
+  {
+    "path": "docs/evidence/card189/external.log",
+    "sha256": "af48baad75964c8392902805017df3394c684ec4fe27572a5506cf90e8ace77c"
+  },
+  {
+    "path": "docs/evidence/card189/help_2_900.png",
+    "sha256": "ad1a834a982734112e9e85e7fb655b7796566935ea3797c2a16d809544c82779"
+  },
+  {
+    "path": "docs/evidence/card189/import-result.txt",
+    "sha256": "4ddaf7716f5a8feeb038e57a44132ea9db76ec5872ddc8db978115e4163d536b"
+  },
+  {
+    "path": "docs/evidence/card189/import.log",
+    "sha256": "8b94dbedadbf7ec7fd9bc39abbe993eba3db0ccf7d8b8d937fe65f67f16cc19a"
+  },
+  {
+    "path": "docs/evidence/card189/main-result.txt",
+    "sha256": "bc5b93b9f7a08b5bf88d17fb006c6132a1a711dd5f1a0525f265f7711662a362"
+  },
+  {
+    "path": "docs/evidence/card189/main.log",
+    "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card189/menu_900.png",
+    "sha256": "cdd73f612df16491f9d799127acebde9e5a6377a79208d55afe6e28d1a38e772"
+  },
+  {
+    "path": "docs/evidence/card189/regression-result.txt",
+    "sha256": "ca9c26e4aebfdbfd8c71f6a27e55e53fdc480bf9087fd2b7c3fbaa7ea2048748"
+  },
+  {
+    "path": "docs/evidence/card189/regression.log",
+    "sha256": "9f5460d7b5ea9a047d31471a4df44fd6c185b98a8c906409658125bc2a9cf6e5"
+  },
+  {
+    "path": "docs/evidence/card189/render-result.txt",
+    "sha256": "4020a1a313f417258882dc6a6cacc02d4e7519aeaf283c6ee4b24a4c32b519b2"
+  },
+  {
+    "path": "docs/evidence/card189/render.log",
+    "sha256": "fd361c94b3f4b6b2d647554ac264dee70d75d38b76c8e15143350087152034ab"
+  },
+  {
+    "path": "docs/evidence/card189/review_900.png",
+    "sha256": "253a726434db0864d86f67d1a371a3737ea42fc7fc4f43aa2c30c0eef8eb38b6"
+  },
+  {
+    "path": "docs/evidence/card189/rival_draft_900.png",
+    "sha256": "9289ece06f0f16eeeaa399643703ae247e8ff83ef9d7b106f58cd316021f2b37"
+  },
+  {
+    "path": "docs/evidence/card189/search_draft_900.png",
+    "sha256": "4a56f7a548455fa9b9b1d9e906e4f2715bbe42a127592ccc81cfa25c1e0dd0d4"
+  },
+  {
+    "path": "docs/evidence/card189/targeted-result.txt",
+    "sha256": "c9718847aa33a5546a05152910b3c24863991846f631e1f160506c96069b4d34"
+  },
+  {
+    "path": "docs/evidence/card189/targeted.log",
+    "sha256": "e298d339c4f2b955bafface4d8c5fa8d758ee9d96b20afe09faf6c95b7384386"
+  }
+]

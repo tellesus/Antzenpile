@@ -24,15 +24,15 @@ var guide_page: int = 0
 var _font: Font = ThemeDB.fallback_font
 const GUIDE: Array = [
 	{"title":"Read what returns", "lines":["OUTWARD is the colony's sensory memory.","Drag to turn; tap a trace to inspect it.","Exploration keeps scouts searching.","Findings become shared only after return.","Departure scents mark who is still away.","Remembered Sources revisits old reports."]},
-	{"title":"Commit living workers", "lines":["Gathering commits workers to real journeys.","Watches share your Exploration effort.","Auto resume needs a confirming supply report.","Past danger needs manual gathering resume.","Recall releases travelers only when home.","Their carried cargo still arrives on return."]},
-	{"title":"Manage returned threats", "lines":["Tap Journey Alarm for direct conflict controls.","Investigate identifies a reported attacker.","Choose workers, then ORDER one attempt.","Recruitment and reports take real travel time.","Retreat cancels orders and recalls this journey.","Report History keeps older returned evidence."]},
-	{"title":"Recruit a response", "lines":["Draw from the alerted trail, then free nest ants.","Traveling ants must reach home before joining.","All Hands can pause other tasks to recruit.","Brood carers and ongoing projects stay held.","Reduced tasks need deliberate reassignment.","Small groups may retreat on predator contact."]},
-	{"title":"Choose another approach", "lines":["Another Approach offers the next direct step.","Withdraw gatherers; wait for their return.","Three paid workers test a longer course.","Only their return can establish it.","Resume gathering deliberately; travel costs more.","Hunting adds risk; collect reported remains."]},
+	{"title":"Commit living workers", "lines":["Plan Gathering edits a target for free.","Send / Order / Queue commits that target.","Assigned and waiting ants are different.","Recall frees travelers only after return.","Carried cargo still arrives with them.","Danger needs deliberate gathering resume."]},
+	{"title":"Manage returned threats", "lines":["A returned loss enables Search & Defend.","A three-ant survey is optional.","Choose a force, then commit the main order.","Hunt needs a returned predator report.","Ground hazards need avoidance.","Identity and results arrive with survivors."]},
+	{"title":"Recruit a response", "lines":["Borrow workers from other jobs starts OFF.","OFF keeps other jobs running.","ON may reduce gathering, cleaning or climate.","Care and ongoing construction stay protected.","Recalled ants reach home before joining.","Restart reduced jobs deliberately."]},
+	{"title":"Choose another approach", "lines":["Another Approach tests a longer course.","Withdraw gatherers and wait for their return.","Three paid workers make the survey trip.","Only their return establishes the course.","Resume gathering with a deliberate order.","More distance costs more travel food."]},
 	{"title":"Support the inside", "lines":["INWARD shows functions, not a tunnel map.","Expand Nursery for up to four cohorts.","Queen's Auto Brood repeats supported groups.","Climate care: water when dry, air when damp.","Midden cleaners isolate accumulating refuse.","Queued traits lock when their brood is laid."]},
 	{"title":"Build a second pile", "lines":["Shelter memories are not safety guarantees.","Queen → Reproduction raises a young queen.","Send Founding Party uses workers and stores.","Its returning messenger reports the camp.","Establish Daughter Pile starts its local jobs.","Inspect or Look From either named pile."]},
-	{"title":"Support your network", "lines":["Entrance supplies move food over real trips.","Send 8 Worker Settlers uses 9 Home workers.","Eight stay; one messenger returns a report.","Supplies and settlers share one connection.","Stop supplies; await return to send workers.","Extra workers still need food and brood care."]},
-	{"title":"Keep your colony", "lines":["Pause and speed control simulation time.","Sound keeps music and cues independent.","Save keeps one colony; Load restores it.","A new colony retains that saved slot.","Repeat uses the selected setting and seed.","Fresh seed changes behavior, not layout."]},
-	{"title":"Keep brood care available", "lines":["Available means free to take another job.","Existing brood keeps its carers at home.","Queen and Entrance show held care workers.","If an older colony stalls, inspect Nursery.","Its named release or recall restores care.","Traveling workers must reach home first."]},
+	{"title":"Support your network", "lines":["Entrance → Manage Connections chooses a nest.","Pick purpose and count; ORDER commits.","Worker settlers stay; one messenger reports.","Each connection has one shared traffic slot.","Stop supplies; await return before switching.","New workers still need food and brood care."]},
+	{"title":"Keep your colony", "lines":["Save / Load uses this build only.","Start a new colony after changing builds.","Save keeps one unrevealed colony.","End Run reveals history; the saved slot stays.","Load restores that saved colony.","Sound keeps music and cues independent."]},
+	{"title":"Keep brood care available", "lines":["Available means free to take another job.","Existing brood keeps its carers at home.","Queen and Entrance show held care workers.","If growth stalls, inspect Nursery.","Its named release or recall restores care.","Traveling workers must reach home first."]},
 	{"title":"Gather aphid honeydew", "lines":["Aphids are small insects that feed on plants.","They produce sugary droplets called honeydew.","Gatherers carry those carbohydrates home.","After harvesting, assign aphid attendants.","Attendants improve output; they do not gather.","They do not defend the journey from predators."]}
 ]
 
@@ -157,6 +157,7 @@ func _draw() -> void:
 	var panel: Rect2 = panel_rect()
 	UIStyle.surface(self, panel,Color("111921"))
 	UIStyle.surface(self, panel,Color("41535a"),true)
+	_label(panel.position+Vector2(376,440),build_caption(),11,Color("78949e"))
 	if confirm_end:
 		_label(panel.position+Vector2(24,32),"End this run and reveal its world?",20,Color("e4d4b8"))
 		_label(panel.position+Vector2(24,69),"This colony cannot resume after the reveal.",15,Color("dbb19a"))
@@ -221,3 +222,6 @@ func _draw_guide(panel: Rect2) -> void:
 
 func _label(at: Vector2,text: String,size: int,color: Color) -> void:
 	draw_string(_font,at,text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
+
+func build_caption() -> String:
+	return "Build %s · same-build saves only" % SaveBuild.current().trim_prefix("windows-").trim_prefix("editor-").left(8)

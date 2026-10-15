@@ -138,7 +138,9 @@ func _draw() -> void:
 			_zone(Vector2(zone.position[0],zone.position[1]),zone.radius,color,{"surface":"Surface impact","residue":"Ground residue","link_residue":"Connection residue","ground":"Ground warning" if zone.phase=="warning" else "Ground pressure"}[zone.kind])
 	if frame.rival:
 		var at: Vector2 = _at([RIVAL.pile_position.x,RIVAL.pile_position.y])
-		draw_rect(Rect2(at-Vector2(5,5),Vector2(10,10)),Color("b56fa6")); _label(at+Vector2(9,4),"Rival pile",12,Color("b56fa6"))
+		draw_rect(Rect2(at-Vector2(5,5),Vector2(10,10)),Color("b56fa6"))
+		var caption: Dictionary=map_caption(at,5,"Rival pile")
+		_label(caption.position,caption.text,12,Color("b56fa6"))
 	for node: Dictionary in frame.nodes:
 		var at: Vector2 = _at(node.position)
 		var color: Color = Color("68baca") if node.kind=="water" else Color("c89767") if node.kind=="protein" else Color("a2ad84") if node.kind=="nest_site" else Color("cbb574")
@@ -148,7 +150,9 @@ func _draw() -> void:
 		if selected_id==node.id: draw_arc(at,14,0,TAU,24,Color.WHITE,1,true)
 	for pile: Dictionary in frame.piles:
 		var at: Vector2 = _at(pile.position)
-		draw_circle(at,8,Color("edd49d")); _label(at+Vector2(13,4),ReportCopy.pile_name(pile.id),13,Color("edd49d"))
+		draw_circle(at,8,Color("edd49d"))
+		var caption: Dictionary=map_caption(at,8,ReportCopy.pile_name(pile.id),13)
+		_label(caption.position,caption.text,13,Color("edd49d"))
 	for scout: Dictionary in frame.scouts: draw_circle(_at(scout.position),2,Color("e5e8e0"))
 	if frame.rain: _label(rect.position+Vector2(12,24),"RAIN",15,Color("68baca"))
 	var side: Vector2 = Vector2(rect.end.x+32,126)
@@ -198,7 +202,20 @@ func _draw() -> void:
 func _zone(position: Vector2, radius: float, color: Color, text: String) -> void:
 	var at: Vector2 = _at([position.x,position.y]); var extent: float = radius/data.bounds[2]*map_rect().size.x
 	draw_circle(at,extent,Color(color,0.13)); draw_arc(at,extent,0,TAU,32,color,1,true)
-	_label(at+Vector2(extent+4,0),text,12,color)
+	var caption: Dictionary=map_caption(at,extent,text)
+	_label(caption.position,caption.text,12,color)
+
+func map_caption(at: Vector2, extent: float, text: String, font_size: int=12) -> Dictionary:
+	var bounds: Rect2=map_rect().grow(-8)
+	var label: String=InterfaceText.fit_line(text,_font,font_size,bounds.size.x)
+	var width: float=_font.get_string_size(label,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x
+	var height: float=_font.get_height(font_size)
+	var ascent: float=_font.get_ascent(font_size)
+	var x: float=at.x+extent+4
+	if x+width>bounds.end.x:x=at.x-extent-4-width
+	x=clampf(x,bounds.position.x,bounds.end.x-width)
+	var baseline: float=clampf(at.y,bounds.position.y+ascent,bounds.end.y-height+ascent)
+	return {"text":label,"position":Vector2(x,baseline),"rect":Rect2(Vector2(x,baseline-ascent),Vector2(width,height))}
 
 func _label(at: Vector2, text: String, size: int, color: Color) -> void:
 	draw_string(_font,at,text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)

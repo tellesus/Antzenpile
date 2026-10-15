@@ -39,7 +39,10 @@ func searching(route: Dictionary, status: Dictionary) -> bool:
 
 func borrowing_copy() -> Dictionary:
 	return {"title":"BORROW WORKERS FROM OTHER JOBS: " + ("ON" if all_hands else "OFF"),
-		"detail":"Can interrupt gathering, cleaning and climate" if all_hands else "Idle ants + workers recalled from this trail"}
+		"detail":"Can interrupt gathering, cleaning and climate" if all_hands else "Idle nest ants; trail gatherers stay assigned" if draft_kind=="gather" else "Idle ants + workers recalled from this trail"}
+
+func goal_editable(route: Dictionary, status: Dictionary) -> bool:
+	return draft_kind=="defend" and not searching(route,status) and not own_party(route,status)
 
 func limit(route: Dictionary, status: Dictionary) -> int:
 	var committed: int = int(status.journey_response.get("workers",0)) if own_party(route,status) else int(route.get("allocated_workers",0)) if kind(route,status)=="gather" else 0
@@ -180,7 +183,7 @@ func _draw_editor(view: Node2D, positions: Dictionary, route: Dictionary, status
 	var plan: Dictionary = preview(route,status)
 	Style.surface(view,box,Color("111e29")); Style.surface(view,box,Color("568b9c"),true)
 	_text(view,box.position+Vector2(136,25),"PROPOSED ADDITION" if plan.additional else "ARMED SEARCH" if searching(route,status) else "PROPOSED RESPONSE",15,240,Color("7de5ee"))
-	_text(view,box.position+Vector2(160,49),"Already sent %d · ordered total %d" % [plan.sent,plan.total],13,296)
+	_text(view,box.position+Vector2(160,49),("Already assigned %d · ordered total %d" if draft_kind=="gather" else "Already sent %d · ordered total %d") % [plan.sent,plan.total],13,296)
 	_text(view,box.position+Vector2(160,78),("+%d ants" if plan.additional else "%d ants") % amount,23,296,Color("d9fbff"))
 	_text(view,box.position+Vector2(160,101),"%d idle at nest · care & building protected" % plan.available,12,296)
 	_button(view,positions.buttons.draft_less_many,"−5")
@@ -188,13 +191,19 @@ func _draw_editor(view: Node2D, positions: Dictionary, route: Dictionary, status
 	_button(view,positions.buttons.draft_more,"+1")
 	_button(view,positions.buttons.draft_more_many,"+5")
 	_button(view,positions.buttons.draft_suggest,"SET TO %d" % suggestion(route,status))
-	_button(view,positions.buttons.draft_goal,"HOLD THE JUNCTION" if draft_kind=="gather" else "SEARCH AND DEFEND" if searching(route,status) else "HUNT FOR PROTEIN" if goal=="hunt" else "DRIVE PREDATOR AWAY", "Gathering workers also fight" if draft_kind=="gather" else "Unknown threat · survey is optional" if searching(route,status) else "Locked for the sent party" if own_party(route,status) else "Tap to change · hunt adds risk")
+	var goal_title: String="HOLD THE JUNCTION" if draft_kind=="gather" else "SEARCH AND DEFEND" if searching(route,status) else "HUNT FOR PROTEIN" if goal=="hunt" else "DRIVE PREDATOR AWAY"
+	var goal_detail: String="Gathering workers also fight" if draft_kind=="gather" else "Unknown threat · survey is optional" if searching(route,status) else "Locked for the sent party" if own_party(route,status) else "Tap to change · hunt adds risk"
+	if goal_editable(route,status):_button(view,positions.buttons.draft_goal,goal_title,goal_detail)
+	else:
+		var center: Vector2=positions.buttons.draft_goal.get_center()
+		_text(view,center+Vector2(0,-3),"GOAL: "+goal_title,13,284,Color("d5eaf0"))
+		_text(view,center+Vector2(0,16),goal_detail,11,284,Color("91b2bf"))
 	var borrowing: Dictionary=borrowing_copy()
 	_button(view,positions.buttons.draft_all,borrowing.title,borrowing.detail)
 	var consequence: String = "May recall aphid attendants, scouts & supplies."
 	var detail: String = "Care/building protected; restart jobs yourself."
 	if not all_hands:
-		consequence = "Recalled ants must reach home before joining."
+		consequence = "Gatherers keep working while recruits join." if draft_kind=="gather" else "Recalled ants must reach home before joining."
 		detail = "%d waiting · %d at nest · %d returning" % [plan.waiting,plan.reserved,plan.returning] if plan.waiting>0 else "Arrival and outcome need a returned report."
 	_text(view,box.position+Vector2(160,279),consequence,12,296,Color("ffd083") if all_hands else Color("a4bdc5"))
 	_text(view,box.position+Vector2(160,295),detail,12,296,Color("ffd083") if all_hands else Color("a4bdc5"))
