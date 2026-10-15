@@ -5,7 +5,7 @@
   },
   {
     "path": "docs/evidence/card181/README.md",
-    "sha256": "fc88668d502057351572061ca7afecd856216e425ec6cf541b819b3bb195bb24"
+    "sha256": "84eac30e455976bea637e48334008b465e1a146ad3cf87a73f13da9c3f0d4753"
   },
   {
     "path": "docs/evidence/card181/daughter_900.png",
@@ -21,7 +21,19 @@
   },
   {
     "path": "docs/evidence/card181/preset-wording/README.md",
-    "sha256": "721ad52a787b2959c292415011c3b29afdf7f48b4db11e4e99cdc597545c9a11"
+    "sha256": "750f936345d1bb436d79e9dc688c78608c2dce62ca2af0541e8909097f637d42"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/package.log",
+    "sha256": "26920c6baec61ac07b6ad09b7c57c292b2260a2b4c275f88faa2a3c3679d9390"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/packed-dispatch.log",
+    "sha256": "10eebc1292d6811fc747ead95e83233b16e916d46bdee7dfb9a9b519542466a8"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/packed_preset.png",
+    "sha256": "227ff4ed0fee6b2de5c34f9f8c6396f4d99bd619f6dd2e9f089cb2f200617e5b"
   },
   {
     "path": "docs/evidence/card181/preset-wording/preset_900.png",
@@ -34,6 +46,14 @@
   {
     "path": "docs/evidence/card181/preset-wording/regression.log",
     "sha256": "b28ca7ea8f9423a86ea8a1f38a6c02a1464bf2d101e529605373a8518abb791a"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
   },
   {
     "path": "docs/evidence/card181/preset-wording/render-result.txt",
@@ -50,6 +70,10 @@
   {
     "path": "docs/evidence/card181/preset-wording/targeted.log",
     "sha256": "d3c009cd80ae42967004824b583683a67972b2230b6a9d81b71919dfa2c70b14"
+  },
+  {
+    "path": "docs/evidence/card181/preset-wording/windows_build.json",
+    "sha256": "26920c6baec61ac07b6ad09b7c57c292b2260a2b4c275f88faa2a3c3679d9390"
   },
   {
     "path": "docs/evidence/card181/queued_900.png",

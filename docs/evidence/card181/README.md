@@ -24,3 +24,5 @@ The refreshed Windows package audits **638 resources**. Isolated committed-runti
 The external `tools/package/dispatch_smoke.gd` renders the900×600 gathering panel from the unchanged exported PCK under the pinned editor, performs a free touch edit, then a mouse commit, and verifies its actual six-worker receipt. This authoring tool is excluded from the game, avoids Root's editor-only debug lifecycle, and does not claim physical touchscreen, human usability or native audio acceptance. [Native PCK log](windows_packed-dispatch.log), [package log](windows_package.log), [metadata](windows_build.json).
 
 ZIP SHA256 `4344063b98b384752d1a55264f281a5c9410f29b3f876680fdbdebf8daecb712`. Local latest-build pointer updated. Combat recruitment, other dense contexts, ant animation, music, player input/feel and release acceptance remain open. Existing save report178 is still unresolved; newly noticed gameplay issues remain deferred by the player.
+
+Current label follow-up: [SET TO 5 preset and refreshed package](preset-wording/README.md). The original181 screenshots/build above remain historical evidence.

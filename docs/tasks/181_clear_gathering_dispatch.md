@@ -20,4 +20,4 @@ Runtime [475de58](https://github.com/tellesus/Antzenpile/commit/475de582aa4d7742
 
 ## Preset wording follow-up (2026-10-15)
 
-The player finds “Suggest 5” strange. Relabel the fixed count preset “SET TO 5” (or its actual capped count), to describe its action directly. It edits the proposed total; the primary commitment button still sends the order. No behavior, rules, layout or new tests change. 11,153 full checks/zero failures; 882 focused/zero;14 native layout/immutable-planning captures pass. Refreshed package pending. [Evidence](../evidence/card181/preset-wording/README.md).
+The player finds “Suggest 5” strange. Relabel the fixed count preset “SET TO 5” (or its actual capped count), to describe its action directly. It edits the proposed total; the primary commitment button still sends the order. No behavior, rules, layout or new tests change. 11,153 full checks/zero failures; 882 focused/zero;14 native layout/immutable-planning captures pass. Published to main and included in the refreshed 638-resource Windows package; release/PCK gates pass. [Evidence](../evidence/card181/preset-wording/README.md).
