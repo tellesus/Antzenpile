@@ -18,9 +18,11 @@ func _init(slot_path: String = DEFAULT_PATH) -> void:
 func save(run: RunState) -> bool:
 	if run == null:
 		return _reject("No active run")
+	var build_id: String = SaveBuild.current()
+	if build_id.is_empty():return _reject("Could not identify this build; save slot left unchanged")
 	var payload: String = JSON.stringify(run.to_dict(), "", true, true)
 	var document: String = JSON.stringify({"format": FORMAT, "file_version": FILE_VERSION,
-		"payload": payload, "sha256": payload.sha256_text()}, "", true, true)
+		"build_id":build_id,"payload": payload, "sha256": payload.sha256_text()}, "", true, true)
 	if document.to_utf8_buffer().size() > MAX_FILE_BYTES:
 		return _reject("Save exceeds slot size limit")
 	# Validate the exact JSON the loader will see before touching the last good slot.
@@ -70,6 +72,8 @@ func load_into(controller: SimulationController) -> bool:
 		return _reject("Save file is malformed")
 	if envelope.format != FORMAT or envelope.file_version != FILE_VERSION or not envelope.payload is String or not envelope.sha256 is String:
 		return _reject("Unsupported save format or version")
+	if not envelope.get("build_id") is String or envelope.build_id != SaveBuild.current() or envelope.build_id.is_empty():
+		return _reject("Save belongs to a different build; start a new colony")
 	if envelope.payload.sha256_text() != envelope.sha256:
 		return _reject("Save checksum does not match")
 	var payload_parser := JSON.new()

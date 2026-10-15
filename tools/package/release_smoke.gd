@@ -24,6 +24,11 @@ func _check_package() -> void:
 	if not save.save(controller.run):
 		fail("Packaged save failed: " + save.last_error)
 		return
+	var envelope: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(save.path))
+	var build_id: String=ProjectSettings.get_setting("application/config/save_build_id", "")
+	if not build_id.begins_with("windows-") or envelope.get("build_id", "")!=build_id:
+		fail("Packaged save lacks its producing runtime build identity")
+		return
 	var twin = load("res://src/core/simulation_controller.gd").new()
 	if not save.load_into(twin):
 		fail("Packaged load failed: " + save.last_error)

@@ -64,6 +64,14 @@ def main():
         archive.extractall(source)
     source_files = {p.relative_to(source).as_posix(): sha(p)
                     for p in sorted(source.rglob("*")) if p.is_file()}
+    # Same runtime content produces the same save identity; docs-only commits do not.
+    identity_rows = "windows\n" + version + "\n" + TEMPLATE_SHA + "\n" + sha(ROOT / "export_presets.cfg") + "\n" + sha(Path(__file__)) + "\n"
+    identity_rows += "".join(f"{path}\t{digest}\n" for path, digest in sorted(source_files.items()))
+    save_build_id = "windows-" + hashlib.sha256(identity_rows.encode("utf-8")).hexdigest()
+    project_path = source / "project.godot"
+    project_text = project_path.read_text(encoding="utf-8")
+    assert "config/save_build_id=" not in project_text, "Build identity must be generated, not authored"
+    project_path.write_text(project_text.replace("[application]", "[application]\nconfig/save_build_id=" + json.dumps(save_build_id), 1), encoding="utf-8", newline="\n")
     preset = (ROOT / "export_presets.cfg").read_text(encoding="utf-8")
     preset = preset.replace('custom_template/release=""',
                             "custom_template/release=" + json.dumps(template.as_posix()))
@@ -104,7 +112,7 @@ def main():
         shutil.copyfile(ROOT / "docs" / "distribution" / name, package / name)
     files = {p.name: {"bytes": p.stat().st_size, "sha256": sha(p)}
              for p in sorted(package.iterdir()) if p.is_file()}
-    manifest = {"status": "systems beta; native player acceptance pending", "revision": revision,
+    manifest = {"status": "systems beta; native player acceptance pending", "revision": revision, "save_build_id": save_build_id,
                 "engine": version, "release_template_sha256": TEMPLATE_SHA,
                 "preset_sha256": sha(ROOT / "export_presets.cfg"), "cold_import_shutdown_retry": import_retried,
                 "committed_runtime": source_files, "exported_resources": resources, "files": files}
@@ -138,7 +146,7 @@ def main():
     latest = builds / "Antzenpile-systems-beta-windows.zip"
     shutil.copyfile(bundle, latest)
     result = {"zip": str(latest), "archived_zip": str(bundle), "zip_bytes": latest.stat().st_size, "zip_sha256": sha(latest),
-              "launch": str(exe), "revision": revision, "resources": len(resources), "logs": str(work),
+              "launch": str(exe), "revision": revision, "save_build_id": save_build_id, "resources": len(resources), "logs": str(work),
               "cold_import_shutdown_retry": import_retried,
               "checked": "isolated import/export/inventory/extraction/release Main; packed save-resume-review under pinned editor",
               "not_checked": "native graphics/audio/feel/performance/clean machine"}

@@ -12,4 +12,4 @@ This does not authorize deleting unrelated local files or player data. Leaving a
 
 Reconsider backward compatibility when preparing a true public release. At that point, explicitly choose the supported release/save versions, migration policy and verification. It is not a limited-beta milestone or current release blocker.
 
-The same-build admission check is tracked in [187](tasks/187_development_save_policy.md). The earlier [178](tasks/178_player_save_validation.md) validates current serialized state and actual review/reload flows; it does not yet identify the producing build.
+[187](tasks/187_development_save_policy.md) enforces producing-build admission in the disk envelope. The earlier [178](tasks/178_player_save_validation.md) validates current serialized state and actual review/reload flows. Restart editor play after changing runtime files; a Windows export is a distinct build. A docs-only change does not invalidate the same runtime build.

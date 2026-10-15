@@ -58,6 +58,7 @@ func run(test: Object) -> bool:
 	temp_file.close()
 	test.check(service.save(game.run) and FileAccess.file_exists(SLOT) and not FileAccess.file_exists(SLOT + ".tmp") and service.last_error.is_empty(), "Save writes and atomically replaces a stale temporary sibling")
 	var original_document: String = FileAccess.get_file_as_string(SLOT)
+	test.check(JSON.parse_string(original_document).build_id==SaveBuild.current(), "The slot records this runtime build, independently of save schema")
 	var loaded := Controller.new()
 	test.check(service.load_into(loaded) and loaded.run.to_dict() == source and loaded.run.colony.piles.home.workers.invariant_holds(), "Disk load recreates every authoritative field and conserves workers")
 	for index: int in 100:
@@ -80,6 +81,16 @@ func run(test: Object) -> bool:
 	test.check(service.load_into(replacement) and replacement.run.to_dict() == stable, "The last good slot still restores after rejected replacement")
 	route.segment_id = segment_id
 	var envelope: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SLOT))
+	for fault: String in ["missing","different","wrong_type"]:
+		var other: Dictionary=envelope.duplicate(true)
+		match fault:
+			"missing":other.erase("build_id")
+			"different":other.build_id="another-build"
+			"wrong_type":other.build_id=187
+		# Admission must reject the build before trying to restore even this bad payload.
+		other.payload="not a run";other.sha256=other.payload.sha256_text()
+		_write(JSON.stringify(other))
+		test.check(not service.load_into(replacement) and service.last_error=="Save belongs to a different build; start a new colony" and replacement.run.to_dict()==stable,"Different-build admission rejects atomically before state validation: "+fault)
 	envelope.file_version = 99
 	_write(JSON.stringify(envelope))
 	test.check(not service.load_into(replacement) and replacement.run.to_dict() == stable, "Unsupported disk version rejects without replacing live state")
@@ -90,7 +101,7 @@ func run(test: Object) -> bool:
 	var invalid: Dictionary = source.duplicate(true)
 	invalid.trails.routes[0].segment_id = "missing_segment"
 	var invalid_payload: String = JSON.stringify(invalid, "", true, true)
-	_write(JSON.stringify({"format": Service.FORMAT, "file_version": Service.FILE_VERSION, "payload": invalid_payload, "sha256": invalid_payload.sha256_text()}))
+	_write(JSON.stringify({"format": Service.FORMAT, "file_version": Service.FILE_VERSION, "build_id":SaveBuild.current(),"payload": invalid_payload, "sha256": invalid_payload.sha256_text()}))
 	test.check(not service.load_into(replacement) and replacement.run.to_dict() == stable, "Well-formed but invalid route reference rejects before replacement")
 	_write("not json")
 	test.check(not service.load_into(replacement) and replacement.run.to_dict() == stable, "Malformed file rejects before replacement")
