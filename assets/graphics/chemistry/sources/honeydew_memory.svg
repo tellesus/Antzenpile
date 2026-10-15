@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<!-- Original sensory archetype; not physical scenery or a remaining-stock count. -->
+<defs>
+<radialGradient id="body"><stop stop-color="white" stop-opacity=".48"/><stop offset=".68" stop-color="white" stop-opacity=".24"/><stop offset="1" stop-color="white" stop-opacity=".04"/></radialGradient>
+<radialGradient id="core"><stop stop-color="white" stop-opacity=".60"/><stop offset=".75" stop-color="white" stop-opacity=".48"/><stop offset="1" stop-color="white" stop-opacity=".07"/></radialGradient>
+</defs>
+<g fill="none" stroke="white" stroke-opacity=".58" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M140 310 Q194 202 356 273 Q307 345 190 327 Q160 327 140 310Z" fill="url(#body)"/>
+<path d="M146 309 Q249 268 350 277 M196 291 L196 319 M235 283 L254 322 M269 281 L295 307" opacity=".4"/>
+<path d="M221 242 C201 223 207 190 234 181 C262 173 289 193 284 222 C283 247 241 266 221 242Z" fill="url(#core)"/>
+<path d="M218 228 Q204 212 210 196 Q217 179 239 179 M260 182 Q293 197 282 226 Q272 244 252 247 M225 192 Q238 180 257 192"/>
+<path d="M222 210 L195 197 L188 183 M216 223 L186 223 L177 233 M223 235 L201 251 L194 266 M278 209 L300 196 L307 181 M284 220 L314 221 L323 231 M276 235 L301 253 L305 265 M235 183 L226 164 M252 180 L262 160" opacity=".78"/>
+<path d="M303 315 Q288 333 289 342 Q292 358 306 357 Q321 353 316 339Z" fill="url(#core)"/>
+<path d="M296 338 Q293 349 302 351 M306 320 Q322 343 313 351"/>
+</g></svg>

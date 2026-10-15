@@ -1,0 +1,37 @@
+{
+	"adapter": "AMD Radeon RX 6650 XT",
+	"audio": "Dummy",
+	"cpu": "AMD Ryzen 7 7800X3D 8-Core Processor",
+	"engine": "4.7.2-stable (official)",
+	"fixture": "same detached six-trail OUTWARD fixture; live decorative clock; frozen authoritative run",
+	"renderer": "gl_compatibility",
+	"samples": [
+		{
+			"frames": 11788,
+			"identified": true,
+			"median_fps": 198.846689202625,
+			"median_ms": 5.029,
+			"one_percent_low_fps": 153.336365408356,
+			"p99_ms": 6.277,
+			"seconds": 60.003007,
+			"worst_ms": 8.01
+		},
+		{
+			"frames": 14681,
+			"identified": false,
+			"median_fps": 260.552371026576,
+			"median_ms": 3.838,
+			"one_percent_low_fps": 121.972064248577,
+			"p99_ms": 5.773,
+			"seconds": 60.004603,
+			"worst_ms": 198.13
+		}
+	],
+	"scope": "native editor frame-loop, not release/full-game performance or isolated GPU timer",
+	"size": [
+		1920,
+		1080
+	],
+	"snapshots_equal": true,
+	"vsync": "disabled"
+}

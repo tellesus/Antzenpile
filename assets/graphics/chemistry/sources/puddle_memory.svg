@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<!-- Original sensory archetype; not physical scenery or a remaining-stock count. -->
+<defs>
+<radialGradient id="body"><stop stop-color="white" stop-opacity=".48"/><stop offset=".68" stop-color="white" stop-opacity=".24"/><stop offset="1" stop-color="white" stop-opacity=".04"/></radialGradient>
+<radialGradient id="core"><stop stop-color="white" stop-opacity=".60"/><stop offset=".75" stop-color="white" stop-opacity=".48"/><stop offset="1" stop-color="white" stop-opacity=".07"/></radialGradient>
+</defs>
+<g fill="none" stroke="white" stroke-opacity=".58" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M139 261 Q164 210 247 226 Q300 191 358 237 Q397 276 345 309 Q285 334 249 315 Q176 340 139 295 Q124 279 139 261Z" fill="url(#body)"/>
+<path d="M140 257 Q166 215 231 229 M259 221 Q316 199 355 237 M373 258 Q393 289 341 309 M315 317 Q275 325 247 316 M224 319 Q162 333 140 297"/>
+<path d="M168 272 Q189 247 239 258 Q276 235 326 259 M333 277 Q300 303 256 287 Q213 302 180 285 M205 272 Q244 263 285 274 M230 247 Q253 238 278 246" opacity=".53"/>
+<path d="M194 236 L201 241 M307 309 L318 303 M152 280 Q147 291 161 299" opacity=".44"/>
+</g></svg>
