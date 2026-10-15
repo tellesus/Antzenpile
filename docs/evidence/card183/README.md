@@ -14,3 +14,5 @@ Two 60-second native editor frame-loop samples; VSync disabled, Dummy audio, act
 | inward | 360.6 | 3.349 | 252.0 |
 
 Windowed desktop scheduling and fixture density limit these measurements. No simulation, save or music rules changed. Packaged runtime evidence follows export of this committed step.
+
+Published runtime and native release/PCK results: [Windows delivery](../card183/package/README.md).

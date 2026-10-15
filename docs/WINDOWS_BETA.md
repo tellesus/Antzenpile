@@ -4,7 +4,7 @@ Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly ve
 
 ## Current playable baseline
 
-Use current `main`. PRs #1/#2 are merged. The latest package contains visual revision180 and [gathering UI181](tasks/181_clear_gathering_dispatch.md), with 638 audited resources. `builds/windows-beta-latest.json` identifies its launch path and runtime commit. Isolated export/extraction, release Main and packed save/settings/review pass; native release startup and unchanged-PCK gathering rendering/edit/commit/receipt also pass. Physical touchscreen, human usability, audio and final release acceptance remain separate; old named exports are historical.
+Use current `main`. PRs#1/#2 are merged. The latest package includes living chemistry179, sensorium180, gathering181, [clear combat recruitment182](tasks/182_clear_combat_recruitment.md) and [luminous worker motion183](tasks/183_luminous_worker_motion.md), with 642 audited resources. `builds/windows-beta-latest.json` identifies its launch path and runtime commit. Isolated export/extraction, release Main and packed save/settings/review pass; native release startup and unchanged-PCK combat/gathering edit/commit/receipts pass. Physical touchscreen, human usability, audio and final release acceptance remain separate; old named exports are historical.
 
 ## Rebuild from a checkout
 
