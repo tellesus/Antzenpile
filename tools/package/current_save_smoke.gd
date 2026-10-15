@@ -16,8 +16,14 @@ func press(at: Vector2) -> void:
 		await process_frame
 
 func run() -> void:
-	var game=load("res://scenes/main/main.tscn").instantiate()
-	get_root().add_child(game);game.set_process(false)
+	# The pinned editor is a debug build, while this PCK excludes debug resources.
+	# Release Main startup is checked separately; attach only the packed review here.
+	var game=load("res://src/core/game_root.gd").new()
+	game.simulation=load("res://src/core/simulation_controller.gd").new()
+	game._review=load("res://src/presentation/run_review.gd").new()
+	game._review.load_command=game.quick_load
+	game._review.new_command=game.review_new_colony
+	get_root().add_child(game._review)
 	get_root().content_scale_size=Vector2i(900,600);DisplayServer.window_set_size(Vector2i(900,600))
 	var controller=game.simulation
 	controller.dispatch_scout("home",0.0);controller.dispatch_scout("home",PI)
@@ -51,7 +57,7 @@ func run() -> void:
 	check(twin.restore_snapshot(expected),"Packed reference snapshot validates")
 	controller.advance(40);twin.advance(40)
 	check(controller.run.to_dict()==twin.run.to_dict(),"Packed restored continuation matches exactly")
-	game.free()
+	game._review.free();game.free()
 	for frame: int in 4:await process_frame
 	await create_timer(0.3).timeout
 	print("[PACKED-CURRENT-SAVE] native_save_review_reload_retention=",failures==0)

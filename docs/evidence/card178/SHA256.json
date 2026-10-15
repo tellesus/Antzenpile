@@ -1,7 +1,7 @@
 [
   {
     "path": "docs/evidence/card178/README.md",
-    "sha256": "684853fc11967eac664e57596f799f8b5644ab8bcd258f5c7afff246d46d30f3"
+    "sha256": "68f5783951e401a4e1df6cc8179a6723f342826bdbeb9f6051097f2f7f43a7be"
   },
   {
     "path": "docs/evidence/card178/import-result.txt",
@@ -18,6 +18,38 @@
   {
     "path": "docs/evidence/card178/main.log",
     "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card178/package/README.md",
+    "sha256": "94dc852ab3e15cf24d9861545b4eff4bd4a21255b0ce56971f2dedfa56784bd6"
+  },
+  {
+    "path": "docs/evidence/card178/package/package.log",
+    "sha256": "6aca52175a38732e985342cf2d75e792a36b6c56999660bc91fb32dd035b3255"
+  },
+  {
+    "path": "docs/evidence/card178/package/packed-save-review.log",
+    "sha256": "4d2f59a28b733fb386f96c1ea325c00a63058e7b6b9053a7a2265def00bf424c"
+  },
+  {
+    "path": "docs/evidence/card178/package/packed-search.log",
+    "sha256": "072d9be257da85de26a7aa8ba7a689b91ac48a2afa4a1b46606c116bf50b927d"
+  },
+  {
+    "path": "docs/evidence/card178/package/release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card178/package/release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
+  },
+  {
+    "path": "docs/evidence/card178/package/review_900.png",
+    "sha256": "1af6d0acc88131b35133f8a156bdde8730110ae2707ae20552c6210d049d51ca"
+  },
+  {
+    "path": "docs/evidence/card178/package/windows_build.json",
+    "sha256": "6aca52175a38732e985342cf2d75e792a36b6c56999660bc91fb32dd035b3255"
   },
   {
     "path": "docs/evidence/card178/regression-result.txt",
