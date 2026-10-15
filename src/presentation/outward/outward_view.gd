@@ -529,7 +529,7 @@ func _run_conflict_command(command: String) -> void:
 		"draft_suggest": conflict.amount = conflict.suggestion(route, _status)
 		"draft_all": conflict.all_hands = not conflict.all_hands
 		"draft_goal":
-			if not own and conflict.draft_kind == "defend": conflict.goal = "hunt" if conflict.goal == "clear" else "clear"
+			if not own and conflict.draft_kind == "defend" and not conflict.searching(route,_status): conflict.goal = "hunt" if conflict.goal == "clear" else "clear"
 		"draft_back": conflict.editing = false; conflict.history_open = false
 		"draft_commit":
 			blocked = conflict.reason("conflict_send", route, _status)

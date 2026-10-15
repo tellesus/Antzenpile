@@ -64,5 +64,5 @@ func _check_order_interface(test: Object, root: Node, baseline: Dictionary) -> v
 		var route: Dictionary = view._conflict_route()
 		before = game.run.to_dict()
 		view._pointer_press(view._conflict_rect("conflict_send").get_center(), "touch")
-		test.check(not view.conflict.reason("conflict_send",route,view._status).is_empty() and game.run.to_dict() == before, "Unavailable response explains delivered %s evidence without dispatch" % finding)
+		test.check(view.conflict.reason("conflict_send",route,view._status).is_empty()==(finding=="") and game.run.to_dict() == before, "Unknown loss permits free armed-search planning; known ground remains blocked: %s" % finding)
 	view.free()

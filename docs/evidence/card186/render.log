@@ -1,0 +1,19 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 26.8.1.260806 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon RX 6650 XT
+
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[NEON] capture=unidentified_1920 size=(1920, 1080)
+[NEON] capture=draft_off_1920 size=(1920, 1080)
+[NEON] capture=draft_on_1920 size=(1920, 1080)
+[NEON] capture=unidentified_1280 size=(1280, 720)
+[NEON] capture=draft_off_1280 size=(1280, 720)
+[NEON] capture=draft_on_1280 size=(1280, 720)
+[NEON] capture=unidentified_900 size=(900, 600)
+[NEON] capture=draft_off_900 size=(900, 600)
+[NEON] capture=draft_on_900 size=(900, 600)
+[NEON] capture=ordered_900 size=(900, 600)
+[NEON] capture=private_encounter_900 size=(900, 600)
+[NEON] capture=returned_1920 size=(1920, 1080)
+[NEON] capture=returned_1280 size=(1280, 720)
+[NEON] capture=returned_900 size=(900, 600)
+[ARMED-SEARCH] native_optional_survey_borrowing_return=true adapter=AMD Radeon RX 6650 XT

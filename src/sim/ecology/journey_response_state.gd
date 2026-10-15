@@ -84,8 +84,16 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 	else:
 		if not trails.routes.has(data.route_id) or trails.routes[data.route_id].purpose != "food" or trails.routes[data.route_id].reported_losses <= 0 and trails.routes[data.route_id].residue_report.is_empty() and trails.routes[data.route_id].passage_memory.count==0: return false
 		if restored_defense.mode == "investigate" and data.workers != CONFIG.investigation_workers: return false
-		if restored_defense.mode == "defend" and (not data.reports.has(data.route_id) or data.reports[data.route_id].finding not in ["ambush","mixed"]): return false
-		if restored_defense.mode == "defend" and (impact != -1 or residue!=-1 or data.ambush_fraction != -1 or data.foreign_seen or data.sampled_at != 0): return false
+		if restored_defense.mode == "defend":
+			var report: Dictionary=data.reports.get(data.route_id,{})
+			# Later reports cannot retroactively invalidate an already-paid departure.
+			var later_ground: bool=JourneyOrders.ground_warning(trails.routes[data.route_id],report) and JourneyOrders.ground_received_at(trails.routes[data.route_id],report)>data.departed_at
+			if not later_ground and not JourneyOrders.response_allowed(trails.routes[data.route_id],report,restored_defense.outcomes.get(data.route_id,{})):return false
+			if restored_defense.goal=="hunt" and report.get("finding","") not in ["ambush","mixed"] and not later_ground:return false
+			if impact!=-1 or residue!=-1 or data.foreign_seen:return false
+			if data.phase=="outbound" and data.ambush_fraction!=-1:return false
+			# Old confirmed combat saves had no private witness fields. Blind searches do.
+			if report.get("finding","") not in ["ambush","mixed"] and (data.phase=="fighting" or restored_defense.rounds>0 or restored_defense.outcome=="secured") and data.ambush_fraction<0:return false
 		var segment: TrailSegmentState = trails.segments[trails.routes[data.route_id].segment_id]
 		if restored_approach.candidate != null: segment = restored_approach.candidate
 		if data.elapsed_ticks >= TRAILS.leg_ticks(segment.length()) or (data.sampled_at > 0 and data.sampled_at < data.departed_at) or (impact == -1 and residue==-1 and data.ambush_fraction == -1 and data.sampled_at != 0 and not data.foreign_seen): return false
@@ -116,8 +124,9 @@ func restore(data: Dictionary, colony: ColonyState, trails: TrailNetwork, time: 
 		restored_orders.goals[id] = goals[id]
 	for id: String in restored_orders.targets:
 		var outcome: Dictionary=restored_defense.outcomes.get(id,{})
-		var addressed: bool=outcome.get("outcome", "")=="secured" and outcome.get("received_at",0.0)>=reports.get(id,{}).get("received_at",0.0) and trails.routes[id].last_loss_time<=outcome.get("received_at",0.0)
-		if restored_orders.targets[id] > 0 and (not reports.has(id) or reports[id].finding not in ["ambush", "mixed"] or addressed): return false
+		if restored_orders.targets[id]>0:
+			if not JourneyOrders.response_allowed(trails.routes[id],reports.get(id,{}),outcome):return false
+			if restored_orders.goals.get(id,"clear")=="hunt" and reports.get(id,{}).get("finding","") not in ["ambush","mixed"]:return false
 	orders = restored_orders
 	approach = restored_approach
 	defense = restored_defense

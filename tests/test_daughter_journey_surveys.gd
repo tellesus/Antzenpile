@@ -64,7 +64,7 @@ func run(test: Object) -> bool:
    "owner":broken.journey_response.route_id=game.run.founding.route_id
    "job":broken.colony.piles[1].workers.commitments["journey:satellite_1"].owner_id="missing"
    "duplicate":broken.colony.piles[0].workers.commitments["journey:home"]={"kind":"other","owner_id":route.id,"count":0}
-   "defense":broken.journey_response.defense.mode="defend"
+   "defense":broken.journey_response.defense.mode="defend";broken.journey_response.defense.goal="hunt"
   before=copy.run.to_dict()
   test.check(not copy.restore_snapshot(broken) and before==copy.run.to_dict(),"Malformed local survey "+gate+" rejects restore atomically")
  var view:=View.new();test.get_root().add_child(view);view.journey_command=root.respond_to_journey

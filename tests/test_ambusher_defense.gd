@@ -16,7 +16,7 @@ func snapshot(game: SimulationController) -> Dictionary:
 func run(test: Object) -> bool:
 	var game: SimulationController = Survey.new().investigated_game()
 	var before: Dictionary = game.run.to_dict()
-	test.check(not game.journey_response.defend("route_1") and game.run.to_dict() == before,"Loss alone cannot authorize an unseen ambusher swarm")
+	test.check(game.journey_response.defend("route_1") and game.run.journey_response.reports.is_empty(),"Returned loss authorizes an armed search without identifying its unseen cause")
 	game = ready_game()
 	var pile: PileState = game.run.colony.piles.home
 	var root := Root.new(); root.simulation = game

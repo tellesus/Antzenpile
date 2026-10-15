@@ -9,6 +9,19 @@ var recruitment: Dictionary = {}
 static func valid_target(value: Variant) -> bool:
 	return typeof(value) == TYPE_INT and value >= 0 and value <= WorkerLedger.MAX_COUNT
 
+static func ground_warning(route: TrailRouteState, report: Dictionary) -> bool:
+	return report.get("finding", "") in ["surface","residue"] or not route.impact_report.is_empty() and route.impact_report.received_at>=report.get("received_at",0.0) or not route.residue_report.is_empty() and route.residue_report.received_at>=report.get("received_at",0.0) or route.passage_memory.count>0 and route.passage_memory.received_at>=report.get("received_at",0.0)
+
+static func ground_received_at(route: TrailRouteState, report: Dictionary) -> float:
+	return maxf(maxf(route.impact_report.get("received_at",0.0),route.residue_report.get("received_at",0.0)),maxf(route.passage_memory.received_at,report.get("received_at",0.0) if report.get("finding","") in ["surface","residue"] else 0.0))
+
+static func addressed(route: TrailRouteState, report: Dictionary, outcome: Dictionary) -> bool:
+	return outcome.get("outcome", "")=="secured" and outcome.get("received_at",0.0)>=report.get("received_at",0.0) and route.last_loss_time<=outcome.get("received_at",0.0)
+
+static func response_allowed(route: TrailRouteState, report: Dictionary, outcome: Dictionary) -> bool:
+	# A returned loss can justify a search, without identifying its cause or location.
+	return route.purpose=="food" and (route.reported_losses>0 or report.get("finding","") in ["ambush","mixed"]) and not ground_warning(route,report) and not addressed(route,report,outcome)
+
 func restore(data: Variant, trails: TrailNetwork) -> bool:
 	if not data is Dictionary: return false
 	var restored: Dictionary[String, int] = {}

@@ -1,0 +1,62 @@
+[
+  {
+    "path": "docs/evidence/card186/README.md",
+    "sha256": "8ca6ff96ddc5bd492f59bd2499d2fe73dbd017e9f67b9485cc070a199bd8814d"
+  },
+  {
+    "path": "docs/evidence/card186/draft_off_900.png",
+    "sha256": "f9f797b61e3f947560054b765b4830886a07db098895ba4fafb8188d4721219a"
+  },
+  {
+    "path": "docs/evidence/card186/draft_on_900.png",
+    "sha256": "aedf2ad350ffc1828b4081424c22fcb07ba1a9aaf9606b8b3b01af169dd59d54"
+  },
+  {
+    "path": "docs/evidence/card186/import-result.txt",
+    "sha256": "cf62bb65d375b0c120d6e167dc2c4c5dcee05e7c40e26fa110208fb43d3b68f7"
+  },
+  {
+    "path": "docs/evidence/card186/import.log",
+    "sha256": "75d536febd5e086a9db719e728336f47db0ae02447a6759e1f8fb47fc3db7446"
+  },
+  {
+    "path": "docs/evidence/card186/main-result.txt",
+    "sha256": "e9b8be84bb7711c248ea1f5ece81988edb5b26812291732af4daa2067cdcafee"
+  },
+  {
+    "path": "docs/evidence/card186/main.log",
+    "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card186/private_encounter_900.png",
+    "sha256": "4ba9e9bcb0de094473f7cfe8ce523ce70a9af09d37d194a480d0dfd01b437db0"
+  },
+  {
+    "path": "docs/evidence/card186/regression-result.txt",
+    "sha256": "7a0ed684d994df275b5d54146f418447aab68a6eaa2d467ac33f33c0ecbab57f"
+  },
+  {
+    "path": "docs/evidence/card186/regression.log",
+    "sha256": "f6d0a5b0e26f5a760d0169fd10011d85b252f1bc43d3e111027320590950748c"
+  },
+  {
+    "path": "docs/evidence/card186/render-result.txt",
+    "sha256": "0b86e127c2a9563f3cc8f8312877e02431755ba52ceebae826d44bfcc8e52542"
+  },
+  {
+    "path": "docs/evidence/card186/render.log",
+    "sha256": "aef0c00f15de176ba211ca0fe959e2bb5926d6af7d2819af2050e4a50c2b7efd"
+  },
+  {
+    "path": "docs/evidence/card186/returned_900.png",
+    "sha256": "ea557b1b6d323bc0eb567a21d6f56a64d0ba2c180c9a4a1d5c323ecce8f3bc9b"
+  },
+  {
+    "path": "docs/evidence/card186/targeted-result.txt",
+    "sha256": "0a74f0427be2b3feff087be256d37a3949258d44ad1215ad21826681d59d30bc"
+  },
+  {
+    "path": "docs/evidence/card186/targeted.log",
+    "sha256": "c6e159aa605cecd6fb59e391661bc963330e4991b3af97852c3095c337383a42"
+  }
+]

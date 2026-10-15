@@ -55,7 +55,7 @@ func run(test: Object) -> bool:
 	var route: Dictionary=view._conflict_route()
 	var status: Dictionary=view._status.duplicate(true)
 	status.journey_response.reports.clear()
-	test.check(popover._identity(route,status)=="Unidentified threat" and not popover.reason("conflict_send",route,status).is_empty(), "Unidentified danger cannot acquire a predator picture or an unexplained force action")
+	test.check(popover._identity(route,status)=="Unidentified threat" and popover.searching(route,status) and popover.reason("conflict_send",route,status).is_empty(), "Unidentified returned danger offers a named armed search without inventing a predator picture")
 	route.surface_warning=true
 	test.check(popover._identity(route,status)=="Surface disturbance" and not popover.reason("conflict_send",route,status).is_empty(), "Impact evidence stays an unassailable impression without an invented animal name")
 	_check_report_order(test,popover)

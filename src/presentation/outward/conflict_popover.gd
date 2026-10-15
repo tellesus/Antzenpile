@@ -31,7 +31,15 @@ func kind(route: Dictionary, status: Dictionary) -> String:
 	if route.get("surface_warning", false): return ""
 	var finding: String = state.get("reports", {}).get(route.get("id"), {}).get("finding", "")
 	if finding in ["ambush", "mixed"] and not Memory.predator_addressed(route,state): return "defend"
-	return "gather" if route.get("foreign_reports", 0) > 0 or route.get("conflict_report", "") != "" else ""
+	if route.get("foreign_reports", 0) > 0 or route.get("conflict_report", "") != "":return "gather"
+	return "defend" if route.get("reported_losses",0)>0 and not Memory.predator_addressed(route,state) else ""
+
+func searching(route: Dictionary, status: Dictionary) -> bool:
+	return not own_party(route,status) and kind(route,status)=="defend" and status.get("journey_response",{}).get("reports",{}).get(route.get("id"),{}).get("finding","") not in ["ambush","mixed"]
+
+func borrowing_copy() -> Dictionary:
+	return {"title":"BORROW WORKERS FROM OTHER JOBS: " + ("ON" if all_hands else "OFF"),
+		"detail":"Can interrupt gathering, cleaning and climate" if all_hands else "Idle ants + workers recalled from this trail"}
 
 func limit(route: Dictionary, status: Dictionary) -> int:
 	var committed: int = int(status.journey_response.get("workers",0)) if own_party(route,status) else int(route.get("allocated_workers",0)) if kind(route,status)=="gather" else 0
@@ -47,6 +55,7 @@ func start_edit(route: Dictionary, status: Dictionary) -> void:
 	amount = clampi(int(entry.get("requested", suggestion(route, status))), 1, limit(route, status))
 	all_hands = entry.get("all_hands", false)
 	goal = status.get("journey_response", {}).get("goal", "clear") if own_party(route, status) else status.get("journey_response", {}).get("goals", {}).get(route.get("id"), "clear")
+	if searching(route,status):goal="clear"
 
 func layout(size: Vector2) -> Dictionary:
 	var radius: float = clampf((size.y - 392) * 0.5, 96, 122)
@@ -97,7 +106,8 @@ func reason(action: String, route: Dictionary, status: Dictionary) -> String:
 		if own_party(route, status):
 			if state.get("mode") != "defend": return "Wait for the survey's return"
 			if state.get("workers", 0) >= status.get("workers_total",0): return "Whole known workforce committed"
-		if kind(route, status).is_empty(): return "Survey to learn who caused the loss"
+		if Memory.predator_addressed(route,state):return "Earlier response resolved this danger"
+		if kind(route, status).is_empty(): return "Needs a returned loss or predator report"
 	if action in ["conflict_survey", "conflict_approach"]:
 		if state.get("away", false) or not state.get("other_party", "").is_empty(): return "Another response party is away"
 		if state.get("recruitment", {}).has(route.get("id")): return "Cancel the recruitment order first"
@@ -139,8 +149,8 @@ func draw(view: Node2D, route: Dictionary, status: Dictionary, size: Vector2) ->
 		if (editing or history_open) and positions.editor.intersects(box): continue
 		view.draw_line(center+(box.get_center()-center).normalized()*radius, box.get_center(), Color("477581"), 1.0, true)
 		var blocked: String = reason(command,route,status)
-		var title: String = {"conflict_send":"REINFORCE" if own_party(route,status) or kind(route,status)=="gather" else "SEND ANTS", "conflict_retreat":"RETREAT / CANCEL", "conflict_survey":"RECHECK DANGER" if not state.get("reports",{}).get(route.get("id"),{}).is_empty() else "INVESTIGATE", "conflict_approach":"ANOTHER APPROACH"}[command]
-		var detail: String = {"conflict_send":"Choose response workers", "conflict_retreat":"Recall this trail and response", "conflict_survey":"3 workers bring a report", "conflict_approach":{"withdraw":"Recall gatherers to reroute", "waiting":"Wait for gatherers to return", "resume":"Resume the reported course", "test":"3 workers test a longer course"}[approach_action(route,status)]}[command]
+		var title: String = {"conflict_send":"REINFORCE" if own_party(route,status) or kind(route,status)=="gather" else "SEARCH & DEFEND" if searching(route,status) else "SEND ANTS", "conflict_retreat":"RETREAT / CANCEL", "conflict_survey":"RECHECK DANGER" if not state.get("reports",{}).get(route.get("id"),{}).is_empty() else "SURVEY DANGER", "conflict_approach":"ANOTHER APPROACH"}[command]
+		var detail: String = {"conflict_send":"Choose response workers", "conflict_retreat":"Recall this trail and response", "conflict_survey":"Optional · 3 survey workers", "conflict_approach":{"withdraw":"Recall gatherers to reroute", "waiting":"Wait for gatherers to return", "resume":"Resume the reported course", "test":"3 workers test a longer course"}[approach_action(route,status)]}[command]
 		_button(view, box, title, blocked if not blocked.is_empty() else detail, not blocked.is_empty())
 	_button(view,positions.buttons.conflict_reports,"REPORT HISTORY")
 	if not editing and not history_open:
@@ -158,7 +168,7 @@ func preview(route: Dictionary, status: Dictionary) -> Dictionary:
 	return {"additional":additional,"sent":sent,"total":sent+amount,"requested":amount,
 		"waiting":int(entry.get("requested",0)),"reserved":int(entry.get("reserved",0)),
 		"returning":int(entry.get("returning",0)),"available":int(status.get("available_workers",0)),
-		"action":"ADD %d ANTS" % amount if additional else "RECRUIT %d ANTS" % amount}
+		"action":"ADD %d ANTS" % amount if additional else "SEARCH & DEFEND · %d ANTS" % amount if searching(route,status) else "RECRUIT %d ANTS" % amount}
 
 func receipt(result: Dictionary) -> String:
 	if not result.get("accepted",false): return result.get("reason","Order unavailable")
@@ -169,19 +179,20 @@ func _draw_editor(view: Node2D, positions: Dictionary, route: Dictionary, status
 	var box: Rect2 = positions.editor
 	var plan: Dictionary = preview(route,status)
 	Style.surface(view,box,Color("111e29")); Style.surface(view,box,Color("568b9c"),true)
-	_text(view,box.position+Vector2(136,25),"PROPOSED ADDITION" if plan.additional else "PROPOSED RESPONSE",15,240,Color("7de5ee"))
+	_text(view,box.position+Vector2(136,25),"PROPOSED ADDITION" if plan.additional else "ARMED SEARCH" if searching(route,status) else "PROPOSED RESPONSE",15,240,Color("7de5ee"))
 	_text(view,box.position+Vector2(160,49),"Already sent %d · ordered total %d" % [plan.sent,plan.total],13,296)
 	_text(view,box.position+Vector2(160,78),("+%d ants" if plan.additional else "%d ants") % amount,23,296,Color("d9fbff"))
-	_text(view,box.position+Vector2(160,101),"%d free at nest · carers & projects held" % plan.available,12,296)
+	_text(view,box.position+Vector2(160,101),"%d idle at nest · care & building protected" % plan.available,12,296)
 	_button(view,positions.buttons.draft_less_many,"−5")
 	_button(view,positions.buttons.draft_less,"−1")
 	_button(view,positions.buttons.draft_more,"+1")
 	_button(view,positions.buttons.draft_more_many,"+5")
 	_button(view,positions.buttons.draft_suggest,"SET TO %d" % suggestion(route,status))
-	_button(view,positions.buttons.draft_goal,"HOLD THE JUNCTION" if draft_kind=="gather" else "HUNT FOR PROTEIN" if goal=="hunt" else "DRIVE PREDATOR AWAY", "Gathering workers also fight" if draft_kind=="gather" else "Locked for the sent party" if own_party(route,status) else "Tap to change · hunt adds risk")
-	_button(view,positions.buttons.draft_all,"OTHER JOBS: ALLOWED" if all_hands else "OTHER JOBS: PROTECTED", "Reduced jobs need reassignment" if all_hands else "Alerted trail + free nest workers only")
-	var consequence: String = "May reduce cleanup, climate, gathering,"
-	var detail: String = "aphid care, scouts & supplies; care stays held."
+	_button(view,positions.buttons.draft_goal,"HOLD THE JUNCTION" if draft_kind=="gather" else "SEARCH AND DEFEND" if searching(route,status) else "HUNT FOR PROTEIN" if goal=="hunt" else "DRIVE PREDATOR AWAY", "Gathering workers also fight" if draft_kind=="gather" else "Unknown threat · survey is optional" if searching(route,status) else "Locked for the sent party" if own_party(route,status) else "Tap to change · hunt adds risk")
+	var borrowing: Dictionary=borrowing_copy()
+	_button(view,positions.buttons.draft_all,borrowing.title,borrowing.detail)
+	var consequence: String = "May recall aphid attendants, scouts & supplies."
+	var detail: String = "Care/building protected; restart jobs yourself."
 	if not all_hands:
 		consequence = "Recalled ants must reach home before joining."
 		detail = "%d waiting · %d at nest · %d returning" % [plan.waiting,plan.reserved,plan.returning] if plan.waiting>0 else "Arrival and outcome need a returned report."
@@ -213,7 +224,7 @@ func _history_records(route: Dictionary, status: Dictionary) -> Array[Dictionary
 	var outcome: Dictionary = state.get("outcomes",{}).get(id,{})
 	if not outcome.is_empty():
 		var text: String = Memory.defense_label(outcome)
-		records.append({"text":text,"received":outcome.received_at,"lines":[text,"%d returned / %d sent" % [outcome.sent-outcome.lost,outcome.sent],_report_dates(outcome,status)]})
+		records.append({"text":text,"received":outcome.received_at,"priority":1,"lines":[text,"%d returned / %d sent" % [outcome.sent-outcome.lost,outcome.sent],_report_dates(outcome,status)]})
 	var pressure: Dictionary = state.get("pressure_reports",{}).get(id,{})
 	if not pressure.is_empty():
 		var text: String = "Holding against resistance" if pressure.pressure=="holding" else "Resistance remains strong"
@@ -235,7 +246,7 @@ func _history_records(route: Dictionary, status: Dictionary) -> Array[Dictionary
 	if not approach.is_empty():
 		var text: String = {"found":"Alternate course established","danger":"Danger on alternate course","unconfirmed":"Alternate course unconfirmed"}.get(approach.outcome,"Approach report")
 		records.append({"text":text,"received":approach.received_at,"lines":[text,_report_dates(approach,status)]})
-	records.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.received>b.received)
+	records.sort_custom(func(a: Dictionary,b: Dictionary) -> bool: return a.received>b.received if a.received!=b.received else a.get("priority",0)>b.get("priority",0))
 	return records
 
 func _report_dates(report: Dictionary, status: Dictionary) -> String:
