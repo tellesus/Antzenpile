@@ -35,7 +35,7 @@ Remaining work is tracked here instead of on dormant branches:
 
 ## Latest actual verification
 
-[181](tasks/181_clear_gathering_dispatch.md): shared explicit gathering commitments and knowledge-safe acknowledgments. **11,153 full checks/zero failures**, 882 focused/zero; pinned import/Main and14 native multi-resolution captures. Windows refresh pending. Gameplay issues newly noted by the player remain deferred; existing save report178 is still open.
+[181](tasks/181_clear_gathering_dispatch.md): shared explicit gathering commitments and knowledge-safe acknowledgments. **11,153 full checks/zero failures**, 882 focused/zero; pinned import/Main and14 native multi-resolution captures. Refreshed Windows package audits 638 resources; release startup, packed save/settings/review and native packaged edit/commit/receipt pass. Gameplay issues newly noted by the player remain deferred; existing save report178 is still open.
 
 [180](tasks/180_sensorium_art_and_escape_menu.md): distinct luminous colony organs, softer production vapor, shaded larger ants and the shared Escape utility menu. **11,048 full checks/zero failures**, 440 affected/zero; clean import/Main, native multi-resolution/knowledge/pause captures and both screen timing samples. [Evidence and limits](evidence/card180/README.md). Fresh committed-main Windows package audits 638 resources and passes extracted release/PCK and native packed cloud/network/menu checks. Further dispatch/art/music and player acceptance remain open.
 

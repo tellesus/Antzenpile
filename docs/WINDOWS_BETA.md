@@ -4,7 +4,7 @@ Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly ve
 
 ## Current playable baseline
 
-Use current `main`. PRs #1 and #2 are merged; the latest package includes the systems beta, recovered neon trails, evidence-supported chemical memories and [visual/Escape-menu revision180](tasks/180_sensorium_art_and_escape_menu.md). `builds/windows-beta-latest.json` is the canonical build pointer. The180 package audits 638 resources and passes isolated export/extraction, actual release Main and packed save/settings/review gates, plus native cloud/INWARD/menu rendering under the pinned editor with the unchanged PCK. Named older exports remain historical. Final player/release-template input/audio/feel acceptance remains separate.
+Use current `main`. PRs #1/#2 are merged. The latest package contains visual revision180 and [gathering UI181](tasks/181_clear_gathering_dispatch.md), with 638 audited resources. `builds/windows-beta-latest.json` identifies its launch path and runtime commit. Isolated export/extraction, release Main and packed save/settings/review pass; native release startup and unchanged-PCK gathering rendering/edit/commit/receipt also pass. Physical touchscreen, human usability, audio and final release acceptance remain separate; old named exports are historical.
 
 ## Rebuild from a checkout
 
