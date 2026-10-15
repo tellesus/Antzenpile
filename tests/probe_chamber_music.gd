@@ -33,7 +33,7 @@ func _run():
 	snapshot = root.simulation.run.to_dict()
 	# Seek every running voice together near the actual longer loop boundary;
 	# development/condition tests above still use uninterrupted real playback.
-	for player: AudioStreamPlayer in audio._music_players(): player.seek(46.0)
+	for player: AudioStreamPlayer in audio._music_players(): player.seek(player.stream.get_length() - 2.0)
 	await create_timer(2.5).timeout
 	_phase(audio, "paused_64x_looped")
 	if snapshot != root.simulation.run.to_dict(): failed = true

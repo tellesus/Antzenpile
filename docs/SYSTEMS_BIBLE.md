@@ -182,7 +182,7 @@ Use a common hierarchy: identity/pile, condition, current order, action/cost/wai
 
 Report age distinguishes observation from receipt. Optional event-speed/pause behavior, if scoped, acts only on approved returned/local events and never hidden victory/death; reading menus must have consistent time behavior. Tooltips explain quantities/ownership/care and remain touch-accessible, not hover-only requirements.
 
-Preserve darkness/negative space, capped representatives, thin trails and restrained effects. No bloom dependency or conventional minimap. Graphics resolve meaningful distinctions only when knowledge supports them. **Acceptance:** player can find/understand reinforcement, retreat, queue priority, transport conflicts and competing needs at standard/compact sizes; final audio does not obscure cues or make routine play fatiguing.
+Preserve black negative space, capped representatives and bounded overdraw. Use the approved conspicuous neon glow and flowing wisps without a bloom dependency or conventional minimap. Graphics resolve meaningful distinctions only when knowledge supports them. **Acceptance:** player can find/understand reinforcement, retreat, queue priority, transport conflicts and competing needs at standard/compact sizes; final audio does not obscure cues or make routine play fatiguing.
 
 ### SYS-14 Persistence, determinism and delivery
 

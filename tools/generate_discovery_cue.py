@@ -1,3 +1,4 @@
+# Historical cue authoring; current score/cues: tools/music/compose_colony_music.py
 """Author a short original high, delicate discovery cue; no runtime synthesis."""
 from math import exp, pi, sin
 from pathlib import Path
@@ -6,7 +7,8 @@ import wave
 
 RATE = 22050
 DURATION = 0.26
-OUT = Path(__file__).resolve().parents[1] / 'assets' / 'audio' / 'returned_discovery.wav'
+OUT = Path(__file__).resolve().parents[1] / 'builds' / 'historical_cues' / 'returned_discovery.wav'
+OUT.parent.mkdir(parents=True, exist_ok=True)
 with wave.open(str(OUT), 'wb') as wav:
     wav.setnchannels(1)
     wav.setsampwidth(2)

@@ -1,25 +1,24 @@
-# Original warm colony arrangement — 092 / percussion revision 093
+# Living colony arrangement â€” 190
 
-Four synchronized **48-second, 16-bar, 80-BPM, 44.1-kHz mono/16-bit PCM** layers. Original score: A-minor/C-major family with four varied phrases, a quiet return home, melody rest bars and sparse tuned timpani answers. Shared gentle room reflections and note/recording decay are baked circularly across the boundary. One common gain preserves layer balance; the runtime keeps its existing -4 dB gain and three-second state fades.
+Four synchronized **85â…“-second, 32-bar, 90-BPM, stereo 44.1-kHz/16-bit PCM** voices. The original D-minor/modal score moves through four eight-bar phrases, varying motifs, register, timing and density. Phrase rests and a sparse return home provide breathing space. Shared circular stereo room/delay carries tails across the score; a 6ms cadence breath brings the file boundary to zero. Equal-power positions keep bass centred and give higher instruments space. One common gain across all subsets retains layer balance; runtime stays at -4dB with three-second real-time fades.
 
-| Layer | Contents |
+| Voice | Role |
 | --- | --- |
-| Base | Warm low harmony/bass, soft recorded bass drum and occasional tuned timpani |
-| Food Exchange | Recorded folk-harp arpeggios with alternating shapes/velocity |
-| Nursery | Recorded soft marimba, two-note answers and phrase-end rests |
-| Midden | Muted frame drum and eight softened shaker accents across 48 seconds; no wooden clicks |
+| Base | Soft detuned breathing harmony, rounded low pulse, recorded bass drum and three tuned timpani answers |
+| Food Exchange | Flowing recorded harp with four phrase shapes and occasional soft glass answers |
+| Nursery | Recorded marimba question/answer melody and quiet sustained answers, with eight rest bars |
+| Midden | Tactile frame drum, varied rests, eight 2.4kHz-lowpassed shaker accents; no wooden clicks |
 
-The score/authoring script is original project work. Seven source recordings are by Sam Gossner / Versilian Studios, **CC0-1.0**, from [VCSL](https://github.com/sgossner/VCSL/tree/sfz); the [publisher's license statement](https://versilian-studios.com/vcsl/) permits commercial use. `sample_manifest.json` pins the upstream tree, each exact raw URL and SHA-256/Git-blob checksum. Six recordings remain in the current mix; the removed wooden click stays in the manifest/cache for historical provenance. No paid instrument/plugin or runtime sampler. Attribution is retained for provenance even though CC0 does not require it.
+The two short stereo returned-information cues are original soft glass synthesis: an upward discovery and a lower falling loss. They retain actual returned-batch eligibility, independent cue volume, no loop, and reload suppression. No hidden threat or live world query enters audio.
 
-Rebuild with the existing Python environment containing NumPy (authoring only):
+The score/script are original project work. Seven recordings by Sam Gossner/Versilian Studios are CC0-1.0 from [VCSL](https://github.com/sgossner/VCSL/tree/sfz); the [publisher's statement](https://versilian-studios.com/vcsl/) permits commercial use. `sample_manifest.json` pins the upstream tree, each URL and SHA-256/Git-blob checksum. Six recordings are used; the historical woodblock stays in the manifest/cache for provenance. No new library/plugin/engine/runtime sampler. NumPy is authoring-only.
 
 ```text
 python tools/music/fetch_samples.py
 python tools/music/compose_colony_music.py
+python tools/music/check_score.py --rebuild
 ```
 
-The first command downloads only seven verified WAVs to ignored `tools/music/samples/`; subsequent runs reuse matching local files. The second runs offline, validates source hashes and renders the four checked-in `assets/audio/*_loop.wav` files. It writes eight actual runtime-gain review combinations to ignored `builds/music_review/` and current numerical evidence to `docs/evidence/card093_music.json` (092 evidence is historical). No Godot/gameplay or network dependency is introduced. `tools/music/.gdignore` prevents Godot importing authoring sources.
+Fetch reuses matching ignored samples. Compose is deterministic with a fixed authoring-only seed, writes the canonical six assets, eight runtime-gain listening mixes under ignored `builds/music_review/`, and `docs/evidence/card190/music.json`. Historical019/068/092/093 evidence is retained; historical generators cannot overwrite the current assets. The independent PCM check covers exact stereo frames, source hashes, all combinations/headroom, DC, seam, distinct phrases and cue overlap. Do not normalize stems independently. Existing Godot import settings remain; native tests verify actual imported duration/phase.
 
-093 responds to the player's sharp, repetitive percussion feedback: removes 12 wooden clicks, replaces 64 beat-by-beat shaker hits with eight varied phrase accents, lowers their gain from 0.016 to 0.009 and bakes a 3-kHz windowed-sinc low-pass into that instrument only. The calibrated 092 common gain is now fixed, so Base/Food/Nursery exports remain byte-identical. Review gain/headroom checks still cover every layer combination after regeneration; do not normalize each stem independently.
-
-Historical 019/068 generators now write to their own ignored historical output folders so they cannot overwrite this soundtrack accidentally. All current mixes share harmony, exact frame counts and a common gain. This is a first pleasant-music pass, not a claim of human listening approval or Android audio validation. Loss/discovery cues are unchanged. Uncompressed PCM payload is about 16.15 MiB for all four stems; streaming/compression can be evaluated later rather than assuming mobile memory is free.
+Four loop PCM payloads total 57.42MiB (about 3.6times the old score). This is deliberate for the current desktop target; no mobile memory/latency or human listening approval is claimed. The game needs neither Python nor a network connection. `tools/music/.gdignore` excludes authoring sources. Listening fatigue/enjoyment and the final balance of voices remain player acceptance, separate from numerical/render/runtime checks.

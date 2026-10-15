@@ -105,7 +105,7 @@ func _make_player(source: AudioStreamWAV, volume: float) -> AudioStreamPlayer:
 	var loop: AudioStreamWAV = source.duplicate()
 	loop.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	loop.loop_begin = 0
-	loop.loop_end = int(source.get_length() * source.mix_rate)
+	loop.loop_end = roundi(source.get_length() * source.mix_rate)
 	player.stream = loop
 	player.volume_db = volume
 	add_child(player)

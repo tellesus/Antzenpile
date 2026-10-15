@@ -1,0 +1,26 @@
+{
+  "actual_pcm": true,
+  "exact_frames": 3763200,
+  "stereo": true,
+  "subset_peaks": [
+    0.4146241607266846,
+    0.5367989761175179,
+    0.5313689843223698,
+    0.5399375883962738,
+    0.41445086311620116,
+    0.5366449337970882,
+    0.5311764314218326,
+    0.539995354266435
+  ],
+  "both_cues_peak_bound": 0.11381791402205302,
+  "worst_combined_bound": 0.653813268288488,
+  "sha256": {
+    "base_loop": "f2224005264d655e6cd2a44ac91559ac1acdcd96cb924c8dc0966c1dd686ba1a",
+    "growth_loop": "c014fe6a02167832ce17db3bc495bdc724ef35d12f99677414e452254fe1a9ab",
+    "nursery_loop": "3db44fe24eee98ab44caaa8793a40751bdffe2d9d5f95d6f5dcebf07af56e829",
+    "midden_loop": "977c65f205c2b717625cba87b11e6a59a7b8d279d930086a04abe5311a7cfc3d",
+    "returned_alarm": "3aa058aa61908848c193374eb476ad142eef96308ff7297c616ec1933000e95c",
+    "returned_discovery": "c45cc4f4ad677dfb8c50d8d63dffaeb082e003914688defa27df5d5e98e61772"
+  },
+  "independent_second_render_matches_all_six_assets": true
+}

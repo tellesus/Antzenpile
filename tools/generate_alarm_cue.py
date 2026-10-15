@@ -1,3 +1,4 @@
+# Historical cue authoring; current score/cues: tools/music/compose_colony_music.py
 """Generate the original soft returned-loss cue; standard library only."""
 import math
 import struct
@@ -6,7 +7,8 @@ from pathlib import Path
 
 rate = 22050
 duration = 0.42
-target = Path(__file__).resolve().parents[1] / "assets/audio/returned_alarm.wav"
+target = Path(__file__).resolve().parents[1] / "builds/historical_cues/returned_alarm.wav"
+target.parent.mkdir(parents=True, exist_ok=True)
 frames = bytearray()
 for index in range(round(rate * duration)):
     time = index / rate
