@@ -1,0 +1,13 @@
+{
+  "zip": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-windows.zip",
+  "archived_zip": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-0la4dljr.zip",
+  "zip_bytes": 59076454,
+  "zip_sha256": "4669303d428f256c5c660a5ae05dea1b2e29dd85b5f70cc26c36a29e793896bf",
+  "launch": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-0la4dljr\\Antzenpile\\Antzenpile.exe",
+  "revision": "cb192cb35f8f5787d3a837962229933a340fe163",
+  "resources": 660,
+  "logs": "C:\\Users\\Michael\\Documents\\Antzenpile\\.godot\\windows-beta\\export-voe7db0b",
+  "cold_import_shutdown_retry": false,
+  "checked": "isolated import/export/inventory/extraction/release Main; packed save-resume-review under pinned editor",
+  "not_checked": "native graphics/audio/feel/performance/clean machine"
+}

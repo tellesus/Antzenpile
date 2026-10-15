@@ -1,7 +1,7 @@
 [
   {
     "path": "docs/evidence/card184/README.md",
-    "sha256": "6041836a3993521038e6da1a9b171e034312fae022d55f1013b8e79cae803950"
+    "sha256": "bf5560e138bda23cf566a555422091933586db590dbb15251aeb4a4ea6fe4972"
   },
   {
     "path": "docs/evidence/card184/empty.png",
@@ -22,6 +22,50 @@
   {
     "path": "docs/evidence/card184/main.log",
     "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card184/package/README.md",
+    "sha256": "685097433bbe8b2dea6f5fb3d36813356f6908eeadaf60a7147ada5ce45c7ae6"
+  },
+  {
+    "path": "docs/evidence/card184/package/gathering_900.png",
+    "sha256": "f34b2633b9df8c4c805b670873deb72f693eefef2df0ad985465b28565159e7a"
+  },
+  {
+    "path": "docs/evidence/card184/package/package.log",
+    "sha256": "26ed1250396dbea8d91ed8bc84f598e5e9fe8515bc8b4b581e94a409629ef4fd"
+  },
+  {
+    "path": "docs/evidence/card184/package/packed-gathering.log",
+    "sha256": "10eebc1292d6811fc747ead95e83233b16e916d46bdee7dfb9a9b519542466a8"
+  },
+  {
+    "path": "docs/evidence/card184/package/packed-sources.log",
+    "sha256": "904965b766b008a6d060e7f9659294032c629121dc49a383a425a8091cb9af22"
+  },
+  {
+    "path": "docs/evidence/card184/package/release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card184/package/release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
+  },
+  {
+    "path": "docs/evidence/card184/package/sources_900.png",
+    "sha256": "90a65f23b729bd6a70383e76fa11c8f1294f024fd609cd6a45fe8b34772ceb4d"
+  },
+  {
+    "path": "docs/evidence/card184/package/sources_gallery_0_900.png",
+    "sha256": "7303107b9f9da82b2ee635fbc50c2b48a27f715fc4c8ecf77a93fed0abbfc922"
+  },
+  {
+    "path": "docs/evidence/card184/package/sources_gallery_1_900.png",
+    "sha256": "27f7b94e93f72f352f3d541b8482a02be70d81fadb4f237820472b27e433ef1f"
+  },
+  {
+    "path": "docs/evidence/card184/package/windows_build.json",
+    "sha256": "26ed1250396dbea8d91ed8bc84f598e5e9fe8515bc8b4b581e94a409629ef4fd"
   },
   {
     "path": "docs/evidence/card184/private_sample.png",

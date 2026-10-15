@@ -14,3 +14,5 @@ Two 60-second native editor frame-loop samples with VSync disabled and Dummy aud
 | Unidentified | 260.6 | 5.773 | 122.0 | 198.13 |
 
 The unidentified control includes a 198ms frame-loop outlier. Desktop scheduling is part of this measurement; it does not prove a cause or establish release acceptance. Tests cover delivered identity, private inbound harvesting, false category/legacy fallback, fading, empty reports, material reuse and hidden depletion/movement. Shader compilation was checked natively; an early reserved-identifier error was corrected before this final gate. Player visual/audio/feel and final release acceptance remain open. Packaged evidence follows publication.
+
+[Published Windows package and native PCK evidence](package/README.md).
