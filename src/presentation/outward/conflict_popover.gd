@@ -76,7 +76,8 @@ func layout(size: Vector2) -> Dictionary:
 		buttons.draft_back = Rect2(editor.position+Vector2(12,262),Vector2(236,44))
 	var bounds := Rect2(Vector2(left, center.y-radius-62),Vector2(right+160-left, 2*radius+124))
 	if editing or history_open: bounds = bounds.merge(editor)
-	return {"center":center,"radius":radius,"buttons":buttons,"editor":editor,"bounds":bounds}
+	var portrait := Rect2(center + Vector2(-radius+24, -radius+48), Vector2(2*radius-48, radius-44))
+	return {"center":center,"radius":radius,"buttons":buttons,"editor":editor,"bounds":bounds,"portrait":portrait}
 
 func button_at(at: Vector2, size: Vector2) -> String:
 	var positions: Dictionary = layout(size)
@@ -116,27 +117,30 @@ func draw(view: Node2D, route: Dictionary, status: Dictionary, size: Vector2) ->
 	var radius: float = positions.radius
 	var state: Dictionary = status.get("journey_response", {})
 	var identity: String = _identity(route, status)
-	view.draw_circle(center, radius, Color("10181b"))
-	view.draw_arc(center, radius, 0, TAU, 64, Color("8e7160"), 1.2, true)
-	_text(view, center+Vector2(0,-radius+22), identity, 15, 2*radius-18)
+	view.draw_circle(center, radius+3, Color("ff637c",0.045))
+	view.draw_circle(center, radius, Color("081219"))
+	view.draw_arc(center, radius, 0, TAU, 96, Color("874958"), 1.2, true)
+	view.draw_arc(center, radius-4, -PI*0.78, -PI*0.22, 32, Color("ff7c99",0.8), 1.8, true)
+	_text(view, center+Vector2(0,-radius+22), identity, 15, 2*radius-18, Color("ffe1eb"))
 	_text(view, center+Vector2(0,-radius+40), _source_name(route, status), 12, 2*radius-24, Color("9eaaa8"))
-	_impression(view, center+Vector2(0,-28), route, status)
 	var latest: Dictionary = _latest(route, status)
-	_text(view, center+Vector2(0,17), latest.text, 13, 2*radius-18)
-	_text(view, center+Vector2(0,35), latest.date, 12, 2*radius-24, Color("abb5b1"))
+	var lines: Array[String] = summary_lines(latest.text, 12, 2*radius-18)
+	for index: int in lines.size():
+		_text(view, center+Vector2(0,14+index*15), lines[index], 12, 2*radius-18, Color("e4f4f8"))
+	_text(view, center+Vector2(0,47), latest.date, 12, 2*radius-24, Color("92b5c2"))
 	var entry: Dictionary = state.get("recruitment", {}).get(route.get("id"), {})
-	var counts: String = "%d sent · awaiting return" % state.get("workers",0) if own_party(route,status) else "%d gatherers assigned" % route.get("allocated_workers",0)
+	var counts: String = "%d sent · awaiting report" % state.get("workers",0) if own_party(route,status) else "%d gatherers assigned" % route.get("allocated_workers",0)
 	if not entry.is_empty(): counts = "%d/%d recruits at nest" % [entry.reserved, entry.requested]
-	_text(view, center+Vector2(0,57), counts, 12, 2*radius-24)
-	var waiting: String = "%d recalled · still traveling" % entry.returning if entry.get("returning",0)>0 else "Needs %d more workers" % entry.shortfall if entry.get("shortfall",0)>0 else "Waiting for travel food / party" if not entry.is_empty() else "Returned reports are snapshots"
-	_text(view, center+Vector2(0,75), waiting, 12, 2*radius-28, Color("abb5b1"))
+	_text(view, center+Vector2(0,67), counts, 12, 2*radius-24)
+	var waiting: String = "%d still traveling home" % entry.returning if entry.get("returning",0)>0 else "Needs %d more workers" % entry.shortfall if entry.get("shortfall",0)>0 else "Waiting for food / party" if not entry.is_empty() else "Memory · not live"
+	_text(view, center+Vector2(0,83), waiting, 11, 2*radius-28, Color("92b5c2"))
 	for command: String in ["conflict_send","conflict_retreat","conflict_survey","conflict_approach"]:
 		var box: Rect2 = positions.buttons[command]
 		if (editing or history_open) and positions.editor.intersects(box): continue
-		view.draw_line(center+(box.get_center()-center).normalized()*radius, box.get_center(), Color("645345"), 1.0, true)
+		view.draw_line(center+(box.get_center()-center).normalized()*radius, box.get_center(), Color("477581"), 1.0, true)
 		var blocked: String = reason(command,route,status)
 		var title: String = {"conflict_send":"REINFORCE" if own_party(route,status) or kind(route,status)=="gather" else "SEND ANTS", "conflict_retreat":"RETREAT / CANCEL", "conflict_survey":"RECHECK DANGER" if not state.get("reports",{}).get(route.get("id"),{}).is_empty() else "INVESTIGATE", "conflict_approach":"ANOTHER APPROACH"}[command]
-		var detail: String = {"conflict_send":"Choose workers and commitment", "conflict_retreat":"Recall this trail and response", "conflict_survey":"3 workers · return with evidence", "conflict_approach":{"withdraw":"Recall gatherers to reroute", "waiting":"Wait for gatherers to return", "resume":"Resume the reported course", "test":"3 workers test a longer course"}[approach_action(route,status)]}[command]
+		var detail: String = {"conflict_send":"Choose response workers", "conflict_retreat":"Recall this trail and response", "conflict_survey":"3 workers bring a report", "conflict_approach":{"withdraw":"Recall gatherers to reroute", "waiting":"Wait for gatherers to return", "resume":"Resume the reported course", "test":"3 workers test a longer course"}[approach_action(route,status)]}[command]
 		_button(view, box, title, blocked if not blocked.is_empty() else detail, not blocked.is_empty())
 	_button(view,positions.buttons.conflict_reports,"REPORT HISTORY")
 	if not editing and not history_open:
@@ -190,7 +194,7 @@ func _draw_editor(view: Node2D, positions: Dictionary, route: Dictionary, status
 
 func _draw_history(view: Node2D, positions: Dictionary, route: Dictionary, status: Dictionary) -> void:
 	var box: Rect2 = positions.editor
-	Style.surface(view,box,Color("172024")); Style.surface(view,box,Color("8e7160"),true)
+	Style.surface(view,box,Color("111e29")); Style.surface(view,box,Color("568b9c"),true)
 	_text(view,box.position+Vector2(160,25),"Returned report history",16,296)
 	var lines: Array[String] = []
 	for record: Dictionary in _history_records(route,status): lines.append_array(record.lines)
@@ -261,43 +265,28 @@ func _identity(route: Dictionary, status: Dictionary) -> String:
 func _source_name(route: Dictionary, status: Dictionary) -> String:
 	return Memory.display_name({"knowledge_id":route.get("destination_knowledge_id",""),"category":route.get("category","carbohydrate"),"source_type":route.get("source_type",""),"memory_label":route.get("memory_label",""),"honeydew":route.get("destination_knowledge_id","")==status.get("honeydew",{}).get("knowledge_id","")})
 
-func _impression(view: Node2D, at: Vector2, route: Dictionary, status: Dictionary) -> void:
-	var identity: String = _identity(route,status)
-	var color := Color("8c7866")
-	if identity in ["Predatory arthropod", "Spider-like predator"]:
-		var clear: bool = identity=="Spider-like predator" or not status.get("journey_response",{}).get("pressure_reports",{}).get(route.get("id"),{}).is_empty() or not status.get("journey_response",{}).get("outcomes",{}).get(route.get("id"),{}).is_empty()
-		view.draw_circle(at,14,Color(color,0.35)); view.draw_circle(at+Vector2(0,-15),7,Color(color,0.3))
-		for side: int in [-1,1]:
-			for i: int in (4 if clear else 2):
-				var bend: Vector2 = at+Vector2(side*(22+i*2),-12+i*8)
-				view.draw_polyline(PackedVector2Array([at+Vector2(side*8,-8+i*6),bend,bend+Vector2(side*8,9)]),Color(color,0.65 if clear else 0.22),1.2,true)
-	elif identity=="Beetle-like hunter":
-		view.draw_circle(at,16,Color(color,0.3));view.draw_circle(at+Vector2(0,-17),7,Color(color,0.35))
-		view.draw_line(at+Vector2(0,-8),at+Vector2(0,13),Color(color,0.55),1.2,true)
-		for side: int in [-1,1]:
-			for index: int in 3:
-				var bend: Vector2=at+Vector2(side*23,-10+index*11)
-				view.draw_polyline(PackedVector2Array([at+Vector2(side*10,-7+index*8),bend,bend+Vector2(side*6,7)]),Color(color,0.55),1.2,true)
-	elif identity=="Foreign ants":
-		for i: int in 3:
-			var ant: Vector2 = at+Vector2((i-1)*24,(i%2)*6)
-			for part: int in 3: view.draw_circle(ant+Vector2(0,(part-1)*5),3,Color(color,0.6))
-			for side: int in [-1,1]: view.draw_line(ant,ant+Vector2(side*8,5),Color(color,0.4),1,true)
-	elif identity in ["Surface disturbance","Large animal passage","Dog-like passage"]:
-		for i: int in 3: view.draw_arc(at+Vector2(0,i*7),28-i*4,PI*0.1,PI*0.9,16,Color(color,0.4-i*0.08),2,true)
-		if identity=="Dog-like passage":
-			view.draw_circle(at+Vector2(0,-7),8,Color(color,0.22))
-			for index: int in 4:view.draw_circle(at+Vector2((index-1.5)*8,-21+absf(index-1.5)*3),3,Color(color,0.35))
-	elif identity=="Strange ground residue":
-		for index: int in 5:view.draw_circle(at+Vector2(sin(index*1.7)*18,cos(index*2.3)*10),10,Color("849274",0.08))
-	else:
-		for i: int in 5: view.draw_circle(at+Vector2(sin(i*2.1)*17,cos(i*1.7)*11),10,Color(color,0.065))
+static func summary_lines(value: String, font_size: int, width: float) -> Array[String]:
+	var lines: Array[String] = [""]
+	var font: Font = ThemeDB.fallback_font
+	for word: String in value.split(" ", false):
+		var next: String = word if lines[-1].is_empty() else lines[-1] + " " + word
+		if lines.size() == 1 and not lines[0].is_empty() and font.get_string_size(next, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > width:
+			lines.append(word)
+		else: lines[-1] = next
+	return lines
+
 
 func _button(view: Node2D, box: Rect2, title: String, detail: String = "", blocked: bool = false) -> void:
-	Style.surface(view,box,Color("1a2022") if blocked else Color("283137"))
-	Style.surface(view,box,Color("4f5149") if blocked else Color("806957"),true)
-	_text(view,box.get_center()+Vector2(0,5 if detail.is_empty() else -3),title,13,box.size.x-12,Color("89938e") if blocked else Color("e1d6c4"))
-	if not detail.is_empty(): _text(view,box.get_center()+Vector2(0,15),detail,11,box.size.x-10,Color("a2aaa4"))
+	Style.surface(view,box,Color("111d25") if blocked else Color("183441"))
+	Style.surface(view,box,Color("3c5662") if blocked else Color("568b9c"),true)
+	var lines: Array[String] = []
+	if box.size.y>=54: lines = summary_lines(detail,11,box.size.x-12)
+	else: lines.append(detail)
+	var two_lines: bool = lines.size()>1
+	_text(view,box.get_center()+Vector2(0,5 if detail.is_empty() else -12 if two_lines else -3),title,13,box.size.x-12,Color("8099a5") if blocked else Color("dcf5fb"))
+	if not detail.is_empty():
+		for index: int in lines.size():
+			_text(view,box.get_center()+Vector2(0,5+index*13 if two_lines else 15),lines[index],11,box.size.x-12,Color("94b4c1"))
 
 func _text(view: Node2D, at: Vector2, value: String, font_size: int, width: float, color: Color = Color("d7dacf")) -> void:
 	var font: Font = ThemeDB.fallback_font

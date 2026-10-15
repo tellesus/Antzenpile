@@ -8,6 +8,8 @@ const UIStyle = preload("res://src/presentation/organic_ui.gd")
 const Art = preload("res://src/presentation/sensory_art.gd")
 const CloudField = preload("res://src/presentation/outward/chemical_field.gd")
 var chemical_field: ChemicalField
+const Impression = preload("res://src/presentation/outward/conflict_impression.gd")
+var conflict_impression: ConflictImpression
 const Scent = preload("res://src/presentation/outward/trail_visual.gd")
 const TrailGlow = preload("res://src/presentation/outward/trail_glow.gd")
 const ScoutTrace = preload("res://src/presentation/outward/scout_trace_visual.gd")
@@ -91,6 +93,8 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	chemical_field = CloudField.new()
 	add_child(chemical_field)
+	conflict_impression = Impression.new()
+	add_child(conflict_impression)
 
 
 func _process(delta: float) -> void:
@@ -108,6 +112,11 @@ func _process(delta: float) -> void:
 		for entry: Dictionary in _placed:
 			empty_ids[entry.id] = _reported_empty(entry.signal)
 		chemical_field.sync(_placed, empty_ids, _animation_time, get_viewport_rect().size)
+	if conflict_impression != null:
+		var route: Dictionary = _conflict_route()
+		var active: bool = not _selected_signal().is_empty() and _journey_attention() and not effort_draft.opened and not gathering_draft.opened
+		if active: conflict.sync(route, _status)
+		conflict_impression.sync(route, _signals, conflict.layout(get_viewport_rect().size).portrait, _animation_time, active)
 	queue_redraw()
 
 
@@ -115,6 +124,7 @@ func reset_mission_visuals() -> void:
 	effort_draft.opened=false
 	gathering_draft.opened=false
 	conflict.reset()
+	if conflict_impression != null: conflict_impression.sync({}, [], Rect2(), _animation_time, false)
 	_seen_missions.clear()
 	_missions_baselined = false
 	_departures.clear()

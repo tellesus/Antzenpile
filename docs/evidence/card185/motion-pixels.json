@@ -1,0 +1,19 @@
+{
+  "native_capture_count": 47,
+  "portrait_roi": [
+    370,
+    256,
+    530,
+    316
+  ],
+  "motion_interval_seconds": 2.3,
+  "roi_pixels": 9600,
+  "changed_pixels_above_2_of_255": 2315,
+  "mean_absolute_rgb_delta": [
+    3.31375,
+    1.6569791666666667,
+    2.265625
+  ],
+  "paused_pixels_equal": true,
+  "paused_evidence": "probe_threat_inspection.gd compares the full viewport over 12 process frames"
+}
