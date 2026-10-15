@@ -30,10 +30,12 @@ Remaining work is tracked here instead of on dormant branches:
 
 - **Player-reported save validation failure:** save a short run, watch End Run/review, then load the earlier save. The attempted fix in the old chat was interrupted; no fix is claimed by consolidation. [178](tasks/178_player_save_validation.md) is the next bounded investigation, using a private copy of the real slot. The generic packaged round-trip gate does not close this report.
 - **M8 visuals:** the organic trail proof and flowing chemical-cloud/spider/beetle memory pass179 are implemented. Revision180 adds distinct luminous INWARD organs, new alpha vapor/membrane materials and shaded larger worker representatives. Remaining: further ant animation/art, supported source/species forms, arc-length trail traffic and player visual acceptance.
-- **Interaction and music:** revision180 moves routine persistent utilities behind Escape. Clearer draft/order dispatch, deeper context simplification and the planned music overhaul remain follow-up work.
+- **Interaction and music:** revision180 moves routine persistent utilities behind Escape. Revision181 makes ordinary Home/Daughter gathering commitments explicit with proposed/current/queued/available counts and one prominent primary action. Combat recruitment clarity, deeper contexts and music remain follow-up work.
 - **Acceptance:** visible packaged-game playtesting, physical touch, balance/audio/feel, timing outliers and clean-machine validation remain open. These are not duplicate feature branches or a Windows 1.0 claim.
 
 ## Latest actual verification
+
+[181](tasks/181_clear_gathering_dispatch.md): shared explicit gathering commitments and knowledge-safe acknowledgments. **11,153 full checks/zero failures**, 882 focused/zero; pinned import/Main and14 native multi-resolution captures. Windows refresh pending. Gameplay issues newly noted by the player remain deferred; existing save report178 is still open.
 
 [180](tasks/180_sensorium_art_and_escape_menu.md): distinct luminous colony organs, softer production vapor, shaded larger ants and the shared Escape utility menu. **11,048 full checks/zero failures**, 440 affected/zero; clean import/Main, native multi-resolution/knowledge/pause captures and both screen timing samples. [Evidence and limits](evidence/card180/README.md). Fresh committed-main Windows package audits 638 resources and passes extracted release/PCK and native packed cloud/network/menu checks. Further dispatch/art/music and player acceptance remain open.
 

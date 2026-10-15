@@ -494,11 +494,11 @@ func _run_gathering_command(command: String) -> void:
 	if command in ["trail_create","gather_edit"]:
 		gathering_draft.begin(selected.source_knowledge_id,int(route.get("desired_workers",0)),int(_status.get("workers_total",1)))
 	elif command=="gather_commit":
-		if not gather_order_command.is_valid() or gathering_draft.source!=selected.source_knowledge_id: show_feedback("Gathering order unavailable",true);return
+		if not gathering_draft.opened or not gather_order_command.is_valid() or gathering_draft.source!=selected.source_knowledge_id: show_feedback("Gathering order unavailable",true);return
 		var result: Dictionary=gather_order_command.call(gathering_draft.source,gathering_draft.amount)
 		activation.outcome(result)
 		if result.get("accepted",false): gathering_draft.opened=false
-		show_feedback("Gathering order accepted · waiting labor stays queued" if result.get("accepted",false) else result.get("reason","Order unavailable"),not result.get("accepted",false))
+		show_feedback(GatheringDraft.receipt(result),not result.get("accepted",false))
 	else: gathering_draft.edit(command)
 
 
@@ -884,7 +884,7 @@ func _draw_context(size: Vector2) -> void:
 	if gathering_draft.opened:
 		if gathering_draft.source!=selected.source_knowledge_id: gathering_draft.opened=false
 		else:
-			gathering_draft.draw(self,size,Memories.display_name(selected),int(_selected_route(selected).get("allocated_workers",0)),int(_status.get("available_workers",0)));return
+			gathering_draft.draw(self,size,Memories.display_name(selected),int(_selected_route(selected).get("allocated_workers",0)),int(_status.get("available_workers",0)),int(_selected_route(selected).get("waiting_workers",0)));return
 	if _journey_attention(): _draw_journey_context(size); return
 	var box: Rect2 = _context_panel_rect()
 	UIStyle.surface(self, box, Color("111921"))
@@ -932,12 +932,12 @@ func _draw_context(size: Vector2) -> void:
 		_label(body.position + Vector2(16, 165), idle_text, Color("a8b8bd"), 15)
 		_label(body.position + Vector2(16, 187), "%s %s: %.1f" % [_status.get("pile_name","Home"), Copy.resource(selected.category), _status.get("resources", {}).get(selected.category, 0.0)], Color("8fa1a8"), 15)
 		if route.get("waiting_workers",0)>0:
-			_draw_trail_button("gather_edit","CHOOSE WORKERS");_draw_trail_button("trail_cancel","CANCEL ORDER")
-		else: _draw_trail_button("trail_create", "CHOOSE GATHERERS")
+			_draw_trail_button("gather_edit","ADJUST TARGET");_draw_trail_button("trail_cancel","CANCEL ORDER")
+		else: _draw_trail_button("trail_create", "PLAN GATHERING")
 	elif route.status == "recalling":
 		_label(body.position + Vector2(16, 165), "Recalling: %d workers away" % route.active_workers, Color("a8b8bd"), 15)
 		_label(body.position + Vector2(16, 187), "Scent %s · Delivered %.1f" % [_scent_label(route), route.delivered_total], Color("8fa1a8"), 15)
-		_draw_trail_button("trail_create", "CHOOSE GATHERERS")
+		_draw_trail_button("trail_create", "PLAN GATHERING")
 	else:
 		var route_note: String = _recovery_note(route) if route.status == "depleted" else "Waiting for carbohydrate" if route.get("energy_limited", false) else "Trail scent: " + _scent_label(route)
 		_label(body.position + Vector2(16, 165), route_note, Color("a8b8bd"), 15)
@@ -950,7 +950,7 @@ func _draw_context(size: Vector2) -> void:
 			if route.active_workers == 0:
 				_draw_trail_button("trail_recheck", _recheck_title(route))
 		else:
-			_draw_trail_button("gather_edit", "CHOOSE WORKERS")
+			_draw_trail_button("gather_edit", "ADJUST TARGET")
 		_draw_trail_button("trail_cancel", "RECALL")
 	var scout_available: bool = _status.has("exploration") or _status.get("available_workers", 0) > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()
@@ -979,15 +979,15 @@ func _draw_honeydew_context(selected: Dictionary, box: Rect2) -> void:
 		UIStyle.surface(self, protect_box, Color("3d3328") if can_start else Color("202326"))
 		_label(protect_box.position + Vector2(protect_box.size.x * 0.5, 29), "CHOOSE ATTENDANTS", Color("e1d4ba") if can_start else Color("8c8881"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 	if route.get("waiting_workers",0)>0:
-		_draw_trail_button("gather_edit","CHOOSE WORKERS");_draw_trail_button("trail_cancel","CANCEL ORDER")
+		_draw_trail_button("gather_edit","ADJUST TARGET");_draw_trail_button("trail_cancel","CANCEL ORDER")
 	elif route.is_empty() or route.status in ["inactive", "recalling"]:
-		_draw_trail_button("trail_create", "CHOOSE GATHERERS")
+		_draw_trail_button("trail_create", "PLAN GATHERING")
 	elif route.status == "depleted":
 		if route.active_workers == 0:
 			_draw_trail_button("trail_recheck", _recheck_title(route))
 		_draw_trail_button("trail_cancel", "RECALL")
 	else:
-		_draw_trail_button("gather_edit","CHOOSE WORKERS")
+		_draw_trail_button("gather_edit","ADJUST TARGET")
 		_draw_trail_button("trail_cancel", "RECALL")
 	var scout_available: bool = _status.has("exploration") or available > 0 and _status.get("active_scouts", 0) < _status.get("scout_cap", 0)
 	var investigate_box: Rect2 = _investigate_button_rect()

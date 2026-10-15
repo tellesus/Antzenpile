@@ -1090,10 +1090,20 @@ func create_trail_for(knowledge_id: String) -> Dictionary:
 	return {"accepted": accepted, "reason": simulation.trails.last_error}
 
 func order_gathering(knowledge_id: String, count: Variant) -> Dictionary:
+	var before: Dictionary = {}
+	for entry: Dictionary in trail_summaries(inward_pile_id):
+		if entry.destination_knowledge_id == knowledge_id: before = entry
 	var route: TrailRouteState=simulation.run.trails.find_route(inward_pile_id,knowledge_id)
 	var accepted: bool=simulation.create_trail(inward_pile_id,knowledge_id,count) if route==null else simulation.set_trail_workers(route.id,count)
 	route=simulation.run.trails.find_route(inward_pile_id,knowledge_id)
-	return {"accepted":accepted,"queued":accepted and route!=null and route.waiting_workers>0,"reason":simulation.trails.last_error}
+	var result: Dictionary = {"accepted":accepted,"queued":accepted and route!=null and route.waiting_workers>0,"reason":simulation.trails.last_error}
+	if accepted:
+		# Receipt uses the normal projection, which retains unreported travelers.
+		for entry: Dictionary in trail_summaries(inward_pile_id):
+			if entry.destination_knowledge_id != knowledge_id: continue
+			result.merge({"target":entry.desired_workers,"assigned":entry.allocated_workers,
+				"waiting":entry.waiting_workers,"reduced":entry.desired_workers < before.get("allocated_workers",0)})
+	return result
 
 
 func set_trail_target(route_id: String, target: int) -> Dictionary:

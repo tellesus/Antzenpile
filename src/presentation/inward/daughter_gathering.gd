@@ -52,7 +52,7 @@ func activate(view: Node2D, at: Vector2, status: Dictionary, command: Callable) 
    var result: Dictionary=command.call(draft.source,"order_%d" % draft.amount)
    view.activation.outcome(result)
    if result.get("accepted",false): draft.opened=false
-   view.show_feedback("Gathering order accepted · unsent ants wait" if result.get("accepted",false) else result.get("reason","Order unavailable"))
+   view.show_feedback(GatheringDraft.receipt(result))
   else: draft.edit(control)
   return true
  if rect(size,"back").has_point(at): opened=false;return true
@@ -87,7 +87,7 @@ func draw(view: Node2D, status: Dictionary) -> void:
  var size: Vector2=view.get_viewport_rect().size
  if draft.opened:
   var entry: Dictionary=selected_entry(status)
-  draft.draw(view,size,Memory.display_name(entry),int(entry.get("workers",0)),int(status.get("available_workers",0)));return
+  draft.draw(view,size,Memory.display_name(entry),int(entry.get("workers",0)),int(status.get("available_workers",0)),int(entry.get("waiting_workers",0)));return
  var box: Rect2=panel(size)
  Style.surface(view,box,Color("111921"));Style.surface(view,box,Color("41535a"),true)
  view._label(box.position+Vector2(16,31),"Daughter Gathering",Color("d9d3be"),20)
@@ -111,7 +111,7 @@ func draw(view: Node2D, status: Dictionary) -> void:
  if not chosen.is_empty():
   at=rect(size,"order");Style.surface(view,at,Color("39302b"))
   var action: String=order(chosen)
-  var title: String="RECHECK" if action=="recheck" else "CHOOSE WORKERS"
+  var title: String="RECHECK" if action=="recheck" else "ADJUST TARGET" if chosen.workers>0 or chosen.waiting_workers>0 else "PLAN GATHERING"
   view._label(at.get_center()+Vector2(0,-3),title,Color("e0c5b7"),12,HORIZONTAL_ALIGNMENT_CENTER)
   view._label(at.get_center()+Vector2(0,15),"Daughter + travel carbs" if action!="recheck" else "Same local gatherers",Color("c5b8b1"),11,HORIZONTAL_ALIGNMENT_CENTER)
   if chosen.workers>0 or chosen.desired_workers>0:
