@@ -574,7 +574,7 @@ func _draw_activity(centers: Dictionary) -> void:
 			under_label = under_label or Rect2(Chambers.label_position(id,center)+Vector2(-90,-17), Vector2(180, 42)).grow(20.0).has_point(ant.position)
 		if under_label:
 			continue
-		Art.ant(self, ant.position, ant.direction, Color(ant.color, 0.62), _animation_time, 1.25, true)
+		Art.ant(self, ant.position, ant.direction, Color(ant.color, 0.91), ant.gait, 1.25, true)
 		if ant.role in ["climate", "cleanup"]:
 			draw_circle(ant.position + ant.direction.normalized() * 6, 1.6, Color(ant.color, 0.65))
 

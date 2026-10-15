@@ -63,7 +63,7 @@ static func representatives(status: Dictionary, centers: Dictionary, time: float
 			var finish: Vector2 = centers[job.to]
 			var control: Vector2 = (start + finish) * 0.5 + Vector2(12, -18)
 			var t: float = fposmod(time * 0.05 + pass_index * 0.5 + index * 0.13, 1.0)
-			result.append({"role": job.role, "color": job.color,
+			result.append({"role": job.role, "color": job.color, "gait":time*1.2+index*0.37+pass_index*0.43,
 				"position": start * pow(1 - t, 2) + control * 2 * (1 - t) * t + finish * t * t,
 				"direction": (control - start) * (1 - t) + (finish - control) * t})
 	return result

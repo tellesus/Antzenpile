@@ -7,13 +7,14 @@ const CONTOUR_STEPS: int = 32
 const CLOUD = preload("res://assets/graphics/sensorium/vapor_v2.png")
 const ORGAN = preload("res://assets/graphics/sensorium/organ_membrane_v2.png")
 const WATER = preload("res://assets/graphics/proof/water_impression.svg")
-const WORKER = preload("res://assets/graphics/proof/worker_walk.png")
-const SCENT_WORKER = preload("res://assets/graphics/proof/worker_scent.png")
+const WORKER = preload("res://assets/graphics/sensorium/worker_walk_v3.png")
+const SCENT_WORKER = preload("res://assets/graphics/sensorium/worker_scent_v3.png")
 const EARTH = preload("res://assets/graphics/proof/nursery_earth.svg")
 const FILAMENT = preload("res://assets/graphics/colony/chemical_cloud.png")
 const ENTRANCE = preload("res://assets/graphics/colony/material/local_home.png")
-const WALK_FRAMES: int = 12
-const WALK_CELL: int = 128
+const WALK_FRAMES: int = 24
+const WALK_CELL: int = 192
+const WALK_COLUMNS: int = 8
 
 
 static func impression_gain(signal_data: Dictionary, empty: bool) -> float:
@@ -100,16 +101,19 @@ static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool, d
 
 
 static func ant(canvas: Node2D, at: Vector2, direction: Vector2, color: Color, phase: float, scale: float = 1.0, interior: bool = false) -> void:
-	var frame: int = posmod(int(floor(phase * 18.0)), WALK_FRAMES)
-	var source := Rect2(Vector2(frame % 6, frame / 6) * WALK_CELL, Vector2.ONE * WALK_CELL)
-	var extent: float = (34.0 if interior else 38.0) * scale
-	canvas.draw_set_transform(at, direction.angle() + PI * 0.5)
+	var frame: int = posmod(int(floor(phase * WALK_FRAMES)), WALK_FRAMES)
+	var source := Rect2(Vector2(frame % WALK_COLUMNS, frame / WALK_COLUMNS) * WALK_CELL, Vector2.ONE * WALK_CELL)
+	var extent: float = (36.0 if interior else 46.0) * scale
+	var stride: float = sin(phase*TAU)
+	canvas.draw_set_transform(at, direction.angle() + PI * 0.5 + stride*0.018,Vector2(1.0+stride*0.012,1.0-stride*0.009))
 	if interior:
-		var tint: Color = Color(1.0, 0.95, 0.86, 0.95).lerp(color, 0.08)
+		canvas.draw_texture_rect_region(SCENT_WORKER,Rect2(Vector2.ONE*-extent*0.55,Vector2.ONE*extent*1.10),source,Color(color,0.18))
+		var tint: Color = Color.WHITE.lerp(color, 0.42)
+		tint.a = color.a
 		canvas.draw_texture_rect_region(WORKER, Rect2(Vector2.ONE * -extent * 0.5, Vector2.ONE * extent), source, tint)
 	else:
 		canvas.draw_texture_rect_region(SCENT_WORKER, Rect2(Vector2.ONE * -extent * 0.56, Vector2.ONE * extent * 1.12), source, Color(color, color.a * 0.24))
-		canvas.draw_texture_rect_region(WORKER, Rect2(Vector2.ONE * -extent * 0.5, Vector2.ONE * extent), source, Color(Color.WHITE.lerp(color, 0.18), color.a))
+		canvas.draw_texture_rect_region(WORKER, Rect2(Vector2.ONE * -extent * 0.5, Vector2.ONE * extent), source, Color(Color.WHITE.lerp(color, 0.68), color.a))
 		canvas.draw_circle(Vector2(0, -extent * 0.19), 0.75, Color(color.lightened(0.6), color.a))
 	canvas.draw_set_transform(Vector2.ZERO)
 

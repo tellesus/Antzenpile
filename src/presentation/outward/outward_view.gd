@@ -735,14 +735,15 @@ func _draw_trails(size: Vector2) -> void:
 			draw_circle(at, 0.75, Color(Art.color_for(path.category), 0.12 * path.strength))
 	for rep: Dictionary in Scent.representatives(routes, _placed, size, _animation_time):
 		var obscured: bool = false
-		var ant_bounds := Rect2(rep.position - Vector2(10,10), Vector2(20,20))
+		var ant_bounds := Rect2(rep.position - Vector2(19,19), Vector2(38,38))
 		for reserved: Rect2 in _caption_blocks:
 			obscured = obscured or reserved.intersects(ant_bounds)
 		if obscured: continue
 		var ant_color: Color = Art.color_for(rep.category)
-		draw_circle(rep.position, 8.5, Color(ant_color, 0.09))
-		draw_circle(rep.position, 4.3, Color(ant_color, 0.17))
-		Art.ant(self, rep.position, rep.direction, Color(ant_color.lightened(0.28), 0.83), _animation_time, 0.82)
+		var visibility: float = rep.visibility
+		draw_circle(rep.position, 8.5, Color(ant_color, 0.09*visibility))
+		draw_circle(rep.position, 4.3, Color(ant_color, 0.17*visibility))
+		Art.ant(self, rep.position, rep.direction, Color(ant_color.lightened(0.12), 0.95*visibility), rep.gait, 1.0)
 	for marker: Dictionary in Scent.alarm_markers(routes, _placed, size):
 		var at: Vector2 = marker.center
 		draw_arc(at, 8.0, 0.0, 2.2, 16, Color(0.82, 0.39, 0.27, 0.5), 1.3, true)
@@ -826,7 +827,7 @@ func _draw_anchor(size: Vector2) -> void:
 	for entry: Dictionary in _departures:
 		var rep: Dictionary = ScoutTrace.departure(entry.age, entry.side, size)
 		if not rep.is_empty():
-			Art.ant(self, rep.position, rep.direction, Color(0.68, 0.61, 0.45, 0.70), _animation_time, 1.15)
+			Art.ant(self, rep.position, rep.direction, Color(0.94, 0.76, 0.39, 0.9), _animation_time*1.5, 1.0)
 	_label(center + Vector2(0, 33), _status.get("pile_name","Home").to_upper(), Color("d8c9ae"), 13, HORIZONTAL_ALIGNMENT_CENTER)
 
 

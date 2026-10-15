@@ -7,6 +7,8 @@ const STEPS: int = 48
 const ANTS_PER_LINK: int = 3
 const MAX_ANTS: int = MAX_LINKS * ANTS_PER_LINK
 const CACHE_LIMIT: int = 12
+const TRAVEL_PIXELS_PER_SECOND: float = 36.0
+const STRIDE_PIXELS: float = 24.0
 static var _geometry_cache: Dictionary = {}
 
 
@@ -53,7 +55,9 @@ static func geometry(start: Vector2, finish: Vector2, route_id: String) -> Dicti
 			at + tangent * 13.0 + side * sign_value * 9.0, at + tangent * 21.0 + side * sign_value * 15.0]))
 	if _geometry_cache.size() >= CACHE_LIMIT:
 		_geometry_cache.erase(_geometry_cache.keys()[0])
-	var result: Dictionary = {"points": points, "branches": branches}
+	var lengths := PackedFloat32Array([0.0])
+	for index: int in range(1,points.size()): lengths.append(lengths[-1]+points[index-1].distance_to(points[index]))
+	var result: Dictionary = {"points": points, "branches": branches,"lengths":lengths,"length":lengths[-1]}
 	_geometry_cache[key] = result
 	return result
 
@@ -82,7 +86,7 @@ static func paths(routes: Array, placed: Array[Dictionary], viewport: Vector2) -
 			var start: Vector2 = home_start(viewport, str(route.get("id", destination_id)))
 			var finish: Vector2 = entry.center + Vector2(0.0, entry.radius * 0.45)
 			var shape: Dictionary = geometry(start, finish, str(route.get("id", destination_id)))
-			result.append({"points": shape.points, "branches": shape.branches, "strength": strength, "chemical": chemical, "ghost": ghost,
+			result.append({"points": shape.points, "branches": shape.branches, "lengths":shape.lengths,"length":shape.length, "strength": strength, "chemical": chemical, "ghost": ghost,
 				"category": entry.signal.get("category", "carbohydrate"), "route": route.duplicate(true)})
 			count += 1
 			break
@@ -120,21 +124,41 @@ static func alarm_markers(routes: Array, placed: Array[Dictionary], viewport: Ve
 	return result
 
 
+static func sample(path: Dictionary, distance: float) -> Dictionary:
+	# Traverse the rendered polyline by distance, independent of Bezier sampling.
+	var points: PackedVector2Array = path.points
+	var lengths: PackedFloat32Array = path.lengths
+	var target: float = clampf(distance,0.0,path.length)
+	var low: int = 0
+	var high: int = points.size()-1
+	while high-low>1:
+		var middle: int = (low+high)/2
+		if lengths[middle]<=target:low=middle
+		else:high=middle
+	var span: float = lengths[high]-lengths[low]
+	var t: float = (target-lengths[low])/span if span>0.0001 else 0.0
+	var first_heading: Vector2 = (points[high]-points[maxi(0,low-1)]).normalized()
+	var last_heading: Vector2 = (points[mini(points.size()-1,high+1)]-points[low]).normalized()
+	var direction: Vector2 = first_heading.lerp(last_heading,t).normalized()
+	return {"position":points[low].lerp(points[high],t),"direction":direction if direction.length_squared()>0.0 else Vector2.UP}
+
 static func representatives(routes: Array, placed: Array[Dictionary], viewport: Vector2, time: float) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for path: Dictionary in paths(routes, placed, viewport):
 		var workers: int = int(path.route.get("active_workers", 0))
-		if path.ghost or workers <= 0:
-			continue
+		if path.ghost or workers <= 0 or path.length<0.001:continue
 		var count: int = mini(ANTS_PER_LINK, workers)
-		var phase: float = float(abs(str(path.route.get("id", "")).hash()) % 100) / 100.0
+		var phase: float = float(abs(str(path.route.get("id", "")).hash()) % 1000) / 1000.0
 		for index: int in count:
-			var t: float = fposmod(time * 0.065 + float(index) / ANTS_PER_LINK + phase, 1.0)
-			if index % 2 == 1:
-				t = 1.0 - t
-			var sample: float = clampf(t, 0.025, 0.975) * STEPS
-			var first: int = int(sample)
-			var a: Vector2 = path.points[first]
-			var b: Vector2 = path.points[first + 1]
-			result.append({"position": a.lerp(b, sample - first), "direction": (b - a) * (-1.0 if index % 2 == 1 else 1.0), "category": path.category})
+			var traveled: float = time*TRAVEL_PIXELS_PER_SECOND + (float(index)/ANTS_PER_LINK+phase)*path.length
+			var distance: float = fposmod(traveled,path.length)
+			var returning: bool = index%2==1
+			if returning:distance=path.length-distance
+			var at: Dictionary = sample(path,distance)
+			var direction: Vector2 = at.direction*(-1.0 if returning else 1.0)
+			# Opposing chemical representatives have small stable lanes, not terrain.
+			var visibility: float = smoothstep(0.0,0.06,distance/path.length)*smoothstep(0.0,0.06,1.0-distance/path.length)
+			result.append({"position":at.position+direction.orthogonal()*1.7,"direction":direction,
+				"category":path.category,"visibility":visibility,"gait":traveled/STRIDE_PIXELS,
+				"distance":distance,"route_id":str(path.route.get("id",""))})
 	return result
