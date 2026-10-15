@@ -1,5 +1,7 @@
 # 170 — Rival economic continuity
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M6-I / ECO-RIVAL / SYS-02/10/14.
 
 Outcome: securing a junction creates breathing room, while a surviving neighboring colony can later send actual replacement foragers from home. Attrition remains meaningful: replacements use its finite living reserves or a paid, delayed aggregate brood; no new ants appear at the contested crossing. Withdrawal/alternate approaches remain useful counterplay.

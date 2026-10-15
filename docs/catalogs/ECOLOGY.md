@@ -1,5 +1,7 @@
 # Ecology, encounters and disturbance catalog
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Current 1.0 design. Shared rules: [SYS-10](../SYSTEMS_BIBLE.md#sys-10-ecology-encounters-and-conflict), [SYS-11](../SYSTEMS_BIBLE.md#sys-11-weather-local-health-and-disturbance). Delivery: [M6](../ROADMAP_1_0.md), with physical rescue in M5 first. Creature profiles are game archetypes inspired by biology, not literal species simulations.
 
 ## Four rule families

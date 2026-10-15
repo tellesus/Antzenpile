@@ -1,5 +1,7 @@
 # 174 — Accurate physical review samples
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M7-D / SYS-10/11/12/14.
 
 Outcome: voluntary physical review shows the moving predator and active disturbance footprints at the selected historical sample, rather than drawing the old fixed ambusher location. Older samples without that context clearly state the omission; they do not invent past positions or schedules.

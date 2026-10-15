@@ -1,5 +1,7 @@
 # Antzenpile systems bible — 1.0
 
+**Current development save policy (2026-10-15):** [Same-build saves only](SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Current design book, 2026-10-05. The player authorized this 1.0 foundation and modular planning pass. It supersedes historical design/planning instructions in the [archive](archive/README.md). This document defines intended systems; [Current Build](CURRENT_BUILD.md) and the technical references identify what actually works. Planned rules become runtime contracts only through a verified implementation card.
 
 ## 1. The game we are building
@@ -23,7 +25,7 @@ Debug truth remains development-only. A separate physical history can be reveale
 
 Each rules family has immutable authored definitions, small typed instance state and a named headless owner. A food profile, trait, chamber or predator is content within its family's tested rules. Add a new family only for a behavior that cannot be expressed honestly by an existing one.
 
-Content declares a stable ID, status/milestone, player purpose, prerequisites, effects/costs, knowledge cues, interactions, save compatibility and verification. IDs are not display labels. Existing saved IDs are preserved or migrated explicitly. Effects use a small whitelist of family-specific hooks; 1.0 does not need a universal effect language, plugin engine or one giant entity schema.
+Content declares a stable ID, status/milestone, player purpose, prerequisites, effects/costs, knowledge cues, interactions, same-build save validation and verification. IDs are not display labels. Previous-build saves are unsupported during development. Effects use a small whitelist of family-specific hooks; 1.0 does not need a universal effect language, plugin engine or one giant entity schema.
 
 The launch content is in [Resources](catalogs/RESOURCES.md), [Chambers](catalogs/CHAMBERS.md), [Adaptations](catalogs/ADAPTATIONS.md), [Ecology](catalogs/ECOLOGY.md) and [Sites/Scenarios](catalogs/SITES_AND_SCENARIOS.md). Their entries are working design commitments; exact tuning values are authored/provisional. Gated content has an explicit inclusion test.
 
@@ -186,11 +188,11 @@ Preserve darkness/negative space, capped representatives, thin trails and restra
 
 **Purpose:** make the complete game dependable on Windows. Foundation: strict saves, fixed ticks and headless owners; planned M9 package/release gates.
 
-Keep definition identity/version separate from mutable state. Validate fresh state atomically before replacing the controller. Capture RNG, orders, partial travel, cohort traits and ownership; absent legacy fields have explicit safe defaults. Preserve the player's saved slot/settings; ending/restarting cannot silently overwrite them.
+Keep definition identity/version separate from mutable state. Validate fresh state atomically before replacing the controller. Capture RNG, orders, partial travel, cohort traits and ownership; cross-build migration/default adapters are not required. Protect the last good same-build slot/settings; ending/restarting cannot silently overwrite them.
 
 Bound journals, witnesses, representations and private replay storage with honest omission notices. No growing unbounded per-ant logs. Scenario content uses shared definitions and stable IDs. Tests are targeted, then one full final suite for code changes; docs use consistency gates.
 
-Ship a reproducible pinned-engine Windows export, clear launch/control/save instructions, asset inventory and supported-machine evidence. Test upgraded/corrupt saves and mature network/crisis/review states. **Acceptance:** clean-machine player run and measured stated desktop performance; no editor paths, secret debug view, new paid dependency or claim based only on headless success.
+Ship a reproducible pinned-engine Windows export, clear launch/control/save instructions, asset inventory and supported-machine evidence. Test same-build round trips, different-build rejection, corrupt files and mature network/crisis/review states. **Acceptance:** clean-machine player run and measured stated desktop performance; no editor paths, secret debug view, new paid dependency or claim based only on headless success.
 
 ## 4. Integration rules and handoff checklist
 
@@ -204,7 +206,7 @@ Ship a reproducible pinned-engine Windows export, clear launch/control/save inst
 | Network → isolation/evacuation → viability | Close traffic explicitly; count surviving local/transit continuation before failure; show knowledge rather than remote truth. |
 | Private history → post-run review | Never a source for normal gameplay reports or forecasts; revealed state closes that play path. |
 
-For every implementation card, specify its catalog/system IDs, visible benefit, dependencies, exact owned state/command changes, invariants/migration, known waiting/failure/recovery and targeted verification. A rule family earns reuse through one complete working entry before bulk content is added. Update Current Build and technical contracts only after actual verification; update the roadmap's completed milestone status with evidence.
+For every implementation card, specify its catalog/system IDs, visible benefit, dependencies, exact owned state/command changes, invariants/same-build persistence, known waiting/failure/recovery and targeted verification. A rule family earns reuse through one complete working entry before bulk content is added. Update Current Build and technical contracts only after actual verification; update the roadmap's completed milestone status with evidence.
 
 155 implements direct two-way supplies and whole worker migration on each established adjacent link, using one shared route/segment and exclusive traffic slot, real costs/travel, captured adult bundles and delayed receipts. The first paid-job owners remain aliases. Coordinated multi-hop delivery, queen/brood rescue and isolation/abandonment remain M5 planned work.
 

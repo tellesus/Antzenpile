@@ -1,5 +1,7 @@
 # 186 — Optional armed search and plain worker borrowing
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete, published to main and included in the Windows beta. Player acceptance remains open.
 
 Player-approved outcome: after a returned unexplained loss, choose Search and Defend with a whole worker count immediately. The three-worker danger survey is optional. Fight only a predator actually encountered along the route; identity and outcomes need a real returned report. Hunt still requires confirmed predator evidence. Known surface/residue hazards remain unassailable. Rename the staffing permission to Borrow workers from other jobs: OFF/ON, explaining interruptions and protected care/building.

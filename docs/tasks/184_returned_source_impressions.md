@@ -1,5 +1,7 @@
 # 184 — Returned source impressions
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete, published to main and included in the Windows beta. Player acceptance remains open.
 
 Outcome: identified sources resolve into distinct luminous wisps: nectar, aphid honeydew, soft fruit, cracked seeds, crumbs, dew, puddle, sheltered seep and generic broken remains. All ten existing source profiles are covered; insect and hunted remains share a coarse broken-shell impression rather than inventing a species. Keep nutrient-family glow with a localized accent.

@@ -1,5 +1,7 @@
 # 180 — Sensorium art direction and clear playfield
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete, published to main and included in the refreshed Windows systems beta. Player art/feel and final release acceptance remain open. Player requests a substantial visual revision with polish and pop, beyond the earlier trail/cloud proofs.
 
 Outcome: softer flowing chemical volumes, readable illuminated ants, distinct luminous INWARD organs connected by delicate living filaments, a coherent dark interface, and an Escape menu that removes persistent Help/Sound/Save/Load clutter. Preserve known-information boundaries, authoritative simulation, all existing semantic actions and compact/mouse/touch access.

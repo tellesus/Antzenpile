@@ -1,5 +1,7 @@
 # 153 — Returned shelter profiles and founding choices
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M5-A/SYS-02/03/09/11/13/14, SITE-LOAM/ROOT/STONE/EDGE.
 
 Outcome: returned scouts distinguish supported shelter/access/damp cues; the player can compare alternative remembered sites and choose the first daughter location. A covered root/stone site trades preparation food/time and damp pressure for lower heat exposure; an edge opening prepares faster with ordinary exposed climate. Safety, unseen resources and future disturbances remain unknown.

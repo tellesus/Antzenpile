@@ -1,5 +1,7 @@
 # 145 — Ventilation Gallery and local effort controls
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M2-C/SYS-01/05/11/13, CH-VENTILATION.
 
 Outcome: build a paid Ventilation Gallery to improve existing humidity/temperature regulation, with actual local staff/water still required. Choose whole climate/cleanup effort within their authored modeled ranges, with suggestions and visible payer/care/limits. Standing scouting effort also gets whole-count controls within the shared cap.

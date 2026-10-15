@@ -1,5 +1,7 @@
 # Portable Windows systems beta
 
+**Current development save policy (2026-10-15):** [Same-build saves only](SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly verified M1–M7 build for player review. Extract the complete ZIP and open `Antzenpile/Antzenpile.exe`; keep its `.pck` beside it. The editor, Python and authoring tools are not needed to play. This is not the final Windows 1.0 release.
 
 ## Current playable baseline

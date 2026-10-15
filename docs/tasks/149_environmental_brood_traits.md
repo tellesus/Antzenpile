@@ -1,5 +1,7 @@
 # 149 — Heat and Moisture Resilience
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M3-B/SYS-06/07/11/13/14, AT-HEAT/MOISTURE.
 
 Outcome: learn from local warm/dry brood strain and surviving progression, then queue inherited environment traits. Heat Resilience reduces warm-brood slowdown at a cost of slower comfortable development. Moisture Resilience reduces dry slowdown at a cost of extra larval carbohydrate. Existing paid cohorts retain their captured inheritance; no outdoor immunity, free water or zero-care exception.

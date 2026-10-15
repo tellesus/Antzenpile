@@ -1,8 +1,12 @@
 # Working on Antzenpile
 
+**Current development save policy (2026-10-15):** [Same-build saves only](docs/SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Translate the current design into code; do not invent major game systems during implementation. When the player explicitly requests design/planning work, develop it in the systems bible/catalogs and distinguish planned rules from implemented contracts.
 
 ## Begin each task
+
+- Follow `docs/SAVE_POLICY.md` and `docs/DEVELOPMENT_GOALS.md`: development saves are same-build only. Do not maintain, investigate, migrate or add compatibility tests for previous-build saves. Older card requirements are superseded; revisit only for true public release preparation.
 
 - `main` is the canonical development game. Inspect status, branch and upstream before editing; fetch and start from current `origin/main`, preserving local user files. Do not resume historical topic branches. Use a short-lived branch only when needed and integrate its completed, authorized work into `main` at delivery. Refresh the Windows package after runtime changes so the default playable build includes that work. See `docs/tasks/177_main_consolidation.md`.
 

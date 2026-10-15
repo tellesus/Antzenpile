@@ -1,5 +1,7 @@
 # 150 — Rapid Trail Repair
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M3-C/SYS-04/06/07/13/14, AT-REPAIR.
 
 Outcome: returned experience of a worn or rain-disturbed food trail, followed by surviving brood progression, reveals Rapid Trail Repair. A paid trial gives future adult travelers a stronger replacement scent contribution on worn existing routes, at a recurring journey-carbohydrate cost. Complete the ten-leaf registry/web before M4 queen continuity.

@@ -1,5 +1,7 @@
 # Coding rules
 
+**Current development save policy (2026-10-15):** [Same-build saves only](SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 ## Scope and style
 
 - Current design/order lives in `SYSTEMS_BIBLE.md`, `ROADMAP_1_0.md` and their catalogs; `CURRENT_BUILD.md` records implemented status. Archived documents are historical evidence only. Do not treat a catalog entry or future schema as an existing API.
@@ -38,7 +40,7 @@ See README for verified Windows setup. Tests should exercise behavior and invari
 | Trails | Allocation, real recall travel, cohort accounting, delayed resource delivery |
 | Chemistry/rain | Pheromone decay, slower familiarity loss, exposed vs sheltered rain response |
 | Brood/chambers | Maturation conserves accounting; labor/resources/time gate development |
-| Save/load | Continued state equals saved/reloaded continuation |
+| Save/load | Same-build continued state equals saved/reloaded continuation; different builds reject atomically. No old-save migration work. |
 | Presentation | No truth leaks; bearing wrap; mouse/touch shared paths; debug isolation |
 
 Run focused checks during implementation and the full headless suite once when code is final; record actual timing as the suite grows rather than assuming its old four-second cost. Bounded history now adds save/continuation coverage; repeated gates still need a changed result or implementation reason. Repeat it when a subsequent fix can affect simulation or shared contracts. Run the editor import when adding or changing Godot resources, Main smoke for runtime/scene changes, and a graphical/manual probe for affected UI, art, input or audio. Do not routinely repeat all three for documentation-only changes or after an unchanged passing result. A headless pass does not prove renderer performance, touch usability, or music synchronization. Record platform and engine version for performance evidence; do not invent device budgets or claim Android validation from a desktop-only run.

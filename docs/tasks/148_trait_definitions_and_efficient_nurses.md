@@ -1,5 +1,7 @@
 # 148 — Trait definitions and Efficient Nurses
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M3-A/SYS-05/06/07/13/14, AT-NURSES plus six existing leaves.
 
 Outcome: inspect consistent definition-driven tradeoffs/evidence/cost/expression for the existing six traits, and earn/queue Efficient Nurses after supported brood/care experience. Adult carriers improve the pile's actual care ratio; inheriting larvae require extra nutrition. No instant adult conversion, free caregivers or change to earlier captured brood.

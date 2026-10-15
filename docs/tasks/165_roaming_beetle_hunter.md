@@ -1,5 +1,7 @@
 # 165 — Roaming beetle hunter
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M6-D / ECO-ROAMER / SC-GARDEN / SYS-10/13/14.
 
 Outcome: fresh Garden Edge runs have a beetle-like hunter patrolling a short exposed feeding corridor. A close returning survey reports its dated outline/course; a later party may find it elsewhere or fail to find it. Players can recheck, Clear/Hunt, reinforce/retreat or test another approach. Alternative food remains useful.

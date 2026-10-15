@@ -1,5 +1,7 @@
 # 176 — Run and inspect the neon trail proof
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Integration update: the player's subsequent [177](177_main_consolidation.md) request merged PR #2 and the systems beta into `main`. Earlier draft/merge recommendations below are historical; final visual acceptance remains follow-up work.
 
 Player outcome: PR #2 has an actual Godot 4.7.2 runtime and rendered visual baseline before further M8 effects are built. Scope is presentation validation and corrections to reproducible trail defects; simulation, gameplay, music and the later UI redesign remain unchanged.

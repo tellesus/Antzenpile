@@ -1,5 +1,7 @@
 # 173 — Practical late connection pressure
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M7-C / ECO-TAINT / SC-ROADSIDE / SYS-09/10/11/14.
 
 Outcome: a fresh reported Roadside network can actually encounter suspect connection cargo, receive dated evidence, close/recall deliberately and recover through safer local intake. The original1200–1800 window preceded ordinary reported links2002–2092 in172; it did not supply a useful cold-run decision.

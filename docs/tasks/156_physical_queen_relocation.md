@@ -1,5 +1,7 @@
 # 156 — Physical laying-queen relocation
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete (2026-10-12). M5-D/SYS-07/09/13/14.
 
 Outcome: an established connection can move its actual living laying queen, her captured condition/identity/ancestry/inheritance and a paid escort to an adjacent queenless nest. An endangered mother can continue the same lineage elsewhere; a lost Home does not require destroying a viable daughter. Existing paid brood stays with its actual local owner and mother history. Brood/store evacuation follows as a separate useful entry.

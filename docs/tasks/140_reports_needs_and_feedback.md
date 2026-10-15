@@ -1,5 +1,7 @@
 # 140 — Persistent returned reports and current needs
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M1-B, SYS-02/13/14.
 
 Outcome: Reports is available from normal play in either view; important returned/local facts persist with seen/received dates, bounded routine delivery groups and saved read state. History links inspect their owning source/conflict/organ without dispatch. Current needs exposes simultaneous guest/food/care/climate/reserve issues and keeps work-in-progress lower than unattended strain. Extend neutral pointer feedback into common control feedback across normal menus/views.

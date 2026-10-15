@@ -1,5 +1,7 @@
 # 142 — Compare remembered sources and understand scouting
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M1-D/SYS-02/03/13.
 
 Outcome: Home and Daughter source browsers compare reported age, delivered intake, assignment/queued labor and known danger, with a selectable stable sort. Standing Exploration explains local/shared effort, manual missions, source priorities and the actual wait reason. Turning attention remains distinct from dispatch intent.

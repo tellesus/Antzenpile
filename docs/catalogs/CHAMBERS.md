@@ -1,5 +1,7 @@
 # Functional chamber catalog
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Current 1.0 design. Shared rules: [SYS-05](../SYSTEMS_BIBLE.md#sys-05-inward-economy-and-functional-chambers), [SYS-06](../SYSTEMS_BIBLE.md#sys-06-brood-reproduction-and-investment-queues). Delivery: [M2/M6](../ROADMAP_1_0.md). These are functional organs in an abstract network, not a tunnel-building game.
 
 ## Rules family

@@ -1,5 +1,7 @@
 # 168 — Supported heavy-passage evidence
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M6-G / ECO-HEAVY / SC-ROADSIDE / SYS-10/13/14.
 
 Outcome: returned Roadside evidence can distinguish a large animal's passage from an unexplained heavy impact. Repeated close witnesses of distinct physical passages can support a dog-like impression. The dated trace opens investigation/withdrawal/alternate-course controls; fighting remains inappropriate. Old generic worlds and reports stay generic.

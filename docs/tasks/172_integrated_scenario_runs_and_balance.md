@@ -1,5 +1,7 @@
 # 172 — Integrated scenario runs and purposeful balance
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M7-B / SC-BACKYARD/GARDEN/ROADSIDE / SYS-03–12/14.
 
 Outcome: each setting has a demonstrated opening → worker/organ growth → inherited tradeoff → paid reproductive/network growth → recoverable pressure → lineage continuation. Decisions use returned/local information and ordinary commands. Publish a small evidence matrix with practical choice/recovery results and material limitations; no fixed play-session target or broad parameter sweep.

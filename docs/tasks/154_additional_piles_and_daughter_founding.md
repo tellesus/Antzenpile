@@ -1,5 +1,7 @@
 # 154 — Additional piles and daughter-origin founding
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M5-B/SYS-02/03/05/06/08/09/13/14.
 
 Outcome: an established daughter can fund a real founding party to another returned site, producing a later-generation independently staffed pile. Home plus two daughters can gather, scout, care, grow and make maternal investments locally, with stable names and free attention switching. Preserve the working first Home/Daughter supply connection; generalized transport/rescue follows next.

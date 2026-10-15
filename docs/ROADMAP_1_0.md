@@ -1,5 +1,7 @@
 # Antzenpile 1.0 roadmap
 
+**Current development save policy (2026-10-15):** [Same-build saves only](SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Current plan, 2026-10-05. Supersedes the archived post-slice, interface and desktop release plans. The [systems bible](SYSTEMS_BIBLE.md) owns rules; its [catalogs](README.md) own concrete content; [current build](CURRENT_BUILD.md) owns implemented status. This roadmap owns order and release gates.
 
 ## The release promise
@@ -136,3 +138,5 @@ Ten resources/traits mean named distinct entries using common rules, not ten ind
 ## Deliberately after 1.0
 
 Mobile packaging/device optimization; detailed mating flights, individual genomes, latent-trait drift/reselection; large animal/species catalogs and detailed human behavior; beneficial-guest diplomacy; large automated logistics empires; comprehensive annual seasons/campaign/destination travel; fungi/seed-processing industry and arbitrary new currencies. These remain visible longer-term options, not unfinished release requirements. Strong evidence or a direct player instruction can change this boundary in Decisions and the roadmap together.
+
+Development policy: backward-compatible saves are not an M8/M9 limited-beta deliverable. Same-build persistence and explicit different-build rejection remain required. Define any supported release/migration contract only during true public release preparation. Current ordered work is in [Development goals](DEVELOPMENT_GOALS.md).

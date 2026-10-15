@@ -1,5 +1,7 @@
 # Current build and gaps
 
+**Current development save policy (2026-10-15):** [Same-build saves only](SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Baseline: gameplay through card 174; design reset through 138. The pre-reset gameplay reference was `774adb95c6e628ca5bcf7efc4efbe02339a0925b`. This document records implementation, not future promises.
 
 ## Implemented foundation

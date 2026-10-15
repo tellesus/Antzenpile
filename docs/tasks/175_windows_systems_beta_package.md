@@ -1,5 +1,7 @@
 # 175 — Portable Windows systems beta
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M1–M7 review handoff / M9 packaging foundation.
 
 Outcome: the player can extract a Windows x86_64 ZIP and launch Antzenpile without an editor or repository. This is a systems beta, not Windows 1.0 or final presentation/performance acceptance.

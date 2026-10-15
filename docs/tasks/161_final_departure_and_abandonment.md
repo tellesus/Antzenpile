@@ -1,5 +1,7 @@
 # 161 — Final departure and nest abandonment
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete (2026-10-13). M5-F / SYS-04/09/13/14.
 
 Outcome: after staged queen/dependent/store rescue, the player can send the remaining whole local workforce to an adjacent nest and deliberately relinquish the empty origin. Final departure is a paid one-way party; there is no fictional messenger returning to an empty nest. Actual recipient arrival confirms the local receipt at the receiver. Source knowledge retains the departure, chosen destination and stock left behind.

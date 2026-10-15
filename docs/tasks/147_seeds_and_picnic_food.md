@@ -1,5 +1,7 @@
 # 147 — Heavier seeds and temporary picnic food
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M2-E/SYS-03/04/05/13/14, RES-SEED/CRUMBS.
 
 Outcome: Roadside offers finite cracked seeds (0.4C/0.6P, bulk1.5) and its existing temporary picnic becomes identified mixed crumbs (0.8C/0.2P, bulk1). Same recipe/travel/receipt rules; different handling and availability support different choices. Existing saved generic nodes keep unit-primary behavior. Known carrying/fuel limits cannot invent carbohydrates to bootstrap low-carbohydrate mixed food.

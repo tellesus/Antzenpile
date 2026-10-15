@@ -1,5 +1,7 @@
 # Nest sites and scenario catalog
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Current 1.0 design. Shared rules: [SYS-09](../SYSTEMS_BIBLE.md#sys-09-sites-nests-and-network-transport), [SYS-12](../SYSTEMS_BIBLE.md#sys-12-scenario-chapters-viability-and-endings). Delivery: [M5/M7](../ROADMAP_1_0.md). Existing settings remain Backyard, Garden Edge and Roadside.
 
 ## Site rules family

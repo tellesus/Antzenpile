@@ -1,5 +1,7 @@
 # Current implementation architecture
 
+**Current development save policy (2026-10-15):** [Same-build saves only](SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Implementation baseline: gameplay through 154. This is a current technical reference, not a declaration that the [1.0 bible](SYSTEMS_BIBLE.md) is implemented. Historical card-by-card explanations are [archive-only](archive/pre_1_0/contracts/ARCHITECTURE.md).
 
 149 adds BroodEnvironment for local heat/dry larval exposure, surviving pupation eligibility and bounded inherited larval rates. Existing worker/reproductive owners retain care, food and paid cohort ownership. Moderate warmth relief cannot erase severe heat, wetness, health or refuse strain. Reproductive progress retains exact rates through a small integer remainder. Environment definitions/UI use the same registry and paid queue.

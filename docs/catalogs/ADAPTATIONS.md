@@ -1,5 +1,7 @@
 # Adaptation web and trait catalog
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Current 1.0 design. Shared rules: [SYS-07](../SYSTEMS_BIBLE.md#sys-07-adaptation-and-inherited-expression), lineage integration [SYS-08](../SYSTEMS_BIBLE.md#sys-08-queen-viability-and-lineages). Delivery: [M3/M4](../ROADMAP_1_0.md). Ten definition-driven traits exist through [150](../tasks/150_rapid_trail_repair.md); maternal-lineage and daughter investment integrated in [152](../tasks/152_maternal_lineage_and_daughter_reproduction.md); broader piles follow M5. This is a composite species, not literal genetics.
 
 ## Rules family

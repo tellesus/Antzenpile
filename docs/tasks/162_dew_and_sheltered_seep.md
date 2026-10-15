@@ -1,5 +1,7 @@
 # 162 — Dew and sheltered seep
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete (2026-10-13). M6-A / RES-DEW/RES-SEEP / SYS-02/03/04/13/14.
 
 Outcome: two distinct water choices join fresh Backyard/Garden Edge/Roadside settings. The nearer exposed plant droplets offer a small wetness-fed opportunity that dries away; a more sheltered seep offers slower dependable renewal near a damp/sheltered approach. The ten resource entries then have concrete identities and shared captured harvest/return handling. Existing puddle/nectar/food rates remain unchanged in this card.

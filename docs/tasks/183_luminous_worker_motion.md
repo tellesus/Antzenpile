@@ -1,5 +1,7 @@
 # 183 — Luminous workers and steady sensory travel
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete, published to main and included in the refreshed Windows beta. Player acceptance remains open.
 
 Outcome: sharper, brighter pearlescent workers with24 poses and moving antennae; independently phased gait tied to OUTWARD screen distance; stable opposing lanes, smooth endpoint fading, and steady travel along curved scent paths. Improve the shared INWARD workers without altering functional jobs.

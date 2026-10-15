@@ -1,5 +1,7 @@
 # 164 — Supported stationary predator witnesses
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M6-C / ECO-AMBUSH / SYS-10/13/14.
 
 Outcome: a returned danger survey can describe a spider-like predator, with dated evidence in the conflict circle and Reports. Unexplained casualties remain unidentified. Existing Clear/Hunt, reinforcement, withdrawal, alternate approach and finite edible remains stay available and retain their current costs.

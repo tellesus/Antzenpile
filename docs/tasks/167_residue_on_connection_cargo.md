@@ -1,5 +1,7 @@
 # 167 — Residue on connection cargo
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M6-F / ECO-TAINT / SC-ROADSIDE / SYS-09/10/11/13/14.
 
 Outcome: fresh Roadside can expose a real supply/store party on the Home-to-edge connection. Actual carbohydrate cargo captures residue once; arrival/recall retains one owner and local chemistry. Returning carriers report strange residue on that link. A player can close it, stop repeating supplies or recall a finite store pack; committed parties still travel. Neither a live chemical reading nor a expiry countdown appears.

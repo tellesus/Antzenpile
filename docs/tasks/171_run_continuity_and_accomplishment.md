@@ -1,5 +1,7 @@
 # 171 — Run continuity and biological accomplishment
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M7-A / SYS-06/08/09/12/13/14.
 
 Outcome: COLONY STATUS explains the lineage's supported continuation, queenless recovery, isolated viable nests, labor stalls and confirmed failure. A worker brood raised by a later-generation mother earns a dated biological accomplishment with continued play or voluntary review. No session timer, hidden-event ending, free queen or forced reveal.

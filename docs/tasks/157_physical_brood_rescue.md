@@ -1,5 +1,7 @@
 # 157 — Physical worker-brood rescue
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete (2026-10-12). M5-D/SYS-04/06/07/09/13/14.
 
 Outcome: choose one actual paid worker-brood cohort at a nest and move its surviving eggs/larvae/pupae through an established adjacent connection. Actual carriers, carers, prepaid travel/feeding and a real messenger protect the body; its captured stage/progress, original mother, inheritance and past losses survive arrival or physical recall. A relocated mother can receive her existing dependent brood without manufacturing another cohort or giving imported adults new traits. Store/reproductive-group rescue and isolation/abandonment remain the next useful entries.

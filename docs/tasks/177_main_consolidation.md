@@ -1,5 +1,7 @@
 # 177 — Consolidate the main development game
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. No runtime/gameplay change in this card.
 
 Player outcome: one canonical `main` checkout and playable Windows build contain the systems beta and recovered neon-trail proof. Future tasks start from current `origin/main`; incomplete work remains in the shared backlog rather than competing long-lived branches.

@@ -1,5 +1,7 @@
 # 178 — Current-build save and review reliability
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete within the player's revised current-build scope; published to main and the Windows beta. Historical failure unrecovered.
 
 Player report: “I played a short run, saved, watched the replay, and then when I tried to restore from save it said it failed validation.”

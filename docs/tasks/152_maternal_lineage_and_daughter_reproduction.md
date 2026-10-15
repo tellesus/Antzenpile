@@ -1,5 +1,7 @@
 # 152 — Maternal lineage and daughter reproduction
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M4-B/SYS-06/07/08/09/13/14, CH-QUEEN and all ten adaptations.
 
 Outcome: an established daughter can queue/fund reproductive groups and paid adaptation trials with Auto Brood on. New offspring/reproductives inherit their laying queen's owned bundle, independent of immigrant adult phenotypes. Paid groups retain their captured parent/bundle through maternal loss, replacement and later founding. A daughter can replace a lost queen using her own funded group. Generalized daughter-origin founding remains M5.

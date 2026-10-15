@@ -1,5 +1,7 @@
 # 151 — Queen viability and local replacement
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M4-A/SYS-05/06/08/11/13/14, CH-QUEEN.
 
 Outcome: local queen weakening is visible and has a paid response; prolonged unsupported nutrition/severe local conditions can kill a laying queen. Workers and funded brood keep their owners. A ready, actually raised reproductive group can fund coarse local mating/establishment and replace a lost queen, preserving a path to new laying.

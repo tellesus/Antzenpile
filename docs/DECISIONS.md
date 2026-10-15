@@ -1,5 +1,7 @@
 # Current decisions
 
+**Current development save policy (2026-10-15):** [Same-build saves only](SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Active policy register after the 1.0 documentation reset, 2026-10-05. The [archive snapshot](archive/pre_1_0/contracts/DECISIONS.md) preserves A01–A86 and implementation history; it is not an independent current roadmap. This register carries forward the applicable boundaries and records new accepted scope. Direct player instructions take precedence.
 
 ## A87 — 1.0 foundation and modular planning reset
@@ -54,3 +56,5 @@ Gathering UI181 (2026-10-15): the player accepts the improved visual direction, 
 Armed search186 (2026-10-15): the player approves replacing compulsory three-worker predator surveys with optional armed search after returned losses, plus explicit Borrow workers from other jobs OFF/ON. Use real route travel/contact, clear/defend only until predator confirmation, actual returned identity/results, optional cautious survey and unchanged ground avoidance/care/ledger rules. The player authorizes continuing through remaining tracked bugs, art/interface/music/release revisions and then gameplay/interface review without routine pauses; this is not human acceptance or authorization to invent Post-1.0 systems.
 
 Current-save scope178 (2026-10-15): the player explicitly excludes historical save compatibility; validate saves created while testing current main. Stop historical migration/root-cause work, preserve original/private files and do not claim the old unconfirmed failure recovered. Validate the exact serialized payload before replacing a slot and exercise current save → ended review → load → deterministic continuation.
+
+2026-10-15 development policy supersession: the player explicitly tables all preservation/loading/migration of previous-build saves until true release preparation. Same-build save/restart/review/reload and atomic rejection remain required. No earlier goal/card/catalog or evidence can reintroduce compatibility work. See SAVE_POLICY.md and DEVELOPMENT_GOALS.md; keep remaining game work unified on main.

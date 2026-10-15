@@ -1,5 +1,7 @@
 # 144 — A paid reproductive alcove
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M2-B/SYS-05/06/13/14, CH-REPRODUCTIVE.
 
 Outcome: invest nutrition, four construction workers and time in one dedicated eight-space reproductive alcove, then raise a reproductive group alongside the existing worker Nursery capacity. Nurses/feeding/queue priority remain real. Inspect the organ and its independent project/occupancy at either pile; Queen still owns reproductive intent.

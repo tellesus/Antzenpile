@@ -1,5 +1,7 @@
 # 141 — Flexible gathering commitments
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M1-C/SYS-01/03/04/13.
 
 Outcome: choose a whole gathering target before committing, with five as a suggestion rather than a required batch. Free local workers can fund part of an explicit order; the remainder waits for care-protected labor. Current assigned/queued/travel/recall and depletion are readable at Home/Daughter sources. Never automatically replace reported casualties just because a target remains higher than surviving labor.

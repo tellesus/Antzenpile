@@ -1,5 +1,7 @@
 # 143 — Queue reproductive investment with Auto Brood
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M2-A/SYS-05/06/13/14.
 
 Outcome: leave Auto Brood on, queue one reproductive group, see what it needs and cancel/reorder it while unfunded. One queued adaptation and one reproductive intent may coexist. The earlier queued intent is next unless deliberately reordered. Existing paid brood continues; eligible special investment has priority over new ordinary laying, while structurally ineligible early intent permits ordinary growth toward its prerequisites.

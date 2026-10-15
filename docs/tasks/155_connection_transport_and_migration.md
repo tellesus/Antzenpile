@@ -1,5 +1,7 @@
 # 155 — Connection supplies and worker migration
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete (2026-10-12). M5-C/SYS-04/05/09/13/14.
 
 Outcome: choose an actual adjacent colony connection, paying pile, recipient and supplies or worker migration. Every established parent/child link supports useful two-way traffic with actual travel and reported receipts; three piles can specialize and resupply one another. A shared connection cannot simultaneously carry conflicting jobs/directions. Preserve existing paid Home/Daughter jobs and their receipts across migration.

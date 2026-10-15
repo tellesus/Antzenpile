@@ -1,5 +1,7 @@
 # Current UI contracts and development boundaries
 
+**Current development save policy (2026-10-15):** [Same-build saves only](SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Baseline: gameplay through 154. [SYS-13](SYSTEMS_BIBLE.md#sys-13-interface-communication-and-presentation) defines intended 1.0 communication. Eight identities, common feedback, reports, source comparisons, flexible gathering/local effort, reproductive queues and paid Alcove/Gallery work; remaining content stays planned.
 
 149 reveals Environment only after local larval strain or inherited lineage. A revealed leaf explains that exposed larvae must survive to pupation; heat/dry benefit, recurring cost, queue/paid lock and adult carrier count remain distinct. Environmental effects follow the laid brood, not current adult share. Family navigation remains free.

@@ -1,5 +1,7 @@
 # Resource and source catalog
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Current 1.0 design. Shared rules: [SYS-03](../SYSTEMS_BIBLE.md#sys-03-resource-sources-and-nutrition), [SYS-04](../SYSTEMS_BIBLE.md#sys-04-trails-travel-and-cargo). Delivery: [M1/M2/M6](../ROADMAP_1_0.md). [Current build](../CURRENT_BUILD.md) distinguishes physical foundations from planned type support.
 
 Identity foundation [139](../tasks/139_returned_resource_identity.md) implements five original profiles. [146](../tasks/146_mixed_food_cargo.md) adds Garden Edge fruit; [147](../tasks/147_seeds_and_picnic_food.md) adds Roadside seeds/picnic crumbs. [162](../tasks/162_dew_and_sheltered_seep.md) adds exposed wetness-fed droplets and a sheltered slow seep; [163](../tasks/163_flexible_producer_tending.md) completes flexible paid aphid service. All ten profiles now use actual captured nutrition/handling/receipts. Original single-role rates stay unchanged. Unimplemented ratios are design seeds.

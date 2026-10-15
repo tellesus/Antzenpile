@@ -1,5 +1,7 @@
 # 139 — Concrete resource identity from returned samples
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M1-A; SYS-02/03/04/13; RES-NECTAR/HONEYDEW/INSECT/HUNT/PUDDLE.
 
 Outcome: recognized foods/water have readable concrete names and stable colony labels; broad cues stay unidentified, source browsers/contexts use the same identity and old generic saves remain generic. Carrying a sample home can establish identity. Keep nutrient stores, quantities, travel, ecology rates and costs unchanged.

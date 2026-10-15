@@ -1,5 +1,7 @@
 # 158 — Finite store rescue
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete (2026-10-12). M5-D / SYS-07/09/13/14.
 
 Outcome: Entrance lets the player choose a nutrient and a whole finite amount, then move that actual stock to an adjacent nest in one paid trip. Eight real carriers return; this never creates a repeating supply intent or reserves settlers. Existing carrying traits bound the pack. Inspection and cargo drafting are free; ORDER pays cargo and round-trip travel once.

@@ -1,5 +1,7 @@
 # 138 — Reset the documentation around Antzenpile 1.0
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete — documentation/design only, 2026-10-05.
 
 Player outcome: one current 1.0 roadmap and a modular systems bible with concrete resource, chamber, adaptation, ecology and scenario catalogs. Clearly distinguish shipped foundations, planned 1.0 work and later scope. Retire superseded plans, implementation history and reviews to an explicitly non-authoritative archive; preserve their evidence and links.

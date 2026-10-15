@@ -1,5 +1,7 @@
 # 181 — Clear gathering commitments
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete, published to main and included in the refreshed Windows systems beta. Player usability acceptance remains open. Continue the approved presentation plan; defer newly noticed gameplay issues.
 
 Outcome: one prominent commitment button with proposed total, already assigned/queued labor, available protected labor and expected change clearly separated. Shared Home/Daughter controls preserve free editing, useful presets and cancellation. Acknowledgments describe the accepted target/queue without implying arrival or harvest. Entry actions identify planning versus recall.

@@ -1,5 +1,7 @@
 # 169 — Refuge and a local ground crisis
 
+**Current development save policy (2026-10-15):** [Same-build saves only](../SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 Status: complete. M6-H / CH-REFUGE / ECO-NEST / SC-ROADSIDE / SYS-05/09/11/13/14.
 
 Outcome: a fresh Roadside colony can build a Refuge Chamber, choose reproductive or worker-brood priority, pay real carers/food/preparation and shelter named local dependents. An actual local ground-shift warning leads to refuge preparation, existing staged rescue/traffic controls, impact, settlement and recovery. Dated reports explain local losses/protection without a private countdown. Older worlds gain no crisis.

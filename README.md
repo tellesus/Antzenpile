@@ -1,5 +1,7 @@
 # Antzenpile
 
+**Current development save policy (2026-10-15):** [Same-build saves only](docs/SAVE_POLICY.md). Earlier requirements to preserve/load/migrate previous-build saves are superseded and tabled until true release preparation. Historical implementation/evidence below does not create a compatibility goal.
+
 A colony-scale strategy/4X game about learning an uncertain world, investing living ants, developing functional organs and continuing a lineage through an expanding nest network. Godot/GDScript, pinned **Godot 4.7.2, 2D Compatibility**, Windows desktop first.
 
 ## Current build
