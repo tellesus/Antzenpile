@@ -10,6 +10,7 @@ var changed: Callable
 var blocked: Callable
 var interaction_started: Callable
 var opened: bool = false
+var show_launcher: bool = true
 var feedback: String = ""
 var _font: Font = ThemeDB.fallback_font
 
@@ -32,7 +33,7 @@ func close_rect() -> Rect2:
 
 func activate_at(at: Vector2) -> bool:
 	if blocked.is_valid() and blocked.call(): return false
-	if button_rect().has_point(at):
+	if show_launcher and button_rect().has_point(at):
 		opened = not opened
 		return true
 	if not opened: return false
@@ -63,8 +64,9 @@ func _input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	if preferences == null or blocked.is_valid() and blocked.call(): return
-	UIStyle.surface(self, button_rect(), Color("18252b"))
-	_label(button_rect().position + Vector2(25,38), "SOUND", 14, Color("d3dcd4"))
+	if show_launcher:
+		UIStyle.surface(self, button_rect(), Color("18252b"))
+		_label(button_rect().position + Vector2(25,38), "SOUND", 14, Color("d3dcd4"))
 	if not opened: return
 	draw_rect(get_viewport_rect(), Color(0.025,0.04,0.06,0.82))
 	var panel: Rect2 = panel_rect()

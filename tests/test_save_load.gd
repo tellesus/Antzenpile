@@ -4,6 +4,7 @@ const Controller = preload("res://src/core/simulation_controller.gd")
 const Service = preload("res://src/core/save_service.gd")
 const Root = preload("res://src/core/game_root.gd")
 const Outward = preload("res://src/presentation/outward/outward_view.gd")
+const Menu = preload("res://src/presentation/colony_controls.gd")
 const Inward = preload("res://src/presentation/inward/inward_view.gd")
 
 const SLOT: String = "res://.godot/card021_test_slot.json"
@@ -95,23 +96,30 @@ func run(test: Object) -> bool:
 	root._outward_view = outward
 	outward.save_command = root.quick_save
 	outward.load_command = root.quick_load
-	var outward_save: Rect2 = outward._button_rect("save")
-	var outward_load: Rect2 = outward._button_rect("load")
-	test.check(outward_save.size == Vector2(100, 64) and outward_load.size == Vector2(100, 64) and not outward_save.intersects(outward_load), "OUTWARD offers distinct touch-sized save and load targets")
-	outward._pointer_press(outward_save.get_center(), "mouse")
-	test.check(outward._feedback == "Run saved", "Mouse save uses the same semantic GameRoot path")
-	root.simulation.advance(1.0)
-	outward._pointer_press(outward_load.get_center(), "touch")
-	test.check(outward._feedback == "Run loaded" and root.simulation.run.to_dict() == source, "Touch load replaces run and reports success")
 	var inward: InwardView = Inward.new()
 	root.add_child(inward)
 	root._inward_view = inward
-	inward.save_command = root.quick_save
-	inward.load_command = root.quick_load
-	var inward_save: Rect2 = inward._button_rect("save")
-	var inward_load: Rect2 = inward._button_rect("load")
-	test.check(inward_save.size == Vector2(100, 64) and inward_load.size == Vector2(100, 64) and not inward_save.intersects(inward_load), "INWARD offers distinct touch-sized save and load targets")
-	test.check(inward.activate_at(inward_save.get_center()) and inward._feedback == "Run saved", "INWARD touch save shares the semantic path")
+	var menu := Menu.new()
+	root.add_child(menu)
+	root._colony_controls = menu
+	menu.utility_command = root.menu_utility
+	for mode: String in ["outward", "inward"]:
+		root.set_mode(mode)
+		for kind: String in ["mouse", "touch"]:
+			var event: InputEvent = InputEventMouseButton.new() if kind == "mouse" else InputEventScreenTouch.new()
+			event.pressed = true
+			if event is InputEventMouseButton: event.button_index = MOUSE_BUTTON_LEFT
+			menu.open_menu()
+			var save: Rect2 = menu.utility_rect("save")
+			var load: Rect2 = menu.utility_rect("load")
+			test.check(save.size.y >= 44 and load.size.y >= 44 and not save.intersects(load), "Shared menu offers distinct touch-sized save/load targets")
+			event.position = save.get_center()
+			menu._input(event)
+			test.check(menu.feedback == "Colony saved", "%s %s saves through the semantic GameRoot path" % [mode,kind])
+			root.simulation.advance(1.0)
+			event.position = load.get_center()
+			menu._input(event)
+			test.check(not menu.opened and root.simulation.run.to_dict() == source, "%s %s load restores exactly and returns to play" % [mode,kind])
 	root.free()
 	DirAccess.remove_absolute(path)
 	DirAccess.remove_absolute(path + ".tmp")

@@ -4,7 +4,8 @@ extends RefCounted
 
 const MAX_MOTES: int = 12
 const CONTOUR_STEPS: int = 32
-const CLOUD = preload("res://assets/graphics/colony/material/scent_smoke.png")
+const CLOUD = preload("res://assets/graphics/sensorium/vapor_v2.png")
+const ORGAN = preload("res://assets/graphics/sensorium/organ_membrane_v2.png")
 const WATER = preload("res://assets/graphics/proof/water_impression.svg")
 const WORKER = preload("res://assets/graphics/proof/worker_walk.png")
 const SCENT_WORKER = preload("res://assets/graphics/proof/worker_scent.png")
@@ -23,11 +24,11 @@ static func impression_gain(signal_data: Dictionary, empty: bool) -> float:
 
 static func color_for(category: String) -> Color:
 	match category:
-		"carbohydrate": return Color("ffc05b")
-		"water": return Color("5ce8ff")
-		"protein": return Color("c993ff")
-		"nest_site": return Color("b2f59b")
-		"threat": return Color("ff7681")
+		"carbohydrate": return Color("ffbc48")
+		"water": return Color("38e5ff")
+		"protein": return Color("bb72ff")
+		"nest_site": return Color("a6f874")
+		"threat": return Color("ff588f")
 	return Color("a9cbbe")
 
 
@@ -101,14 +102,15 @@ static func cloud(canvas: Node2D, entry: Dictionary, time: float, empty: bool, d
 static func ant(canvas: Node2D, at: Vector2, direction: Vector2, color: Color, phase: float, scale: float = 1.0, interior: bool = false) -> void:
 	var frame: int = posmod(int(floor(phase * 18.0)), WALK_FRAMES)
 	var source := Rect2(Vector2(frame % 6, frame / 6) * WALK_CELL, Vector2.ONE * WALK_CELL)
-	var extent: float = (30.0 if interior else 24.0) * scale
+	var extent: float = (34.0 if interior else 38.0) * scale
 	canvas.draw_set_transform(at, direction.angle() + PI * 0.5)
 	if interior:
 		var tint: Color = Color(1.0, 0.95, 0.86, 0.95).lerp(color, 0.08)
 		canvas.draw_texture_rect_region(WORKER, Rect2(Vector2.ONE * -extent * 0.5, Vector2.ONE * extent), source, tint)
 	else:
-		canvas.draw_texture_rect_region(SCENT_WORKER, Rect2(Vector2.ONE * -extent * 0.58, Vector2.ONE * extent * 1.16), source, Color(color, color.a * 0.10))
-		canvas.draw_texture_rect_region(SCENT_WORKER, Rect2(Vector2.ONE * -extent * 0.5, Vector2.ONE * extent), source, color)
+		canvas.draw_texture_rect_region(SCENT_WORKER, Rect2(Vector2.ONE * -extent * 0.56, Vector2.ONE * extent * 1.12), source, Color(color, color.a * 0.24))
+		canvas.draw_texture_rect_region(WORKER, Rect2(Vector2.ONE * -extent * 0.5, Vector2.ONE * extent), source, Color(Color.WHITE.lerp(color, 0.18), color.a))
+		canvas.draw_circle(Vector2(0, -extent * 0.19), 0.75, Color(color.lightened(0.6), color.a))
 	canvas.draw_set_transform(Vector2.ZERO)
 
 
@@ -131,8 +133,13 @@ static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, w
 		canvas.draw_polyline(points, Color(color.lightened(0.3),color.a*0.85), 0.8, true)
 
 
-static func home_entrance(canvas: Node2D, center: Vector2) -> void:
+static func home_entrance(canvas: Node2D, center: Vector2, time: float = 0.0) -> void:
 	# Only immediate home substrate; no remote landscape or world coordinates.
 	# Broad immediate Home field. Its opening aligns with the existing sensory
 	# anchor; transparent upper space cannot introduce remote scenery.
-	canvas.draw_texture_rect(ENTRANCE,Rect2(center-Vector2(640,204),Vector2(1280,336)),false)
+	canvas.draw_texture_rect(ENTRANCE,Rect2(center-Vector2(640,204),Vector2(1280,336)),false,Color(0.30,0.37,0.46,0.65))
+	var at: Vector2 = center - Vector2(0, 16)
+	canvas.draw_set_transform(at, 0.025 * sin(time * 0.2))
+	canvas.draw_texture_rect(CLOUD,Rect2(-Vector2(225,92),Vector2(450,184)),false,Color(1.0,0.60,0.18,0.12))
+	canvas.draw_texture_rect(ORGAN,Rect2(-Vector2(168,57),Vector2(336,114)),false,Color(1.0,0.69,0.26,0.82))
+	canvas.draw_set_transform(Vector2.ZERO)

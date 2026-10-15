@@ -18,7 +18,7 @@ func run(test: Object) -> bool:
 	touch.position = controls.choice_rect("guide").get_center()
 	controls._input(touch)
 	test.check(controls.status_open and not controls.guide_open, "Menu status opens separately from Help")
-	# The status panel retains direct Help access; the top-level Help button also works.
+	# The status panel retains direct Help access.
 	controls._input(touch)
 	test.check(controls.opened and controls.guide_open and controls.guide_page == 0, "Requested guide opens through touch without automatic tutorial")
 	for page: int in Controls.GUIDE.size():
@@ -32,6 +32,7 @@ func run(test: Object) -> bool:
 	mouse.position = controls.guide_rect("back").get_center()
 	controls._input(mouse)
 	test.check(not controls.guide_open and not controls.opened, "Close Help returns to play without opening restart choices")
+	controls.open_menu()
 	controls.activate_at(controls.help_button_rect().get_center())
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE

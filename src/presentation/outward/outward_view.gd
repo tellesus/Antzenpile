@@ -88,6 +88,7 @@ func show_feedback(message: String, rejected: bool = false) -> void:
 
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	chemical_field = CloudField.new()
 	add_child(chemical_field)
 
@@ -624,7 +625,7 @@ func _button_at(at: Vector2) -> String:
 			if not radial_command.is_empty(): return radial_command
 		elif (chosen_route.get("reported_losses",0) > 0 or not chosen_route.get("residue_report",{}).is_empty() or not chosen_route.get("passage_memory",{}).is_empty() or chosen_route.get("conflict_report", "") != "") and _journey_rect("journey_open").has_point(at): return "journey_open"
 		if _journey_attention():
-			for command: String in ["scout","pause","speed_1","speed_4","speed_16","speed_64","inward","save","load","sources"]:
+			for command: String in ["scout","pause","speed_1","speed_4","speed_16","speed_64","inward","sources"]:
 				if _button_rect(command).has_point(at): return command
 			return ""
 		if _is_honeydew(_selected_signal()):
@@ -649,7 +650,7 @@ func _button_at(at: Vector2) -> String:
 		for command: String in contextual:
 			if _trail_button_rect(command).has_point(at):
 				return command
-	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load", "sources"]:
+	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "sources"]:
 		if _button_rect(command).has_point(at):
 			return command
 	return ""
@@ -659,7 +660,7 @@ func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	_prepare_signal_captions(size)
 	_draw_rain(size)
-	Art.home_entrance(self,Vector2(size.x*0.5,size.y*0.78))
+	Art.home_entrance(self,Vector2(size.x*0.5,size.y*0.78),_animation_time)
 	_draw_trails(size)
 	_draw_scout_traces(size)
 	_draw_anchor(size)
@@ -852,7 +853,7 @@ func _signal_caption(signal_data: Dictionary) -> String:
 
 
 func _draw_hud(size: Vector2) -> void:
-	_label(Vector2(24, 38), "OUTWARD  /  " + _status.get("pile_name","Home").to_upper(), Color("dad7c8"), 22)
+	UIStyle.heading(self, Vector2(24, 42), "OUTWARD", _status.get("pile_name", "Home"))
 	_label(Vector2(24, 63), "Drag to turn. Tap a trace to listen.", Color("82939c"), 13)
 	if _status.get("rain_phase", "") == "raining":
 		_label(Vector2(24, 92), "RAIN / cooled air · scent disturbed", Color("8aadb8"), 13)
@@ -1190,7 +1191,7 @@ func _draw_trail_button(command: String, title: String) -> void:
 
 
 func _draw_controls(size: Vector2) -> void:
-	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "save", "load", "sources"]:
+	for command: String in ["scout", "pause", "speed_1", "speed_4", "speed_16", "speed_64", "inward", "sources"]:
 		var box: Rect2 = _button_rect(command)
 		var active: bool = command.begins_with("speed_") and not _status.is_empty() and int(command.trim_prefix("speed_")) == _status.time_scale
 		var unavailable: bool = command == "scout" and not exploration_command.is_valid() and not _status.is_empty() and (_status.available_workers < 1 or _status.active_scouts >= _status.scout_cap)

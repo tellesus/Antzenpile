@@ -15,6 +15,9 @@ var confirm_end: bool = false
 var blocked: Callable
 var interaction_started: Callable
 var opened: bool = false
+var utility_command: Callable
+var escape_context: Callable
+var feedback: String = ""
 var selected_scenario: String = "backyard_slice"
 var guide_open: bool = false
 var guide_page: int = 0
@@ -39,16 +42,29 @@ func _ready() -> void:
 func _process(_delta: float) -> void: queue_redraw()
 
 func button_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 436,78,100,64)
+	return Rect2(get_viewport_rect().size.x - 100,78,76,44)
 
 func help_button_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 544, 78, 100, 64)
+	return utility_rect("help")
 
 func panel_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 432,156,408,430)
+	var size: Vector2 = get_viewport_rect().size
+	return Rect2((size - Vector2(728,470)) * 0.5, Vector2(728,470))
 
 func choice_rect(choice: String) -> Rect2:
-	return Rect2(panel_rect().position + Vector2(24,148 if choice == "repeat" else 200 if choice == "fresh" else 356 if choice == "guide" else 304 if choice == "end" else 252),Vector2(360,44))
+	return Rect2(panel_rect().position + Vector2(24,148 if choice == "repeat" else 200 if choice == "fresh" else 356 if choice == "guide" else 304 if choice == "end" else 252),Vector2(328,44))
+
+func utility_rect(action: String) -> Rect2:
+	return Rect2(panel_rect().position + Vector2(376,94 + ["save", "load", "sound", "help", "pause"].find(action) * 54), Vector2(328,44))
+
+func open_menu() -> void:
+	opened = true
+	confirm_end = false
+	guide_open = false
+	status_open = false
+	feedback = ""
+	if scenario_provider.is_valid(): selected_scenario = scenario_provider.call()
+	if interaction_started.is_valid(): interaction_started.call()
 
 
 func guide_rect(command: String) -> Rect2:
@@ -56,22 +72,19 @@ func guide_rect(command: String) -> Rect2:
 
 
 func scenario_rect() -> Rect2:
-	return Rect2(panel_rect().position + Vector2(24,94), Vector2(360,44))
+	return Rect2(panel_rect().position + Vector2(24,94), Vector2(328,44))
 
 func activate_at(at: Vector2) -> bool:
 	if blocked.is_valid() and blocked.call(): return false
-	if help_button_rect().has_point(at):
+	if opened and not confirm_end and not status_open and not guide_open and help_button_rect().has_point(at):
 		opened = true
 		guide_open = true
 		status_open=false
 		guide_page = 0
 		return true
 	if button_rect().has_point(at):
-		opened = not opened
-		confirm_end = false
-		guide_open = false
-		status_open=false
-		if opened and scenario_provider.is_valid(): selected_scenario = scenario_provider.call()
+		if opened: opened = false
+		else: open_menu()
 		return true
 	if not opened: return false
 	if confirm_end:
@@ -91,6 +104,13 @@ func activate_at(at: Vector2) -> bool:
 		elif guide_rect("previous").has_point(at): guide_page = maxi(0,guide_page - 1)
 		elif guide_rect("next").has_point(at): guide_page = (guide_page + 1) % GUIDE.size()
 		return true
+	for action: String in ["save", "load", "sound", "pause"]:
+		if utility_rect(action).has_point(at):
+			if utility_command.is_valid():
+				var result: Dictionary = utility_command.call(action)
+				feedback = result.get("reason", "")
+				activation.outcome(result)
+			return true
 	if choice_rect("end").has_point(at): confirm_end=true; return true
 	if choice_rect("guide").has_point(at):
 		status_open = true
@@ -114,8 +134,10 @@ func activate_at(at: Vector2) -> bool:
 
 func _input(event: InputEvent) -> void:
 	if blocked.is_valid() and blocked.call(): return
-	if opened and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		opened = false
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+		if opened: opened = false
+		elif escape_context.is_valid() and escape_context.call(): pass
+		else: open_menu()
 		get_viewport().set_input_as_handled()
 		return
 	var press: bool = event is InputEventScreenTouch and event.pressed or event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
@@ -129,9 +151,7 @@ func _input(event: InputEvent) -> void:
 func _draw() -> void:
 	if blocked.is_valid() and blocked.call(): return
 	UIStyle.surface(self, button_rect(),Color("18252b"))
-	_label(button_rect().position + Vector2(5,38),"COLONY MENU",13,Color("d3dcd4"))
-	UIStyle.surface(self, help_button_rect(), Color("18252b"))
-	_label(help_button_rect().position + Vector2(31,38), "HELP", 14, Color("d3dcd4"))
+	_label(button_rect().position + Vector2(13,28),"ESC  ≡",13,Color("c8e1e7"))
 	if not opened: return
 	draw_rect(get_viewport_rect(),Color(0.025,0.04,0.06,0.82))
 	var panel: Rect2 = panel_rect()
@@ -151,14 +171,18 @@ func _draw() -> void:
 	if status_open:
 		_draw_status(panel)
 		return
-	_label(panel.position+Vector2(24,32),"Colony menu",22,Color("d9d3be"))
-	_label(panel.position+Vector2(24,64),"New colonies replace unsaved progress.",15,Color("ccac91"))
-	_label(panel.position+Vector2(24,86),"Saved colony and sound settings stay.",14,Color("a9b9bc"))
+	UIStyle.heading(self, panel.position+Vector2(24,40),"COLONY", "Menu")
+	_label(panel.position+Vector2(24,73),"New colonies replace unsaved progress.",13,Color("a7b7bf"))
 	UIStyle.surface(self, scenario_rect(),Color("263038"))
 	_label(scenario_rect().position+Vector2(16,28),"SETTING: %s  ·  CHANGE" % ScenarioCatalog.label_for(selected_scenario),14,Color("a9b9bc"))
 	for choice: String in ["repeat","fresh","cancel","end","guide"]:
 		UIStyle.surface(self, choice_rect(choice),Color("35483c") if choice in ["repeat","fresh"] else Color("263038"))
 		_label(choice_rect(choice).position+Vector2(32,28),"REPEAT THIS SEED" if choice == "repeat" else "START WITH A FRESH SEED" if choice == "fresh" else "COLONY STATUS" if choice == "guide" else "END RUN AND REVIEW" if choice == "end" else "CANCEL",14,Color("dce5d9"))
+	for action: String in ["save", "load", "sound", "help", "pause"]:
+		UIStyle.surface(self, utility_rect(action), Color("1a303e"))
+		_label(utility_rect(action).position + Vector2(22,28), {"save":"SAVE COLONY     Ctrl+S", "load":"LOAD COLONY     Ctrl+L", "sound":"SOUND", "help":"HOW TO PLAY", "pause":"PAUSE / RESUME"}[action], 14, Color("dcebf1"))
+	_label(panel.position + Vector2(24,440), "Escape returns to play", 12, Color("78949e"))
+	_label(panel.position + Vector2(376,405), preload("res://src/presentation/interface_text.gd").fit_line(feedback,_font,12,328), 12, Color("8fd6c1"))
 
 func _draw_status(panel: Rect2) -> void:
 	var status: Dictionary=status_provider.call() if status_provider.is_valid() else {}

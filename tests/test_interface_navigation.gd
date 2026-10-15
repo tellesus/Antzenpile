@@ -28,9 +28,10 @@ func run(test: Object) -> bool:
 		var event: InputEvent = InputEventScreenTouch.new() if kind == "touch" else InputEventMouseButton.new()
 		event.pressed = true
 		if event is InputEventMouseButton: event.button_index = MOUSE_BUTTON_LEFT
+		controls.open_menu()
 		event.position = controls.help_button_rect().get_center()
 		controls._input(event)
-		test.check(controls.opened and controls.guide_open and view._pointer_kind.is_empty(), "%s opens Help directly and cancels an old field gesture" % kind)
+		test.check(controls.opened and controls.guide_open and view._pointer_kind.is_empty(), "%s opens Help from the menu and cancels an old field gesture" % kind)
 		event.position = controls.guide_rect("back").get_center()
 		controls._input(event)
 		test.check(not controls.opened and not controls.guide_open, "%s Close Help returns directly to play" % kind)

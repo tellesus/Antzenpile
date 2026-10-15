@@ -1,0 +1,106 @@
+[
+  {
+    "path": "docs/evidence/card180/.gdignore",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "docs/evidence/card180/README.md",
+    "sha256": "fccb233ce680cd8030469feb9f8cecf2774ce26dfddbb722e64c175d91ecb635"
+  },
+  {
+    "path": "docs/evidence/card180/context_900.png",
+    "sha256": "a505cc3fcaa186002240671f17ec6ce4da59b777f84f8f86902d3b6b84ff80dc"
+  },
+  {
+    "path": "docs/evidence/card180/developed_1920.png",
+    "sha256": "482b64d059807c0801c5a1490d0601c92ab4d3757c634cdd78381f95bae15784"
+  },
+  {
+    "path": "docs/evidence/card180/inward_1920.png",
+    "sha256": "75603764a09700c7707dd32fa826a9b2fe84c448cdd6ab79a5f0c2585fe42359"
+  },
+  {
+    "path": "docs/evidence/card180/menu_900.png",
+    "sha256": "037f36a584d24497aba55e15de245bb1f9bdeccc4e6f048f4be3b53150295d0f"
+  },
+  {
+    "path": "docs/evidence/card180/outward_1920.png",
+    "sha256": "fc61a7ffb013563ba65fd0213fb81b952de4af6d37182e9802535aaadf218649"
+  },
+  {
+    "path": "docs/evidence/card180/preview.log",
+    "sha256": "c53362b8ed2aa6d672e275995a952222c82dd789c8f49d0160f1cd2d1189346a"
+  },
+  {
+    "path": "docs/evidence/card180/regression-obsolete-controls.log",
+    "sha256": "b04608ba33d8f7d494918c5c31ef98f4ae3717bcae603221827b3eb1238586c0"
+  },
+  {
+    "path": "docs/evidence/card180/returned_beetle_1920.png",
+    "sha256": "c41f2f098fcd57834d71dd76f3e70be07a765dd3f73ecd0a8f1b42ef4aa497ff"
+  },
+  {
+    "path": "docs/evidence/card180/returned_spider_1920.png",
+    "sha256": "8a38d864849fe0fad17c835c474795df4e92791f216a1a1d3fc164ba9781cd62"
+  },
+  {
+    "path": "docs/evidence/card180/spider_detail.png",
+    "sha256": "9d187cb856f96066dbf9058736cd5d28531a2e635b6ae0e5fc7ed91834aa05dd"
+  },
+  {
+    "path": "docs/evidence/card180/strained_900.png",
+    "sha256": "6b4b60c64f6524c0fbada5e69850d5c4c713e22c9548211de0e79bce191f0749"
+  },
+  {
+    "path": "docs/evidence/card180/windows_import-result.txt",
+    "sha256": "71136951dc99fd537a11eea6234783ad6179aaf4e65cddcc4f9c78bf8f0b9bb1"
+  },
+  {
+    "path": "docs/evidence/card180/windows_import.log",
+    "sha256": "0ce7f15b789bf9a60441a1db5ad2cb13bb3f8016f3f19b53127f066a6d9b1159"
+  },
+  {
+    "path": "docs/evidence/card180/windows_main-result.txt",
+    "sha256": "85b712b948e8453140bcd4b4a18468d656519b6fc785634256d606a558d0c4a5"
+  },
+  {
+    "path": "docs/evidence/card180/windows_main.log",
+    "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card180/windows_performance.json",
+    "sha256": "65ced27396a641a6e3ae3daa7d97f4d253cbaffb2524b272e45fe0c25d9b66f6"
+  },
+  {
+    "path": "docs/evidence/card180/windows_profile-result.txt",
+    "sha256": "5ca5f2f3f4361be82c79906f4e31433f865f7fc0e10c7e6d0d6d074c484d471d"
+  },
+  {
+    "path": "docs/evidence/card180/windows_profile.log",
+    "sha256": "1443a72f6f9d2e0216bf5ff99689fb8578f2e7a9fcbcc3c94a1f926e4df5a63b"
+  },
+  {
+    "path": "docs/evidence/card180/windows_regression-result.txt",
+    "sha256": "56d45add337a70606d2730e7770c82bd3a6a43dab027858a3e7598cf5caef837"
+  },
+  {
+    "path": "docs/evidence/card180/windows_regression.log",
+    "sha256": "4412bc8b25701149bb535865289e05252476967d5dd974f6676a8004146041e8"
+  },
+  {
+    "path": "docs/evidence/card180/windows_render-result.txt",
+    "sha256": "5dc2c19b5e7dbab3de465d022344ae3631b2c8f208f05d5f5c03a7a36cdaff79"
+  },
+  {
+    "path": "docs/evidence/card180/windows_render.log",
+    "sha256": "1baabf7cebf20a72209f3453cbdbd3c028ad137915151c386465e4afc9d44561"
+  },
+  {
+    "path": "docs/evidence/card180/windows_targeted-result.txt",
+    "sha256": "9d90a4fb5dddfb733d1a63d5cee9e56ab83029a4807ff9b83a9df50fd703b9a3"
+  },
+  {
+    "path": "docs/evidence/card180/windows_targeted.log",
+    "sha256": "5399f141610339c517f536f78461cbb7d7a89065c6ce6c9e157181ebc04e131d"
+  }
+]

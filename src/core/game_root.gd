@@ -110,6 +110,7 @@ func _ready() -> void:
 		set_mode("outward")
 		_audio_settings = preload("res://src/presentation/audio_settings.gd").new()
 		_audio_settings.preferences = audio_preferences
+		_audio_settings.show_launcher = false
 		_audio_settings.changed = audio_preferences.save_file
 		_audio_settings.blocked = sound_controls_blocked
 		_audio_settings.interaction_started = cancel_field_gesture
@@ -121,6 +122,8 @@ func _ready() -> void:
 		_colony_controls.start_command = start_new_colony
 		_colony_controls.end_command = end_run_review
 		_colony_controls.status_provider = colony_status
+		_colony_controls.utility_command = menu_utility
+		_colony_controls.escape_context = close_attention
 		_colony_controls.blocked = colony_controls_blocked
 		_colony_controls.interaction_started = cancel_field_gesture
 		_colony_controls.z_index = 101
@@ -201,6 +204,57 @@ func set_mode(next_mode: String) -> bool:
 
 func cancel_field_gesture() -> void:
 	if _outward_view != null: _outward_view.cancel_pointer_gesture()
+
+
+func menu_utility(action: String) -> Dictionary:
+	if action == "save":
+		var result: Dictionary = quick_save()
+		if result.get("accepted", false): result.reason = "Colony saved"
+		return result
+	if action == "load":
+		var result: Dictionary = quick_load()
+		if result.get("accepted", false) and _colony_controls != null: _colony_controls.opened = false
+		return result
+	if action == "pause":
+		simulation.toggle_pause()
+		return {"accepted":true, "reason":"Colony paused" if simulation.run.clock.paused else "Colony running"}
+	if action == "sound" and _audio_settings != null:
+		if _colony_controls != null: _colony_controls.opened = false
+		_audio_settings.opened = true
+		return {"accepted":true, "reason":""}
+	return {"accepted":false, "reason":"Unavailable"}
+
+
+func close_attention() -> bool:
+	# Escape closes presentation attention first, without sending any command.
+	var view: Node2D = _outward_view if mode == "outward" else _inward_view
+	if view == null: return false
+	if view.effort_draft.opened:
+		view.effort_draft.opened = false
+		return true
+	if mode == "outward":
+		if view.gathering_draft.opened:
+			view.gathering_draft.opened = false
+			return true
+		if view.conflict.editing or view.conflict.history_open:
+			view.conflict.editing = false
+			view.conflict.history_open = false
+			return true
+		if view.sources_open or view.exploration_open:
+			view.sources_open = false
+			view.exploration_open = false
+			return true
+		view.journey_open = false
+	else:
+		for controls: RefCounted in [view.chamber_controls, view.refuge_controls, view.connection_controls, view.gathering]:
+			if controls.opened:
+				controls.opened = false
+				return true
+	if not view.selected_id.is_empty():
+		view.selected_id = ""
+		cancel_field_gesture()
+		return true
+	return false
 
 
 func interaction_blocked() -> bool:
