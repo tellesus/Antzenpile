@@ -4,7 +4,7 @@ Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly ve
 
 ## Current playable baseline
 
-Use current `main`. PRs #1 and #2 are merged; the latest package includes the systems beta, recovered soft neon trails and [flowing clouds/returned spider-beetle memories179](tasks/179_living_chemical_clouds.md). `builds/windows-beta-latest.json` is the canonical build pointer. Launch its `launch` path or extract the stable latest ZIP; named older export folders remain historical snapshots. The179 package audits 634 resources and passes the extracted release/PCK gates, plus native rendering under the pinned editor with its unchanged PCK. Final player/release-template input/audio/feel acceptance remains separate.
+Use current `main`. PRs #1 and #2 are merged; the latest package includes the systems beta, recovered neon trails, evidence-supported chemical memories and [visual/Escape-menu revision180](tasks/180_sensorium_art_and_escape_menu.md). `builds/windows-beta-latest.json` is the canonical build pointer. The180 package audits 638 resources and passes isolated export/extraction, actual release Main and packed save/settings/review gates, plus native cloud/INWARD/menu rendering under the pinned editor with the unchanged PCK. Named older exports remain historical. Final player/release-template input/audio/feel acceptance remains separate.
 
 ## Rebuild from a checkout
 

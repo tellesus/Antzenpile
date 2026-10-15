@@ -5,7 +5,7 @@
   },
   {
     "path": "docs/evidence/card180/README.md",
-    "sha256": "fccb233ce680cd8030469feb9f8cecf2774ce26dfddbb722e64c175d91ecb635"
+    "sha256": "c1e2a65a60d2042ef16ac36e046d83be3200b681d94ceecb5271d9326d8a6c62"
   },
   {
     "path": "docs/evidence/card180/context_900.png",
@@ -26,6 +26,14 @@
   {
     "path": "docs/evidence/card180/outward_1920.png",
     "sha256": "fc61a7ffb013563ba65fd0213fb81b952de4af6d37182e9802535aaadf218649"
+  },
+  {
+    "path": "docs/evidence/card180/packed_inward.png",
+    "sha256": "643746e8d07d29d6c764c4dc5e007df13d4e5037d0b5a8efca58192631203aec"
+  },
+  {
+    "path": "docs/evidence/card180/packed_menu.png",
+    "sha256": "26d2be42cdc2e11577fdbf67ed62ad1e17ba0f68b2c6cba212ec41165f3da516"
   },
   {
     "path": "docs/evidence/card180/preview.log",
@@ -52,6 +60,18 @@
     "sha256": "6b4b60c64f6524c0fbada5e69850d5c4c713e22c9548211de0e79bce191f0749"
   },
   {
+    "path": "docs/evidence/card180/windows_build.json",
+    "sha256": "7f1cb39a1b637cb5a4b5094b3b3d1bce5a45146d4d109823f39e20303be49300"
+  },
+  {
+    "path": "docs/evidence/card180/windows_exit-current180.log",
+    "sha256": "73eb15705bb5e16e55d3a8bf366490736549214121e383b4966c3f80dfd47b9c"
+  },
+  {
+    "path": "docs/evidence/card180/windows_exit-previous179.log",
+    "sha256": "61e1899db6a7fd438ca57cd8cb591ecb78af8da57483b88a7b11e38856564104"
+  },
+  {
     "path": "docs/evidence/card180/windows_import-result.txt",
     "sha256": "71136951dc99fd537a11eea6234783ad6179aaf4e65cddcc4f9c78bf8f0b9bb1"
   },
@@ -66,6 +86,18 @@
   {
     "path": "docs/evidence/card180/windows_main.log",
     "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card180/windows_package.log",
+    "sha256": "7f1cb39a1b637cb5a4b5094b3b3d1bce5a45146d4d109823f39e20303be49300"
+  },
+  {
+    "path": "docs/evidence/card180/windows_packed-clouds.log",
+    "sha256": "600539c18ffc80cc2ba528b21135ed4081480d28e0b950843fc75870189e47be"
+  },
+  {
+    "path": "docs/evidence/card180/windows_packed-sensorium.log",
+    "sha256": "b51bed3884f813827bafac1d2e5dbfea3793c509a59cedf8ac6403ad1a9b3d6d"
   },
   {
     "path": "docs/evidence/card180/windows_performance.json",
@@ -86,6 +118,14 @@
   {
     "path": "docs/evidence/card180/windows_regression.log",
     "sha256": "4412bc8b25701149bb535865289e05252476967d5dd974f6676a8004146041e8"
+  },
+  {
+    "path": "docs/evidence/card180/windows_release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card180/windows_release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
   },
   {
     "path": "docs/evidence/card180/windows_render-result.txt",

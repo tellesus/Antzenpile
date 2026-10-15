@@ -35,7 +35,7 @@ Remaining work is tracked here instead of on dormant branches:
 
 ## Latest actual verification
 
-[180](tasks/180_sensorium_art_and_escape_menu.md): distinct luminous colony organs, softer production vapor, shaded larger ants and the shared Escape utility menu. **11,048 full checks/zero failures**, 440 affected/zero; clean import/Main, native multi-resolution/knowledge/pause captures and both screen timing samples. [Evidence and limits](evidence/card180/README.md). Committed-main Windows refresh pending. Further dispatch/art/music and player acceptance remain open.
+[180](tasks/180_sensorium_art_and_escape_menu.md): distinct luminous colony organs, softer production vapor, shaded larger ants and the shared Escape utility menu. **11,048 full checks/zero failures**, 440 affected/zero; clean import/Main, native multi-resolution/knowledge/pause captures and both screen timing samples. [Evidence and limits](evidence/card180/README.md). Fresh committed-main Windows package audits 638 resources and passes extracted release/PCK and native packed cloud/network/menu checks. Further dispatch/art/music and player acceptance remain open.
 
 [179](tasks/179_living_chemical_clouds.md): flowing OUTWARD chemical materials, actual returned spider/beetle memory masks, observation-age fade and pause-aware internal motion. 11,026 full checks/zero failures;542 focused/zero; pinned import/Main and native multi-resolution input/knowledge captures pass. [Native timing and limits](evidence/card179/README.md). The refreshed committed-main Windows package audits634 resources and passes extracted release/PCK and native packed-cloud gates. Menus/dispatch/music and player/release acceptance remain pending.
 

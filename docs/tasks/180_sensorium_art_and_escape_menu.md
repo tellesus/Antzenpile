@@ -1,6 +1,6 @@
 # 180 — Sensorium art direction and clear playfield
 
-Status: runtime verified; publishing and committed-main Windows refresh pending. Player requests a substantial visual revision with polish and pop, beyond the earlier trail/cloud proofs.
+Status: complete, published to main and included in the refreshed Windows systems beta. Player art/feel and final release acceptance remain open. Player requests a substantial visual revision with polish and pop, beyond the earlier trail/cloud proofs.
 
 Outcome: softer flowing chemical volumes, readable illuminated ants, distinct luminous INWARD organs connected by delicate living filaments, a coherent dark interface, and an Escape menu that removes persistent Help/Sound/Save/Load clutter. Preserve known-information boundaries, authoritative simulation, all existing semantic actions and compact/mouse/touch access.
 
@@ -21,3 +21,7 @@ Changed groups: two production alpha textures and mipmaps; soft shader flow; sha
 
 
 Handoff: finish publication/package, then collect player visual feedback. Next useful interaction slice is one clear choose-and-send workflow for ordinary worker dispatch, preserving protected care and real travel. Music and remaining art are separate work.
+
+## Main and playable package
+
+Runtime revision [79f482b](https://github.com/tellesus/Antzenpile/commit/79f482bbf7505e17d4e70175ddb9e4ed97fa6d21), 638 audited resources. Both main checkouts updated, all 109 preserved local files unchanged. Isolated package/release Main/packed save-settings-review and native unchanged-PCK material/network/menu checks pass. [Delivery details](../evidence/card180/README.md#published-main-and-windows-package). No extra branch or PR remains. The specific save report178 and further art/dispatch/music/player acceptance remain open.
