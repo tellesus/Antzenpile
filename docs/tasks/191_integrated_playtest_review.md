@@ -1,0 +1,14 @@
+# 191 — Unified playtest review
+
+Status: source implementation/review verified; unified Windows delivery pending.
+
+Review the current combined game after the visual, interface, same-build save and music revisions. Use fresh actual three-setting strategies to reach developed organs, daughter nests and supported Roadside recovery. Capture standard/compact real summaries and free inspection. Check normal scene input/audio shutdown, current save/review/reload and conservation; measure actual active frame loops at 1080p with declared speed, duration and limits. Separately audit/build the committed Windows runtime and its unchanged packaged resources, native Main and external menu/audio/save probes. Never present an editor timing sample as final release or clean-machine acceptance.
+
+Resolve concrete faults within current design; otherwise deliver the unified main/Windows beta and explicitly assign human visual/audio/feel, physical-touch and clean-machine acceptance to player testing. Post-1.0 systems, mobile and previous-build save compatibility remain tabled. Reconcile current goals/remaining-work documentation so historical next-step notes do not create duplicate tasks or branches.
+
+
+Integrated captures exposed real mature-state overlaps: Reports covered OUTWARD's other-nest launcher; INWARD's bottom other-nest target covered Nursery commitments, and the harm target fell below600px. Both nest launchers now occupy a separate header target. The compact Nursery groups its existing approved space/care/stage/strain/air/price information and preserves44px actions for climate, brood, expansion and harm. Standard layout/rules remain. Native review uses actual fresh strategies and canonical JSON snapshot transfer rather than unsupported raw typed dictionaries.
+
+The packaged forced `--quit-after` startup check retained an eight-object audio diagnostic (four WAVs/four playbacks), also present in189. Normal window close now follows [Godot's documented quit-notification lifecycle](https://docs.godotengine.org/en/stable/tutorials/inputs/handling_quit_requests.html): stop audio, keep four frames and250ms for its queued release, then quit. Repeated requests are idempotent; the simulation stops, interaction blocks, no save is written, and freed Root restores the previous automatic-quit setting. Forced process/CLI quit bypasses the lifecycle and remains an artificial-harness limitation, not a claim of normal-close failure. Native actual Root notification and unchanged-PCK method tests must exit without warnings. No current save-schema/gameplay/audio-intent change.
+
+Verified: 12375 checks, 0 failures; focused 890 checks, 0 failures; import/Main,39 native captures, compact touch, warning-free normal close and six 30-second active measurements. [Evidence](../evidence/card191/README.md).

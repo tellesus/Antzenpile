@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 26.8.1.260806 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon RX 6650 XT
+
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[INTEGRATED-PERF] {"frames":3896,"label":"backyard_slice_outward","median_fps":130.80444735121,"median_ms":7.645,"one_percent_low_fps":108.836399357028,"p99_ms":8.682,"seconds":30.000904,"simulated_seconds_advanced":32.0,"speed":1,"worst_ms":11.131}
+[INTEGRATED-PERF] {"frames":4295,"label":"backyard_slice_inward64","median_fps":143.967751223726,"median_ms":6.946,"one_percent_low_fps":90.967363871571,"p99_ms":10.428,"seconds":30.004642,"simulated_seconds_advanced":2048.75,"speed":64,"worst_ms":14.082}
+[INTEGRATED-PERF] {"frames":3277,"label":"garden_edge_outward","median_fps":110.204981265153,"median_ms":9.074,"one_percent_low_fps":89.0661815708575,"p99_ms":10.357,"seconds":30.004076,"simulated_seconds_advanced":32.0,"speed":1,"worst_ms":13.261}
+[INTEGRATED-PERF] {"frames":2803,"label":"garden_edge_inward64","median_fps":93.8614604843251,"median_ms":10.654,"one_percent_low_fps":66.2038484981999,"p99_ms":14.439,"seconds":30.008634,"simulated_seconds_advanced":2049.5,"speed":64,"worst_ms":18.293}
+[INTEGRATED-PERF] {"frames":3221,"label":"roadside_outward","median_fps":108.695652173913,"median_ms":9.2,"one_percent_low_fps":88.5466278492561,"p99_ms":10.547,"seconds":30.006964,"simulated_seconds_advanced":32.0,"speed":1,"worst_ms":12.689}
+[INTEGRATED-PERF] {"frames":3843,"label":"roadside_inward64","median_fps":130.633572828217,"median_ms":7.655,"one_percent_low_fps":81.3549139411032,"p99_ms":11.759,"seconds":30.005103,"simulated_seconds_advanced":2048.75,"speed":64,"worst_ms":14.84}
+[INTEGRATED] fresh_complete_runs_inspection_active_ledgers_audio=true captures=39

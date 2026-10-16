@@ -28,6 +28,9 @@ var _colony_controls: ColonyControls
 var _reports_view: Node2D
 var _discovery_notice: ReturnedDiscovery = preload("res://src/presentation/returned_discovery.gd").new()
 var _discovery_reports: int = 0
+var _closing: bool = false
+var _owns_quit_requests: bool = false
+var _previous_auto_accept_quit: bool = true
 
 
 func _ready() -> void:
@@ -35,6 +38,7 @@ func _ready() -> void:
 	if OS.is_debug_build():
 		print("[RUN] seed=%d scenario=%s time=%.2f" % [simulation.run.run_seed, simulation.run.scenario_id, simulation.run.simulation_time])
 	if DisplayServer.get_name() != "headless":
+		_own_window_close_requests()
 		audio_preferences.load_file()
 		var outward: OutwardView = Outward.new()
 		outward.signal_provider = focused_outward_signals
@@ -152,6 +156,32 @@ func _ready() -> void:
 		add_child(_debug_view)
 
 
+func _own_window_close_requests() -> void:
+	_previous_auto_accept_quit = get_tree().auto_accept_quit
+	get_tree().auto_accept_quit = false
+	_owns_quit_requests = true
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST and _owns_quit_requests and not _closing:
+		_closing = true
+		_finish_window_close.call_deferred()
+
+
+func _finish_window_close() -> void:
+	# Stop before SceneTree.quit: the audio thread needs live frames to release
+	# queued playbacks. Window close never writes a save or changes colony state.
+	set_process(false)
+	if _audio_controller != null: _audio_controller.stop_playback()
+	for frame: int in 4: await get_tree().process_frame
+	await get_tree().create_timer(0.25).timeout
+	get_tree().quit()
+
+
+func _exit_tree() -> void:
+	if _owns_quit_requests: get_tree().auto_accept_quit = _previous_auto_accept_quit
+
+
 func _process(delta: float) -> void:
 	simulation.advance(delta)
 	if _outward_view != null: poll_discovery_notice()
@@ -258,7 +288,7 @@ func close_attention() -> bool:
 
 
 func interaction_blocked() -> bool:
-	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened or _reports_view!=null and _reports_view.opened
+	return _closing or simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _colony_controls != null and _colony_controls.opened or _reports_view!=null and _reports_view.opened
 
 
 func sound_controls_blocked() -> bool:

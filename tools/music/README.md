@@ -1,6 +1,6 @@
-# Living colony arrangement â€” 190
+# Living colony arrangement — 190
 
-Four synchronized **85â…“-second, 32-bar, 90-BPM, stereo 44.1-kHz/16-bit PCM** voices. The original D-minor/modal score moves through four eight-bar phrases, varying motifs, register, timing and density. Phrase rests and a sparse return home provide breathing space. Shared circular stereo room/delay carries tails across the score; a 6ms cadence breath brings the file boundary to zero. Equal-power positions keep bass centred and give higher instruments space. One common gain across all subsets retains layer balance; runtime stays at -4dB with three-second real-time fades.
+Four synchronized **85⅓-second, 32-bar, 90-BPM, stereo 44.1-kHz/16-bit PCM** voices. The original D-minor/modal score moves through four eight-bar phrases, varying motifs, register, timing and density. Phrase rests and a sparse return home provide breathing space. Shared circular stereo room/delay carries tails across the score; a 6ms cadence breath brings the file boundary to zero. Equal-power positions keep bass centred and give higher instruments space. One common gain across all subsets retains layer balance; runtime stays at -4dB with three-second real-time fades.
 
 | Voice | Role |
 | --- | --- |

@@ -1,0 +1,371 @@
+WorkerThreadPool: 16 threads, 4 max low-priority.
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+Accessibility: AccessKit driver loaded.
+Native OpenGL API detected: 3.3: ATI Technologies Inc. - AMD Radeon RX 6650 XT
+Accessibility: window 0 adapter created.
+SDL: Init OK!
+Using "winink" pen tablet driver...
+Shader 'CanvasSdfShaderGLES3' SHA256: aa553461706a9602812993db0b29125fafe3578c8e6919121228c4fc732a0ad8
+Shader 'SkeletonShaderGLES3' SHA256: 93ceb3a6c718b74213a1c75948bb4e41d73db1896fc660a8991a42bc2fd36862
+Shader 'ParticlesShaderGLES3' SHA256: bb6ee2b29994a89e3d4571ec4c175e2aaa8d28270862661b99a671273e5e1413
+Shader 'ParticlesCopyShaderGLES3' SHA256: 9ecce6e0c3f0d8c9776c7efb56a8071c82f5542cb0efac8dc9a39ea8e609cd70
+Shader 'CopyShaderGLES3' SHA256: eb13860473a351ee681d9c23dc250c79f2973d98ab9f6c8def54e861603bea96
+Shader 'CubemapFilterShaderGLES3' SHA256: d7dd5a012de4382bf7ba7a47c649f13cec8a9038ea88b5c7abde3834318dd052
+Shader 'GlowShaderGLES3' SHA256: 3a1e306e99039d39ef3cd117135c616e36bb10e485f02bb952cbc1152b90f607
+Shader 'PostShaderGLES3' SHA256: 4c5edcb37af55c16bf62d7d244531194333d14490d1e07468a30ad9489773621
+Shader 'FeedShaderGLES3' SHA256: d161c9f783354bef5c11e7655582d6e95bc7a38991ad7ae97d71d83a58276c7f
+Shader 'CanvasShaderGLES3' SHA256: 9cfa6e7854e9be007475ab3f320a8cef50d5189417c08eb12ca2db5e8506aa4e
+Shader 'CanvasOcclusionShaderGLES3' SHA256: 49b5ce12e676a9180850bcae29e7c7709a54e3f3c8e583f39a9c80fdb13a6838
+Shader 'SceneShaderGLES3' SHA256: e9a7b5cd72e0b9a8f28120d2fcf68cb2b57ec403f67f2889ed4943655a2ced82
+Shader 'SkyShaderGLES3' SHA256: 8e14f2f8e4a39310ae0e93eb38ad8c72491d20da50c3b1e2171944f6a0b39003
+Shader 'TexBlitShaderGLES3' SHA256: 57d2471058030b16e27d5275a2aefbcdae4a73a0ad711d524627705b0d18b7c8
+OpenGL API 3.3.0 Core Profile Context 26.8.1.260806 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon RX 6650 XT
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CORE API HASH: 0
+EDITOR API HASH: 0
+SceneTreeFTI: traversal method DEFAULT
+Loaded system CA certificates
+Loading resource: res://.godot/exported/133200997/export-f39996a6d27a38698d16421ab974097b-main.scn remapped: res://.godot/exported/133200997/export-f39996a6d27a38698d16421ab974097b-main.scn
+Loading resource: res://src/core/game_root.gdc remapped: res://src/core/game_root.gdc
+Loading resource: res://.godot/exported/133200997/export-be8a6e1833d1ca9f04c02fc04cf190b1-default_food_exchange.res remapped: res://.godot/exported/133200997/export-be8a6e1833d1ca9f04c02fc04cf190b1-default_food_exchange.res
+Loading resource: res://src/sim/colony/food_exchange_config.gdc remapped: res://src/sim/colony/food_exchange_config.gdc
+Completed load for: 'res://src/sim/colony/food_exchange_config.gd' remapped 'res://src/sim/colony/food_exchange_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_food_exchange.tres' remapped 'res://.godot/exported/133200997/export-be8a6e1833d1ca9f04c02fc04cf190b1-default_food_exchange.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-4c5237c148f7c727824b0c9884125f27-default_brood.res remapped: res://.godot/exported/133200997/export-4c5237c148f7c727824b0c9884125f27-default_brood.res
+Loading resource: res://src/sim/colony/brood_config.gdc remapped: res://src/sim/colony/brood_config.gdc
+Completed load for: 'res://src/sim/colony/brood_config.gd' remapped 'res://src/sim/colony/brood_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_brood.tres' remapped 'res://.godot/exported/133200997/export-4c5237c148f7c727824b0c9884125f27-default_brood.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-e634cf1cf9eccabf085349d5a34fbd52-default_nursery_development.res remapped: res://.godot/exported/133200997/export-e634cf1cf9eccabf085349d5a34fbd52-default_nursery_development.res
+Loading resource: res://src/sim/colony/nursery_development_config.gdc remapped: res://src/sim/colony/nursery_development_config.gdc
+Completed load for: 'res://src/sim/colony/nursery_development_config.gd' remapped 'res://src/sim/colony/nursery_development_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_nursery_development.tres' remapped 'res://.godot/exported/133200997/export-e634cf1cf9eccabf085349d5a34fbd52-default_nursery_development.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-cfa25a1618d578314f5da46dbc48017b-default_sanitation.res remapped: res://.godot/exported/133200997/export-cfa25a1618d578314f5da46dbc48017b-default_sanitation.res
+Loading resource: res://src/sim/colony/sanitation_config.gdc remapped: res://src/sim/colony/sanitation_config.gdc
+Completed load for: 'res://src/sim/colony/sanitation_config.gd' remapped 'res://src/sim/colony/sanitation_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_sanitation.tres' remapped 'res://.godot/exported/133200997/export-cfa25a1618d578314f5da46dbc48017b-default_sanitation.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-77e19751ff58d8d4e14885ef1a73dd83-backyard_honeydew.res remapped: res://.godot/exported/133200997/export-77e19751ff58d8d4e14885ef1a73dd83-backyard_honeydew.res
+Loading resource: res://src/sim/ecology/honeydew_definition.gdc remapped: res://src/sim/ecology/honeydew_definition.gdc
+Completed load for: 'res://src/sim/ecology/honeydew_definition.gd' remapped 'res://src/sim/ecology/honeydew_definition.gdc' at thread -1
+Completed load for: 'res://data/ecology/backyard_honeydew.tres' remapped 'res://.godot/exported/133200997/export-77e19751ff58d8d4e14885ef1a73dd83-backyard_honeydew.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-cdf89d9cb6d57913e053d035233fa111-lean.res remapped: res://.godot/exported/133200997/export-cdf89d9cb6d57913e053d035233fa111-lean.res
+Loading resource: res://src/sim/colony/trait_definition.gdc remapped: res://src/sim/colony/trait_definition.gdc
+Completed load for: 'res://src/sim/colony/trait_definition.gd' remapped 'res://src/sim/colony/trait_definition.gdc' at thread -1
+Completed load for: 'res://data/adaptation/traits/lean.tres' remapped 'res://.godot/exported/133200997/export-cdf89d9cb6d57913e053d035233fa111-lean.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-4e16a0c1fc7230c2e984c60fcb6994a8-load.res remapped: res://.godot/exported/133200997/export-4e16a0c1fc7230c2e984c60fcb6994a8-load.res
+Completed load for: 'res://data/adaptation/traits/load.tres' remapped 'res://.godot/exported/133200997/export-4e16a0c1fc7230c2e984c60fcb6994a8-load.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-4e4c799264824ceeedeffa6cf67474b9-persistent.res remapped: res://.godot/exported/133200997/export-4e4c799264824ceeedeffa6cf67474b9-persistent.res
+Completed load for: 'res://data/adaptation/traits/persistent.tres' remapped 'res://.godot/exported/133200997/export-4e4c799264824ceeedeffa6cf67474b9-persistent.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-58bfd8975ff22d42db7dfc4c218523aa-security.res remapped: res://.godot/exported/133200997/export-58bfd8975ff22d42db7dfc4c218523aa-security.res
+Completed load for: 'res://data/adaptation/traits/security.tres' remapped 'res://.godot/exported/133200997/export-58bfd8975ff22d42db7dfc4c218523aa-security.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-6bac37af6f24f6d05af2dfd88e4cdc53-tolerance.res remapped: res://.godot/exported/133200997/export-6bac37af6f24f6d05af2dfd88e4cdc53-tolerance.res
+Completed load for: 'res://data/adaptation/traits/tolerance.tres' remapped 'res://.godot/exported/133200997/export-6bac37af6f24f6d05af2dfd88e4cdc53-tolerance.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-bb01c2dfa3e2888df792d571bdcacacc-fighter.res remapped: res://.godot/exported/133200997/export-bb01c2dfa3e2888df792d571bdcacacc-fighter.res
+Completed load for: 'res://data/adaptation/traits/fighter.tres' remapped 'res://.godot/exported/133200997/export-bb01c2dfa3e2888df792d571bdcacacc-fighter.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-406a6fd64f847d8870f6148f6a661ddf-efficient_nurses.res remapped: res://.godot/exported/133200997/export-406a6fd64f847d8870f6148f6a661ddf-efficient_nurses.res
+Completed load for: 'res://data/adaptation/traits/efficient_nurses.tres' remapped 'res://.godot/exported/133200997/export-406a6fd64f847d8870f6148f6a661ddf-efficient_nurses.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-aab176dfda0ac67a667f002abf6588c8-heat_resilience.res remapped: res://.godot/exported/133200997/export-aab176dfda0ac67a667f002abf6588c8-heat_resilience.res
+Completed load for: 'res://data/adaptation/traits/heat_resilience.tres' remapped 'res://.godot/exported/133200997/export-aab176dfda0ac67a667f002abf6588c8-heat_resilience.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-812b78b13af6b328fa663a53b4dab815-moisture_resilience.res remapped: res://.godot/exported/133200997/export-812b78b13af6b328fa663a53b4dab815-moisture_resilience.res
+Completed load for: 'res://data/adaptation/traits/moisture_resilience.tres' remapped 'res://.godot/exported/133200997/export-812b78b13af6b328fa663a53b4dab815-moisture_resilience.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-7c0cb46178843de7dec18f63408066c2-rapid_repair.res remapped: res://.godot/exported/133200997/export-7c0cb46178843de7dec18f63408066c2-rapid_repair.res
+Completed load for: 'res://data/adaptation/traits/rapid_repair.tres' remapped 'res://.godot/exported/133200997/export-7c0cb46178843de7dec18f63408066c2-rapid_repair.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-3a9754f9f66639dac4efe1c8545e4533-default_interpile_supply.res remapped: res://.godot/exported/133200997/export-3a9754f9f66639dac4efe1c8545e4533-default_interpile_supply.res
+Loading resource: res://src/sim/colony/interpile_supply_config.gdc remapped: res://src/sim/colony/interpile_supply_config.gdc
+Completed load for: 'res://src/sim/colony/interpile_supply_config.gd' remapped 'res://src/sim/colony/interpile_supply_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_interpile_supply.tres' remapped 'res://.godot/exported/133200997/export-3a9754f9f66639dac4efe1c8545e4533-default_interpile_supply.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-40c3ce0132f8ad8a0d5222c92500acb5-default_humidity.res remapped: res://.godot/exported/133200997/export-40c3ce0132f8ad8a0d5222c92500acb5-default_humidity.res
+Loading resource: res://src/sim/colony/humidity_config.gdc remapped: res://src/sim/colony/humidity_config.gdc
+Completed load for: 'res://src/sim/colony/humidity_config.gd' remapped 'res://src/sim/colony/humidity_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_humidity.tres' remapped 'res://.godot/exported/133200997/export-40c3ce0132f8ad8a0d5222c92500acb5-default_humidity.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-78b7b6c8b73b971e793054c3419c4a07-persistent_chemistry.res remapped: res://.godot/exported/133200997/export-78b7b6c8b73b971e793054c3419c4a07-persistent_chemistry.res
+Loading resource: res://src/sim/colony/trail_chemistry_definition.gdc remapped: res://src/sim/colony/trail_chemistry_definition.gdc
+Completed load for: 'res://src/sim/colony/trail_chemistry_definition.gd' remapped 'res://src/sim/colony/trail_chemistry_definition.gdc' at thread -1
+Completed load for: 'res://data/adaptation/persistent_chemistry.tres' remapped 'res://.godot/exported/133200997/export-78b7b6c8b73b971e793054c3419c4a07-persistent_chemistry.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-b2d519d3abcd157c6a44d4e07f4d21be-strong_mandibles.res remapped: res://.godot/exported/133200997/export-b2d519d3abcd157c6a44d4e07f4d21be-strong_mandibles.res
+Loading resource: res://src/sim/colony/fighting_trait_config.gdc remapped: res://src/sim/colony/fighting_trait_config.gdc
+Completed load for: 'res://src/sim/colony/fighting_trait_config.gd' remapped 'res://src/sim/colony/fighting_trait_config.gdc' at thread -1
+Completed load for: 'res://data/adaptation/strong_mandibles.tres' remapped 'res://.godot/exported/133200997/export-b2d519d3abcd157c6a44d4e07f4d21be-strong_mandibles.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-c27a443037cb1cac5a5fb6194bf8b3b2-recognition.res remapped: res://.godot/exported/133200997/export-c27a443037cb1cac5a5fb6194bf8b3b2-recognition.res
+Loading resource: res://src/sim/colony/recognition_definition.gdc remapped: res://src/sim/colony/recognition_definition.gdc
+Completed load for: 'res://src/sim/colony/recognition_definition.gd' remapped 'res://src/sim/colony/recognition_definition.gdc' at thread -1
+Completed load for: 'res://data/adaptation/recognition.tres' remapped 'res://.godot/exported/133200997/export-c27a443037cb1cac5a5fb6194bf8b3b2-recognition.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-ec26a08e2c5d1df25c5c42ab9f650e70-backyard_guest.res remapped: res://.godot/exported/133200997/export-ec26a08e2c5d1df25c5c42ab9f650e70-backyard_guest.res
+Loading resource: res://src/sim/ecology/guest_definition.gdc remapped: res://src/sim/ecology/guest_definition.gdc
+Completed load for: 'res://src/sim/ecology/guest_definition.gd' remapped 'res://src/sim/ecology/guest_definition.gdc' at thread -1
+Completed load for: 'res://data/ecology/backyard_guest.tres' remapped 'res://.godot/exported/133200997/export-ec26a08e2c5d1df25c5c42ab9f650e70-backyard_guest.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-fe0c5537118145588562f283976ca637-default_trails.res remapped: res://.godot/exported/133200997/export-fe0c5537118145588562f283976ca637-default_trails.res
+Loading resource: res://src/sim/trails/trail_config.gdc remapped: res://src/sim/trails/trail_config.gdc
+Completed load for: 'res://src/sim/trails/trail_config.gd' remapped 'res://src/sim/trails/trail_config.gdc' at thread -1
+Completed load for: 'res://data/trails/default_trails.tres' remapped 'res://.godot/exported/133200997/export-fe0c5537118145588562f283976ca637-default_trails.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-ad0637a48d1b3f00791480b81d4514b7-default_journey_response.res remapped: res://.godot/exported/133200997/export-ad0637a48d1b3f00791480b81d4514b7-default_journey_response.res
+Loading resource: res://src/sim/ecology/journey_response_config.gdc remapped: res://src/sim/ecology/journey_response_config.gdc
+Completed load for: 'res://src/sim/ecology/journey_response_config.gd' remapped 'res://src/sim/ecology/journey_response_config.gdc' at thread -1
+Completed load for: 'res://data/ecology/default_journey_response.tres' remapped 'res://.godot/exported/133200997/export-ad0637a48d1b3f00791480b81d4514b7-default_journey_response.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-4fb2fd42e1cf9dd9fe88aa39bd55677c-default_scouts.res remapped: res://.godot/exported/133200997/export-4fb2fd42e1cf9dd9fe88aa39bd55677c-default_scouts.res
+Loading resource: res://src/sim/scouting/scout_config.gdc remapped: res://src/sim/scouting/scout_config.gdc
+Completed load for: 'res://src/sim/scouting/scout_config.gd' remapped 'res://src/sim/scouting/scout_config.gdc' at thread -1
+Completed load for: 'res://data/scouting/default_scouts.tres' remapped 'res://.godot/exported/133200997/export-4fb2fd42e1cf9dd9fe88aa39bd55677c-default_scouts.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-140b6eb4ab05eb7c8853a4f0f60e7947-roadside_residue.res remapped: res://.godot/exported/133200997/export-140b6eb4ab05eb7c8853a4f0f60e7947-roadside_residue.res
+Loading resource: res://src/sim/ecology/residue_definition.gdc remapped: res://src/sim/ecology/residue_definition.gdc
+Completed load for: 'res://src/sim/ecology/residue_definition.gd' remapped 'res://src/sim/ecology/residue_definition.gdc' at thread -1
+Completed load for: 'res://data/ecology/roadside_residue.tres' remapped 'res://.godot/exported/133200997/export-140b6eb4ab05eb7c8853a4f0f60e7947-roadside_residue.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-1abe786ebb97cedd6871589287cb363e-roadside_surface_impact.res remapped: res://.godot/exported/133200997/export-1abe786ebb97cedd6871589287cb363e-roadside_surface_impact.res
+Loading resource: res://src/sim/weather/surface_impact_config.gdc remapped: res://src/sim/weather/surface_impact_config.gdc
+Completed load for: 'res://src/sim/weather/surface_impact_config.gd' remapped 'res://src/sim/weather/surface_impact_config.gdc' at thread -1
+Completed load for: 'res://data/weather/roadside_surface_impact.tres' remapped 'res://.godot/exported/133200997/export-1abe786ebb97cedd6871589287cb363e-roadside_surface_impact.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-fc32755911e41b57fe183409e413f285-backyard_predator.res remapped: res://.godot/exported/133200997/export-fc32755911e41b57fe183409e413f285-backyard_predator.res
+Loading resource: res://src/sim/ecology/predator_definition.gdc remapped: res://src/sim/ecology/predator_definition.gdc
+Completed load for: 'res://src/sim/ecology/predator_definition.gd' remapped 'res://src/sim/ecology/predator_definition.gdc' at thread -1
+Completed load for: 'res://data/ecology/backyard_predator.tres' remapped 'res://.godot/exported/133200997/export-fc32755911e41b57fe183409e413f285-backyard_predator.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-03f7d693446e622cd48a6bcb86304b4c-backyard_rival.res remapped: res://.godot/exported/133200997/export-03f7d693446e622cd48a6bcb86304b4c-backyard_rival.res
+Loading resource: res://src/sim/ecology/rival_definition.gdc remapped: res://src/sim/ecology/rival_definition.gdc
+Completed load for: 'res://src/sim/ecology/rival_definition.gd' remapped 'res://src/sim/ecology/rival_definition.gdc' at thread -1
+Completed load for: 'res://data/ecology/backyard_rival.tres' remapped 'res://.godot/exported/133200997/export-03f7d693446e622cd48a6bcb86304b4c-backyard_rival.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-ddc7b5d100dd3f6a5f86fcd3b9b5e021-default_reproduction.res remapped: res://.godot/exported/133200997/export-ddc7b5d100dd3f6a5f86fcd3b9b5e021-default_reproduction.res
+Loading resource: res://src/sim/colony/reproduction_config.gdc remapped: res://src/sim/colony/reproduction_config.gdc
+Completed load for: 'res://src/sim/colony/reproduction_config.gd' remapped 'res://src/sim/colony/reproduction_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_reproduction.tres' remapped 'res://.godot/exported/133200997/export-ddc7b5d100dd3f6a5f86fcd3b9b5e021-default_reproduction.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-27fb759365d61cd16b72eb7751247198-default_founding.res remapped: res://.godot/exported/133200997/export-27fb759365d61cd16b72eb7751247198-default_founding.res
+Loading resource: res://src/sim/colony/founding_config.gdc remapped: res://src/sim/colony/founding_config.gdc
+Completed load for: 'res://src/sim/colony/founding_config.gd' remapped 'res://src/sim/colony/founding_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_founding.tres' remapped 'res://.godot/exported/133200997/export-27fb759365d61cd16b72eb7751247198-default_founding.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-7b09d9d4bd1468f7daff6b902d417161-loam.res remapped: res://.godot/exported/133200997/export-7b09d9d4bd1468f7daff6b902d417161-loam.res
+Loading resource: res://src/sim/world/site_definition.gdc remapped: res://src/sim/world/site_definition.gdc
+Completed load for: 'res://src/sim/world/site_definition.gd' remapped 'res://src/sim/world/site_definition.gdc' at thread -1
+Completed load for: 'res://data/sites/loam.tres' remapped 'res://.godot/exported/133200997/export-7b09d9d4bd1468f7daff6b902d417161-loam.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-bee6b4aeead3fb55642db9d0d505ba69-root.res remapped: res://.godot/exported/133200997/export-bee6b4aeead3fb55642db9d0d505ba69-root.res
+Completed load for: 'res://data/sites/root.tres' remapped 'res://.godot/exported/133200997/export-bee6b4aeead3fb55642db9d0d505ba69-root.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-3e686eace957684655757e03e29e4546-stone.res remapped: res://.godot/exported/133200997/export-3e686eace957684655757e03e29e4546-stone.res
+Completed load for: 'res://data/sites/stone.tres' remapped 'res://.godot/exported/133200997/export-3e686eace957684655757e03e29e4546-stone.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-00b1afeb20fe30d0f973fc39a03eb7eb-edge.res remapped: res://.godot/exported/133200997/export-00b1afeb20fe30d0f973fc39a03eb7eb-edge.res
+Completed load for: 'res://data/sites/edge.tres' remapped 'res://.godot/exported/133200997/export-00b1afeb20fe30d0f973fc39a03eb7eb-edge.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-65c2ec9cd55497f3e42234c2ef03b9f2-refuge_chamber.res remapped: res://.godot/exported/133200997/export-65c2ec9cd55497f3e42234c2ef03b9f2-refuge_chamber.res
+Loading resource: res://src/sim/colony/chamber_definition.gdc remapped: res://src/sim/colony/chamber_definition.gdc
+Completed load for: 'res://src/sim/colony/chamber_definition.gd' remapped 'res://src/sim/colony/chamber_definition.gdc' at thread -1
+Completed load for: 'res://data/chambers/refuge_chamber.tres' remapped 'res://.godot/exported/133200997/export-65c2ec9cd55497f3e42234c2ef03b9f2-refuge_chamber.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-f9628d066f3d86eb14a123613125c7cc-reproductive_alcove.res remapped: res://.godot/exported/133200997/export-f9628d066f3d86eb14a123613125c7cc-reproductive_alcove.res
+Completed load for: 'res://data/chambers/reproductive_alcove.tres' remapped 'res://.godot/exported/133200997/export-f9628d066f3d86eb14a123613125c7cc-reproductive_alcove.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-136556f40c3a30d17f3264bcd0410c3d-ventilation_gallery.res remapped: res://.godot/exported/133200997/export-136556f40c3a30d17f3264bcd0410c3d-ventilation_gallery.res
+Completed load for: 'res://data/chambers/ventilation_gallery.tres' remapped 'res://.godot/exported/133200997/export-136556f40c3a30d17f3264bcd0410c3d-ventilation_gallery.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-3553f7a2322a260e5560894a243491be-garden_beetle.res remapped: res://.godot/exported/133200997/export-3553f7a2322a260e5560894a243491be-garden_beetle.res
+Completed load for: 'res://data/ecology/garden_beetle.tres' remapped 'res://.godot/exported/133200997/export-3553f7a2322a260e5560894a243491be-garden_beetle.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-f64f44c1276a89f82c605c54c0222aeb-default_storage.res remapped: res://.godot/exported/133200997/export-f64f44c1276a89f82c605c54c0222aeb-default_storage.res
+Loading resource: res://src/sim/colony/resource_storage_config.gdc remapped: res://src/sim/colony/resource_storage_config.gdc
+Completed load for: 'res://src/sim/colony/resource_storage_config.gd' remapped 'res://src/sim/colony/resource_storage_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_storage.tres' remapped 'res://.godot/exported/133200997/export-f64f44c1276a89f82c605c54c0222aeb-default_storage.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-cf1dccaa725282a6453c5d78e9a38b55-default_queen.res remapped: res://.godot/exported/133200997/export-cf1dccaa725282a6453c5d78e9a38b55-default_queen.res
+Loading resource: res://src/sim/colony/queen_config.gdc remapped: res://src/sim/colony/queen_config.gdc
+Completed load for: 'res://src/sim/colony/queen_config.gd' remapped 'res://src/sim/colony/queen_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_queen.tres' remapped 'res://.godot/exported/133200997/export-cf1dccaa725282a6453c5d78e9a38b55-default_queen.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-605515941ac36912ce13fb9b8058407d-default_heat.res remapped: res://.godot/exported/133200997/export-605515941ac36912ce13fb9b8058407d-default_heat.res
+Loading resource: res://src/sim/weather/heat_config.gdc remapped: res://src/sim/weather/heat_config.gdc
+Completed load for: 'res://src/sim/weather/heat_config.gd' remapped 'res://src/sim/weather/heat_config.gdc' at thread -1
+Completed load for: 'res://data/weather/default_heat.tres' remapped 'res://.godot/exported/133200997/export-605515941ac36912ce13fb9b8058407d-default_heat.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-b210ec0d536cb6b6e6958cfeba9d060a-default_brood_health.res remapped: res://.godot/exported/133200997/export-b210ec0d536cb6b6e6958cfeba9d060a-default_brood_health.res
+Loading resource: res://src/sim/colony/brood_health_config.gdc remapped: res://src/sim/colony/brood_health_config.gdc
+Completed load for: 'res://src/sim/colony/brood_health_config.gd' remapped 'res://src/sim/colony/brood_health_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_brood_health.tres' remapped 'res://.godot/exported/133200997/export-b210ec0d536cb6b6e6958cfeba9d060a-default_brood_health.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-fa31a36ec31642c2f69e96d5702802e2-default_food_toxicity.res remapped: res://.godot/exported/133200997/export-fa31a36ec31642c2f69e96d5702802e2-default_food_toxicity.res
+Loading resource: res://src/sim/colony/food_toxicity_config.gdc remapped: res://src/sim/colony/food_toxicity_config.gdc
+Completed load for: 'res://src/sim/colony/food_toxicity_config.gd' remapped 'res://src/sim/colony/food_toxicity_config.gdc' at thread -1
+Completed load for: 'res://data/resources/default_food_toxicity.tres' remapped 'res://.godot/exported/133200997/export-fa31a36ec31642c2f69e96d5702802e2-default_food_toxicity.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-b028e81038af452d5aaa9c80a2bb10ed-generic.res remapped: res://.godot/exported/133200997/export-b028e81038af452d5aaa9c80a2bb10ed-generic.res
+Completed load for: 'res://data/sites/generic.tres' remapped 'res://.godot/exported/133200997/export-b028e81038af452d5aaa9c80a2bb10ed-generic.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-171e7b7bc5747bd249eba62537abd538-default_knowledge.res remapped: res://.godot/exported/133200997/export-171e7b7bc5747bd249eba62537abd538-default_knowledge.res
+Loading resource: res://src/sim/knowledge/knowledge_config.gdc remapped: res://src/sim/knowledge/knowledge_config.gdc
+Completed load for: 'res://src/sim/knowledge/knowledge_config.gd' remapped 'res://src/sim/knowledge/knowledge_config.gdc' at thread -1
+Completed load for: 'res://data/knowledge/default_knowledge.tres' remapped 'res://.godot/exported/133200997/export-171e7b7bc5747bd249eba62537abd538-default_knowledge.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-ae3751a1713fa4382e010efbe5505b70-dew_drops.res remapped: res://.godot/exported/133200997/export-ae3751a1713fa4382e010efbe5505b70-dew_drops.res
+Loading resource: res://src/sim/world/water_source_profile.gdc remapped: res://src/sim/world/water_source_profile.gdc
+Completed load for: 'res://src/sim/world/water_source_profile.gd' remapped 'res://src/sim/world/water_source_profile.gdc' at thread -1
+Completed load for: 'res://data/sources/dew_drops.tres' remapped 'res://.godot/exported/133200997/export-ae3751a1713fa4382e010efbe5505b70-dew_drops.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-c898c72ea99a382748e4099016eb0356-sheltered_seep.res remapped: res://.godot/exported/133200997/export-c898c72ea99a382748e4099016eb0356-sheltered_seep.res
+Completed load for: 'res://data/sources/sheltered_seep.tres' remapped 'res://.godot/exported/133200997/export-c898c72ea99a382748e4099016eb0356-sheltered_seep.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-ff1897218a1620fb767986dc914e0a43-flower_nectar.res remapped: res://.godot/exported/133200997/export-ff1897218a1620fb767986dc914e0a43-flower_nectar.res
+Completed load for: 'res://data/sources/flower_nectar.tres' remapped 'res://.godot/exported/133200997/export-ff1897218a1620fb767986dc914e0a43-flower_nectar.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-b11d948be00a82e6159fac9517ad3366-aphid_honeydew.res remapped: res://.godot/exported/133200997/export-b11d948be00a82e6159fac9517ad3366-aphid_honeydew.res
+Completed load for: 'res://data/sources/aphid_honeydew.tres' remapped 'res://.godot/exported/133200997/export-b11d948be00a82e6159fac9517ad3366-aphid_honeydew.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-dc29825ccd7355b966e555d15199d8f8-insect_remains.res remapped: res://.godot/exported/133200997/export-dc29825ccd7355b966e555d15199d8f8-insect_remains.res
+Completed load for: 'res://data/sources/insect_remains.tres' remapped 'res://.godot/exported/133200997/export-dc29825ccd7355b966e555d15199d8f8-insect_remains.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-b0986e55b480b613122ae763174dec76-hunted_arthropod.res remapped: res://.godot/exported/133200997/export-b0986e55b480b613122ae763174dec76-hunted_arthropod.res
+Completed load for: 'res://data/sources/hunted_arthropod.tres' remapped 'res://.godot/exported/133200997/export-b0986e55b480b613122ae763174dec76-hunted_arthropod.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-a2de32f6b9b5873273af8ad43cac421e-rain_puddle.res remapped: res://.godot/exported/133200997/export-a2de32f6b9b5873273af8ad43cac421e-rain_puddle.res
+Completed load for: 'res://data/sources/rain_puddle.tres' remapped 'res://.godot/exported/133200997/export-a2de32f6b9b5873273af8ad43cac421e-rain_puddle.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-72e7d9bba7070b3f85b632cd7e1637f1-ripe_fruit.res remapped: res://.godot/exported/133200997/export-72e7d9bba7070b3f85b632cd7e1637f1-ripe_fruit.res
+Completed load for: 'res://data/sources/ripe_fruit.tres' remapped 'res://.godot/exported/133200997/export-72e7d9bba7070b3f85b632cd7e1637f1-ripe_fruit.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-c2f2c79aa3134959df804eb12b051ad6-cracked_seeds.res remapped: res://.godot/exported/133200997/export-c2f2c79aa3134959df804eb12b051ad6-cracked_seeds.res
+Completed load for: 'res://data/sources/cracked_seeds.tres' remapped 'res://.godot/exported/133200997/export-c2f2c79aa3134959df804eb12b051ad6-cracked_seeds.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-b44104e9a050c4cea46c0e34db869f71-picnic_crumbs.res remapped: res://.godot/exported/133200997/export-b44104e9a050c4cea46c0e34db869f71-picnic_crumbs.res
+Completed load for: 'res://data/sources/picnic_crumbs.tres' remapped 'res://.godot/exported/133200997/export-b44104e9a050c4cea46c0e34db869f71-picnic_crumbs.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-c51a5c003651981a9aae9e23c927f473-roadside_connection_residue.res remapped: res://.godot/exported/133200997/export-c51a5c003651981a9aae9e23c927f473-roadside_connection_residue.res
+Completed load for: 'res://data/ecology/roadside_connection_residue.tres' remapped 'res://.godot/exported/133200997/export-c51a5c003651981a9aae9e23c927f473-roadside_connection_residue.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-9600a632c82b3b48c529fad8025f3dcd-roadside_connection_residue_v2.res remapped: res://.godot/exported/133200997/export-9600a632c82b3b48c529fad8025f3dcd-roadside_connection_residue_v2.res
+Completed load for: 'res://data/ecology/roadside_connection_residue_v2.tres' remapped 'res://.godot/exported/133200997/export-9600a632c82b3b48c529fad8025f3dcd-roadside_connection_residue_v2.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-a38c19f4c803a31f0325bb80c62a068e-default_rain.res remapped: res://.godot/exported/133200997/export-a38c19f4c803a31f0325bb80c62a068e-default_rain.res
+Loading resource: res://src/sim/weather/rain_config.gdc remapped: res://src/sim/weather/rain_config.gdc
+Completed load for: 'res://src/sim/weather/rain_config.gd' remapped 'res://src/sim/weather/rain_config.gdc' at thread -1
+Completed load for: 'res://data/weather/default_rain.tres' remapped 'res://.godot/exported/133200997/export-a38c19f4c803a31f0325bb80c62a068e-default_rain.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-baa739109dbdef2366941eec82df6717-default_swarm.res remapped: res://.godot/exported/133200997/export-baa739109dbdef2366941eec82df6717-default_swarm.res
+Loading resource: res://src/sim/ecology/swarm_config.gdc remapped: res://src/sim/ecology/swarm_config.gdc
+Completed load for: 'res://src/sim/ecology/swarm_config.gd' remapped 'res://src/sim/ecology/swarm_config.gdc' at thread -1
+Completed load for: 'res://data/ecology/default_swarm.tres' remapped 'res://.godot/exported/133200997/export-baa739109dbdef2366941eec82df6717-default_swarm.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-22f85ee80cb1612e09ea6b64781d6f6b-roadside_nest_disturbance.res remapped: res://.godot/exported/133200997/export-22f85ee80cb1612e09ea6b64781d6f6b-roadside_nest_disturbance.res
+Completed load for: 'res://data/weather/roadside_nest_disturbance.tres' remapped 'res://.godot/exported/133200997/export-22f85ee80cb1612e09ea6b64781d6f6b-roadside_nest_disturbance.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-bf664df873ee4f80407f3c159db4d38b-roadside_nest_disturbance_v2.res remapped: res://.godot/exported/133200997/export-bf664df873ee4f80407f3c159db4d38b-roadside_nest_disturbance_v2.res
+Completed load for: 'res://data/weather/roadside_nest_disturbance_v2.tres' remapped 'res://.godot/exported/133200997/export-bf664df873ee4f80407f3c159db4d38b-roadside_nest_disturbance_v2.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-8dd7434447666b4ffd0e3ba4a2905251-backyard_nectar.res remapped: res://.godot/exported/133200997/export-8dd7434447666b4ffd0e3ba4a2905251-backyard_nectar.res
+Loading resource: res://src/sim/ecology/resource_pulse_definition.gdc remapped: res://src/sim/ecology/resource_pulse_definition.gdc
+Completed load for: 'res://src/sim/ecology/resource_pulse_definition.gd' remapped 'res://src/sim/ecology/resource_pulse_definition.gdc' at thread -1
+Completed load for: 'res://data/ecology/backyard_nectar.tres' remapped 'res://.godot/exported/133200997/export-8dd7434447666b4ffd0e3ba4a2905251-backyard_nectar.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-9e279f37151bfcfa7d784eec19731eaa-picnic_crumbs.res remapped: res://.godot/exported/133200997/export-9e279f37151bfcfa7d784eec19731eaa-picnic_crumbs.res
+Loading resource: res://src/sim/ecology/temporary_resource_definition.gdc remapped: res://src/sim/ecology/temporary_resource_definition.gdc
+Completed load for: 'res://src/sim/ecology/temporary_resource_definition.gd' remapped 'res://src/sim/ecology/temporary_resource_definition.gdc' at thread -1
+Completed load for: 'res://data/ecology/picnic_crumbs.tres' remapped 'res://.godot/exported/133200997/export-9e279f37151bfcfa7d784eec19731eaa-picnic_crumbs.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-ede8943eab28d1c482834780ba115c7b-default_perception.res remapped: res://.godot/exported/133200997/export-ede8943eab28d1c482834780ba115c7b-default_perception.res
+Loading resource: res://src/presentation/perception_config.gdc remapped: res://src/presentation/perception_config.gdc
+Completed load for: 'res://src/presentation/perception_config.gd' remapped 'res://src/presentation/perception_config.gdc' at thread -1
+Completed load for: 'res://data/signals/default_perception.tres' remapped 'res://.godot/exported/133200997/export-ede8943eab28d1c482834780ba115c7b-default_perception.res' at thread -1
+Loading resource: res://assets/graphics/colony/chemical_cloud.png remapped: res://assets/graphics/colony/chemical_cloud.png
+Loading resource: res://.godot/imported/chemical_cloud.png-d63da1309192065522a5ddfcc91c35f9.ctex remapped: res://.godot/imported/chemical_cloud.png-d63da1309192065522a5ddfcc91c35f9.ctex
+Completed load for: 'res://assets/graphics/colony/chemical_cloud.png' remapped 'res://assets/graphics/colony/chemical_cloud.png' at thread -1
+Loading resource: res://assets/graphics/sensorium/vapor_v2.png remapped: res://assets/graphics/sensorium/vapor_v2.png
+Loading resource: res://.godot/imported/vapor_v2.png-ce8f2d15fe4fde9c573b9a3fa721d14d.ctex remapped: res://.godot/imported/vapor_v2.png-ce8f2d15fe4fde9c573b9a3fa721d14d.ctex
+Completed load for: 'res://assets/graphics/sensorium/vapor_v2.png' remapped 'res://assets/graphics/sensorium/vapor_v2.png' at thread -1
+Loading resource: res://assets/graphics/sensorium/organ_membrane_v2.png remapped: res://assets/graphics/sensorium/organ_membrane_v2.png
+Loading resource: res://.godot/imported/organ_membrane_v2.png-c93ce8ec54723fed7441fd5e0bb24697.ctex remapped: res://.godot/imported/organ_membrane_v2.png-c93ce8ec54723fed7441fd5e0bb24697.ctex
+Completed load for: 'res://assets/graphics/sensorium/organ_membrane_v2.png' remapped 'res://assets/graphics/sensorium/organ_membrane_v2.png' at thread -1
+Loading resource: res://assets/graphics/proof/water_impression.svg remapped: res://assets/graphics/proof/water_impression.svg
+Loading resource: res://.godot/imported/water_impression.svg-c5076ca4bcccc1b0956f4479c72be54b.ctex remapped: res://.godot/imported/water_impression.svg-c5076ca4bcccc1b0956f4479c72be54b.ctex
+Completed load for: 'res://assets/graphics/proof/water_impression.svg' remapped 'res://assets/graphics/proof/water_impression.svg' at thread -1
+Loading resource: res://assets/graphics/sensorium/worker_walk_v3.png remapped: res://assets/graphics/sensorium/worker_walk_v3.png
+Loading resource: res://.godot/imported/worker_walk_v3.png-98dc5010863c055ae3a8d092c11f77eb.ctex remapped: res://.godot/imported/worker_walk_v3.png-98dc5010863c055ae3a8d092c11f77eb.ctex
+Completed load for: 'res://assets/graphics/sensorium/worker_walk_v3.png' remapped 'res://assets/graphics/sensorium/worker_walk_v3.png' at thread -1
+Loading resource: res://assets/graphics/sensorium/worker_scent_v3.png remapped: res://assets/graphics/sensorium/worker_scent_v3.png
+Loading resource: res://.godot/imported/worker_scent_v3.png-cc9c20708c067b1d6a16f1c674b85a6a.ctex remapped: res://.godot/imported/worker_scent_v3.png-cc9c20708c067b1d6a16f1c674b85a6a.ctex
+Completed load for: 'res://assets/graphics/sensorium/worker_scent_v3.png' remapped 'res://assets/graphics/sensorium/worker_scent_v3.png' at thread -1
+Loading resource: res://assets/graphics/proof/nursery_earth.svg remapped: res://assets/graphics/proof/nursery_earth.svg
+Loading resource: res://.godot/imported/nursery_earth.svg-7c8868a177b0459f31e30dc1411e19f3.ctex remapped: res://.godot/imported/nursery_earth.svg-7c8868a177b0459f31e30dc1411e19f3.ctex
+Completed load for: 'res://assets/graphics/proof/nursery_earth.svg' remapped 'res://assets/graphics/proof/nursery_earth.svg' at thread -1
+Loading resource: res://assets/graphics/colony/material/local_home.png remapped: res://assets/graphics/colony/material/local_home.png
+Loading resource: res://.godot/imported/local_home.png-ca6165a88ee024538440a18a7239dd92.ctex remapped: res://.godot/imported/local_home.png-ca6165a88ee024538440a18a7239dd92.ctex
+Completed load for: 'res://assets/graphics/colony/material/local_home.png' remapped 'res://assets/graphics/colony/material/local_home.png' at thread -1
+Loading resource: res://assets/graphics/chemistry/chemical_wisps.gdshader remapped: res://assets/graphics/chemistry/chemical_wisps.gdshader
+Completed load for: 'res://assets/graphics/chemistry/chemical_wisps.gdshader' remapped 'res://assets/graphics/chemistry/chemical_wisps.gdshader' at thread -1
+Loading resource: res://.godot/exported/133200997/export-6a6a7be49ebeabd66d1b97e4309bcacb-flow_noise.res remapped: res://.godot/exported/133200997/export-6a6a7be49ebeabd66d1b97e4309bcacb-flow_noise.res
+Completed load for: 'res://assets/graphics/chemistry/flow_noise.tres' remapped 'res://.godot/exported/133200997/export-6a6a7be49ebeabd66d1b97e4309bcacb-flow_noise.res' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/nectar_memory.svg remapped: res://assets/graphics/chemistry/sources/nectar_memory.svg
+Loading resource: res://.godot/imported/nectar_memory.svg-c7597cf56f1e062a76f1049ae9a489ff.ctex remapped: res://.godot/imported/nectar_memory.svg-c7597cf56f1e062a76f1049ae9a489ff.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/nectar_memory.svg' remapped 'res://assets/graphics/chemistry/sources/nectar_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/honeydew_memory.svg remapped: res://assets/graphics/chemistry/sources/honeydew_memory.svg
+Loading resource: res://.godot/imported/honeydew_memory.svg-c477d03097bd8b99141b1e65a5378c90.ctex remapped: res://.godot/imported/honeydew_memory.svg-c477d03097bd8b99141b1e65a5378c90.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/honeydew_memory.svg' remapped 'res://assets/graphics/chemistry/sources/honeydew_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/fruit_memory.svg remapped: res://assets/graphics/chemistry/sources/fruit_memory.svg
+Loading resource: res://.godot/imported/fruit_memory.svg-a9a6f94269c6f8557c57f1de2fef7afb.ctex remapped: res://.godot/imported/fruit_memory.svg-a9a6f94269c6f8557c57f1de2fef7afb.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/fruit_memory.svg' remapped 'res://assets/graphics/chemistry/sources/fruit_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/seeds_memory.svg remapped: res://assets/graphics/chemistry/sources/seeds_memory.svg
+Loading resource: res://.godot/imported/seeds_memory.svg-7f7bbcd9eaf7a51f99eeca3ee68acb2b.ctex remapped: res://.godot/imported/seeds_memory.svg-7f7bbcd9eaf7a51f99eeca3ee68acb2b.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/seeds_memory.svg' remapped 'res://assets/graphics/chemistry/sources/seeds_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/crumbs_memory.svg remapped: res://assets/graphics/chemistry/sources/crumbs_memory.svg
+Loading resource: res://.godot/imported/crumbs_memory.svg-b6a3423502b0708700af4336d115d273.ctex remapped: res://.godot/imported/crumbs_memory.svg-b6a3423502b0708700af4336d115d273.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/crumbs_memory.svg' remapped 'res://assets/graphics/chemistry/sources/crumbs_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/dew_memory.svg remapped: res://assets/graphics/chemistry/sources/dew_memory.svg
+Loading resource: res://.godot/imported/dew_memory.svg-ef965a48ecee6a31dc31dff0b798906c.ctex remapped: res://.godot/imported/dew_memory.svg-ef965a48ecee6a31dc31dff0b798906c.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/dew_memory.svg' remapped 'res://assets/graphics/chemistry/sources/dew_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/puddle_memory.svg remapped: res://assets/graphics/chemistry/sources/puddle_memory.svg
+Loading resource: res://.godot/imported/puddle_memory.svg-3ac06ef5f27896d6560a3f5c512b1105.ctex remapped: res://.godot/imported/puddle_memory.svg-3ac06ef5f27896d6560a3f5c512b1105.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/puddle_memory.svg' remapped 'res://assets/graphics/chemistry/sources/puddle_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/seep_memory.svg remapped: res://assets/graphics/chemistry/sources/seep_memory.svg
+Loading resource: res://.godot/imported/seep_memory.svg-2b0dc76b3b0c066d8fb09353efd70003.ctex remapped: res://.godot/imported/seep_memory.svg-2b0dc76b3b0c066d8fb09353efd70003.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/seep_memory.svg' remapped 'res://assets/graphics/chemistry/sources/seep_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/sources/remains_memory.svg remapped: res://assets/graphics/chemistry/sources/remains_memory.svg
+Loading resource: res://.godot/imported/remains_memory.svg-9fd7df9b95f709979f6e4f5fc8e0ea53.ctex remapped: res://.godot/imported/remains_memory.svg-9fd7df9b95f709979f6e4f5fc8e0ea53.ctex
+Completed load for: 'res://assets/graphics/chemistry/sources/remains_memory.svg' remapped 'res://assets/graphics/chemistry/sources/remains_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/spider_memory.svg remapped: res://assets/graphics/chemistry/spider_memory.svg
+Loading resource: res://.godot/imported/spider_memory.svg-c7d18bb6ed52e4d63cb65fa41f9ba88d.ctex remapped: res://.godot/imported/spider_memory.svg-c7d18bb6ed52e4d63cb65fa41f9ba88d.ctex
+Completed load for: 'res://assets/graphics/chemistry/spider_memory.svg' remapped 'res://assets/graphics/chemistry/spider_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/beetle_memory.svg remapped: res://assets/graphics/chemistry/beetle_memory.svg
+Loading resource: res://.godot/imported/beetle_memory.svg-a16b7c3e036cdc085ed08dc5a94e8620.ctex remapped: res://.godot/imported/beetle_memory.svg-a16b7c3e036cdc085ed08dc5a94e8620.ctex
+Completed load for: 'res://assets/graphics/chemistry/beetle_memory.svg' remapped 'res://assets/graphics/chemistry/beetle_memory.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/context/site_loam.svg remapped: res://assets/graphics/chemistry/context/site_loam.svg
+Loading resource: res://.godot/imported/site_loam.svg-1d089ff802f5bfe102e26faaa83c0806.ctex remapped: res://.godot/imported/site_loam.svg-1d089ff802f5bfe102e26faaa83c0806.ctex
+Completed load for: 'res://assets/graphics/chemistry/context/site_loam.svg' remapped 'res://assets/graphics/chemistry/context/site_loam.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/context/site_root.svg remapped: res://assets/graphics/chemistry/context/site_root.svg
+Loading resource: res://.godot/imported/site_root.svg-2fb396e16f65f3acce95228c9ced7ea0.ctex remapped: res://.godot/imported/site_root.svg-2fb396e16f65f3acce95228c9ced7ea0.ctex
+Completed load for: 'res://assets/graphics/chemistry/context/site_root.svg' remapped 'res://assets/graphics/chemistry/context/site_root.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/context/site_stone.svg remapped: res://assets/graphics/chemistry/context/site_stone.svg
+Loading resource: res://.godot/imported/site_stone.svg-35f7a7bdd4f26442a9c107566bfb2671.ctex remapped: res://.godot/imported/site_stone.svg-35f7a7bdd4f26442a9c107566bfb2671.ctex
+Completed load for: 'res://assets/graphics/chemistry/context/site_stone.svg' remapped 'res://assets/graphics/chemistry/context/site_stone.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/context/site_edge.svg remapped: res://assets/graphics/chemistry/context/site_edge.svg
+Loading resource: res://.godot/imported/site_edge.svg-6f4f6532d71eb55443c37d8e6df9cce4.ctex remapped: res://.godot/imported/site_edge.svg-6f4f6532d71eb55443c37d8e6df9cce4.ctex
+Completed load for: 'res://assets/graphics/chemistry/context/site_edge.svg' remapped 'res://assets/graphics/chemistry/context/site_edge.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/context/foreign_ants.svg remapped: res://assets/graphics/chemistry/context/foreign_ants.svg
+Loading resource: res://.godot/imported/foreign_ants.svg-aeb80f610621a300b70cc77094c7a089.ctex remapped: res://.godot/imported/foreign_ants.svg-aeb80f610621a300b70cc77094c7a089.ctex
+Completed load for: 'res://assets/graphics/chemistry/context/foreign_ants.svg' remapped 'res://assets/graphics/chemistry/context/foreign_ants.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/context/large_animal.svg remapped: res://assets/graphics/chemistry/context/large_animal.svg
+Loading resource: res://.godot/imported/large_animal.svg-b04cc2cfd780a04a0199447903454f5d.ctex remapped: res://.godot/imported/large_animal.svg-b04cc2cfd780a04a0199447903454f5d.ctex
+Completed load for: 'res://assets/graphics/chemistry/context/large_animal.svg' remapped 'res://assets/graphics/chemistry/context/large_animal.svg' at thread -1
+Loading resource: res://assets/graphics/chemistry/context/dog_like.svg remapped: res://assets/graphics/chemistry/context/dog_like.svg
+Loading resource: res://.godot/imported/dog_like.svg-4c33c3e8937f211b446c116333c9d5b7.ctex remapped: res://.godot/imported/dog_like.svg-4c33c3e8937f211b446c116333c9d5b7.ctex
+Completed load for: 'res://assets/graphics/chemistry/context/dog_like.svg' remapped 'res://assets/graphics/chemistry/context/dog_like.svg' at thread -1
+Loading resource: res://assets/graphics/colony/queen.png remapped: res://assets/graphics/colony/queen.png
+Loading resource: res://.godot/imported/queen.png-e1e151067a33ccf165496370d4f4f9f3.ctex remapped: res://.godot/imported/queen.png-e1e151067a33ccf165496370d4f4f9f3.ctex
+Completed load for: 'res://assets/graphics/colony/queen.png' remapped 'res://assets/graphics/colony/queen.png' at thread -1
+Loading resource: res://assets/graphics/colony/brood_egg.png remapped: res://assets/graphics/colony/brood_egg.png
+Loading resource: res://.godot/imported/brood_egg.png-911fb71a56193fd2e9398e3f9b35f312.ctex remapped: res://.godot/imported/brood_egg.png-911fb71a56193fd2e9398e3f9b35f312.ctex
+Completed load for: 'res://assets/graphics/colony/brood_egg.png' remapped 'res://assets/graphics/colony/brood_egg.png' at thread -1
+Loading resource: res://assets/graphics/colony/brood_larva.png remapped: res://assets/graphics/colony/brood_larva.png
+Loading resource: res://.godot/imported/brood_larva.png-fcaf7f36be5b8f00a8ba538524596554.ctex remapped: res://.godot/imported/brood_larva.png-fcaf7f36be5b8f00a8ba538524596554.ctex
+Completed load for: 'res://assets/graphics/colony/brood_larva.png' remapped 'res://assets/graphics/colony/brood_larva.png' at thread -1
+Loading resource: res://assets/graphics/colony/brood_pupa.png remapped: res://assets/graphics/colony/brood_pupa.png
+Loading resource: res://.godot/imported/brood_pupa.png-d7b2c5aed216df89dd76c36c0ec89ce8.ctex remapped: res://.godot/imported/brood_pupa.png-d7b2c5aed216df89dd76c36c0ec89ce8.ctex
+Completed load for: 'res://assets/graphics/colony/brood_pupa.png' remapped 'res://assets/graphics/colony/brood_pupa.png' at thread -1
+Loading resource: res://assets/audio/base_loop.wav remapped: res://assets/audio/base_loop.wav
+Loading resource: res://.godot/imported/base_loop.wav-8f690565c44383c1c0524be91c2633f2.sample remapped: res://.godot/imported/base_loop.wav-8f690565c44383c1c0524be91c2633f2.sample
+Completed load for: 'res://assets/audio/base_loop.wav' remapped 'res://assets/audio/base_loop.wav' at thread -1
+Loading resource: res://assets/audio/growth_loop.wav remapped: res://assets/audio/growth_loop.wav
+Loading resource: res://.godot/imported/growth_loop.wav-78c3d3f56002afc0493fdd0b4aebba5f.sample remapped: res://.godot/imported/growth_loop.wav-78c3d3f56002afc0493fdd0b4aebba5f.sample
+Completed load for: 'res://assets/audio/growth_loop.wav' remapped 'res://assets/audio/growth_loop.wav' at thread -1
+Loading resource: res://assets/audio/nursery_loop.wav remapped: res://assets/audio/nursery_loop.wav
+Loading resource: res://.godot/imported/nursery_loop.wav-9e2badd29f8b2734d5c1e8e3b3c8b0a2.sample remapped: res://.godot/imported/nursery_loop.wav-9e2badd29f8b2734d5c1e8e3b3c8b0a2.sample
+Completed load for: 'res://assets/audio/nursery_loop.wav' remapped 'res://assets/audio/nursery_loop.wav' at thread -1
+Loading resource: res://assets/audio/midden_loop.wav remapped: res://assets/audio/midden_loop.wav
+Loading resource: res://.godot/imported/midden_loop.wav-cd4d4112f4e7c2891424d19bb74e207c.sample remapped: res://.godot/imported/midden_loop.wav-cd4d4112f4e7c2891424d19bb74e207c.sample
+Completed load for: 'res://assets/audio/midden_loop.wav' remapped 'res://assets/audio/midden_loop.wav' at thread -1
+Loading resource: res://assets/audio/returned_alarm.wav remapped: res://assets/audio/returned_alarm.wav
+Loading resource: res://.godot/imported/returned_alarm.wav-392178220ed5256f51bc12e991bb4802.sample remapped: res://.godot/imported/returned_alarm.wav-392178220ed5256f51bc12e991bb4802.sample
+Completed load for: 'res://assets/audio/returned_alarm.wav' remapped 'res://assets/audio/returned_alarm.wav' at thread -1
+Loading resource: res://assets/audio/returned_discovery.wav remapped: res://assets/audio/returned_discovery.wav
+Loading resource: res://.godot/imported/returned_discovery.wav-39c0e7e7e1077ee738aef3661df48d2d.sample remapped: res://.godot/imported/returned_discovery.wav-39c0e7e7e1077ee738aef3661df48d2d.sample
+Completed load for: 'res://assets/audio/returned_discovery.wav' remapped 'res://assets/audio/returned_discovery.wav' at thread -1
+Completed load for: 'res://src/core/game_root.gd' remapped 'res://src/core/game_root.gdc' at thread -1
+Completed load for: 'res://scenes/main/main.tscn' remapped 'res://.godot/exported/133200997/export-f39996a6d27a38698d16421ab974097b-main.scn' at thread -1
+Loading resource: res://.godot/exported/133200997/export-1d0fc8babd4295dc861d3ecb5e94a03a-backyard_slice.res remapped: res://.godot/exported/133200997/export-1d0fc8babd4295dc861d3ecb5e94a03a-backyard_slice.res
+Loading resource: res://.godot/exported/133200997/export-fbbd7fea11d82428daa6c8cc591a0220-water.res remapped: res://.godot/exported/133200997/export-fbbd7fea11d82428daa6c8cc591a0220-water.res
+Completed load for: 'res://data/resources/water.tres' remapped 'res://.godot/exported/133200997/export-fbbd7fea11d82428daa6c8cc591a0220-water.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-4346c477dc437a8a72b47ca24dd2607c-nest_site.res remapped: res://.godot/exported/133200997/export-4346c477dc437a8a72b47ca24dd2607c-nest_site.res
+Completed load for: 'res://data/resources/nest_site.tres' remapped 'res://.godot/exported/133200997/export-4346c477dc437a8a72b47ca24dd2607c-nest_site.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-291fef4ec98d45af605279444531bd5e-carbohydrate.res remapped: res://.godot/exported/133200997/export-291fef4ec98d45af605279444531bd5e-carbohydrate.res
+Completed load for: 'res://data/resources/carbohydrate.tres' remapped 'res://.godot/exported/133200997/export-291fef4ec98d45af605279444531bd5e-carbohydrate.res' at thread -1
+Loading resource: res://.godot/exported/133200997/export-4c4b9cb57880758423040645a0c4482a-protein.res remapped: res://.godot/exported/133200997/export-4c4b9cb57880758423040645a0c4482a-protein.res
+Completed load for: 'res://data/resources/protein.tres' remapped 'res://.godot/exported/133200997/export-4c4b9cb57880758423040645a0c4482a-protein.res' at thread -1
+Completed load for: 'res://data/scenarios/backyard_slice.tres' remapped 'res://.godot/exported/133200997/export-1d0fc8babd4295dc861d3ecb5e94a03a-backyard_slice.res' at thread -1
+XR: Clearing primary interface
+XR: Removed interface "Native mobile"
+XR: Removed interface "OpenXR"
+Accessibility: window 0 adapter destroyed.
+Leaked instance: AudioStreamWAV:9223372197345625972 - Reference count: 1
+Leaked instance: AudioStreamWAV:9223372197395957623 - Reference count: 1
+Leaked instance: AudioStreamWAV:9223372197446289274 - Reference count: 1
+Leaked instance: AudioStreamWAV:9223372197496620925 - Reference count: 1
+Leaked instance: AudioStreamPlaybackWAV:9223372197664393090 - Reference count: 1
+Leaked instance: AudioStreamPlaybackWAV:9223372197681170308 - Reference count: 1
+Leaked instance: AudioStreamPlaybackWAV:9223372197697947525 - Reference count: 1
+Leaked instance: AudioStreamPlaybackWAV:9223372197714724742 - Reference count: 1
+Hint: Leaked instances typically happen when nodes are removed from the scene tree (with `remove_child()`) but not freed (with `free()` or `queue_free()`).
+Orphan StringName: Master (static: 0, total: 8)
+StringName: 1 unclaimed string names at exit.
+WARNING: 8 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

@@ -575,7 +575,7 @@ func _button_rect(command: String) -> Rect2:
 	match command:
 		"internal_pressure": return Rect2(264, 100, 300, 44)
 		"daughter_pressure": return Rect2(264, 100 if _status.get("internal_attention", {}).is_empty() else 152, 300, 44)
-		"pile": return Rect2(24, 152, 220, 44)
+		"pile": return Rect2(get_viewport_rect().size.x - 316, 88, 208, 44)
 		"sources": return Rect2(24, 100, 220, 44)
 		"scout": return Rect2(24, y, 148, 64)
 		"pause": return Rect2(188, y, 104, 64)

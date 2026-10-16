@@ -26,6 +26,7 @@ var midden_player: AudioStreamPlayer
 var nursery_gain: float = 0.0
 var midden_gain: float = 0.0
 var preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
+var _shutting_down: bool = false
 
 
 func _ready() -> void:
@@ -46,7 +47,7 @@ func _ready() -> void:
 
 
 func restart_after_load() -> void:
-	if base_player == null or growth_player == null:
+	if _shutting_down or base_player == null or growth_player == null:
 		return
 	_reported_losses = int(alarm_provider.call()) if alarm_provider.is_valid() else 0
 	_reported_discoveries = int(discovery_provider.call()) if discovery_provider.is_valid() else 0
@@ -86,6 +87,12 @@ func poll_returned_alarm() -> bool:
 
 
 func _exit_tree() -> void:
+	stop_playback()
+
+
+func stop_playback() -> void:
+	_shutting_down = true
+	set_process(false)
 	for player: AudioStreamPlayer in _music_players() + [alarm_player, discovery_player]:
 		if player != null:
 			player.stop()

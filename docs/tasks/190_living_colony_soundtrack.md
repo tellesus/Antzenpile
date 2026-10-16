@@ -1,4 +1,4 @@
-# 190 â€” Living colony soundtrack
+# 190 — Living colony soundtrack
 
 Status: implementation and source verification complete; unified Windows publication pending.
 
