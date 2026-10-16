@@ -25,7 +25,7 @@ static func report(run: RunState, origin: String, observed_at: float) -> void:
 	evidence.estimated_position = run.world.nodes[ID].position; evidence.uncertainty_radius = 0.25
 	evidence.closest_distance = 0; evidence.proximity_confirmed = true
 	var inbox: Dictionary[String, Observation] = {evidence.id: evidence}
-	assert(run.knowledge.consume(inbox, run.simulation_time))
+	var evidence_received: bool = run.knowledge.consume(inbox, run.simulation_time); assert(evidence_received)
 
 static func valid(world: WorldState, predator: PredatorState) -> bool:
 	if world.nodes.has(ID) != predator.killed: return false

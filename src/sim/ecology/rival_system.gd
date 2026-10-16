@@ -33,8 +33,8 @@ func tick(delta: float) -> void:
 	_tick_replacement()
 	if state.direction=="resting":
 		if state.workers.available>SwarmSystem.CONFIG.rival_retreat_count and _run.clock.tick_count>=state.continuity.rest_until_tick:
-			assert(state.workers.create_commitment("rival:trail","trail","rival_route_1"))
-			assert(state.workers.allocate("rival:trail",mini(CONFIG.trail_workers,state.workers.available)))
+			var commitment_created: bool = state.workers.create_commitment("rival:trail","trail","rival_route_1"); assert(commitment_created)
+			var workers_allocated: bool = state.workers.allocate("rival:trail",mini(CONFIG.trail_workers,state.workers.available)); assert(workers_allocated)
 			state.direction="outbound";state.remaining_ticks=leg;state.continuity.rest_until_tick=0
 		return
 	if _run.swarm.active() and _run.swarm.rival_engaged:
@@ -56,11 +56,11 @@ func tick(delta: float) -> void:
 		if state.continuity.enabled:
 			# Only an actual home arrival may add living reserves to the party.
 			if state.workers.count("rival:trail")<=SwarmSystem.CONFIG.rival_retreat_count:
-				assert(state.workers.release("rival:trail",state.workers.count("rival:trail")))
-				assert(state.workers.retire_commitment("rival:trail"))
+				var workers_released: bool = state.workers.release("rival:trail",state.workers.count("rival:trail")); assert(workers_released)
+				var commitment_retired: bool = state.workers.retire_commitment("rival:trail"); assert(commitment_retired)
 				state.direction="resting";state.remaining_ticks=0;state.continuity.rest_until_tick=_run.clock.tick_count+CONFIG.retreat_ticks;return
 			var refill: int=mini(CONFIG.trail_workers-state.workers.count("rival:trail"),state.workers.available)
-			if refill>0: assert(state.workers.allocate("rival:trail",refill))
+			if refill>0: var workers_allocated2: bool = state.workers.allocate("rival:trail",refill); assert(workers_allocated2)
 	state.remaining_ticks = leg
 
 func _tick_replacement() -> void:
@@ -70,16 +70,16 @@ func _tick_replacement() -> void:
 	if group.brood_count>0:
 		group.remaining_ticks-=1
 		if group.remaining_ticks>0: return
-		assert(state.workers.add_living_workers("available",group.brood_count,"Rival paid brood emergence"))
+		var workers_emerged: bool = state.workers.add_living_workers("available",group.brood_count,"Rival paid brood emergence"); assert(workers_emerged)
 		group.emerged_total+=group.brood_count
-		assert(state.workers.release("rival:brood",CONFIG.replacement_carers))
-		assert(state.workers.retire_commitment("rival:brood"))
+		var workers_released: bool = state.workers.release("rival:brood",CONFIG.replacement_carers); assert(workers_released)
+		var commitment_retired: bool = state.workers.retire_commitment("rival:brood"); assert(commitment_retired)
 		group.brood_count=0;group.funded_tick=0
 		return
 	var count: int=mini(CONFIG.replacement_group,CONFIG.population-state.workers.total)
 	if count<1 or state.workers.available<CONFIG.replacement_carers or state.stored_carbohydrate<count*CONFIG.replacement_cost or group.emerged_total>WorkerLedger.MAX_COUNT-CONFIG.population-count: return
-	assert(state.workers.create_commitment("rival:brood","internal","rival_brood"))
-	assert(state.workers.allocate("rival:brood",CONFIG.replacement_carers))
+	var commitment_created: bool = state.workers.create_commitment("rival:brood","internal","rival_brood"); assert(commitment_created)
+	var workers_allocated: bool = state.workers.allocate("rival:brood",CONFIG.replacement_carers); assert(workers_allocated)
 	state.stored_carbohydrate=roundf((state.stored_carbohydrate-count*CONFIG.replacement_cost)*100000.0)/100000.0
 	group.replacement_spent+=count*CONFIG.replacement_cost
 	group.brood_count=count;group.remaining_ticks=CONFIG.replacement_ticks;group.funded_tick=_run.clock.tick_count

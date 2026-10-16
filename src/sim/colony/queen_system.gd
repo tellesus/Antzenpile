@@ -96,7 +96,7 @@ func injure(pile_id: String, amount: int) -> void:
 	if pile.queen.count==0:return
 	pile.queen.condition=maxi(0,pile.queen.condition-amount)
 	if pile.queen.condition==0:
-		pile.queen.count=0;assert(set_care(pile_id,0));pile.queued_adaptation="";pile.investments=InvestmentIntent.new()
+		pile.queen.count=0;var care_stopped: bool = set_care(pile_id,0); assert(care_stopped);pile.queued_adaptation="";pile.investments=InvestmentIntent.new()
 
 func lose_replacement(pile_id: String) -> bool:
 	var pile: PileState=_run.colony.piles[pile_id]

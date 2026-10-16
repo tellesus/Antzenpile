@@ -36,13 +36,13 @@ func order(pile_id: String, action: String) -> bool:
 		refuge.priority=action;_run.refuges[pile_id]=refuge;last_error="";return true
 	if action=="release":
 		if refuge.phase=="none":return _reject("No shelter carers are held")
-		assert(pile.workers.release("refuge:"+pile_id,RefugeState.WORKERS));assert(pile.workers.retire_commitment("refuge:"+pile_id))
+		var workers_released: bool = pile.workers.release("refuge:"+pile_id,RefugeState.WORKERS); assert(workers_released);var commitment_retired: bool = pile.workers.retire_commitment("refuge:"+pile_id); assert(commitment_retired)
 		var empty:=RefugeState.new();empty.priority=refuge.priority;_run.refuges[pile_id]=empty;last_error="";return true
 	if action!="prepare":return _reject("Unknown shelter action")
 	last_error=blocker(pile_id)
 	if not last_error.is_empty():return false
 	if not pile.workers.create_commitment("refuge:"+pile_id,"internal",pile_id):return _reject("Shelter commitment unavailable")
-	assert(pile.allocate_workers("refuge:"+pile_id,RefugeState.WORKERS));assert(pile.consume_resources(RefugeState.COSTS))
+	var workers_allocated: bool = pile.allocate_workers("refuge:"+pile_id,RefugeState.WORKERS); assert(workers_allocated);var resources_paid: bool = pile.consume_resources(RefugeState.COSTS); assert(resources_paid)
 	refuge.targets=candidates(pile);refuge.phase="preparing";refuge.started_tick=_run.clock.tick_count;_run.refuges[pile_id]=refuge;last_error="";return true
 func tick() -> void:
 	for refuge: RefugeState in _run.refuges.values():

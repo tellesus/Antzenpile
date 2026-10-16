@@ -38,7 +38,7 @@ func tick(delta: float) -> float:
 	var next_elapsed: float = minf(CONFIG.duration_seconds, state.elapsed_seconds + delta)
 	var raining_seconds: float = next_elapsed - state.elapsed_seconds
 	for pile: PileState in _run.colony.piles.values():
-		assert(pile.deposit_resource("water", CONFIG.water_per_second * raining_seconds))
+		var resource_deposited: bool = pile.deposit_resource("water", CONFIG.water_per_second * raining_seconds); assert(resource_deposited)
 	_refill_exterior_water(raining_seconds)
 	state.elapsed_seconds = next_elapsed
 	if state.elapsed_seconds >= CONFIG.duration_seconds:

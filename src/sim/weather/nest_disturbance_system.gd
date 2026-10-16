@@ -19,7 +19,7 @@ func tick() -> void:
 		if phase=="pressure" and record.impacted==0:_impact(pile,record)
 		if phase=="settled" and record.settled==0:
 			record.settled=_run.clock.tick_count
-			if RefugeSystem.new(_run).state(id).phase!="none":assert(RefugeSystem.new(_run).order(id,"release"))
+			if RefugeSystem.new(_run).state(id).phase!="none":var refuge_released: bool = RefugeSystem.new(_run).order(id,"release"); assert(refuge_released)
 	if phase=="pressure" and not state.scent_disturbed:
 		for segment: TrailSegmentState in _run.trails.segments.values():
 			if segment.distance_to_path(config.position)<=config.radius:segment.decay_chemistry(-log(config.remaining_scent)/log(2.0))
@@ -37,14 +37,14 @@ func _impact(pile: PileState, record: Dictionary) -> void:
 		for index: int in losses:
 			if BROOD_SYSTEM.new(_run).lose_one(pile.id,"",cohort.uid(pile.id)):record.brood+=1
 	if not pile.queen.replacement_group.is_empty() and not refuge.protects(ReproductionState.body_identity(pile.queen.replacement_group,pile.id)):
-		assert(QueenSystem.new(_run).lose_replacement(pile.id));record.royals+=3
+		var replacement_lost: bool = QueenSystem.new(_run).lose_replacement(pile.id); assert(replacement_lost);record.royals+=3
 	if pile.reproduction.phase!="none" and not refuge.protects(pile.reproduction.identity(pile.id)):
-		assert(ReproductionSystem.new(_run).lose_group(pile.id));record.royals+=3
+		var group_lost: bool = ReproductionSystem.new(_run).lose_group(pile.id); assert(group_lost);record.royals+=3
 	var workers: int=roundi(pile.workers_available*config.worker_loss_fraction*exposure)
 	for index: int in workers:
 		var adapted: int=1 if _run.rng.randf()<pile.adaptation_fraction() else 0
 		var profile: String=pile.genetics.loss_profile(adapted==1,pile.adaptation_repertoire,pile.workers_total,_run.rng)
-		assert(pile.lose_workers("available",1,adapted,"local ground pressure",profile));record.workers+=1
+		var workers_lost: bool = pile.lose_workers("available",1,adapted,"local ground pressure",profile); assert(workers_lost);record.workers+=1
 func summary(pile_id: String) -> Dictionary:
 	if not _run.nest_disturbance.records.has(pile_id):return {}
 	var record: Dictionary=_run.nest_disturbance.records[pile_id]

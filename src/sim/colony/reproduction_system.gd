@@ -90,7 +90,7 @@ func lose_group(pile_id: String) -> bool:
 	if pile.reproduction.phase=="none":return false
 	var pool: String="reproduction:"+pile_id
 	if pile.reproduction.active():
-		assert(pile.workers.release(pool,CONFIG.nurses));assert(pile.workers.retire_commitment(pool))
+		var workers_released: bool = pile.workers.release(pool,CONFIG.nurses); assert(workers_released);var commitment_retired: bool = pile.workers.retire_commitment(pool); assert(commitment_retired)
 	pile.reproduction=ReproductionState.new()
 	return true
 

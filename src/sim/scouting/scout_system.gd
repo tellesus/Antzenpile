@@ -335,7 +335,7 @@ func tick(delta: float) -> void:
 				assert(valid)
 				_run.delivered_observations[delivered.id] = delivered
 			if not agent.investigation_source_id.is_empty() and not agent.observations.has(agent.investigation_source_id) and agent.mission_target in agent.return_path:
-				assert(_run.knowledge.record_outcome(agent.investigation_source_id, false, _run.simulation_time, "scout"))
+				var outcome_recorded: bool = _run.knowledge.record_outcome(agent.investigation_source_id, false, _run.simulation_time, "scout"); assert(outcome_recorded)
 			var released: bool = home.workers.release(id, 1)
 			assert(released)
 			var retired: bool = home.workers.retire_commitment(id)
@@ -395,7 +395,7 @@ func _ambush(agent: ScoutAgent, from: Vector2) -> bool:
 	var pile: PileState = _run.colony.piles[agent.origin_pile]
 	var adapted: int = 1 if _run.rng.randf() < pile.adaptation_fraction() else 0
 	var profile: String = pile.genetics.loss_profile(adapted == 1, pile.adaptation_repertoire, pile.workers_total, _run.rng)
-	assert(pile.lose_workers(agent.id, 1, adapted, "scout ambush", profile))
+	var workers_lost: bool = pile.lose_workers(agent.id, 1, adapted, "scout ambush", profile); assert(workers_lost)
 	agent.lost = true
 	agent.lost_profile = profile
 	agent.observations.clear()
@@ -416,7 +416,7 @@ func _settle_missing(agent: ScoutAgent) -> void:
 		if memory.expected_at < 0.0:
 			memory.expected_at = agent.expected_tick * SimulationClock.TICK_INTERVAL
 		memory.missing_at = _run.simulation_time
-	assert(_run.colony.piles[agent.origin_pile].workers.retire_commitment(agent.id))
+	var commitment_retired: bool = _run.colony.piles[agent.origin_pile].workers.retire_commitment(agent.id); assert(commitment_retired)
 	_run.scouts.erase(agent.id)
 	_prune_history()
 

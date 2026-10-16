@@ -36,7 +36,7 @@ func investigate_approach(route_id: String) -> bool:
 	if pile.resources.carbohydrate < cost: return _reject("Needs three workers and longer-approach travel food")
 	if not _dispatch(route_id,"investigate",CONFIG.investigation_workers): return false
 	var old_cost: float = _cost(route_id,CONFIG.investigation_workers)
-	if cost > old_cost: assert(pile.consume_resources({"carbohydrate":cost-old_cost}))
+	if cost > old_cost: var resources_paid: bool = pile.consume_resources({"carbohydrate":cost-old_cost}); assert(resources_paid)
 	_run.journey_response.approach.candidate = candidate
 	return true
 
@@ -128,7 +128,7 @@ func _fund_orders() -> void:
 			if pile.workers_assignable + pile.workers.count(ConflictRecruitment.pool(id)) < maxi(0, int(entry.trail_target) - route.allocated_workers - _run.trails.pending_losses(id)): continue
 			var target: int = entry.trail_target
 			recruitment.cancel(id)
-			assert(recruitment.jobs.gatherers.set_workers(id, target))
+			var target_set: bool = recruitment.jobs.gatherers.set_workers(id, target); assert(target_set)
 		elif state.active():
 			if state.route_id == id and state.defense.mode == "defend" and not _reinforcement_pending():
 				reinforce(id, int(entry.count))
@@ -149,7 +149,7 @@ func _dispatch(route_id: String, mode: String, count: int) -> bool:
 	if not recruited and pile.workers_assignable < count or pile.resources.carbohydrate < cost: return _reject("Needs %d available workers and travel food" % count)
 	if not pile.workers.create_commitment(commitment,"other",route_id): return _reject("Party commitment unavailable")
 	if recruited: recruitment.consume(route_id, commitment, count)
-	else: assert(pile.allocate_workers(commitment,count))
+	else: var workers_allocated: bool = pile.allocate_workers(commitment,count); assert(workers_allocated)
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
 	assert(paid)
 	state.route_id = route_id; state.phase = "outbound"; state.workers = count; state.departed_at = _run.simulation_time
@@ -173,10 +173,10 @@ func reinforce(route_id: String, count: int = CONFIG.reinforcement_workers) -> b
 	if not recruited and pile.workers_assignable < count or pile.resources.carbohydrate < cost: return _reject("Reinforcement needs workers and travel food")
 	if recruited:
 		var entry: Dictionary = state.orders.recruitment[route_id]
-		assert(pile.workers.transfer(ConflictRecruitment.pool(route_id), "journey:" + pile.id, count))
+		var workers_transferred: bool = pile.workers.transfer(ConflictRecruitment.pool(route_id), "journey:" + pile.id, count); assert(workers_transferred)
 		entry.count -= count
 		if entry.count == 0: recruitment.cancel(route_id)
-	else: assert(pile.allocate_workers("journey:"+pile.id,count))
+	else: var workers_allocated: bool = pile.allocate_workers("journey:"+pile.id,count); assert(workers_allocated)
 	var paid: bool = pile.consume_resources({"carbohydrate":cost})
 	assert(paid)
 	defense.extra_combat_multiplier = pile.combat_multiplier()
