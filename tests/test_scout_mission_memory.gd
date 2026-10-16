@@ -110,7 +110,7 @@ func _test_view(test: Object) -> void:
 	view._process(0.0)
 	var traces: Array[Dictionary] = view._mission_traces
 	test.check(traces.size() == 1 and traces[0].missions.size() == 2, "Nearby mission directions share a bounded trace")
-	test.check(Trace.pick(traces, traces[0].points[8], "") != "", "Outer scout trail stroke is selectable as well as its cap")
+	test.check(Trace.pick(traces, traces[0].points[traces[0].points.size()*2/3], "") != "", "Outer scout trail stroke is selectable as well as its cap")
 	for kind: String in ["mouse", "touch"]:
 		view._pointer_press(traces[0].center, kind)
 		view._pointer_release(traces[0].center, kind)

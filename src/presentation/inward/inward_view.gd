@@ -201,10 +201,12 @@ func activate_at(at: Vector2) -> bool:
 		web_family = "foraging"
 		queue_redraw()
 		return true
-	if selected_id == "adaptation" and Web.families(_status).size()>1 and _web_family_rect().has_point(at):
-		web_family = Web.next_family(_status,web_family)
-		web_selection = "foraging"
-		return true
+	if selected_id == "adaptation":
+		for family: String in Web.families(_status):
+			if _web_family_rect(family).has_point(at):
+				web_family=family
+				web_selection="foraging"
+				return true
 	if selected_id == "adaptation" and web_selection == "honeydew" and _status.get("honeydew", {}).get("relationship", "unknown") in ["exploited", "tended"] and _honeydew_rect().has_point(at):
 		var service: Dictionary=_status.honeydew
 		effort_draft.begin("producer",service.target if service.target>0 else service.required_workers,service.cap,service.required_workers)
@@ -478,8 +480,9 @@ func _web_back_rect() -> Rect2:
 	return Rect2(24, 116, 196, 44)
 
 
-func _web_family_rect() -> Rect2:
-	return Rect2(236, 116, 220, 44)
+func _web_family_rect(family: String = "") -> Rect2:
+	var index: int=Web.families(_status).find(family if not family.is_empty() else Web.next_family(_status,web_family))
+	return Rect2(236+(index%3)*104,116+(index/3)*50,96,44)
 
 
 func _honeydew_rect() -> Rect2:
@@ -507,9 +510,10 @@ func _draw() -> void:
 		Web.draw_graph(self, size, _status, web_selection, _animation_time, web_family)
 		UIStyle.surface(self, _web_back_rect(), Color("18252b"))
 		_label(_web_back_rect().position + Vector2(98, 29), "COLONY NETWORK", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
-		if Web.families(_status).size()>1:
-			UIStyle.surface(self, _web_family_rect(), Color("28212f"))
-			_label(_web_family_rect().position + Vector2(110, 29), "INSPECT "+Web.next_family(_status,web_family).to_upper(), Color("d3c5df"), 14, HORIZONTAL_ALIGNMENT_CENTER)
+		for family: String in Web.families(_status):
+			var tab: Rect2=_web_family_rect(family)
+			UIStyle.surface(self,tab,Color("74664c") if family==web_family else Color("302d37"))
+			_label(tab.get_center()+Vector2(0,5),family.capitalize(),UIStyle.TEXT,11,HORIZONTAL_ALIGNMENT_CENTER)
 		_draw_hud(size)
 		_draw_context(size)
 		_draw_controls(size)
@@ -699,18 +703,18 @@ func _draw_context(size: Vector2) -> void:
 		"midden":
 			var midden: Dictionary = _status.get("midden", {})
 			_detail_line(box, 65, "Refuse burden: %.1f" % midden.get("burden", 0.0))
-			_detail_line(box, 89, "Developed isolation" if midden.get("state") == "developed" else "Basic refuse isolation")
+			_detail_line(box, 89, "Built Midden · cleanup doubled" if midden.get("state") == "developed" else "Waste noticed · open refuse heap")
 			_detail_line(box, 113, "Brood recovering · keep cleaning" if _status.get("brood_health", {}).get("condition", "stable") == "recovering" else "Unhealthy brood · isolate refuse" if _status.get("brood_health", {}).get("condition", "stable") != "stable" else "Larval growth: %.0f%%" % (midden.get("larval_rate", 1.0) * 100.0))
-			_detail_line(box, 137, "Cleanup workers: %d" % midden.get("cleaners", 0))
+			_detail_line(box, 137, "%d cleaners · work without a building" % midden.get("cleaners",0) if midden.get("state")!="developed" else "%d cleaners · built isolation chamber" % midden.get("cleaners",0))
 			for target: int in [0, 1, 2, 5]:
 				var button: Rect2 = _cleaner_rect(target)
 				UIStyle.surface(self, button, Color("4b5141") if target == midden.get("cleaners", 0) else Color("263038"))
 				_label(button.get_center() + Vector2(0, 6), str(target), Color("dce5d9"), 16, HORIZONTAL_ALIGNMENT_CENTER)
 			if midden.get("state") == "primitive":
-				_detail_line(box, 218, "Develop for twice the cleanup")
+				_detail_line(box, 218, "Build isolation: same crew cleans 2×")
 				_detail_line(box, 244, "Needs %.0f carbs · %.0f protein" % [midden.costs.carbohydrate, midden.costs.protein])
 				_detail_line(box, 266, "%.0f water · %d workers · %.0fs" % [midden.costs.water, midden.build_workers, midden.build_seconds])
-				_draw_action(_midden_develop_rect(), "DEVELOP MIDDEN", Copy.local_shortage(_status, midden.costs, midden.build_workers))
+				_draw_action(_midden_develop_rect(), "BUILD MIDDEN", Copy.local_shortage(_status, midden.costs, midden.build_workers))
 			elif midden.get("state") == "developing":
 				_detail_line(box, 224, "Developing: %.0f%%" % (midden.progress * 100.0))
 				_detail_line(box, 246, "%d excavation workers committed" % midden.build_workers)
@@ -906,7 +910,7 @@ func _draw_context(size: Vector2) -> void:
 		"adaptation":
 			_detail_line(box, 65, web_family.capitalize()+" tradeoffs · overview")
 			_detail_line(box, 91, "Select a trait to inspect its tradeoff")
-			_detail_line(box, 117, "Queue its next brood in this panel")
+			_detail_line(box, 117, "Queue → raise brood → adult carriers")
 			if not _status.adaptation_trial.is_empty():
 				_detail_line(box, 163, "Laid: " + Web.short_title(_status.adaptation_trial.adaptation_id))
 				_detail_line(box, 189, "Locked · await brood report" if _status.adaptation_trial.get("transport_wait","")=="report" else "Locked · incoming paid brood" if _status.adaptation_trial.get("transport_wait","")=="incoming" else "Locked · %s brood" % _status.adaptation_trial.stage.capitalize())
@@ -918,7 +922,7 @@ func _draw_context(size: Vector2) -> void:
 			else:
 				_detail_line(box, 163, "One focused brood trial at a time")
 				_detail_line(box, 189, "Genes require food, nurses and brood")
-				_detail_line(box, 215, "Relationships grow through interaction")
+				_detail_line(box, 215, "New families follow colony experience")
 			if not _queued_trait().is_empty():
 				_draw_action(_adaptation_rect(""), "CANCEL QUEUED CHOICE", "", Color("28212f"))
 				_detail_line(box, 302, "Next: " + Web.short_title(_queued_trait()))
@@ -1054,7 +1058,10 @@ func _draw_compact_nursery(box: Rect2) -> void:
 
 
 func _detail_line(box: Rect2, y: float, value: String) -> void:
-	_label(box.position + Vector2(16, y), value, Color("a9b9bc"), 15)
+	var font_size: int=15
+	while font_size>11 and _font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x>box.size.x-32:
+		font_size-=1
+	_label(box.position+Vector2(16,y),Copy.fit_line(value,_font,font_size,box.size.x-32),Color("b8c3af"),font_size)
 
 
 func _brood_block_reason() -> String:

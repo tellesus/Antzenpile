@@ -2,6 +2,7 @@ class_name ScoutTraceVisual
 extends RefCounted
 ## Abstract launch directions/coarse returned course, never remote scout positions.
 
+const Art = preload("res://src/presentation/sensory_art.gd")
 const Panorama = preload("res://src/presentation/outward/outward_projection.gd")
 const Perception = preload("res://src/presentation/perception_model.gd")
 const MAX_TRACES: int = 8
@@ -35,10 +36,13 @@ static func traces(missions: Array, facing: float, size: Vector2) -> Array[Dicti
 		var finish := Vector2(size.x * 0.5 + float(relative) / Panorama.HALF_FIELD * (size.x * 0.5 - 72.0), size.y * 0.61)
 		var points := PackedVector2Array()
 		var stub: bool = mission.scent < 0.1
-		for index: int in 13:
-			var t: float = float(index) / 12.0 * (0.48 if stub else 1.0)
+		for index: int in 33:
+			var t: float = float(index) / 32.0 * (0.48 if stub else 1.0)
 			var control: Vector2 = home + Vector2((finish.x - home.x) * 0.3, -40)
-			points.append(home * (1.0 - t) * (1.0 - t) + control * 2.0 * t * (1.0 - t) + finish * t * t)
+			var at: Vector2=home*(1.0-t)*(1.0-t)+control*2.0*t*(1.0-t)+finish*t*t
+			var side: Vector2=(finish-home).normalized().orthogonal()
+			at+=side*sin(t*PI)*sin(t*TAU+sector*0.63)*9.0
+			points.append(at)
 		var entry: Dictionary = {"missions": [mission.duplicate(true)], "points": points,
 			"stub": stub, "center": points[-1], "scent": mission.scent}
 		groups[sector] = entry
@@ -79,3 +83,34 @@ static func departure(age: float, side: float, size: Vector2) -> Dictionary:
 	var finish: Vector2 = home + Vector2(0, -22.0)
 	return {"position": first.lerp(middle, t / 0.6) if t < 0.6 else middle.lerp(finish, (t - 0.6) / 0.4),
 		"direction": middle - first if t < 0.6 else finish - middle}
+
+
+static func draw_scent(view: Node2D, entry: Dictionary, time: float, selected: bool) -> void:
+	# Decorative chemistry on a remembered launch direction, never a scout's
+	# live position or progress. Motion does not depend on simulation time speed.
+	var points: PackedVector2Array=entry.points
+	var color:=Color("99e8bd")
+	var strength: float=clampf(float(entry.scent),0.0,1.0)
+	var opacity: float=(0.18+strength*0.32)*(1.25 if selected else 1.0)
+	var width: float=18.0+strength*12.0
+	Art.filament(view,points,Color(color,opacity*0.42),width*2.1,Art.FILAMENT,false)
+	Art.filament(view,points,Color(color,opacity),width,Art.FILAMENT,false)
+	# Two broken, flowing inner wisps keep the trace from reading as a wire.
+	for layer: int in 2:
+		var strand:=PackedVector2Array()
+		for i: int in points.size():
+			var t: float=float(i)/(points.size()-1)
+			var tangent: Vector2=points[mini(i+1,points.size()-1)]-points[maxi(0,i-1)]
+			strand.append(points[i]+tangent.normalized().orthogonal()*sin(t*TAU*1.4-time*0.6+layer*PI)*sin(t*PI)*width*0.20)
+		Art.filament(view,strand.slice(3+layer*8,points.size()-2-layer*3),Color(color.lightened(0.18),opacity*0.70),width*0.30,Art.FILAMENT,false)
+	for i: int in 5:
+		var index: int=5+i*5
+		var at: Vector2=points[index]+Vector2(sin(time*0.3+i),cos(time*0.23+i))*3
+		var extent:=Vector2(34,24)*(0.65+strength*0.5)
+		view.draw_texture_rect(Art.CLOUD,Rect2(at-extent*0.5,extent),false,Color(color,opacity*0.20))
+	var tip_size:=Vector2(30,24)*(0.6+strength*0.4)
+	view.draw_texture_rect(Art.CLOUD,Rect2(entry.center-tip_size*0.5,tip_size),false,Color(color,opacity*0.55))
+	if selected:
+		var rim: PackedVector2Array=Art.membrane(entry.center,17,0.4,0.8)
+		view.draw_polyline(rim.slice(3,11),Color(color,0.85),1.3,true)
+		view.draw_polyline(rim.slice(19,27),Color(color,0.85),1.3,true)

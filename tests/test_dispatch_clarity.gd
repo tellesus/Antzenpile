@@ -52,7 +52,9 @@ func run(test: Object) -> bool:
 			test.check(draft.panel(size).encloses(box) and box.size.x>=44 and box.size.y>=44,"Controls fit the panel and preserve touch targets")
 			for previous: Rect2 in boxes: test.check(not box.intersects(previous),"Visible actions do not overlap")
 			boxes.append(box)
-		test.check(draft.rect(size,"gather_commit").size.x==draft.panel(size).size.x-32,"There is one full-width primary commitment action")
+		test.check(draft.rect(size,"gather_commit").size.x==draft.rect(size,"gather_commit").size.y,"The sole primary commitment is a circular satellite")
+		var send: Rect2=draft.rect(size,"gather_commit")
+		test.check(draft.command_at(send.position+Vector2(1,1),size)=="gather_panel","Circle corners shield gestures without dispatching")
 	# An actual unreported casualty must remain unknown in the new receipt too.
 	var root := Root.new()
 	root.simulation = Predator.new()._fixture()

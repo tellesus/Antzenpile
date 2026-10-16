@@ -18,3 +18,5 @@ The Godot engine is distributed under its MIT license. Its license and
 third-party copyright/license notices accompany this build in
 GODOT_LICENSE.txt and GODOT_COPYRIGHT.txt, pinned to Godot 4.7.2.
 These notices describe dependencies; they do not relicense Antzenpile.
+
+The excavated local nest relief is original deterministic SVG artwork authored by tools/art/generate_excavated_home.py. It uses no third-party image or runtime dependency.

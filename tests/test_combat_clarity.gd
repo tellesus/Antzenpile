@@ -53,7 +53,7 @@ func run(test: Object) -> bool:
 	for size: Vector2 in [Vector2(1920,1080),Vector2(1280,720),Vector2(900,600)]:
 		popover.editing=true
 		var positions: Dictionary=popover.layout(size)
-		test.check(positions.buttons.draft_commit.size.x==positions.editor.size.x-24,"Combat has one full-width primary order")
+		test.check(positions.buttons.draft_commit.size.x==positions.buttons.draft_commit.size.y,"Combat has one circular Send satellite")
 		for command: String in positions.buttons:
 			if command.begins_with("draft_"):
 				test.check(positions.editor.encloses(positions.buttons[command]),"Every combat editor target fits inside the panel")

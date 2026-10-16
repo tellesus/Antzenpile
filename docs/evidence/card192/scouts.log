@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 26.8.1.260806 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon RX 6650 XT
+
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[NEON] capture=scouts_1920 size=(1920, 1080)
+[NEON] capture=scout_selected_1920 size=(1920, 1080)
+[NEON] capture=scouts_1280 size=(1280, 720)
+[NEON] capture=scout_selected_1280 size=(1280, 720)
+[NEON] capture=scouts_900 size=(900, 600)
+[NEON] capture=scout_selected_900 size=(900, 600)
+[SCOUT SCENT] paused snapshots and decorative clock preserved=true

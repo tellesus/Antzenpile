@@ -11,7 +11,7 @@ const WORKER = preload("res://assets/graphics/sensorium/worker_walk_v3.png")
 const SCENT_WORKER = preload("res://assets/graphics/sensorium/worker_scent_v3.png")
 const EARTH = preload("res://assets/graphics/proof/nursery_earth.svg")
 const FILAMENT = preload("res://assets/graphics/colony/chemical_cloud.png")
-const ENTRANCE = preload("res://assets/graphics/colony/material/local_home.png")
+const ENTRANCE = preload("res://assets/graphics/colony/material/excavated_home.svg")
 const WALK_FRAMES: int = 24
 const WALK_CELL: int = 192
 const WALK_COLUMNS: int = 8
@@ -137,13 +137,17 @@ static func filament(canvas: Node2D, points: PackedVector2Array, color: Color, w
 		canvas.draw_polyline(points, Color(color.lightened(0.3),color.a*0.85), 0.8, true)
 
 
-static func home_entrance(canvas: Node2D, center: Vector2, time: float = 0.0) -> void:
-	# Only immediate home substrate; no remote landscape or world coordinates.
-	# Broad immediate Home field. Its opening aligns with the existing sensory
-	# anchor; transparent upper space cannot introduce remote scenery.
-	canvas.draw_texture_rect(ENTRANCE,Rect2(center-Vector2(640,204),Vector2(1280,336)),false,Color(0.30,0.37,0.46,0.65))
-	var at: Vector2 = center - Vector2(0, 16)
-	canvas.draw_set_transform(at, 0.025 * sin(time * 0.2))
-	canvas.draw_texture_rect(CLOUD,Rect2(-Vector2(225,92),Vector2(450,184)),false,Color(1.0,0.60,0.18,0.12))
-	canvas.draw_texture_rect(ORGAN,Rect2(-Vector2(168,57),Vector2(336,114)),false,Color(1.0,0.69,0.26,0.82))
-	canvas.draw_set_transform(Vector2.ZERO)
+static func home_entrance(canvas: Node2D, center: Vector2, time: float = 0.0, available: int = 0) -> void:
+	# The mouth remains the sensory anchor. Static relief is baked once; six
+	# local representatives at most move on it, using only approved local labor.
+	var scale: float=clampf(canvas.get_viewport_rect().size.x/1280.0,0.72,1.25)
+	canvas.draw_texture_rect(ENTRANCE,Rect2(center-Vector2(800,200)*scale,Vector2(1600,440)*scale),false)
+	for i: int in mini(6,maxi(0,available)):
+		var progress: float=fposmod(time*0.045+i*0.167,1.0)
+		var angle: float=0.2+i*0.55
+		var distance: float=sin(progress*PI)
+		var offset:=Vector2(cos(angle)*220*distance,25+sin(angle)*100*distance)*scale
+		var direction:=Vector2(cos(angle),sin(angle)*0.55)*(1.0 if progress<0.5 else -1.0)
+		ant(canvas,center+offset,direction,Color("cda86b"),time*1.8+i,0.44*scale,true)
+		if progress<0.5:
+			canvas.draw_circle(center+offset+direction.normalized()*4*scale,1.8*scale,Color("a48451"))

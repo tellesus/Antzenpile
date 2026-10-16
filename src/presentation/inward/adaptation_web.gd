@@ -2,6 +2,7 @@ class_name AdaptationWeb
 extends RefCounted
 ## Knowledge-derived attention graph, not a physical network or a hidden tech tree.
 
+const Style = preload("res://src/presentation/organic_ui.gd")
 const Art = preload("res://src/presentation/sensory_art.gd")
 
 static func positions(size: Vector2) -> Dictionary:
@@ -9,17 +10,17 @@ static func positions(size: Vector2) -> Dictionary:
 	var height: float = maxf(0.0, size.y - 310.0)
 	var origin := Vector2(24, 170)
 	return {"foraging": origin + Vector2(width * 0.50, height * 0.25),
-		"lean": origin + Vector2(width * 0.27, height * 0.50),
-		"load": origin + Vector2(width * 0.73, height * 0.50),
+		"lean": origin + Vector2(width * 0.27, height * 0.62),
+		"load": origin + Vector2(width * 0.73, height * 0.62),
 		"fighter": origin + Vector2(width * 0.50, height * 0.65),
 		"efficient_nurses": origin + Vector2(width * 0.50, height * 0.65),
-		"heat_resilience": origin + Vector2(width * 0.27, height * 0.50),
-		"moisture_resilience": origin + Vector2(width * 0.73, height * 0.50),
-		"security": origin + Vector2(width * 0.27, height * 0.50),
-		"tolerance": origin + Vector2(width * 0.73, height * 0.50),
-		"persistent": origin + Vector2(width * 0.27, height * 0.50),
-		"rapid_repair": origin + Vector2(width * 0.73, height * 0.50),
-		"honeydew": origin + Vector2(width * 0.73, height * 0.84)}
+		"heat_resilience": origin + Vector2(width * 0.27, height * 0.62),
+		"moisture_resilience": origin + Vector2(width * 0.73, height * 0.62),
+		"security": origin + Vector2(width * 0.27, height * 0.62),
+		"tolerance": origin + Vector2(width * 0.73, height * 0.62),
+		"persistent": origin + Vector2(width * 0.27, height * 0.62),
+		"rapid_repair": origin + Vector2(width * 0.73, height * 0.62),
+		"honeydew": origin + Vector2(width * 0.50, height * 0.84)}
 
 static func visible_nodes(status: Dictionary, family: String = "foraging") -> Array[String]:
 	if family=="chemistry":
@@ -138,7 +139,7 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 				view.draw_polyline(points, Color(color, 0.24), 1.0, true)
 		var at: Vector2 = centers[id]
 		var boundary: PackedVector2Array = Art.membrane(at, 28, phase * 0.18 + at.x * 0.01, 0.72 if ecological else 1.0)
-		view.draw_colored_polygon(boundary, Color(color, 0.07))
+		Style.orb(view,Rect2(at-Vector2(28,28),Vector2(56,56)),Color("c3a5ea"),id==selected)
 		view.draw_polyline(boundary.slice(1, 27), Color(color, 0.48), 1.2, true)
 		if state.begins_with("Inherited") or state.begins_with("Queen lineage"):
 			view.draw_circle(at, 18.0, Color(color, 0.15))
@@ -159,5 +160,5 @@ static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected
 			view.draw_arc(at, 39, PI, PI + 0.65, 12, Color("dce5d9"), 1.0, true)
 		var label: String = family.capitalize()+" repertoire" if id=="foraging" and family!="foraging" else title(id)
 		view._label(at + Vector2(0, 45), label, color, 15, HORIZONTAL_ALIGNMENT_CENTER)
-		var subtitle: String = "Genes and ecological experience" if id == "foraging" else trait_state(status, id) if not ecological else "Ecological · tending active" if status.honeydew.relationship == "tended" else "Ecological · harvested" if status.honeydew.relationship == "exploited" else "Ecological · source observed"
+		var subtitle: String = "Experience → brood → inheritance" if id == "foraging" else trait_state(status, id) if not ecological else "Ecological · tending active" if status.honeydew.relationship == "tended" else "Ecological · harvested" if status.honeydew.relationship == "exploited" else "Ecological · source observed"
 		view._label(at + Vector2(0, 64), subtitle, Color(color, 0.75), 12, HORIZONTAL_ALIGNMENT_CENTER)

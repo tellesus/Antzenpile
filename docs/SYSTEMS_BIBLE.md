@@ -247,3 +247,7 @@ For every implementation card, specify its catalog/system IDs, visible benefit, 
 173 verifies practical late connection pressure in a fresh ordinary Roadside network. Old enabled worlds/cargo/receipts retain link_v1; fresh link_v2 overlaps reported links. Actual returning cues support closure, paid continuation, finite contaminated recall and healthy local recovery. Private content versions/intervals are stripped from normal projections. M7 physical-review integrity174 remains before the systems beta.
 
 174 completes physical-review integrity: bounded samples retain actual moving-predator and active disturbance context; ended review uses the selected date and older omissions remain explicit. Gameplay and normal knowledge do not read physical history. M1–M7 is now the headlessly verified systems beta, with native player graphics/feel/audio/balance and final M8/M9 shipping acceptance pending.
+
+### Player review192: coherence before additional systems
+
+The 2026-10-15 player review rejects current UI/art acceptance and identifies weak combat, apparently shallow adaptation progression and unclear function/construction prerequisites. Organic controls, five dispatch satellites and an ant-built entrance are the accepted presentation direction. See [review](GAMEPLAY_REDESIGN_REVIEW.md) for implemented clarity fixes and a proposed fresh-colony decision arc. Combat rebalance, adaptation redesign and changing construction prerequisites remain explicit design work; the existing catalog does not by itself prove these systems are satisfying.

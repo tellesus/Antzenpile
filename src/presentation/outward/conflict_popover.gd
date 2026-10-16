@@ -61,32 +61,32 @@ func start_edit(route: Dictionary, status: Dictionary) -> void:
 	if searching(route,status):goal="clear"
 
 func layout(size: Vector2) -> Dictionary:
-	var radius: float = clampf((size.y - 392) * 0.5, 96, 122)
+	var radius: float = clampf((size.y - 420) * 0.5, 96, 108)
 	var center := Vector2(size.x * 0.5 - (110 if editing or history_open else 0), (142 + size.y - 118) * 0.5)
-	var left: float = center.x - radius - 170
-	var right: float = center.x + radius + 10
+	var left: float = center.x-radius-120
+	var right: float = center.x+radius+12
 	var buttons: Dictionary = {
-		"conflict_send":Rect2(center.x-80, center.y-radius-62, 160, 54),
-		"conflict_retreat":Rect2(center.x-80, center.y+radius+8, 160, 54),
-		"conflict_survey":Rect2(left, center.y-27, 160, 54),
-		"conflict_approach":Rect2(right, center.y-27, 160, 54),
-		"conflict_reports":Rect2(left, center.y+55, 160, 44),
-		"journey_close":Rect2(right, center.y+55, 160, 44),
-		"conflict_close":Rect2(right+116, center.y-radius-62, 44, 44)}
+		"conflict_send":Rect2(center+Vector2(-36,-radius-76),Vector2(72,72)),
+		"conflict_retreat":Rect2(center+Vector2(-36,radius+4),Vector2(72,72)),
+		"conflict_survey":Rect2(center+Vector2(-radius-94,-38),Vector2(76,76)),
+		"conflict_approach":Rect2(center+Vector2(radius+18,-38),Vector2(76,76)),
+		"conflict_reports":Rect2(center+Vector2(-radius-88,48),Vector2(64,64)),
+		"journey_close":Rect2(center+Vector2(radius+24,48),Vector2(64,64)),
+		"conflict_close":Rect2(center+Vector2(radius+44,-radius-58),Vector2(44,44))}
 	var editor := Rect2(center.x+radius+12, maxf(140, center.y-175), 320, 350)
 	if editing:
-		buttons.merge({"draft_less_many":Rect2(editor.position+Vector2(12,116),Vector2(44,44)),
-			"draft_less":Rect2(editor.position+Vector2(62,116),Vector2(44,44)),
-			"draft_suggest":Rect2(editor.position+Vector2(112,116),Vector2(96,44)),
-			"draft_more":Rect2(editor.position+Vector2(214,116),Vector2(44,44)),
-			"draft_more_many":Rect2(editor.position+Vector2(264,116),Vector2(44,44)),
-			"draft_goal":Rect2(editor.position+Vector2(12,166),Vector2(296,44)),
-			"draft_all":Rect2(editor.position+Vector2(12,216),Vector2(296,44)),
-			"draft_commit":Rect2(editor.position+Vector2(12,302),Vector2(296,44)),
-			"draft_back":Rect2(editor.position+Vector2(264,6),Vector2(44,44))})
+		var count_center: Vector2=editor.position+Vector2(160,122)
+		for pair: Array in [["draft_less_many",150.0],["draft_less",-150.0],["draft_more",-30.0],["draft_more_many",30.0],["draft_commit",90.0]]:
+			var at: Vector2=count_center+Vector2.from_angle(deg_to_rad(pair[1]))*80
+			var r: float=24 if pair[0]=="draft_commit" else 22
+			buttons[pair[0]]=Rect2(at-Vector2.ONE*r,Vector2.ONE*r*2)
+		buttons.merge({"draft_suggest":Rect2(count_center-Vector2(42,42),Vector2(84,84)),
+			"draft_goal":Rect2(editor.position+Vector2(12,232),Vector2(296,44)),
+			"draft_all":Rect2(editor.position+Vector2(12,282),Vector2(296,44)),
+			"draft_back":Rect2(editor.position+Vector2(268,6),Vector2(44,44))})
 	elif history_open:
 		buttons.draft_back = Rect2(editor.position+Vector2(12,262),Vector2(236,44))
-	var bounds := Rect2(Vector2(left, center.y-radius-62),Vector2(right+160-left, 2*radius+124))
+	var bounds := Rect2(Vector2(left, center.y-radius-76),Vector2(right+110-left, 2*radius+152))
 	if editing or history_open: bounds = bounds.merge(editor)
 	var portrait := Rect2(center + Vector2(-radius+24, -radius+48), Vector2(2*radius-48, radius-44))
 	return {"center":center,"radius":radius,"buttons":buttons,"editor":editor,"bounds":bounds,"portrait":portrait}
@@ -95,12 +95,15 @@ func button_at(at: Vector2, size: Vector2) -> String:
 	var positions: Dictionary = layout(size)
 	if (editing or history_open) and positions.editor.has_point(at):
 		for command: String in positions.buttons:
-			if command.begins_with("draft_") and positions.buttons[command].has_point(at): return command
+			if command.begins_with("draft_") and _hit(command,positions.buttons[command],at): return command
 		return "journey_panel"
 	for command: String in positions.buttons:
 		if (editing or history_open) and positions.editor.intersects(positions.buttons[command]): continue
-		if not command.begins_with("draft_") and positions.buttons[command].has_point(at): return command
+		if not command.begins_with("draft_") and _hit(command,positions.buttons[command],at): return command
 	return "journey_panel" if positions.bounds.has_point(at) else ""
+
+func _hit(command: String, box: Rect2, at: Vector2) -> bool:
+	return box.has_point(at) if command in ["draft_goal","draft_all"] or history_open and command=="draft_back" else Style.circle_hit(box,at)
 
 func reason(action: String, route: Dictionary, status: Dictionary) -> String:
 	var state: Dictionary = status.get("journey_response", {})
@@ -131,7 +134,7 @@ func draw(view: Node2D, route: Dictionary, status: Dictionary, size: Vector2) ->
 	var state: Dictionary = status.get("journey_response", {})
 	var identity: String = _identity(route, status)
 	view.draw_circle(center, radius+3, Color("ff637c",0.045))
-	view.draw_circle(center, radius, Color("081219"))
+	Style.orb(view,Rect2(center-Vector2.ONE*radius,Vector2.ONE*radius*2),Color("dc9075"))
 	view.draw_arc(center, radius, 0, TAU, 96, Color("874958"), 1.2, true)
 	view.draw_arc(center, radius-4, -PI*0.78, -PI*0.22, 32, Color("ff7c99",0.8), 1.8, true)
 	_text(view, center+Vector2(0,-radius+22), identity, 15, 2*radius-18, Color("ffe1eb"))
@@ -152,16 +155,28 @@ func draw(view: Node2D, route: Dictionary, status: Dictionary, size: Vector2) ->
 		if (editing or history_open) and positions.editor.intersects(box): continue
 		view.draw_line(center+(box.get_center()-center).normalized()*radius, box.get_center(), Color("477581"), 1.0, true)
 		var blocked: String = reason(command,route,status)
-		var title: String = {"conflict_send":"REINFORCE" if own_party(route,status) or kind(route,status)=="gather" else "SEARCH & DEFEND" if searching(route,status) else "SEND ANTS", "conflict_retreat":"RETREAT / CANCEL", "conflict_survey":"RECHECK DANGER" if not state.get("reports",{}).get(route.get("id"),{}).is_empty() else "SURVEY DANGER", "conflict_approach":"ANOTHER APPROACH"}[command]
-		var detail: String = {"conflict_send":"Choose response workers", "conflict_retreat":"Recall this trail and response", "conflict_survey":"Optional · 3 survey workers", "conflict_approach":{"withdraw":"Recall gatherers to reroute", "waiting":"Wait for gatherers to return", "resume":"Resume the reported course", "test":"3 workers test a longer course"}[approach_action(route,status)]}[command]
-		_button(view, box, title, blocked if not blocked.is_empty() else detail, not blocked.is_empty())
-	_button(view,positions.buttons.conflict_reports,"REPORT HISTORY")
+		Style.orb(view,box,Color("9b7869") if not blocked.is_empty() else Style.GOLD)
+		Style.icon(view,box.get_center()-Vector2(0,7),command.trim_prefix("conflict_"),Color("948f7d") if not blocked.is_empty() else Style.TEXT)
+		_text(view,box.get_center()+Vector2(0,20),{"conflict_send":"RECRUIT","conflict_retreat":"RECALL","conflict_survey":"SURVEY","conflict_approach":"REROUTE"}[command],9,box.size.x-6,Style.TEXT)
+	_context_orb(view,positions.buttons.conflict_reports,"reports","HISTORY")
 	if not editing and not history_open:
-		var outcome: Dictionary = state.get("outcomes",{}).get(route.get("id"),{})
-		_button(view,positions.buttons.journey_close,"INSPECT REMAINS" if outcome.get("goal", "clear")=="hunt" and outcome.get("outcome","")=="secured" else "INSPECT SOURCE")
-		_button(view,positions.buttons.conflict_close,"×")
+		_context_orb(view,positions.buttons.journey_close,"source","SOURCE")
+		Style.orb(view,positions.buttons.conflict_close)
+		_text(view,positions.buttons.conflict_close.get_center()+Vector2(0,5),"×",18,36)
 	if editing: _draw_editor(view,positions,route,status)
 	elif history_open: _draw_history(view,positions,route,status)
+
+	if not editing and not history_open:
+		for command: String in ["conflict_send","conflict_retreat","conflict_survey","conflict_approach","conflict_reports","journey_close"]:
+			var titles: Dictionary={"conflict_send":"Choose response workers","conflict_retreat":"Retreat / cancel recruitment","conflict_survey":"Survey danger","conflict_approach":"Another approach","conflict_reports":"Returned report history","journey_close":"Inspect source"}
+			var details: Dictionary={"conflict_send":"Plan a response; sends nothing yet","conflict_retreat":"Recall trail and response; travel takes time","conflict_survey":"Optional: send three survey workers","conflict_approach":{"withdraw":"Recall gatherers before rerouting","waiting":"Wait for gatherers to return","resume":"Resume the reported alternate course","test":"Send three workers to test a longer course"}[approach_action(route,status)],"conflict_reports":"Read delivered evidence and its age","journey_close":"Return to gathering and source details"}
+			var blocked: String=reason(command,route,status)
+			Style.tooltip(view,positions.buttons[command],titles[command],blocked if not blocked.is_empty() else details[command],size)
+
+func _context_orb(view: Node2D, box: Rect2, icon_name: String, caption: String) -> void:
+	Style.orb(view,box)
+	Style.icon(view,box.get_center()-Vector2(0,7),icon_name,Style.TEXT)
+	_text(view,box.get_center()+Vector2(0,20),caption,9,box.size.x-4,Style.TEXT)
 
 func preview(route: Dictionary, status: Dictionary) -> Dictionary:
 	# Counts are detached knowledge, including unreported travelers, never bodies.
@@ -182,15 +197,20 @@ func _draw_editor(view: Node2D, positions: Dictionary, route: Dictionary, status
 	var box: Rect2 = positions.editor
 	var plan: Dictionary = preview(route,status)
 	Style.surface(view,box,Color("111e29")); Style.surface(view,box,Color("568b9c"),true)
-	_text(view,box.position+Vector2(136,25),"PROPOSED ADDITION" if plan.additional else "ARMED SEARCH" if searching(route,status) else "PROPOSED RESPONSE",15,240,Color("7de5ee"))
-	_text(view,box.position+Vector2(160,49),("Already assigned %d · ordered total %d" if draft_kind=="gather" else "Already sent %d · ordered total %d") % [plan.sent,plan.total],13,296)
-	_text(view,box.position+Vector2(160,78),("+%d ants" if plan.additional else "%d ants") % amount,23,296,Color("d9fbff"))
-	_text(view,box.position+Vector2(160,101),"%d idle at nest · care & building protected" % plan.available,12,296)
-	_button(view,positions.buttons.draft_less_many,"−5")
-	_button(view,positions.buttons.draft_less,"−1")
-	_button(view,positions.buttons.draft_more,"+1")
-	_button(view,positions.buttons.draft_more_many,"+5")
-	_button(view,positions.buttons.draft_suggest,"SET TO %d" % suggestion(route,status))
+	_text(view,box.position+Vector2(142,25),"ADD TO RESPONSE" if plan.additional else "PLAN RESPONSE",15,244,Style.GOLD)
+	_text(view,box.position+Vector2(150,48),"%d sent · %d free · care protected" % [plan.sent,plan.available],11,256)
+	var core: Rect2=positions.buttons.draft_suggest
+	for command: String in ["draft_less","draft_more","draft_less_many","draft_more_many","draft_commit"]:
+		var target: Rect2=positions.buttons[command]
+		var direction: Vector2=(target.get_center()-core.get_center()).normalized()
+		view.draw_line(core.get_center()+direction*40,target.get_center(),Color(Style.GOLD,0.45),2,true)
+	Style.orb(view,core,Style.GOLD)
+	_text(view,core.get_center()+Vector2(0,-17),"ADD" if plan.additional else "ANTS",10,76,Style.GOLD)
+	_text(view,core.get_center()+Vector2(0,14),str(amount),30,76,Style.TEXT)
+	for pair: Array in [["draft_less_many","−5"],["draft_less","−1"],["draft_more","+1"],["draft_more_many","+5"],["draft_commit","SEND"],["draft_back","×"]]:
+		var target: Rect2=positions.buttons[pair[0]]
+		Style.orb(view,target,Color("b9dc83") if pair[0]=="draft_commit" else Style.GOLD,pair[0]=="draft_commit")
+		_text(view,target.get_center()+Vector2(0,5),pair[1],11 if pair[0]=="draft_commit" else 16,target.size.x-6,Style.TEXT)
 	var goal_title: String="HOLD THE JUNCTION" if draft_kind=="gather" else "SEARCH AND DEFEND" if searching(route,status) else "HUNT FOR PROTEIN" if goal=="hunt" else "DRIVE PREDATOR AWAY"
 	var goal_detail: String="Gathering workers also fight" if draft_kind=="gather" else "Unknown threat · survey is optional" if searching(route,status) else "Locked for the sent party" if own_party(route,status) else "Tap to change · hunt adds risk"
 	if goal_editable(route,status):_button(view,positions.buttons.draft_goal,goal_title,goal_detail)
@@ -200,17 +220,9 @@ func _draw_editor(view: Node2D, positions: Dictionary, route: Dictionary, status
 		_text(view,center+Vector2(0,16),goal_detail,11,284,Color("91b2bf"))
 	var borrowing: Dictionary=borrowing_copy()
 	_button(view,positions.buttons.draft_all,borrowing.title,borrowing.detail)
-	var consequence: String = "May recall aphid attendants, scouts & supplies."
-	var detail: String = "Care/building protected; restart jobs yourself."
-	if not all_hands:
-		consequence = "Gatherers keep working while recruits join." if draft_kind=="gather" else "Recalled ants must reach home before joining."
-		detail = "%d waiting · %d at nest · %d returning" % [plan.waiting,plan.reserved,plan.returning] if plan.waiting>0 else "Arrival and outcome need a returned report."
-	_text(view,box.position+Vector2(160,279),consequence,12,296,Color("ffd083") if all_hands else Color("a4bdc5"))
-	_text(view,box.position+Vector2(160,295),detail,12,296,Color("ffd083") if all_hands else Color("a4bdc5"))
-	Style.surface(view,positions.buttons.draft_commit,Color("164757"))
-	Style.surface(view,positions.buttons.draft_commit,Color("69dceb"),true)
-	_text(view,positions.buttons.draft_commit.get_center()+Vector2(0,5),plan.action,16,280,Color("ddfcff"))
-	_button(view,positions.buttons.draft_back,"×")
+	_text(view,box.position+Vector2(160,342),"Jobs may be reduced; restart them yourself" if all_hands else "Recruits travel first · wait for their report",11,296,Style.GOLD)
+	Style.tooltip(view,positions.buttons.draft_commit,plan.action,"Commit this proposal; arrival is not instant",view.get_viewport_rect().size)
+	Style.tooltip(view,core,"Reset to suggested count","Free edit; suggestion is not a victory estimate",view.get_viewport_rect().size)
 
 func _draw_history(view: Node2D, positions: Dictionary, route: Dictionary, status: Dictionary) -> void:
 	var box: Rect2 = positions.editor

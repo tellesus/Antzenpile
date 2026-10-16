@@ -10,21 +10,21 @@ var maximum: int=1
 
 func begin(source_id: String, current: int, total: int) -> void:
 	opened=true;source=source_id;maximum=maxi(1,total);amount=clampi(current if current>0 else CONFIG.initial_workers,1,maximum)
-func panel(size: Vector2) -> Rect2: return Rect2(size.x-316,144,292,334)
+func panel(size: Vector2) -> Rect2: return Rect2(size.x-364,140,340,344)
 func rect(size: Vector2, command: String) -> Rect2:
 	var box: Rect2=panel(size)
-	match command:
-		"gather_less": return Rect2(box.position+Vector2(16,110),Vector2(56,44))
-		"gather_suggest": return Rect2(box.position+Vector2(78,160),Vector2(132,44))
-		"gather_more": return Rect2(box.position+Vector2(216,110),Vector2(60,44))
-		"gather_less_many": return Rect2(box.position+Vector2(16,160),Vector2(56,44))
-		"gather_more_many": return Rect2(box.position+Vector2(216,160),Vector2(60,44))
-		"gather_commit": return Rect2(box.position+Vector2(16,274),Vector2(260,44))
-		"gather_back": return Rect2(box.position+Vector2(232,8),Vector2(44,44))
+	var center: Vector2=box.position+Vector2(170,154)
+	var angles: Dictionary={"gather_less":-145.0,"gather_more":-35.0,"gather_less_many":155.0,"gather_more_many":25.0,"gather_commit":90.0}
+	if angles.has(command):
+		var at: Vector2=center+Vector2.from_angle(deg_to_rad(angles[command]))*100
+		var radius: float=28 if command=="gather_commit" else 24
+		return Rect2(at-Vector2.ONE*radius,Vector2.ONE*radius*2)
+	if command=="gather_suggest":return Rect2(center-Vector2(56,56),Vector2(112,112))
+	if command=="gather_back":return Rect2(box.position+Vector2(288,8),Vector2(44,44))
 	return Rect2()
 func command_at(at: Vector2, size: Vector2) -> String:
 	for command: String in ["gather_less","gather_suggest","gather_more","gather_less_many","gather_more_many","gather_commit","gather_back"]:
-		if rect(size,command).has_point(at): return command
+		if Style.circle_hit(rect(size,command),at): return command
 	return "gather_panel" if panel(size).has_point(at) else ""
 func edit(command: String) -> void:
 	match command:
@@ -51,33 +51,33 @@ static func receipt(result: Dictionary) -> String:
 	return text + (" · surplus returns by travel" if result.get("reduced",false) else " · trips take time")
 
 func draw(view: Node2D, size: Vector2, source_name: String, assigned: int, available: int, queued: int = 0) -> void:
-	var box: Rect2=panel(size);Style.surface(view,box,Color("111d22"));Style.surface(view,box,Color("39727c"),true)
-	_text(view,box.position+Vector2(16,28),"Gatherers",20,204,Color("e9f6fa"))
-	_text(view,box.position+Vector2(16,52),source_name,13,204)
-	_text(view,box.position+Vector2(16,76),"Already assigned %d · queued %d" % [assigned,queued],12,260)
-	_text(view,box.position+Vector2(16,96),"Available now %d · brood carers held" % available,12,260,Color("8fced4"))
-	var counter:=Rect2(box.position+Vector2(78,110),Vector2(132,44))
-	Style.surface(view,counter,Color("15232d"))
-	_center(view,counter.position+Vector2(66,13),"PROPOSED TOTAL",10,124,Color("8fa1a8"))
-	_center(view,counter.position+Vector2(66,39),str(amount),25,124,Color("e9f6fa"))
-	for pair: Array in [["gather_less","−1"],["gather_suggest","SET TO %d" % mini(maximum,CONFIG.initial_workers)],["gather_more","+1"],["gather_less_many","−5"],["gather_more_many","+5"],["gather_back","×"]]:
-		var target: Rect2=rect(size,pair[0]);Style.surface(view,target,Color("26363e"))
-		_center(view,target.get_center()+Vector2(0,5),pair[1],14,target.size.x-12)
+	var box: Rect2=panel(size)
+	Style.surface(view,box,Color("424936"))
+	_text(view,box.position+Vector2(18,28),"Gathering",20,252,Style.TEXT)
+	_text(view,box.position+Vector2(18,49),source_name,13,252,Style.GOLD)
+	_center(view,box.position+Vector2(170,66),"%d assigned · %d queued · %d free" % [assigned,queued,available],12,304)
+	var core: Rect2=rect(size,"gather_suggest")
+	for command: String in ["gather_less","gather_more","gather_less_many","gather_more_many","gather_commit"]:
+		var target: Rect2=rect(size,command)
+		var direction: Vector2=(target.get_center()-core.get_center()).normalized()
+		view.draw_line(core.get_center()+direction*54,target.get_center(),Color(Style.GOLD,0.45),2,true)
+	Style.orb(view,core,Style.GOLD)
+	_center(view,core.get_center()+Vector2(0,-22),"TOTAL",11,100,Style.GOLD)
+	_center(view,core.get_center()+Vector2(0,13),str(amount),34,100,Style.TEXT)
+	_center(view,core.get_center()+Vector2(0,34),"gatherers",11,100)
+	for pair: Array in [["gather_less","−1"],["gather_more","+1"],["gather_less_many","−5"],["gather_more_many","+5"],["gather_commit","SEND"],["gather_back","×"]]:
+		var target: Rect2=rect(size,pair[0])
+		Style.orb(view,target,Color("b9dc83") if pair[0]=="gather_commit" else Style.GOLD,pair[0]=="gather_commit")
+		_center(view,target.get_center()+Vector2(0,5),pair[1],12 if pair[0]=="gather_commit" else 17,target.size.x-8,Style.TEXT)
 	var change: Dictionary=preview(assigned,available)
-	var first: String="On send: up to %d from the nest" % change.now
-	var second: String="%d wait for free labor" % change.waiting if change.waiting>0 else "Trips need food and take time"
-	if change.surplus>0:
-		first="Lower target by %d gatherers" % change.surplus
-		second="Travelers return before becoming free"
-	elif change.additional==0:
-		first="Keeps the current %d assigned" % assigned
-		second="This is a total, not extra workers"
-	_text(view,box.position+Vector2(16,229),first,13,260,Color("c5e4dc"))
-	_text(view,box.position+Vector2(16,249),second,12,260)
-	_text(view,box.position+Vector2(16,266),"Only the button below commits this proposal",11,260,Color("8fa1a8"))
-	var send: Rect2=rect(size,"gather_commit")
-	Style.surface(view,send,Color("287375"))
-	_center(view,send.get_center()+Vector2(0,5),action_title(assigned,available),15,248,Color("efffff"))
+	var detail: String="Up to %d leave · %d wait for free labor" % [change.now,change.waiting]
+	if change.surplus>0:detail="Lower target; surplus returns by travel"
+	elif change.additional==0:detail="Keeps current assignment; no extra workers"
+	_center(view,box.position+Vector2(170,299),action_title(assigned,available),13,308,Color("c4e3a5"))
+	_center(view,box.position+Vector2(170,319),detail,12,308)
+	_center(view,box.position+Vector2(170,336),"Care protected · travel and food still required",10,308,Color("a4b29b"))
+	Style.tooltip(view,core,"Reset to suggested count","Sets the free draft to %d; sends nothing" % mini(maximum,CONFIG.initial_workers),size)
+	Style.tooltip(view,rect(size,"gather_commit"),action_title(assigned,available),"Commit this total; unfunded workers queue",size)
 
 func _text(view: Node2D, at: Vector2, value: String, size: int, width: float, color: Color = Color("bccdd2")) -> void:
 	view.draw_string(ThemeDB.fallback_font,at,Copy.fit_line(value,ThemeDB.fallback_font,size,width),HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)

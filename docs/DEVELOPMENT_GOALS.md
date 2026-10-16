@@ -1,6 +1,6 @@
 # Current development goals
 
-Updated 2026-10-15. The authorized recovery/consolidation and current implementation queue are complete through 191. Canonical `main` and one latest Windows playtest build contain the combined work; earlier topic branches/exports are historical.
+Updated 2026-10-15. Player feedback reopens M8:192 rebuilds shared UI/dispatch/entrance presentation;193 repairs actual-release gameplay omissions. The earlier implementation queue was complete through191, but appearance and gameplay coherence were not accepted. Canonical `main` and one latest Windows playtest build contain the combined work; earlier topic branches/exports are historical.
 
 | Goal | Current result |
 | --- | --- |
@@ -10,7 +10,7 @@ Updated 2026-10-15. The authorized recovery/consolidation and current implementa
 | Music/ordinary audio exit | Complete190/191: original longer stereo adaptive score, distinct voices/rests/cues and verified phase/fades/preferences; normal close drains queued audio before exit. Player listening/fatigue remains acceptance. |
 | Integrated gameplay/interface/package review | Complete191 automated scope: fresh three-setting development/network/recovery, native standard/compact inspection, active1×/64× measurements and current-main Windows/PCK gates. |
 
-Next is player testing of the unified beta: appearance, listening/enjoyment, balance/control feel, physical touch if used, real session frame pacing and another-machine launch. Further high-speed/driver tuning follows measured playtest evidence; final Windows 1.0/release acceptance is not claimed by automated checks. Do not create speculative feature branches to fill this acceptance stage. New concrete reports become bounded cards on main.
+The next design outcome is the fresh-colony decision arc in [Gameplay coherence review](GAMEPLAY_REDESIGN_REVIEW.md), with combat, adaptation and construction choices assessed together. Continue player testing of the revised beta: appearance, listening/enjoyment, balance/control feel, physical touch if used, real session frame pacing and another-machine launch. Further high-speed/driver tuning follows measured playtest evidence; final Windows 1.0/release acceptance is not claimed by automated checks. Do not create speculative feature branches to fill this acceptance stage. New concrete reports become bounded cards on main.
 
 [Save policy](SAVE_POLICY.md) overrides every older goal/card/catalog: loading, recovering, preserving compatibility or migrating **previous-build saves is not a development goal, priority, regression gate or resource allocation**. It stays tabled until true public release preparation. Start a new colony after changing builds. Same-build save/load/quit/restart/review must continue to work. Leaving unrelated files untouched is file safety, not old-save support.
 

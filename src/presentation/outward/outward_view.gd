@@ -672,7 +672,7 @@ func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	_prepare_signal_captions(size)
 	_draw_rain(size)
-	Art.home_entrance(self,Vector2(size.x*0.5,size.y*0.78),_animation_time)
+	Art.home_entrance(self,Vector2(size.x*0.5,size.y*0.78),_animation_time,int(_status.get("available_workers",0)))
 	_draw_trails(size)
 	_draw_scout_traces(size)
 	_draw_anchor(size)
@@ -800,12 +800,8 @@ func _draw_scout_traces(size: Vector2) -> void:
 		var selected: bool = false
 		for mission: Dictionary in entry.missions:
 			selected = selected or selected_id == "mission:" + mission.id
-		var color := Color("a8b4ad")
-		draw_polyline(entry.points, Color(color, 0.30 if selected else 0.16 if entry.stub else 0.13 + 0.10 * entry.scent), 1.0, true)
-		# Broken cap means remembered departure, distinct from a resource route.
-		draw_arc(entry.center, 6.0, 0.2, 2.4 if entry.stub else 5.8, 16, Color(color, 0.55), 1.0, true)
-		if selected:
-			draw_arc(entry.center, 15.0, PI, TAU, 20, Color("dce5d9"), 1.0, true)
+		var color := Color("a9d7be")
+		ScoutTrace.draw_scent(self,entry,_animation_time,selected)
 		var label: String = "NOT RETURNED" if entry.missions[0].get("missing_at", -1.0) >= 0.0 else "OVERDUE" if entry.missions[0].get("overdue", false) else "SCOUT" if entry.missions[0].returned_at < 0.0 else "RETURNED"
 		if entry.missions.size() > 1:
 			label += " ×%d" % entry.missions.size()
@@ -827,8 +823,8 @@ func _draw_scout_traces(size: Vector2) -> void:
 			continue
 		var at: Vector2 = projected[0].center
 		if previous != null:
-			draw_line(previous, at, Color(0.65, 0.72, 0.68, 0.15), 1.0, true)
-		draw_circle(at, 2.0, Color(0.65, 0.72, 0.68, 0.30))
+			Art.filament(self,PackedVector2Array([previous,previous.lerp(at,0.5),at]),Color("99e8bd",0.15),10.0,Art.FILAMENT,false)
+		draw_texture_rect(Art.CLOUD,Rect2(at-Vector2(9,7),Vector2(18,14)),false,Color("99e8bd",0.18))
 		previous = at
 
 
