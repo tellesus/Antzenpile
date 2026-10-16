@@ -22,4 +22,4 @@ Use one fresh-colony arc to connect **discover food → commit labor → observe
 
 The current UI/art is a reviewable revision, not final player acceptance. Remaining UI work includes contextual hierarchy across dense construction/network/queen panels and stronger adaptation identity; remaining design work includes encounter pacing, meaningful progression and construction prerequisites. Same-build saves, the knowledge boundary, real travel, authoritative labor and the pinned renderer remain in force.
 
-The player also rejected scout traces on2026-10-16.192 replaces their line-and-ring appearance with chemical ribbons and vapor, retaining honest departure memory and returned-course information. The final adaptation layout checks include the later honeydew relationship as well as the initial paired traits.
+The player also rejected scout traces on 2026-10-16. Card192 replaces their line-and-ring appearance with chemical ribbons and vapor, retaining honest departure memory and returned-course information. The final adaptation layout checks include the later honeydew relationship as well as the initial paired traits.

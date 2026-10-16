@@ -1,6 +1,6 @@
 # 193 — Execute gameplay operations in Windows release builds
 
-Status: source complete and actual-release verified; integrated Windows delivery follows192 in this session.
+Status: complete; actual-release verified and delivered with192 in the refreshed Windows package. Final full regression: 12,380 checks, 0 failures. See [package evidence](../evidence/card192/package/README.md).
 
 The screenshot's `-1/12 recruits` is the worker ledger's missing-pool sentinel. Recruitment creates, fills, transfers and retires its pools inside `assert(...)`; Godot removes the entire expression in non-debug builds. Related mutations in response, rivals, scouts, rain, refuge and reproductive loss use the same pattern. Editor-based packaged-PCK tests cannot catch this release-only omission.
 

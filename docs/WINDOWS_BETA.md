@@ -6,7 +6,7 @@ Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly ve
 
 ## Current playable baseline
 
-Use current `main`. PRs1/2 are merged; all approved current revisions through 191, including the new stereo score190, are in the unified beta. **678 resources**; [full/native/package evidence](evidence/card191/README.md). `builds/windows-beta-latest.json` identifies runtime/launch/ZIP hashes. Start a new colony after changing builds. Same-build save/review/restart, separate sound settings, compact native input and ordinary-close cleanup pass. Human visual/audio/balance/feel, physical touch, high-speed frame pacing and clean-machine/final release acceptance remain separate.
+Use current `main`. PRs1/2 are merged; revisions through 193 include the organic UI, excavated entrance, scout scent and actual-release gameplay repair alongside the stereo score. **680 resources**; [full/native evidence](evidence/card192/README.md), [package evidence](evidence/card192/package/README.md) and [actual-release gameplay checks](evidence/card193/README.md). `builds/windows-beta-latest.json` identifies runtime/launch/ZIP hashes. Start a new colony after changing builds. Same-build save/review/restart, separate sound settings, compact native input and ordinary-close cleanup pass. Human visual/audio/balance/feel, physical touch, high-speed frame pacing and clean-machine/final release acceptance remain separate.
 
 ## Rebuild from a checkout
 

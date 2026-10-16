@@ -1,6 +1,6 @@
 # 192 — Organic interface and excavated entrance
 
-Status: implementation and regression complete; Windows delivery follows the final native timing check.
+Status: complete; integrated on canonical main and delivered in the refreshed Windows package. Native timing and package input/save checks pass; player appearance/feel remains acceptance.
 
 Outcome: replace the rectangular blue utility skin throughout the interface with an organic, warm mineral/chitin surface vocabulary; give gathering and conflict staffing a central count and five circular satellites (+1, +5, −1, −5, Send); give contextual conflict actions larger icon circles and explanatory hover popups. Replace OUTWARD's flat strip/glowing washer with a visibly raised, pellet-built local nest mouth, excavation fans and bounded pause-aware activity. Preserve existing semantic commands, counts, care, travel and returned knowledge.
 
