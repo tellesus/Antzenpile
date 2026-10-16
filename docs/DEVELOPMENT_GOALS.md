@@ -1,13 +1,17 @@
 # Current development goals
 
-Player-authorized continuing work, updated 2026-10-15. Continue through bounded cards without routine feedback pauses. Use canonical `main`, publish verified work there, refresh one current Windows playtest build, and preserve unrelated local files.
+Updated 2026-10-15. The authorized recovery/consolidation and current implementation queue are complete through 191. Canonical `main` and one latest Windows playtest build contain the combined work; earlier topic branches/exports are historical.
 
-1. Enforce the [development save policy](SAVE_POLICY.md): same-build save/load only; old-save preservation, recovery and migration are tabled until true release preparation. Current validation/review/continuation178 and producing-build admission187 are verified and delivered.
-2. Finish M8 visual presentation: returned animal/foreign-ant/site impressions188 are delivered; context/help/review consistency189 is delivered. Keep strong neon, rich texture and flowing wisps on black, with representation limited by actual returned evidence. The identified rival staffing explanation, current help and review-map caption bounds are corrected.
-3. Finish the separate music overhaul and exit/audio cleanup: richer, characterful adaptive stems that remain enjoyable when looped. Preserve the distinction between automated checks and human listening/feel acceptance.
-4. Review integrated gameplay and interface after those revisions. Address concrete incoherence, confusing controls and missing counterplay within the established game; do not invent Post-1.0 systems.
-5. Complete the automated integrated Windows/runtime/package/performance review. Commit and integrate each finished card, resolve or explicitly table remaining items, and deliver a unified current playtest version with every verified feature/fix. Human clean-machine, visual/audio/feel acceptance remains the player's part.
+| Goal | Current result |
+| --- | --- |
+| Recover/consolidate stalled graphics work | Complete176/177: recovered code and six runtime captures, PRs1/2 merged; main is the only remote development branch. |
+| Development save policy/reliability | Complete178/187: same-build-only admission, exact continued state, save/end/review/load/restart and failed-write retention. |
+| M8 graphics/interface revisions | Complete179–189 and191: living neon clouds/workers, all supported food/threat/site/animal/foreign forms, explicit gathering/combat/borrowing/search, current help, bounded review and mature compact controls. Player appearance/feel remains acceptance. |
+| Music/ordinary audio exit | Complete190/191: original longer stereo adaptive score, distinct voices/rests/cues and verified phase/fades/preferences; normal close drains queued audio before exit. Player listening/fatigue remains acceptance. |
+| Integrated gameplay/interface/package review | Complete191 automated scope: fresh three-setting development/network/recovery, native standard/compact inspection, active1×/64× measurements and current-main Windows/PCK gates. |
 
-Already unified on `main`: PRs1/2, recovered trails, living clouds, luminous INWARD/worker art, clearer gathering/combat controls, returned source/threat impressions, optional armed search/plain worker borrowing186, and current save preflight/review178. No dormant topic branch is the playable source of truth.
+Next is player testing of the unified beta: appearance, listening/enjoyment, balance/control feel, physical touch if used, real session frame pacing and another-machine launch. Further high-speed/driver tuning follows measured playtest evidence; final Windows 1.0/release acceptance is not claimed by automated checks. Do not create speculative feature branches to fill this acceptance stage. New concrete reports become bounded cards on main.
 
-No current goal, priority, regression requirement or acceptance gate includes loading saves made by a previous development build. [Save policy](SAVE_POLICY.md) overrides older milestone/card wording. Other deliberately deferred systems remain in the [roadmap](ROADMAP_1_0.md).
+[Save policy](SAVE_POLICY.md) overrides every older goal/card/catalog: loading, recovering, preserving compatibility or migrating **previous-build saves is not a development goal, priority, regression gate or resource allocation**. It stays tabled until true public release preparation. Start a new colony after changing builds. Same-build save/load/quit/restart/review must continue to work. Leaving unrelated files untouched is file safety, not old-save support.
+
+Mobile and Post-1.0 systems remain deliberately deferred in the [roadmap](ROADMAP_1_0.md). [Current build/evidence](CURRENT_BUILD.md) and [Windows guide](WINDOWS_BETA.md) identify actual delivery and its limits.

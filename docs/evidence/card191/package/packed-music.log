@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 26.8.1.260806 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon RX 6650 XT
+
+[MUSIC] uninterrupted:0 phase=0.838821 spread=0.000000
+[MUSIC] uninterrupted:1 phase=1.860499 spread=0.000000
+[MUSIC] focus_condition_paused64 phase=4.925533 spread=0.000000
+[MUSIC] seek_wrap phase=0.431701 spread=0.000000
+[MUSIC] music_muted_keeps_clock phase=0.988980 spread=0.000000
+[MUSIC] reload_preferences_baseline phase=0.281542 spread=0.000000
+[MUSIC] native_audio_phase_wrap_fades_preferences_cues_reload=true full_uninterrupted=false driver=Dummy build=windows-70847444713205294d923d01fc0b339788e0a383c4aba15a650f0db0fab837e5

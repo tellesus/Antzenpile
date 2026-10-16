@@ -20,3 +20,5 @@ Six 30-second samples, RX6650XT/Ryzen7800X3D, pinned 4.7.2 Compatibility,1080p, 
 | roadside_inward64 | 64× | 130.6 | 11.76 | 81.4 | 14.84 |
 
 [Raw measured run/sample metadata](performance.json). Further high-speed/driver/frame-pacing tuning and final performance acceptance remain beta playtest/release work. The unified Windows package and current documentation/goals follow this source verification.
+
+[Unified current Windows package evidence](package/README.md).

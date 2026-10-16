@@ -1,7 +1,7 @@
 [
   {
     "path": "docs/evidence/card191/README.md",
-    "sha256": "a7de2d68e59d68ce5e5bc4112153ef7c0155aaf73a3cf064bd34a531407a9515"
+    "sha256": "31829d1cd2ae547b87903b9270aab9a19e21dec25cb5cf38f132757e2bea80c1"
   },
   {
     "path": "docs/evidence/card191/backyard_slice_nursery_900.png",
@@ -54,6 +54,58 @@
   {
     "path": "docs/evidence/card191/main.log",
     "sha256": "0475557e742da5c1a2098595fad13100e46d0b560692627aae666d46a6be0628"
+  },
+  {
+    "path": "docs/evidence/card191/package/README.md",
+    "sha256": "ba3a491cdb042d8a54605ef02a080931e8d2bb0c0b48b3eac8a11f72390322c6"
+  },
+  {
+    "path": "docs/evidence/card191/package/compact_900.png",
+    "sha256": "9ed937067ef6931211fe98a89bd7d31cc5e59282658cb73c91857a102f3e9157"
+  },
+  {
+    "path": "docs/evidence/card191/package/package.log",
+    "sha256": "5b1749848ecc5dd401d69519238f76d606dc7b566ea439a867d6e88530c10b36"
+  },
+  {
+    "path": "docs/evidence/card191/package/packed-close.log",
+    "sha256": "fab201d13f95d9208fdc2eee5abf0f444f1ed262cce799f88f28c13b728e8b4a"
+  },
+  {
+    "path": "docs/evidence/card191/package/packed-compact.log",
+    "sha256": "d861f667dfb776c75fcdc5e3882005481c13365493a18ec5356f94d01b16dc81"
+  },
+  {
+    "path": "docs/evidence/card191/package/packed-interface.log",
+    "sha256": "73cc5fcdd01076524f679ebe78180c1f0728487de9f7d46653d8d86f9c08dd6c"
+  },
+  {
+    "path": "docs/evidence/card191/package/packed-music.log",
+    "sha256": "3e5e96478fb1f6c0ae69cc8f039e553a8d04b05a92b7b71496523ecf327f22a2"
+  },
+  {
+    "path": "docs/evidence/card191/package/packed-restart-load.log",
+    "sha256": "ea22bf56bf6e3962bc0275278cfbd6c88daec04c041f77561eb5b007e89a1837"
+  },
+  {
+    "path": "docs/evidence/card191/package/packed-restart-save.log",
+    "sha256": "ebe9bf681d07471b2c5f60f16dd119078367a0438de16681c78790fecc5cecfc"
+  },
+  {
+    "path": "docs/evidence/card191/package/packed-save-review.log",
+    "sha256": "4d2f59a28b733fb386f96c1ea325c00a63058e7b6b9053a7a2265def00bf424c"
+  },
+  {
+    "path": "docs/evidence/card191/package/release-native-engine.log",
+    "sha256": "d96f58fd4dd35014223a6994000b71d4ed55b85d9a5be1313331570f100ddada"
+  },
+  {
+    "path": "docs/evidence/card191/package/release-native.log",
+    "sha256": "8a17808ec265b55133ca8b9e7799d5b6199ebe2c5f8480ffd4d0cf0d678d26c9"
+  },
+  {
+    "path": "docs/evidence/card191/package/windows_build.json",
+    "sha256": "5b1749848ecc5dd401d69519238f76d606dc7b566ea439a867d6e88530c10b36"
   },
   {
     "path": "docs/evidence/card191/performance-result.txt",
