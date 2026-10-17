@@ -16,6 +16,8 @@ M8 revisions179–189: flowing chemical clouds and supported wispy creature/site
 
 [Tactile entrance and ambience195](tasks/195_tactile_entrance_and_local_ambience.md): Blender-rendered uneven banks, recessed throat, worn approaches and plant fragments with a CC0 ambientCG soil material replace the192 entrance sprite. A processed CC0 Freesound leaf recording supplies quiet decorative Home ambience, with an independent persistent volume setting, pause/ended-review fade and shutdown cleanup. Reproducible authoring recipes retain source/license/hash records. Blender remains an offline authoring tool.
 
+**Player feedback196:** the195 anthill is accepted. The current music and added rustle ambience are rejected as an audio direction despite their technical checks. [Replacement research](MUSIC_REPLACEMENT_RESEARCH.md) is complete: RimWorld menu music is the player's positive reference, and a new original spacious organic/electronic score with optional restrained lofi rhythm is proposed. Short listening sketches precede another full adaptive implementation. No runtime music replacement is delivered by196; the current package still contains190/195 audio. Researched additional tools are not automatically approved.
+
 [Current persistence178](tasks/178_player_save_validation.md)/[same-build admission187](tasks/187_development_save_policy.md): exact serialized preflight before slot replacement, fresh current-run validation, failed-write retention, actual save→review→load and separate-process continuation. No historical save failure or old-save migration is a current task.
 
 ## Latest actual verification

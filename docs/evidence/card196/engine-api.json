@@ -1,0 +1,80 @@
+{
+	"classes": {
+		"AudioStreamInteractive": {
+			"exists": true,
+			"methods": [
+				"_get_linked_undo_properties",
+				"_inspector_array_swap_clip",
+				"set_clip_count",
+				"get_clip_count",
+				"set_initial_clip",
+				"get_initial_clip",
+				"set_clip_name",
+				"get_clip_name",
+				"set_clip_stream",
+				"get_clip_stream",
+				"set_clip_auto_advance",
+				"get_clip_auto_advance",
+				"set_clip_auto_advance_next_clip",
+				"get_clip_auto_advance_next_clip",
+				"add_transition",
+				"has_transition",
+				"erase_transition",
+				"get_transition_list",
+				"get_transition_from_time",
+				"get_transition_to_time",
+				"get_transition_fade_mode",
+				"get_transition_fade_beats",
+				"is_transition_using_filler_clip",
+				"get_transition_filler_clip",
+				"is_transition_holding_previous",
+				"_set_transitions",
+				"_get_transitions"
+			]
+		},
+		"AudioStreamOggVorbis": {
+			"exists": true,
+			"methods": [
+				"load_from_buffer",
+				"load_from_file",
+				"set_packet_sequence",
+				"get_packet_sequence",
+				"set_loop",
+				"has_loop",
+				"set_loop_offset",
+				"get_loop_offset",
+				"set_bpm",
+				"get_bpm",
+				"set_beat_count",
+				"get_beat_count",
+				"set_bar_beats",
+				"get_bar_beats",
+				"set_tags",
+				"get_tags"
+			]
+		},
+		"AudioStreamPlaybackInteractive": {
+			"exists": true,
+			"methods": [
+				"switch_to_clip_by_name",
+				"switch_to_clip",
+				"get_current_clip_index"
+			]
+		},
+		"AudioStreamSynchronized": {
+			"exists": true,
+			"methods": [
+				"set_stream_count",
+				"get_stream_count",
+				"set_sync_stream",
+				"get_sync_stream",
+				"set_sync_stream_volume",
+				"get_sync_stream_volume"
+			]
+		}
+	},
+	"engine": "4.7.2-stable (official)",
+	"nested_resource_constructs": true,
+	"scope": "API/resource construction only; no native playback, nesting/phase or output quality assertion",
+	"sync_mute_roundtrip_db": -80.0
+}

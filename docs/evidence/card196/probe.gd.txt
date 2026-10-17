@@ -1,0 +1,19 @@
+extends SceneTree
+func _initialize() -> void:
+    var result: Dictionary = {"engine":Engine.get_version_info().string,"scope":"API/resource construction only; no native playback, nesting/phase or output quality assertion","classes":{}}
+    for name: String in ["AudioStreamSynchronized","AudioStreamInteractive","AudioStreamOggVorbis","AudioStreamPlaybackInteractive"]:
+        var methods: Array[String] = []
+        for row: Dictionary in ClassDB.class_get_method_list(name, true): methods.append(row.name)
+        result.classes[name] = {"exists":ClassDB.class_exists(name),"methods":methods}
+    var sync := AudioStreamSynchronized.new()
+    sync.stream_count = 2
+    sync.set_sync_stream_volume(1, -80.0)
+    result.sync_mute_roundtrip_db = sync.get_sync_stream_volume(1)
+    var interactive := AudioStreamInteractive.new()
+    interactive.clip_count = 2
+    interactive.set_clip_stream(0, sync)
+    result.nested_resource_constructs = interactive.get_clip_stream(0) == sync
+    var file := FileAccess.open("res://.godot/card196/engine-api.json",FileAccess.WRITE)
+    file.store_string(JSON.stringify(result,"\t")+"\n"); file.close()
+    print("[MUSIC196] API construction probe complete; playback not tested")
+    quit()

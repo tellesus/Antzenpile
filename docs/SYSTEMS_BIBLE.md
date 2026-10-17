@@ -184,6 +184,8 @@ Report age distinguishes observation from receipt. Optional event-speed/pause be
 
 Preserve black negative space, capped representatives and bounded overdraw. Use the approved conspicuous neon glow and flowing wisps without a bloom dependency or conventional minimap. Graphics resolve meaningful distinctions only when knowledge supports them. **Acceptance:** player can find/understand reinforcement, retreat, queue priority, transport conflicts and competing needs at standard/compact sizes; final audio does not obscure cues or make routine play fatiguing.
 
+**Planned music replacement196 (not implemented):** the player rejects190's score and195's intrusive rustle bed, accepts the195 anthill, and names RimWorld main-menu music as a positive reference. Replace the musical content with an original spacious organic/electronic ambient score; explore restrained lofi rhythm through listening sketches. Develop compatible musical sections, entering/leaving layers and real rests rather than one permanent instrument per developed chamber. Keep information cues distinct, use only approved local/returned data, and retain independent real-time music and simulation clocks. [Research and proposed pilot](MUSIC_REPLACEMENT_RESEARCH.md) compares production methods and marks unapproved additional tools. Short listening acceptance precedes a full adaptive soundtrack; its proposed tempo, instruments, phrase lengths and arrangement rules are not implemented contracts.
+
 ### SYS-14 Persistence, determinism and delivery
 
 **Purpose:** make the complete game dependable on Windows. Foundation: strict saves, fixed ticks and headless owners; planned M9 package/release gates.
