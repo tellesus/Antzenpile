@@ -8,6 +8,7 @@ const NURSERY_LOOP = preload("res://assets/audio/nursery_loop.wav")
 const MIDDEN_LOOP = preload("res://assets/audio/midden_loop.wav")
 const ALARM_CUE = preload("res://assets/audio/returned_alarm.wav")
 const DISCOVERY_CUE = preload("res://assets/audio/returned_discovery.wav")
+const AMBIENCE_LOOP = preload("res://assets/audio/colony_ambience.wav")
 const FADE_SECONDS: float = 3.0
 const MIX_DB: float = -4.0
 
@@ -25,6 +26,8 @@ var nursery_player: AudioStreamPlayer
 var midden_player: AudioStreamPlayer
 var nursery_gain: float = 0.0
 var midden_gain: float = 0.0
+var ambience_player: AudioStreamPlayer
+var ambience_gain: float = 0.0
 var preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
 var _shutting_down: bool = false
 
@@ -34,6 +37,7 @@ func _ready() -> void:
 	growth_player = _make_player(GROWTH_LOOP, -80.0)
 	nursery_player = _make_player(NURSERY_LOOP, -80.0)
 	midden_player = _make_player(MIDDEN_LOOP, -80.0)
+	ambience_player = _make_player(AMBIENCE_LOOP, -80.0)
 	if alarm_provider.is_valid():
 		alarm_player = AudioStreamPlayer.new()
 		alarm_player.stream = ALARM_CUE
@@ -55,14 +59,17 @@ func restart_after_load() -> void:
 		alarm_player.stop()
 	if discovery_player != null: discovery_player.stop()
 	for player: AudioStreamPlayer in _music_players(): player.stop()
+	ambience_player.stop()
 	var state: MusicState = _current_state()
 	stem_gain = state.food_gain
 	nursery_gain = state.nursery_gain
 	midden_gain = state.midden_gain
+	ambience_gain = state.ambience_gain
 	_update_growth_volume()
 	# All play calls enter the same audio mix frame and retain their own phase.
 	if DisplayServer.get_name() != "headless":
 		for player: AudioStreamPlayer in _music_players(): player.play(0.0)
+		ambience_player.play(0.0)
 
 
 func _process(delta: float) -> void:
@@ -70,6 +77,7 @@ func _process(delta: float) -> void:
 	stem_gain = move_toward(stem_gain, state.food_gain, delta / FADE_SECONDS)
 	nursery_gain = move_toward(nursery_gain, state.nursery_gain, delta / FADE_SECONDS)
 	midden_gain = move_toward(midden_gain, state.midden_gain, delta / FADE_SECONDS)
+	ambience_gain = move_toward(ambience_gain, state.ambience_gain, delta / 1.5)
 	_update_growth_volume()
 	poll_returned_alarm()
 	poll_returned_discovery()
@@ -93,7 +101,7 @@ func _exit_tree() -> void:
 func stop_playback() -> void:
 	_shutting_down = true
 	set_process(false)
-	for player: AudioStreamPlayer in _music_players() + [alarm_player, discovery_player]:
+	for player: AudioStreamPlayer in _music_players() + [alarm_player, discovery_player, ambience_player]:
 		if player != null:
 			player.stop()
 			player.stream = null
@@ -124,6 +132,7 @@ func _update_growth_volume() -> void:
 	growth_player.volume_db = _level_db(stem_gain * preferences.music, MIX_DB)
 	nursery_player.volume_db = _level_db(nursery_gain * preferences.music, MIX_DB)
 	midden_player.volume_db = _level_db(midden_gain * preferences.music, MIX_DB)
+	ambience_player.volume_db = _level_db(ambience_gain * preferences.ambience, -3.0)
 	if alarm_player != null: alarm_player.volume_db = _level_db(preferences.cues, -15.0)
 	if discovery_player != null: discovery_player.volume_db = _level_db(preferences.cues, -15.0)
 

@@ -10,7 +10,7 @@ func run(test: Object) -> bool:
 	test.check(prefs.set_level("music", 0.25) and prefs.set_level("cues", 0), "Music and information levels can differ")
 	for value: Variant in [-1, 2, NAN, INF, "quiet", true]:
 		test.check(not prefs.set_level("music", value) and prefs.music == 0.25, "Invalid audio levels leave preferences unchanged")
-	test.check(not prefs.set_level("ambient", 0.5), "No unused audio category is invented")
+	test.check(not prefs.set_level("unknown", 0.5), "Unknown audio categories are rejected")
 	var path: String = "res://.godot/test_audio_preferences.cfg"
 	test.check(prefs.save_file(path), "Sound levels persist outside colony saves")
 	var copy := Preferences.new()

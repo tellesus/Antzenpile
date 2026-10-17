@@ -6,6 +6,7 @@ var development_level: int = 0
 var nursery_gain: float = 0.0
 var midden_gain: float = 0.0
 var food_gain: float = 0.0
+var ambience_gain: float = 0.0
 
 
 static func from_food_exchange(state: String) -> MusicState:
@@ -17,6 +18,9 @@ static func from_food_exchange(state: String) -> MusicState:
 
 static func from_summary(summary: Dictionary, focus: String = "") -> MusicState:
 	var result: MusicState = from_food_exchange(summary.get("food_exchange_state", "primitive"))
+	# Decorative local colony texture, never exterior activity or report evidence.
+	if not summary.get("paused", true) and not summary.get("relinquished", false) and int(summary.get("workers_available", 0)) > 0:
+		result.ambience_gain = 0.4 + 0.6 * clampf(float(summary.workers_available) / 40.0, 0.0, 1.0)
 	if summary.get("nursery_state", "") == "developed":
 		var condition: float = minf(summary.get("humidity", {}).get("larval_rate", 1.0), summary.get("midden", {}).get("larval_rate", 1.0))
 		for cohort: Dictionary in summary.get("brood", []):

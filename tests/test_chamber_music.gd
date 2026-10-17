@@ -37,7 +37,7 @@ func run(test: Object) -> bool:
 	test.check(is_equal_approx(audio.nursery_gain, 0.5) and is_equal_approx(audio.midden_gain, 0.5), "Additional stems crossfade over real seconds")
 	current[0] = strained
 	audio.restart_after_load()
-	test.check(audio.nursery_gain == strained.nursery_gain and audio.get_child_count() == 4, "Reload restores current condition and reuses all players")
+	test.check(audio.nursery_gain == strained.nursery_gain and audio.get_child_count() == 5, "Reload restores current condition and reuses all players")
 	for loop: AudioStreamWAV in [Audio.BASE_LOOP, Audio.GROWTH_LOOP, Audio.NURSERY_LOOP, Audio.MIDDEN_LOOP]:
 		test.check(loop.mix_rate == 44100 and is_equal_approx(loop.get_length(), 256.0 / 3.0), "Authored stems retain equal sample rate and full thirty-two-bar duration")
 		test.check(loop.stereo, "Every imported voice preserves the authored stereo field")

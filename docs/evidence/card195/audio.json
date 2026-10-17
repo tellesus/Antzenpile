@@ -1,0 +1,23 @@
+{
+  "source": {
+    "file": "leaves.mp3",
+    "url": "https://cdn.freesound.org/previews/191/191454_3052037-hq.mp3",
+    "page": "https://freesound.org/people/leah15/sounds/191454/",
+    "author": "leah15",
+    "license": "CC0-1.0",
+    "sha256": "69b4c40fa71d225f328ce3145414ca92f53fc3a44e508baafad71aa8af30a3d6",
+    "bytes": 407726
+  },
+  "seconds": 24,
+  "sample_rate": 44100,
+  "channels": 2,
+  "peak_dbfs": -15.917600346881503,
+  "rms_dbfs": -34.146068930644276,
+  "seam_step": 144,
+  "dc": [
+    -5.837547733350373e-19,
+    1.87572501081364e-22
+  ],
+  "sha256": "a54e78d9b6bba3bd91fb2d0f5a0227eb3a6a8bacbae64fe7cef4501f37d41eb1",
+  "seed": 195
+}

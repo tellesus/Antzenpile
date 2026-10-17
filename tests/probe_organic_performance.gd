@@ -1,7 +1,8 @@
 extends "res://tests/probe_sensorium_performance.gd"
 ## Six source routes plus eight scout scent directions; separate from live simulation timing.
 func _run() -> void:
-	output_dir="res://.godot/card192"
+	output_dir="res://.godot/card192" if OS.get_cmdline_user_args().is_empty() else OS.get_cmdline_user_args()[0]
+	DirAccess.make_dir_recursive_absolute(output_dir)
 	game_root=Root.new();get_root().add_child(game_root);game_root.set_process(false)
 	game_root.simulation.toggle_pause()
 	var frozen: Dictionary=game_root.simulation.run.to_dict()

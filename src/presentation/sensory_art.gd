@@ -11,7 +11,7 @@ const WORKER = preload("res://assets/graphics/sensorium/worker_walk_v3.png")
 const SCENT_WORKER = preload("res://assets/graphics/sensorium/worker_scent_v3.png")
 const EARTH = preload("res://assets/graphics/proof/nursery_earth.svg")
 const FILAMENT = preload("res://assets/graphics/colony/chemical_cloud.png")
-const ENTRANCE = preload("res://assets/graphics/colony/material/excavated_home.svg")
+const ENTRANCE = preload("res://assets/graphics/colony/material/excavated_home.png")
 const WALK_FRAMES: int = 24
 const WALK_CELL: int = 192
 const WALK_COLUMNS: int = 8
@@ -141,7 +141,7 @@ static func home_entrance(canvas: Node2D, center: Vector2, time: float = 0.0, av
 	# The mouth remains the sensory anchor. Static relief is baked once; six
 	# local representatives at most move on it, using only approved local labor.
 	var scale: float=clampf(canvas.get_viewport_rect().size.x/1280.0,0.72,1.25)
-	canvas.draw_texture_rect(ENTRANCE,Rect2(center-Vector2(800,200)*scale,Vector2(1600,440)*scale),false)
+	canvas.draw_texture_rect(ENTRANCE,Rect2(center-Vector2(800,280)*scale,Vector2(1600,560)*scale),false)
 	for i: int in mini(6,maxi(0,available)):
 		var progress: float=fposmod(time*0.045+i*0.167,1.0)
 		var angle: float=0.2+i*0.55

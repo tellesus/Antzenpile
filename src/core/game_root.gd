@@ -766,7 +766,9 @@ func music_state(pile_id: String) -> MusicState:
 	if not simulation.run.colony.piles.has(pile_id):
 		return MusicState.new()
 	var focus: String = _inward_view.selected_id if mode == "inward" and _inward_view != null else ""
-	return MusicState.from_summary(inward_status(pile_id), focus)
+	var result: MusicState = MusicState.from_summary(inward_status(pile_id), focus)
+	if simulation.run.history.ended: result.ambience_gain = 0.0
+	return result
 
 
 func quick_save() -> Dictionary:
