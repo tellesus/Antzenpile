@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "scope": "PCM/encoding/reconstruction/loudness preparation only; player listening pending",
+  "sketches": [
+    {
+      "id": "C1_QuietSky",
+      "seconds": 86.0,
+      "lufs": -23.500264778871262,
+      "decoded_mp3_lufs": -23.946098458909344,
+      "peak_estimate_dbtp": -8.280344510866747,
+      "pcm_stem_sum_max_error": 6.103515625e-05,
+      "repeat_three_passes_exact": true
+    },
+    {
+      "id": "C2_WarmCurrent",
+      "seconds": 86.0,
+      "lufs": -23.500265113995194,
+      "decoded_mp3_lufs": -23.946115103982898,
+      "peak_estimate_dbtp": -10.705223117468952,
+      "pcm_stem_sum_max_error": 6.103515625e-05,
+      "repeat_three_passes_exact": true
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # 197 — Ambient/lofi listening pilot
 
-Status: complete for listening delivery, 2026-10-17; player selection pending. Player authorizes the196 pilot using approved resources; optional additional tools remain deferred unless this route fails.
+Status: complete for listening delivery, 2026-10-17; player feedback recorded in198. Player authorizes the196 pilot using approved resources; optional additional tools remain deferred unless this route fails.
 
 Outcome: three original60–90second listening sketches—spacious organic ambient, restrained lofi and organic/electronic hybrid—with matched listening loudness, separate authored parts and longer repetition previews. Use fresh composition/palette and no190 score or195 rustle bed. RimWorld menu music is a mood reference, not source audio to copy or condition on.
 
@@ -17,3 +17,5 @@ Verification: all file checks pass. PCM−23.500LUFS, decoded MP3−23.946LUFS w
 Changed-file groups: isolated authoring recipe/source manifest; short review audio and technical evidence; task/current-build/goals/decision handoff. No playable content replacement is claimed.
 
 Handoff: player chooses A/B/C, a combination of qualities, or rejects all. Incorporate that musical feedback before generating a full adaptive suite or adopting optional tools. Current audio remains in the earlier build until the chosen replacement is implemented.
+
+Follow-up198: A is weakest because its plucks are intrusive/jarring; B has promise but does not come together; C is generally best but its repeated triple-note hits become tiring. Revise C's foreground attacks and explore B's warmer color within that structure. This is a preferred direction, not acceptance of a final soundtrack.

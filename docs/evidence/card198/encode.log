@@ -1,0 +1,7 @@
+{"file": "docs/evidence/card198/audio/C1_QuietSky.mp3", "bytes": 1721514, "sha256": "f6d575711ac3aa6bb40e2f9ecc7dfd5d4d13ab3a5b012c8c1493e09bbcf1eb01", "decoded_frames": 3792600, "decoded_peak": 0.3656946122646332}
+{"file": "builds/music_pilot198/C1_QuietSky/repeat_3_passes.mp3", "bytes": 5261106, "sha256": "edc3ac9d16422f2bf76ab68759831af8ebc7a5d3debbb24704a6af27954729c2", "decoded_frames": 11598300, "decoded_peak": 0.36579933762550354}
+{"file": "docs/evidence/card198/audio/C2_WarmCurrent.mp3", "bytes": 1721514, "sha256": "1456655fe87ac9717448fe3fb223e92f3d88804e54c473b023ad2bc9286c5142", "decoded_frames": 3792600, "decoded_peak": 0.2767809331417084}
+{"file": "builds/music_pilot198/C2_WarmCurrent/repeat_3_passes.mp3", "bytes": 5261106, "sha256": "e4c0ae5cc57c84e1bb55c3436986e873ef5069831d0160fd7caef30efb3923e8", "decoded_frames": 11598300, "decoded_peak": 0.2768373489379883}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit
