@@ -1,6 +1,6 @@
 # Current development goals
 
-Updated 2026-10-16. Player feedback reopens M8:192 rebuilds shared UI/dispatch/entrance/scout presentation;193 repairs actual-release gameplay omissions. Both are implemented and verified; appearance and gameplay coherence remain player acceptance. Canonical `main` and one latest Windows playtest build contain the combined work; earlier topic branches/exports are historical.
+Updated 2026-10-17. Player feedback reopens M8:192 rebuilds shared UI/dispatch/entrance/scout presentation;193 repairs actual-release gameplay omissions;195 uses approved production resources for a tactile entrance and quiet local ambience. Appearance and gameplay coherence remain player acceptance. Canonical `main` and one latest Windows playtest build contain the combined work; earlier topic branches/exports are historical.
 
 | Goal | Current result |
 | --- | --- |
@@ -11,6 +11,7 @@ Updated 2026-10-16. Player feedback reopens M8:192 rebuilds shared UI/dispatch/e
 | Integrated gameplay/interface/package review | Complete191 automated scope: fresh three-setting development/network/recovery, native standard/compact inspection, active1×/64× measurements and current-main Windows/PCK gates. |
 | Organic UI, excavated entrance and scout scent | Complete192 implementation: shared warm surfaces, five-circle count editors, contextual icons/tooltips, pellet-built local entrance, textured scout memory, direct known adaptation navigation and clearer Midden rules. Full 12,380 checks and native captures/timing pass. |
 | Release gameplay correctness | Complete193: 42 mutations execute outside debug assertions; the original missing recruitment pool is reproduced in the old release and 1,237 corrected actual-release checks pass. |
+| Approved art/audio resources | Complete195 implementation: original Blender entrance with CC0 scanned soil, processed CC0 granular leaf ambience and independent controls. Full12,395 checks, native presentation/mixer checks and two1080p scene timing samples pass. Human appearance/listening remains acceptance. |
 
 The next design outcome is the fresh-colony decision arc in [Gameplay coherence review](GAMEPLAY_REDESIGN_REVIEW.md), with combat, adaptation and construction choices assessed together. Continue player testing of the revised beta: appearance, listening/enjoyment, balance/control feel, physical touch if used, real session frame pacing and another-machine launch. Further high-speed/driver tuning follows measured playtest evidence; final Windows 1.0/release acceptance is not claimed by automated checks. Do not create speculative feature branches to fill this acceptance stage. New concrete reports become bounded cards on main.
 
