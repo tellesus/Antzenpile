@@ -18,6 +18,8 @@ M8 revisions179–189: flowing chemical clouds and supported wispy creature/site
 
 **Player feedback196:** the195 anthill is accepted. The current music and added rustle ambience are rejected as an audio direction despite their technical checks. [Replacement research](MUSIC_REPLACEMENT_RESEARCH.md) is complete: RimWorld menu music is the player's positive reference, and a new original spacious organic/electronic score with optional restrained lofi rhythm is proposed. Short listening sketches precede another full adaptive implementation. No runtime music replacement is delivered by196; the current package still contains190/195 audio. Researched additional tools are not automatically approved.
 
+[Listening pilot197](evidence/card197/README.md) delivers three separate original76–86second auditions with matched measured loudness, lossless role tracks and longer repetition previews. It uses new soft CC0 piano recordings, original generated voices and the existing offline authoring stack; no optional tool is adopted. Player musical selection/rejection is pending. These listening artifacts are excluded from the game and do not refresh its Windows package.
+
 [Current persistence178](tasks/178_player_save_validation.md)/[same-build admission187](tasks/187_development_save_policy.md): exact serialized preflight before slot replacement, fresh current-run validation, failed-write retention, actual save→review→load and separate-process continuation. No historical save failure or old-save migration is a current task.
 
 ## Latest actual verification

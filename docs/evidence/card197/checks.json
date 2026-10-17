@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "scope": "PCM/encoding/reconstruction/loudness preparation only; player listening pending",
+  "sketches": [
+    {
+      "id": "A_Mosslight",
+      "seconds": 76.58823129251701,
+      "lufs": -23.50026460395348,
+      "decoded_mp3_lufs": -23.946307619012963,
+      "peak_estimate_dbtp": -7.783590376151484,
+      "pcm_stem_sum_max_error": 3.0517578125e-05,
+      "repeat_three_passes_exact": true
+    },
+    {
+      "id": "B_SlowCurrent",
+      "seconds": 83.83784580498866,
+      "lufs": -23.50026528282725,
+      "decoded_mp3_lufs": -23.946113194447182,
+      "peak_estimate_dbtp": -8.329904732634496,
+      "pcm_stem_sum_max_error": 6.103515625e-05,
+      "repeat_three_passes_exact": true
+    },
+    {
+      "id": "C_RootAndSky",
+      "seconds": 86.0,
+      "lufs": -23.500265286650503,
+      "decoded_mp3_lufs": -23.946070382613488,
+      "peak_estimate_dbtp": -7.804262308372387,
+      "pcm_stem_sum_max_error": 6.103515625e-05,
+      "repeat_three_passes_exact": true
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "encoder": "Blender bundled Audaspace / MP3 160kbps",
+  "files": [
+    {
+      "file": "docs/evidence/card197/audio/A_Mosslight.mp3",
+      "bytes": 1532910,
+      "sha256": "dedfa6ff6936071696cfa118af6c1dd6c58a4061c33b5ce4b7ffad3e77020163",
+      "decoded_frames": 3377541,
+      "decoded_peak": 0.38675978779792786,
+      "decoded_channels": 2
+    },
+    {
+      "file": "builds/music_pilot197/A_Mosslight/repeat_3_passes.mp3",
+      "bytes": 4696861,
+      "sha256": "17849192a9dcfcf04fd07a18059e31d9cb820dadd78585b6eae92207022f0822",
+      "decoded_frames": 10353123,
+      "decoded_peak": 0.3870382606983185,
+      "decoded_channels": 2
+    },
+    {
+      "file": "docs/evidence/card197/audio/B_SlowCurrent.mp3",
+      "bytes": 1678151,
+      "sha256": "3c584c21ba00d570a1d17ae36287943c28ba393acc6f907b6290dc575bc6a263",
+      "decoded_frames": 3697249,
+      "decoded_peak": 0.36384594440460205,
+      "decoded_channels": 2
+    },
+    {
+      "file": "builds/music_pilot197/B_SlowCurrent/repeat_3_passes.mp3",
+      "bytes": 5131538,
+      "sha256": "5d1fb1e137b931ef27c1a10ea246c31789c76f8c7061d5baf33e010c0bb9d908",
+      "decoded_frames": 11312247,
+      "decoded_peak": 0.3639191687107086,
+      "decoded_channels": 2
+    },
+    {
+      "file": "docs/evidence/card197/audio/C_RootAndSky.mp3",
+      "bytes": 1721514,
+      "sha256": "256b39bf9658b0cf1f961bf5bdbfe3e9197bd0fbb389ef45634e8821487b1e3c",
+      "decoded_frames": 3792600,
+      "decoded_peak": 0.38647812604904175,
+      "decoded_channels": 2
+    },
+    {
+      "file": "builds/music_pilot197/C_RootAndSky/repeat_3_passes.mp3",
+      "bytes": 5261106,
+      "sha256": "6514f260cb67c0fc616796647f5a267ab146acac8b4a0afc7512c649a25ea88a",
+      "decoded_frames": 11598300,
+      "decoded_peak": 0.38671690225601196,
+      "decoded_channels": 2
+    }
+  ]
+}

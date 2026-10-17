@@ -1,0 +1,80 @@
+{
+  "source": "https://github.com/sgossner/VCSL",
+  "upstream_tree": "dfcf4a4918771eee884b96ad4493de82ef84daf6",
+  "author": "Sam Gossner / Versilian Studios",
+  "license": "CC0-1.0",
+  "samples": [
+    {
+      "file": "piano_48.wav",
+      "midi": 48,
+      "source_path": "Chordophones/Zithers/Grand Piano, Kawai/Sustains/GPiano_sus_C3_v1_rr1_Player.wav",
+      "git_blob": "f1aad3b5a4eea04cfe4cd05ef85691eeaeedd435",
+      "bytes": 2374332,
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Zithers/Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_C3_v1_rr1_Player.wav",
+      "sha256": "eb52431464cc160cb7c3576d5087b6cc67326fd903b620088c0874f6bcff4a8e"
+    },
+    {
+      "file": "piano_52.wav",
+      "midi": 52,
+      "source_path": "Chordophones/Zithers/Grand Piano, Kawai/Sustains/GPiano_sus_E3_v1_rr1_Player.wav",
+      "git_blob": "ca7e6be66103bb3bd979b8d1ae8d0741cc15cc95",
+      "bytes": 1680460,
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Zithers/Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_E3_v1_rr1_Player.wav",
+      "sha256": "3986177d766ad67acaeb8d0d53114c4380dea65bc1632938dc597006e5123771"
+    },
+    {
+      "file": "piano_56.wav",
+      "midi": 56,
+      "source_path": "Chordophones/Zithers/Grand Piano, Kawai/Sustains/GPiano_sus_G#3_v1_rr1_Player.wav",
+      "git_blob": "85d2aad154563f2a6875e7dcd094bcf904c11d5c",
+      "bytes": 2157608,
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Zithers/Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_G%233_v1_rr1_Player.wav",
+      "sha256": "a812c31c7f474ee603a7a3eb83e6e285ee87878344ce9a372bd00730281852c5"
+    },
+    {
+      "file": "piano_60.wav",
+      "midi": 60,
+      "source_path": "Chordophones/Zithers/Grand Piano, Kawai/Sustains/GPiano_sus_C4_v1_rr1_Player.wav",
+      "git_blob": "3f44173e0c32ca3caab64725d980b51a3c7faad0",
+      "bytes": 1768284,
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Zithers/Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_C4_v1_rr1_Player.wav",
+      "sha256": "f921d4737ee847ecb55ce251a94e1841069b70e206b00342676954992ea7d0dc"
+    },
+    {
+      "file": "piano_64.wav",
+      "midi": 64,
+      "source_path": "Chordophones/Zithers/Grand Piano, Kawai/Sustains/GPiano_sus_E4_v1_rr1_Player.wav",
+      "git_blob": "9792f61419d73cf6f7a49e00fc611a1b82975617",
+      "bytes": 1608616,
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Zithers/Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_E4_v1_rr1_Player.wav",
+      "sha256": "2bbea3d9e280e7b87605eaa01853b9e81c8ce21eae1db61cfb6fa33b94ca449f"
+    },
+    {
+      "file": "piano_68.wav",
+      "midi": 68,
+      "source_path": "Chordophones/Zithers/Grand Piano, Kawai/Sustains/GPiano_sus_G#4_v1_rr1_Player.wav",
+      "git_blob": "4b8bd147a5af7046789b5a5cec0312af6d85c1a8",
+      "bytes": 1381584,
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Zithers/Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_G%234_v1_rr1_Player.wav",
+      "sha256": "09f8fc60ff5fde5ca7bc80f189885c2678df7405adf27a251139eae8c39c6390"
+    },
+    {
+      "file": "piano_72.wav",
+      "midi": 72,
+      "source_path": "Chordophones/Zithers/Grand Piano, Kawai/Sustains/GPiano_sus_C5_v1_rr1_Player.wav",
+      "git_blob": "1bd041f897a0bbb593db9e93676a91476b9777df",
+      "bytes": 1284188,
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Zithers/Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_C5_v1_rr1_Player.wav",
+      "sha256": "94186af4a11f4a5aa4a550615bd923ff12bdc2db22ea0cbfd24a58bca77308c0"
+    },
+    {
+      "file": "piano_75.wav",
+      "midi": 75,
+      "source_path": "Chordophones/Zithers/Grand Piano, Kawai/Sustains/GPiano_sus_D#5_v1_rr1_Player.wav",
+      "git_blob": "eb1ea35ee591c5a1b3137bf9bd35dd91ff3b0be9",
+      "bytes": 584968,
+      "url": "https://raw.githubusercontent.com/sgossner/VCSL/dfcf4a4918771eee884b96ad4493de82ef84daf6/Chordophones/Zithers/Grand%20Piano%2C%20Kawai/Sustains/GPiano_sus_D%235_v1_rr1_Player.wav",
+      "sha256": "a207576b7a205d7eb7ad4d5aa9eb79dd2ededd42415b2dc8cc36d4c576c213ea"
+    }
+  ]
+}
