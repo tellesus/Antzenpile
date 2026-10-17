@@ -22,6 +22,8 @@ M8 revisions179–189: flowing chemical clouds and supported wispy creature/site
 
 Player feedback198 prefers C as the starting point, rejects A's intrusive plucks, finds B promising but incoherent, and finds C's repeated triple-note hits tiring. [Two revised auditions](evidence/card198/README.md) remove the pluck/rolled-chord attacks and simplify percussion; one retains sparse piano, the other brings warmer lower-register keys into C's structure. Musical acceptance remains pending; these are standalone listening artifacts.
 
+Feedback199 selects C2 as much better/pretty solid and rejects C1's piano sounds. [C2 layered production suite](evidence/card199/README.md) develops four compatible musical densities/roles and a4:27 illustrative blend/rest mix using only the selected synthetic palette. It excludes recorded piano and earlier plucks. This is an offline production handoff, not an installed replacement; actual runtime music and the Windows package remain at195 until integration. Longer-form listening and runtime/final mix acceptance remain open.
+
 [Current persistence178](tasks/178_player_save_validation.md)/[same-build admission187](tasks/187_development_save_policy.md): exact serialized preflight before slot replacement, fresh current-run validation, failed-write retention, actual save→review→load and separate-process continuation. No historical save failure or old-save migration is a current task.
 
 ## Latest actual verification

@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "scope": "offline file/loop/transition/cue-overlap preparation; listening and game integration pending",
+  "section_frames": 2352000,
+  "section_seconds": 53.333333333333336,
+  "sections": [
+    {
+      "id": "Air",
+      "frames": 2352000,
+      "lufs": -26.176224931808033,
+      "reconstruction_max_error": 3.0517578125e-05,
+      "source_roles_checked": 4,
+      "part_combinations_checked": 15,
+      "foreground_events": 3
+    },
+    {
+      "id": "Warm",
+      "frames": 2352000,
+      "lufs": -23.552271700579624,
+      "reconstruction_max_error": 3.0517578125e-05,
+      "source_roles_checked": 4,
+      "part_combinations_checked": 15,
+      "foreground_events": 7
+    },
+    {
+      "id": "Current",
+      "frames": 2352000,
+      "lufs": -23.500265483084164,
+      "reconstruction_max_error": 6.103515625e-05,
+      "source_roles_checked": 4,
+      "part_combinations_checked": 15,
+      "foreground_events": 7
+    },
+    {
+      "id": "Breath",
+      "frames": 2352000,
+      "lufs": -31.687779452795585,
+      "reconstruction_max_error": 0.0,
+      "source_roles_checked": 4,
+      "part_combinations_checked": 15,
+      "foreground_events": 0
+    }
+  ],
+  "demo_seconds": 266.6666666666667,
+  "demo_lufs": -24.636314271433637,
+  "decoded_mp3_lufs": -25.08214895502604,
+  "demo_reconstruction_max_error": 6.103515625e-05,
+  "part_combinations_checked": 60,
+  "piano_or_plucked_recordings": 0,
+  "silent_foreground_rhythm_breath_confirmed": true,
+  "whole_mix_rest_seconds": 13.333333333333334
+}

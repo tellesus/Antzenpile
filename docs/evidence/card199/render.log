@@ -1,0 +1,5 @@
+{"id": "Air", "frames": 2352000, "seconds": 53.333333333333336, "lufs": -26.175959408422898, "peak_dbtp_estimate": -14.440213758347909, "events": 43, "foreground_events": 3}
+{"id": "Warm", "frames": 2352000, "seconds": 53.333333333333336, "lufs": -23.55200676040336, "peak_dbtp_estimate": -11.596102465974578, "events": 47, "foreground_events": 7}
+{"id": "Current", "frames": 2352000, "seconds": 53.333333333333336, "lufs": -23.50000000000028, "peak_dbtp_estimate": -11.564299476735336, "events": 67, "foreground_events": 7}
+{"id": "Breath", "frames": 2352000, "seconds": 53.333333333333336, "lufs": -31.687521385277687, "peak_dbtp_estimate": -21.112873681750763, "events": 32, "foreground_events": 0}
+DEMO 266.6666666666667 -24.63604925577964 -11.564299476735336

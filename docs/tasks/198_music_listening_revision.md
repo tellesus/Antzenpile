@@ -1,6 +1,6 @@
 # 198 — Remove jarring attacks from the listening pilot
 
-Status: complete for listening delivery, 2026-10-17; player response pending. The player rates197 A weakest (intrusive plucks), B promising but incoherent, and C best but quickly tiring because of its three-note hits.
+Status: complete for listening delivery, 2026-10-17; player response recorded in199. The player rates197 A weakest (intrusive plucks), B promising but incoherent, and C best but quickly tiring because of its three-note hits.
 
 Outcome: two standalone revisions based on C's72BPM harmony/space/breath: C1 removes the repeated plucked/chord attacks while retaining sparse softened piano; C2 explores B's warmer key color inside C's coherent structure with a quieter, lower-register phrase. Neither repeats the rejected three-hit figure. Match measured listening loudness and provide longer repetition previews and separate role tracks.
 
@@ -13,3 +13,5 @@ Verification: final PCM/MP3 file gates pass; PCM−23.500LUFS, decoded MP3−23.
 Changed-file groups: isolated198 authoring and review/evidence; current feedback/goals/decision/task handoff. Existing technical contracts remain unchanged.
 
 Handoff: compare whether C1 resolves the jarring attacks and whether C2's warmer phrase improves cohesion. Keep or reject musical qualities based on the player's response before a full adaptive-suite/runtime replacement. Optional tools remain deferred.
+
+Feedback199: C2 is much better/pretty solid. C1 is nice but its piano sounds are unpleasant. Use C2's warm synthetic keys as the musical foundation and exclude the recorded piano voice. This selects the direction; longer-form arrangement, adaptive transitions and the final game mix remain to be reviewed.

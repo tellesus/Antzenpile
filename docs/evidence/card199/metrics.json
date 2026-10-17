@@ -1,0 +1,409 @@
+{
+  "scope": "C2-based offline production suite, not integrated gameplay; listening/fatigue pending",
+  "rate": 44100,
+  "pcm_bits": 16,
+  "channels": 2,
+  "bpm": 72,
+  "frames_per_section": 2352000,
+  "sections": [
+    {
+      "id": "Air",
+      "frames": 2352000,
+      "seconds": 53.333333333333336,
+      "lufs": -26.175959408422898,
+      "peak_dbtp_estimate": -14.440213758347909,
+      "roles": {
+        "foreground": {
+          "rms": 0.016072246901714125,
+          "wrap_step": 3.4112671260215146e-19,
+          "nearby_slope_limit": 5.000000000000789e-05,
+          "sha256": "406fa22aa27a8700cdfaf3bfbfb44c58944262ddd38e6511ea988aa3b70f8565"
+        },
+        "space": {
+          "rms": 0.034202648635631584,
+          "wrap_step": 0.0026221071877612634,
+          "nearby_slope_limit": 0.005440150678603011,
+          "sha256": "c4e362816ad9efc02265ec477805974352881fcd7a7d3d05c2ab6df2c3a741c2"
+        },
+        "bass": {
+          "rms": 0.008216172916274214,
+          "wrap_step": 1.4871887783054685e-08,
+          "nearby_slope_limit": 5.0037455316692846e-05,
+          "sha256": "13eabb777df2bbe7770a0326943e3ed557713e45fa76c2f9a6a1a2d5180fe829"
+        },
+        "rhythm": {
+          "rms": 0.0,
+          "wrap_step": 0.0,
+          "nearby_slope_limit": 5e-05,
+          "sha256": "59ba8e88bc921b97135f7b1dec7ff2d57e541209d29421e25f34f6abba623b24"
+        }
+      },
+      "combinations": [
+        {
+          "mask": 1,
+          "sample_peak_dbfs": -20.254807583439213
+        },
+        {
+          "mask": 2,
+          "sample_peak_dbfs": -15.311449508006783
+        },
+        {
+          "mask": 3,
+          "sample_peak_dbfs": -13.856271412903405
+        },
+        {
+          "mask": 4,
+          "sample_peak_dbfs": -29.79825318731443
+        },
+        {
+          "mask": 5,
+          "sample_peak_dbfs": -20.18591740898831
+        },
+        {
+          "mask": 6,
+          "sample_peak_dbfs": -15.964386254052291
+        },
+        {
+          "mask": 7,
+          "sample_peak_dbfs": -14.445741133378977
+        },
+        {
+          "mask": 8,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 9,
+          "sample_peak_dbfs": -20.254807583439213
+        },
+        {
+          "mask": 10,
+          "sample_peak_dbfs": -15.311449508006783
+        },
+        {
+          "mask": 11,
+          "sample_peak_dbfs": -13.856271412903405
+        },
+        {
+          "mask": 12,
+          "sample_peak_dbfs": -29.79825318731443
+        },
+        {
+          "mask": 13,
+          "sample_peak_dbfs": -20.18591740898831
+        },
+        {
+          "mask": 14,
+          "sample_peak_dbfs": -15.964386254052291
+        },
+        {
+          "mask": 15,
+          "sample_peak_dbfs": -14.445741133378977
+        }
+      ],
+      "events": 43,
+      "foreground_events": 3
+    },
+    {
+      "id": "Warm",
+      "frames": 2352000,
+      "seconds": 53.333333333333336,
+      "lufs": -23.55200676040336,
+      "peak_dbtp_estimate": -11.596102465974578,
+      "roles": {
+        "foreground": {
+          "rms": 0.036610723141454304,
+          "wrap_step": 8.251078200515995e-07,
+          "nearby_slope_limit": 5.2875640830486865e-05,
+          "sha256": "96664edd8eec5715657305c6fc83afc5bb66fc122b12d2d7b2eebef9cbdf9298"
+        },
+        "space": {
+          "rms": 0.03557075458105686,
+          "wrap_step": 0.0027269914752717297,
+          "nearby_slope_limit": 0.005655756705747209,
+          "sha256": "6cdf51f3b34a15917b72b858c777f7114ce6d6ac271447e7c909394c850468f7"
+        },
+        "bass": {
+          "rms": 0.014015824386585416,
+          "wrap_step": 2.5369690924029045e-08,
+          "nearby_slope_limit": 5.006389436377015e-05,
+          "sha256": "6277851a2ae28b22746d06d8babb4b6ab143d9fd313624f121c6bed5a770c272"
+        },
+        "rhythm": {
+          "rms": 0.0,
+          "wrap_step": 0.0,
+          "nearby_slope_limit": 5e-05,
+          "sha256": "59ba8e88bc921b97135f7b1dec7ff2d57e541209d29421e25f34f6abba623b24"
+        }
+      },
+      "combinations": [
+        {
+          "mask": 1,
+          "sample_peak_dbfs": -16.732982414185457
+        },
+        {
+          "mask": 2,
+          "sample_peak_dbfs": -14.97078272203134
+        },
+        {
+          "mask": 3,
+          "sample_peak_dbfs": -11.182853506244763
+        },
+        {
+          "mask": 4,
+          "sample_peak_dbfs": -25.159271656900792
+        },
+        {
+          "mask": 5,
+          "sample_peak_dbfs": -15.138012337718362
+        },
+        {
+          "mask": 6,
+          "sample_peak_dbfs": -15.349327551422032
+        },
+        {
+          "mask": 7,
+          "sample_peak_dbfs": -11.601629841005645
+        },
+        {
+          "mask": 8,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 9,
+          "sample_peak_dbfs": -16.732982414185457
+        },
+        {
+          "mask": 10,
+          "sample_peak_dbfs": -14.97078272203134
+        },
+        {
+          "mask": 11,
+          "sample_peak_dbfs": -11.182853506244763
+        },
+        {
+          "mask": 12,
+          "sample_peak_dbfs": -25.159271656900792
+        },
+        {
+          "mask": 13,
+          "sample_peak_dbfs": -15.138012337718362
+        },
+        {
+          "mask": 14,
+          "sample_peak_dbfs": -15.349327551422032
+        },
+        {
+          "mask": 15,
+          "sample_peak_dbfs": -11.601629841005645
+        }
+      ],
+      "events": 47,
+      "foreground_events": 7
+    },
+    {
+      "id": "Current",
+      "frames": 2352000,
+      "seconds": 53.333333333333336,
+      "lufs": -23.50000000000028,
+      "peak_dbtp_estimate": -11.564299476735336,
+      "roles": {
+        "foreground": {
+          "rms": 0.036610723141454304,
+          "wrap_step": 8.251078200515995e-07,
+          "nearby_slope_limit": 5.2875640830486865e-05,
+          "sha256": "96664edd8eec5715657305c6fc83afc5bb66fc122b12d2d7b2eebef9cbdf9298"
+        },
+        "space": {
+          "rms": 0.03557075458105686,
+          "wrap_step": 0.0027269914752717297,
+          "nearby_slope_limit": 0.005655756705747209,
+          "sha256": "6cdf51f3b34a15917b72b858c777f7114ce6d6ac271447e7c909394c850468f7"
+        },
+        "bass": {
+          "rms": 0.015465737254163225,
+          "wrap_step": 2.799414170921583e-08,
+          "nearby_slope_limit": 5.0070504125539504e-05,
+          "sha256": "f65792e3417fd402b5ef985c76f5d275e8af38e45481851b3ee1caf5dac5c159"
+        },
+        "rhythm": {
+          "rms": 0.003865396976292551,
+          "wrap_step": 3.9810548520952116e-20,
+          "nearby_slope_limit": 5.0000000000000124e-05,
+          "sha256": "73bd647767e63af7645eee321300c240eda9580f0220f0d1aafabc51e6700cad"
+        }
+      },
+      "combinations": [
+        {
+          "mask": 1,
+          "sample_peak_dbfs": -16.732982414185457
+        },
+        {
+          "mask": 2,
+          "sample_peak_dbfs": -14.97078272203134
+        },
+        {
+          "mask": 3,
+          "sample_peak_dbfs": -11.182853506244763
+        },
+        {
+          "mask": 4,
+          "sample_peak_dbfs": -24.30423204848179
+        },
+        {
+          "mask": 5,
+          "sample_peak_dbfs": -14.982072584368622
+        },
+        {
+          "mask": 6,
+          "sample_peak_dbfs": -15.149827200851307
+        },
+        {
+          "mask": 7,
+          "sample_peak_dbfs": -11.569676671654626
+        },
+        {
+          "mask": 8,
+          "sample_peak_dbfs": -25.08843082147928
+        },
+        {
+          "mask": 9,
+          "sample_peak_dbfs": -16.732523381052186
+        },
+        {
+          "mask": 10,
+          "sample_peak_dbfs": -14.970500102410282
+        },
+        {
+          "mask": 11,
+          "sample_peak_dbfs": -11.182684136035617
+        },
+        {
+          "mask": 12,
+          "sample_peak_dbfs": -22.668453219225476
+        },
+        {
+          "mask": 13,
+          "sample_peak_dbfs": -14.98257754396332
+        },
+        {
+          "mask": 14,
+          "sample_peak_dbfs": -15.149669693025508
+        },
+        {
+          "mask": 15,
+          "sample_peak_dbfs": -11.569826851766408
+        }
+      ],
+      "events": 67,
+      "foreground_events": 7
+    },
+    {
+      "id": "Breath",
+      "frames": 2352000,
+      "seconds": 53.333333333333336,
+      "lufs": -31.687521385277687,
+      "peak_dbtp_estimate": -21.112873681750763,
+      "roles": {
+        "foreground": {
+          "rms": 0.0,
+          "wrap_step": 0.0,
+          "nearby_slope_limit": 5e-05,
+          "sha256": "59ba8e88bc921b97135f7b1dec7ff2d57e541209d29421e25f34f6abba623b24"
+        },
+        "space": {
+          "rms": 0.01645079108404408,
+          "wrap_step": 0.0,
+          "nearby_slope_limit": 5.101138680327761e-05,
+          "sha256": "b7eb87359f9e8c837a11f88bdf785b684914be291773664beedb0b9a29ff3485"
+        },
+        "bass": {
+          "rms": 0.0,
+          "wrap_step": 0.0,
+          "nearby_slope_limit": 5e-05,
+          "sha256": "59ba8e88bc921b97135f7b1dec7ff2d57e541209d29421e25f34f6abba623b24"
+        },
+        "rhythm": {
+          "rms": 0.0,
+          "wrap_step": 0.0,
+          "nearby_slope_limit": 5e-05,
+          "sha256": "59ba8e88bc921b97135f7b1dec7ff2d57e541209d29421e25f34f6abba623b24"
+        }
+      },
+      "combinations": [
+        {
+          "mask": 1,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 2,
+          "sample_peak_dbfs": -21.11840105678183
+        },
+        {
+          "mask": 3,
+          "sample_peak_dbfs": -21.11840105678183
+        },
+        {
+          "mask": 4,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 5,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 6,
+          "sample_peak_dbfs": -21.11840105678183
+        },
+        {
+          "mask": 7,
+          "sample_peak_dbfs": -21.11840105678183
+        },
+        {
+          "mask": 8,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 9,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 10,
+          "sample_peak_dbfs": -21.11840105678183
+        },
+        {
+          "mask": 11,
+          "sample_peak_dbfs": -21.11840105678183
+        },
+        {
+          "mask": 12,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 13,
+          "sample_peak_dbfs": -240.0
+        },
+        {
+          "mask": 14,
+          "sample_peak_dbfs": -21.11840105678183
+        },
+        {
+          "mask": 15,
+          "sample_peak_dbfs": -21.11840105678183
+        }
+      ],
+      "events": 32,
+      "foreground_events": 0
+    }
+  ],
+  "shared_gain": 1.160751604331321,
+  "demo_seconds": 266.6666666666667,
+  "demo_lufs": -24.63604925577964,
+  "demo_peak_dbtp_estimate": -11.564299476735336,
+  "cue_overlap_peak_dbtp_estimate": -11.564299476735336,
+  "whole_mix_rest_interval_seconds": [
+    200,
+    213.33333333333334
+  ],
+  "fade_seconds": 6.666666666666667,
+  "transition_weights_sum_error": 0.0
+}
