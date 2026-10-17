@@ -17,6 +17,7 @@ Translate the current design into code; do not invent major game systems during 
 
 ## Preserve the design
 
+- Player authorization (2026-10-16): the specific free art/audio tools, resources and addon listed in `docs/CODING_RULES.md#authorized-art-and-audio-resources` are approved for use without asking again. Paid services are not authorized. Ask for additional tools/resources outside that list when needed; do not treat the earlier dependency restriction as a ban on the approved choices.
 - Godot/GDScript; Windows desktop graphics first, touch-friendly controls. Mobile export, device validation, quality tiers and mobile-specific optimization are tabled by the player (2026-10-03) until resumed. Preserve the pinned 2D Compatibility engine.
 - Keep hidden 2D reality, simulation, colony knowledge/perception, and presentation separate. Normal UI consumes approved presentation data, never hidden world objects. Debug truth access must stay development-only.
 - Simulation must run headlessly. Lightweight typed state owns gameplay; scene nodes and graphics do not.

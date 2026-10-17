@@ -9,8 +9,26 @@
 - Implement one bounded task card in a small logical commit. A card should usually end in a player-visible behavior with its simulation, presentation, and evidence together; split it when the pieces need separate verification or a useful independent handoff. Avoid unrelated cleanup and unused future-system folders/classes. Expand roadmap cards against actual code before implementation.
 - Prefer typed GDScript, explicit fields and ownership, short focused functions, and descriptive names. Use snake_case files/methods/fields and PascalCase class names. Comments explain invariants and non-obvious choices.
 - Data and balance live in authored definitions/configuration. Keep provisional values visibly tunable. Favor simple, inspectable algorithms over speculative optimization or framework building.
-- Do not introduce plugins, addons, or external libraries unless the task explicitly authorizes them; otherwise obtain approval. Keep the prototype nearly dependency-free. No engine upgrades as incidental cleanup.
+- Use the specifically authorized art/audio tools, resources and addon below when useful, without repeat approval. Ask before adding tools/resources or dependencies outside the approved scope. Prefer focused dependencies that improve quality or reduce maintenance. Paid services are not authorized; the $0 budget remains. No engine upgrades as incidental cleanup.
 - Prefer composition to deep inheritance. After bootstrap, keep main runnable between tasks; experimental visual work belongs on a separate branch. Use commit subjects such as `task 012: implement trail allocation`.
+
+## Authorized art and audio resources
+
+Player approval, 2026-10-16: the following specific choices are authorized for relevant development work. Approval permits their use; it does not require installing every tool or replacing working systems.
+
+| Tool or resource | Authorized use |
+| --- | --- |
+| [Blender](https://www.blender.org/) | Continue and expand offline modeling, materials and rendered assets for the 2D game. |
+| [Material Maker](https://www.materialmaker.org/) | Procedural material/texture authoring and exported assets. |
+| [Poly Haven](https://polyhaven.com/license/) and [ambientCG](https://docs.ambientcg.com/license/) | Free CC0 material assets, processed for the game's visual direction. |
+| [Godot Shaders](https://godotshaders.com/license/) | Selected MIT/CC0 shader examples adapted and tested in the pinned Compatibility renderer; verify each entry's license. |
+| [Freesound](https://freesound.org/help/faq/) | Free sound recordings, preferably CC0; verify each recording's license and meet attribution requirements where applicable. |
+| [Audacity](https://www.audacityteam.org/) | Offline editing, processing and assembly of audio. |
+| [Surge XT](https://github.com/surge-synthesizer/surge) | Offline synthesis of musical voices, ambience and sound effects. |
+| [Godot Sound Manager](https://github.com/nathanhoad/godot_sound_manager) | Evaluate and integrate the focused MIT-licensed GDScript audio addon when it benefits the existing implementation. |
+| [Godot interactive music streams](https://docs.godotengine.org/en/stable/classes/class_audiostreaminteractive.html) | Use the engine's built-in clip/transition facilities when suitable. |
+
+Keep offline authoring tools separate from shipped runtime requirements. Retain asset provenance, license/attribution records and reproducible production sources; pin adopted addon versions and verify affected Windows exports. The existing VCSL sample use remains authorized. This list does not authorize paid services, paid extras offered by these projects, unrelated plugins, engine/renderer changes or major architectural replacements. If another resource is needed, ask the player; their willingness to consider it is not advance approval. The earlier blanket dependency caution must not prevent use of these approved choices.
 
 ## Boundaries
 
