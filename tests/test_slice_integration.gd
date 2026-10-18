@@ -41,7 +41,7 @@ func run(test: Object) -> bool:
 		test.check(game.create_trail("home", "known:protein_01"), "Player commits a protein trail to support larval growth")
 	test.check(_advance_until(game, func() -> bool: return pile.food_exchange_state == "developed", 100.0), "Food Exchange completes after its committed build time")
 	var developed_at: float = game.run.simulation_time
-	test.check(root.music_state("home").development_level == 1, "Developed Food Exchange activates the semantic second music layer")
+	test.check(root.inward_status("home").food_exchange_state == "developed", "Developed Food Exchange is visible in the approved colony summary")
 	test.check(_advance_until(game, func() -> bool: return pile.brood_matured_total == 8, 500.0), "Supported brood matures into eight living workers")
 	var emerged_at: float = game.run.simulation_time
 	test.check(pile.workers_total == 48 and pile.workers.invariant_holds(), "End-of-slice growth conserves ledger-owned workers")

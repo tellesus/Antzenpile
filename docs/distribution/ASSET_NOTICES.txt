@@ -1,19 +1,17 @@
 Antzenpile systems-beta asset provenance
 
 Game geometry, score and information cues are original project work; licensed
-material and ambience contributions are identified below. Blender-authored
+material contributions are identified below. Blender-authored
 worker/queen/brood renders and vector art use committed project sources.
 Colony and sensory materials include OpenAI imagegen finishes from original
 project sculpts. Player reference screenshots are not shipped as backdrops.
 No runtime Blender, Krita, sampler, web service or paid addon is required.
 
-The layered original score incorporates CC0 recordings by Sam Gossner /
-Versilian Studios from the Versilian Community Sample Library (VCSL):
-https://github.com/sgossner/VCSL/tree/sfz
-https://versilian-studios.com/vcsl/
-CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
-Exact source URLs/hashes are retained in tools/music/sample_manifest.json
-in the source repository. Attribution is retained for provenance.
+The current C2 Warm Current score200 is original project synthesis and arrangement,
+using the reproducible pilot198/suite199 production sources. No recorded piano,
+VCSL instrument sample, reference track or Freesound recording is used in this
+score. Returned information cues remain original project synthesis. Historical
+score190 and rustle195 assets are not distributed in this build.
 
 The Godot engine is distributed under its MIT license. Its license and
 third-party copyright/license notices accompany this build in
@@ -27,9 +25,7 @@ offline lighting rendered using Ground054 color/displacement from ambientCG
 (Lennart Demes), CC0 1.0: https://ambientcg.com/view?id=Ground054
 License: https://docs.ambientcg.com/license/
 
-Colony ambience195 is a processed granular arrangement of the public HQ preview
-of "Leaves rustling.wav" by leah15, CC0 1.0:
-https://freesound.org/people/leah15/sounds/191454/
-License: https://creativecommons.org/publicdomain/zero/1.0/
-Source URLs/checksums and reproducible authoring are in tools/art/entrance195.
-No runtime Blender, online sound service or additional addon is required.
+Original C2 production and cyclic encoding sources are retained under
+tools/music/suite199 in the source repository. Blender/Audaspace is used only
+for offline compression. No runtime Blender, online audio service or additional
+addon is required.

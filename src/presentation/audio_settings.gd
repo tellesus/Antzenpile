@@ -23,14 +23,14 @@ func button_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 328, 78, 100, 64)
 
 func panel_rect() -> Rect2:
-	return Rect2(get_viewport_rect().size.x - 432, 130, 408, 402)
+	return Rect2(get_viewport_rect().size.x - 432, 130, 408, 312)
 
 func level_rect(category: String, index: int) -> Rect2:
-	var row: int = ["music", "cues", "ambience"].find(category)
+	var row: int = ["music", "cues"].find(category)
 	return Rect2(panel_rect().position + Vector2(32 + index * 68, 88 + row * 90), Vector2(60, 44))
 
 func close_rect() -> Rect2:
-	return Rect2(panel_rect().position + Vector2(32, 336), Vector2(332,44))
+	return Rect2(panel_rect().position + Vector2(32, 246), Vector2(332,44))
 
 func activate_at(at: Vector2) -> bool:
 	if blocked.is_valid() and blocked.call(): return false
@@ -41,7 +41,7 @@ func activate_at(at: Vector2) -> bool:
 	if close_rect().has_point(at):
 		opened = false
 		return true
-	for category: String in ["music", "cues", "ambience"]:
+	for category: String in ["music", "cues"]:
 		for index: int in 5:
 			if level_rect(category, index).has_point(at):
 				preferences.set_level(category, index * 0.25)
@@ -74,15 +74,15 @@ func _draw() -> void:
 	UIStyle.surface(self, panel, Color("111921"))
 	UIStyle.surface(self, panel, Color("41535a"), true)
 	_label(panel.position + Vector2(24,32), "Sound", 22, Color("d9d3be"))
-	for category: String in ["music", "cues", "ambience"]:
-		var row: int = ["music", "cues", "ambience"].find(category)
-		var title: String = {"music":"Music", "cues":"Information cues", "ambience":"Colony ambience"}[category]
+	for category: String in ["music", "cues"]:
+		var row: int = ["music", "cues"].find(category)
+		var title: String = {"music":"Music", "cues":"Information cues"}[category]
 		_label(panel.position + Vector2(32,72 + row * 90), title, 16, Color("a9b9bc"))
 		for index: int in 5:
 			var button: Rect2 = level_rect(category,index)
 			UIStyle.surface(self, button, Color("355059") if preferences.get(category) == index * 0.25 else Color("263038"))
 			_label(button.position + Vector2(9,28), "Off" if index == 0 else "%d%%" % (index * 25), 14, Color("dce5d9"))
-	_label(panel.position + Vector2(32,329), feedback, 12, Color("82939c"))
+	_label(panel.position + Vector2(32,239), feedback, 12, Color("82939c"))
 	UIStyle.surface(self, close_rect(), Color("263038"))
 	_label(close_rect().position + Vector2(142,28), "CLOSE", 14, Color("dce5d9"))
 

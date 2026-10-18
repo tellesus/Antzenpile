@@ -28,13 +28,14 @@ func run(test: Object) -> bool:
 	audio.preferences = prefs
 	audio.alarm_provider = func(): return 0
 	test.get_root().add_child(audio)
-	test.check(is_equal_approx(audio.base_player.volume_db, Audio.MIX_DB + linear_to_db(0.25)) and audio.alarm_player.volume_db == -80, "Quiet music and muted cues have independent gain")
+	audio._process(Audio.START_FADE_SECONDS)
+	test.check(is_equal_approx(audio.music_player.volume_db, 0.0 + linear_to_db(0.25)) and audio.alarm_player.volume_db == -80, "Quiet music and muted cues have independent gain")
 	prefs.set_level("music", 0)
 	prefs.set_level("cues", 1)
 	audio._process(0)
-	test.check(audio.base_player.volume_db == -80 and audio.alarm_player.volume_db == -15, "Music off retains the authored information-cue volume")
+	test.check(audio.music_player.volume_db == -80 and audio.alarm_player.volume_db == -15, "Music off retains the authored information-cue volume")
 	audio.restart_after_load()
-	test.check(prefs.music == 0 and prefs.cues == 1 and audio.base_player.volume_db == -80, "Run reload keeps player audio preferences")
+	test.check(prefs.music == 0 and prefs.cues == 1 and audio.music_player.volume_db == -80, "Run reload keeps player audio preferences")
 	var settings := Settings.new()
 	settings.preferences = prefs
 	var calls: Array[int] = [0]

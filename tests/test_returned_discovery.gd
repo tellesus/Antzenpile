@@ -39,8 +39,8 @@ func run(test: Object) -> bool:
 	reports[0] = 3
 	test.check(audio.poll_returned_discovery() and not audio.poll_returned_discovery(), "One pending batch causes one semantic audio event")
 	audio.preferences.cues = 0
-	audio._process(0)
-	test.check(audio.discovery_player.volume_db == -80 and audio.base_player.volume_db == Audio.MIX_DB, "Discovery obeys information level independently of music")
+	audio._process(Audio.START_FADE_SECONDS)
+	test.check(audio.discovery_player.volume_db == -80 and audio.music_player.volume_db == 0.0, "Discovery obeys information level independently of music")
 	audio.restart_after_load()
 	test.check(not audio.poll_returned_discovery() and not audio.discovery_player.playing and Audio.DISCOVERY_CUE.loop_mode == AudioStreamWAV.LOOP_DISABLED and Audio.DISCOVERY_CUE.get_length() <= 0.3, "Reload suppresses a bounded non-looping cue")
 	audio.free()

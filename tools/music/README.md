@@ -1,3 +1,7 @@
+# Current soundtrack: C2 trial200
+
+See [suite199](suite199/README.md) for current production and cyclic encoding. The following190 recipe is historical and regenerates rejected assets; do not use it to build current soundtrack content. Existing returned-information cue files remain unchanged.
+
 # Living colony arrangement — 190
 
 Four synchronized **85⅓-second, 32-bar, 90-BPM, stereo 44.1-kHz/16-bit PCM** voices. The original D-minor/modal score moves through four eight-bar phrases, varying motifs, register, timing and density. Phrase rests and a sparse return home provide breathing space. Shared circular stereo room/delay carries tails across the score; a 6ms cadence breath brings the file boundary to zero. Equal-power positions keep bass centred and give higher instruments space. One common gain across all subsets retains layer balance; runtime stays at -4dB with three-second real-time fades.

@@ -15,3 +15,5 @@ Verification: final file gates pass across60 part combinations, exact frames, ro
 Changed-file groups: isolated suite authoring and production/preview evidence; task/current-build/goals/decision/planned-bible handoff. Current runtime contracts remain unchanged.
 
 Handoff: evaluate whether C2's selected palette remains pleasant through longer-form layer changes/rest/repetition. The production parts are ready for a bounded runtime integration following that listening gate: retire190 music/195 rustle, keep independent preferences/information boundaries, verify real mixer timing/lifecycle and refresh Windows. Do not reintroduce the rejected piano/plucked voices or adopt optional tools without a concrete need and authorization.
+
+Follow-up200: the player accepts this arrangement for now and requests a longer in-game trial. Runtime integration is authorized;199’s standalone evidence remains a production record. See [200](200_c2_runtime_playtest.md).

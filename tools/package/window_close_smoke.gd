@@ -25,7 +25,7 @@ func _run() -> void:
 	get_root().propagate_notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
 	for frame: int in 2: await process_frame
 	var passed: bool = game._closing and not auto_accept_quit and not game._audio_controller.is_processing() and game.simulation.run.to_dict() == frozen
-	for player: AudioStreamPlayer in game._audio_controller._music_players() + [game._audio_controller.ambience_player]:
+	for player: AudioStreamPlayer in game._audio_controller._players():
 		passed = passed and not player.playing and player.stream == null
 	print("[WINDOW-CLOSE] queued_audio_release_no_save_or_simulation_change=%s build=%s" % [passed,SaveBuild.current()])
 	if not passed: quit(1)

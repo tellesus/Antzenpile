@@ -1,0 +1,53 @@
+{
+  "sequence": [
+    "Air",
+    "Warm",
+    "Current",
+    "Breath",
+    "Warm"
+  ],
+  "bpm": 72,
+  "sample_rate": 44100,
+  "frames": 11760000,
+  "seconds": 266.6666666666667,
+  "blend_seconds": 6.666666666666667,
+  "blend": "complementary sin-squared / cos-squared, phase-aligned",
+  "source_demo_middle_max_error": 3.050602617836538e-05,
+  "decoded_lufs_estimate": -24.58019953209197,
+  "pcm_lufs_estimate": -24.608082154865695,
+  "decoded_peak": 0.2653937339782715,
+  "decoded_wrap_step": 0.005199156701564789,
+  "nearby_slope_limit": 0.006860194269008941,
+  "decoded_section_boundaries": [
+    {
+      "seconds": 53.333333333333336,
+      "step": 0.002623561769723892,
+      "nearby_slope_limit": 0.006585665328800685
+    },
+    {
+      "seconds": 106.66666666666667,
+      "step": 0.0027680285274982452,
+      "nearby_slope_limit": 0.006852296993508938
+    },
+    {
+      "seconds": 160.0,
+      "step": 0.00279134139418602,
+      "nearby_slope_limit": 0.0068684379126876674
+    },
+    {
+      "seconds": 213.33333333333334,
+      "step": 0.0,
+      "nearby_slope_limit": 0.00011128378118664848
+    }
+  ],
+  "rest_interior_peak": 0.0,
+  "bytes": 3512272,
+  "sha256": "49c0f7dfe0dc6aecf66fafd229a94909d0a424ae915975ce8bba5663b62a5c9d",
+  "sources": {
+    "Air": "e82d70664d3a6007561f63465dfebc8da74012ddb439fe788210fecb345ab0e9",
+    "Warm": "7a44caa398f46d27c6491158ca53c187a5bf6374f71d1cc4594c7cc4e048ad44",
+    "Current": "6eccd8a2937a1b8f6f1ef02448880f63cd1ea3382bba892f41ad2f89538c3df2",
+    "Breath": "b7eb87359f9e8c837a11f88bdf785b684914be291773664beedb0b9a29ff3485"
+  },
+  "scope": "authored cyclic arrangement; no gameplay-reactive scheduler; estimated meter"
+}

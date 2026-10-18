@@ -12,7 +12,7 @@ Current documentation, established 2026-10-05 by card 138. This is the entry poi
 | [Systems bible](SYSTEMS_BIBLE.md) | The planned game: shared rules, system boundaries, player decisions and 1.0 requirements. |
 | [1.0 roadmap](ROADMAP_1_0.md) | Implementation order, dependencies, milestone outcomes and release gates. |
 | [Current build](CURRENT_BUILD.md) | What actually exists, what is partial, and the latest recorded evidence. Never infer implementation from a catalog entry. |
-| [Music replacement research](MUSIC_REPLACEMENT_RESEARCH.md) | Research196: ambient/lofi production methods, RimWorld reference, approved/additional tool boundaries and a proposed listening pilot; replacement music is not yet implemented. |
+| [Music replacement research](MUSIC_REPLACEMENT_RESEARCH.md) | Research196: ambient/lofi production methods, RimWorld reference, approved/additional tool boundaries and a proposed listening pilot; C2 production199 is installed for a bounded longer-play trial in200. |
 | [Resource catalog](catalogs/RESOURCES.md) | Concrete foods/water sources, reusable source rules, identification and yield profiles. |
 | [Chamber catalog](catalogs/CHAMBERS.md) | Functional organs, projects, staffing and planned additions. |
 | [Adaptation catalog](catalogs/ADAPTATIONS.md) | Web families, existing/planned traits, evidence, inheritance and tradeoffs. |

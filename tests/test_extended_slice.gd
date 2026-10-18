@@ -34,7 +34,7 @@ func run(test: Object) -> bool:
 	test.check(_advance_until(game, func() -> bool: return game.run.knowledge.nodes.has("known:protein_01"), 150.0), "Protein scout returns knowledge")
 	test.check(game.create_trail("home", "known:protein_01"), "Player funds protein collection")
 	var first_emerged: bool = _advance_until(game, func() -> bool: return pile.brood_matured_total == 8, 500.0)
-	test.check(first_emerged and pile.food_exchange_state == "developed" and root.music_state("home").development_level == 1 and pile.workers_total == 48, "Early Food Exchange and first brood complete with semantic music reward")
+	test.check(first_emerged and pile.food_exchange_state == "developed" and pile.workers_total == 48, "Early Food Exchange and first brood complete with conserved population")
 	if not first_emerged:
 		root.free()
 		return true

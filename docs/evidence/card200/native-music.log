@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 26.8.1.260806 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon RX 6650 XT
+
+[C2] uninterrupted second=0 position=0.833 playing=true
+[C2] uninterrupted second=30 position=30.923 playing=true
+[C2] uninterrupted second=60 position=61.045 playing=true
+[C2] uninterrupted second=90 position=91.170 playing=true
+[C2] uninterrupted second=120 position=121.292 playing=true
+[C2] uninterrupted second=150 position=151.394 playing=true
+[C2] uninterrupted second=180 position=181.525 playing=true
+[C2] uninterrupted second=210 position=211.650 playing=true
+[C2] uninterrupted second=240 position=241.760 playing=true
+[C2] uninterrupted second=265 position=0.203 playing=true
+[C2] passed=true full_uninterrupted_wrap=true frames=13002240 peak=0.265420 rest_peak=0.000000000 driver=WASAPI build=editor-2a896f8af91cebb1e62fb9a86421c45e2513c0f66d4c0b283730d1985a7e2505

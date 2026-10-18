@@ -25,6 +25,6 @@ func run(test: Object) -> bool:
 		viewport.free()
 	var audio := Audio.new(); test.get_root().add_child(audio)
 	audio.stop_playback(); audio.stop_playback(); audio.restart_after_load()
-	for player: AudioStreamPlayer in audio._music_players(): test.check(player.stream == null and not player.playing,"Shutdown is idempotent and reload cannot restart released audio")
+	test.check(audio.music_player.stream == null and not audio.music_player.playing,"Shutdown is idempotent and reload cannot restart released audio")
 	audio.free()
 	return true

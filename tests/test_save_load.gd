@@ -109,7 +109,7 @@ func run(test: Object) -> bool:
 	var root := Root.new()
 	test.get_root().add_child(root)
 	root.save_service = service
-	test.check(root.quick_load().accepted and root.simulation.run.to_dict() == source and root.music_state("home").development_level == 0, "Headless GameRoot load refreshes semantic run state without graphics or audio")
+	test.check(root.quick_load().accepted and root.simulation.run.to_dict() == source and root._audio_controller == null, "Headless GameRoot load refreshes semantic run state without graphics or audio")
 	test.check(InputMap.has_action("save_run") and InputMap.has_action("load_run"), "Save and load have named keyboard actions")
 	var outward: OutwardView = Outward.new()
 	root.add_child(outward)

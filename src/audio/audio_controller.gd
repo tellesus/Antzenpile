@@ -1,96 +1,65 @@
 class_name AudioController
 extends Node
-## Persistent phase-matched players; detached colony intent only chooses the mix.
+## Authored C2 cycle; musical time belongs to the audio mixer, never simulation.
 
-const BASE_LOOP = preload("res://assets/audio/base_loop.wav")
-const GROWTH_LOOP = preload("res://assets/audio/growth_loop.wav")
-const NURSERY_LOOP = preload("res://assets/audio/nursery_loop.wav")
-const MIDDEN_LOOP = preload("res://assets/audio/midden_loop.wav")
+const MUSIC_LOOP = preload("res://assets/audio/warm_current.ogg")
 const ALARM_CUE = preload("res://assets/audio/returned_alarm.wav")
 const DISCOVERY_CUE = preload("res://assets/audio/returned_discovery.wav")
-const AMBIENCE_LOOP = preload("res://assets/audio/colony_ambience.wav")
-const FADE_SECONDS: float = 3.0
-const MIX_DB: float = -4.0
+const START_FADE_SECONDS: float = 1.4
 
-var state_provider: Callable
 var alarm_provider: Callable
 var discovery_provider: Callable
-var discovery_player: AudioStreamPlayer
-var _reported_discoveries: int = 0
+var music_player: AudioStreamPlayer
 var alarm_player: AudioStreamPlayer
-var _reported_losses: int = 0
-var stem_gain: float = 0.0
-var base_player: AudioStreamPlayer
-var growth_player: AudioStreamPlayer
-var nursery_player: AudioStreamPlayer
-var midden_player: AudioStreamPlayer
-var nursery_gain: float = 0.0
-var midden_gain: float = 0.0
-var ambience_player: AudioStreamPlayer
-var ambience_gain: float = 0.0
+var discovery_player: AudioStreamPlayer
 var preferences: AudioPreferences = preload("res://src/audio/audio_preferences.gd").new()
+var _reported_losses: int = 0
+var _reported_discoveries: int = 0
+var _start_gain: float = 0.0
 var _shutting_down: bool = false
 
 
 func _ready() -> void:
-	base_player = _make_player(BASE_LOOP, MIX_DB)
-	growth_player = _make_player(GROWTH_LOOP, -80.0)
-	nursery_player = _make_player(NURSERY_LOOP, -80.0)
-	midden_player = _make_player(MIDDEN_LOOP, -80.0)
-	ambience_player = _make_player(AMBIENCE_LOOP, -80.0)
-	if alarm_provider.is_valid():
-		alarm_player = AudioStreamPlayer.new()
-		alarm_player.stream = ALARM_CUE
-		alarm_player.volume_db = -15.0
-		add_child(alarm_player)
-	if discovery_provider.is_valid():
-		discovery_player = AudioStreamPlayer.new()
-		discovery_player.stream = DISCOVERY_CUE
-		add_child(discovery_player)
+	music_player = _make_player(MUSIC_LOOP)
+	if alarm_provider.is_valid(): alarm_player = _make_player(ALARM_CUE)
+	if discovery_provider.is_valid(): discovery_player = _make_player(DISCOVERY_CUE)
 	restart_after_load()
 
 
 func restart_after_load() -> void:
-	if _shutting_down or base_player == null or growth_player == null:
-		return
+	if _shutting_down or music_player == null: return
 	_reported_losses = int(alarm_provider.call()) if alarm_provider.is_valid() else 0
 	_reported_discoveries = int(discovery_provider.call()) if discovery_provider.is_valid() else 0
-	if alarm_player != null:
-		alarm_player.stop()
-	if discovery_player != null: discovery_player.stop()
-	for player: AudioStreamPlayer in _music_players(): player.stop()
-	ambience_player.stop()
-	var state: MusicState = _current_state()
-	stem_gain = state.food_gain
-	nursery_gain = state.nursery_gain
-	midden_gain = state.midden_gain
-	ambience_gain = state.ambience_gain
-	_update_growth_volume()
-	# All play calls enter the same audio mix frame and retain their own phase.
-	if DisplayServer.get_name() != "headless":
-		for player: AudioStreamPlayer in _music_players(): player.play(0.0)
-		ambience_player.play(0.0)
+	for player: AudioStreamPlayer in _players():
+		if player != null: player.stop()
+	_start_gain = 0.0
+	_update_volume()
+	if DisplayServer.get_name() != "headless": music_player.play()
 
 
 func _process(delta: float) -> void:
-	var state: MusicState = _current_state()
-	stem_gain = move_toward(stem_gain, state.food_gain, delta / FADE_SECONDS)
-	nursery_gain = move_toward(nursery_gain, state.nursery_gain, delta / FADE_SECONDS)
-	midden_gain = move_toward(midden_gain, state.midden_gain, delta / FADE_SECONDS)
-	ambience_gain = move_toward(ambience_gain, state.ambience_gain, delta / 1.5)
-	_update_growth_volume()
+	if _shutting_down: return
+	_start_gain = move_toward(_start_gain, 1.0, delta / START_FADE_SECONDS)
+	_update_volume()
 	poll_returned_alarm()
 	poll_returned_discovery()
 
 
 func poll_returned_alarm() -> bool:
-	if not alarm_provider.is_valid():
-		return false
-	var losses: int = int(alarm_provider.call())
-	var new_report: bool = losses > _reported_losses
-	_reported_losses = losses
-	if new_report and alarm_player != null and DisplayServer.get_name() != "headless":
-		alarm_player.play()
+	if _shutting_down or not alarm_provider.is_valid(): return false
+	var reports: int = int(alarm_provider.call())
+	var new_report: bool = reports > _reported_losses
+	_reported_losses = reports
+	if new_report and alarm_player != null and DisplayServer.get_name() != "headless": alarm_player.play()
+	return new_report
+
+
+func poll_returned_discovery() -> bool:
+	if _shutting_down or not discovery_provider.is_valid(): return false
+	var reports: int = int(discovery_provider.call())
+	var new_report: bool = reports > _reported_discoveries
+	_reported_discoveries = reports
+	if new_report and discovery_player != null and DisplayServer.get_name() != "headless": discovery_player.play()
 	return new_report
 
 
@@ -101,54 +70,28 @@ func _exit_tree() -> void:
 func stop_playback() -> void:
 	_shutting_down = true
 	set_process(false)
-	for player: AudioStreamPlayer in _music_players() + [alarm_player, discovery_player, ambience_player]:
+	for player: AudioStreamPlayer in _players():
 		if player != null:
 			player.stop()
 			player.stream = null
 
 
-func _current_state() -> MusicState:
-	if state_provider.is_valid():
-		var state: MusicState = state_provider.call()
-		if state != null:
-			return state
-	return MusicState.new()
-
-
-func _make_player(source: AudioStreamWAV, volume: float) -> AudioStreamPlayer:
+func _make_player(source: AudioStream) -> AudioStreamPlayer:
 	var player := AudioStreamPlayer.new()
-	var loop: AudioStreamWAV = source.duplicate()
-	loop.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	loop.loop_begin = 0
-	loop.loop_end = roundi(source.get_length() * source.mix_rate)
-	player.stream = loop
-	player.volume_db = volume
+	player.stream = source
 	add_child(player)
 	return player
 
 
-func _update_growth_volume() -> void:
-	base_player.volume_db = _level_db(preferences.music, MIX_DB)
-	growth_player.volume_db = _level_db(stem_gain * preferences.music, MIX_DB)
-	nursery_player.volume_db = _level_db(nursery_gain * preferences.music, MIX_DB)
-	midden_player.volume_db = _level_db(midden_gain * preferences.music, MIX_DB)
-	ambience_player.volume_db = _level_db(ambience_gain * preferences.ambience, -3.0)
+func _update_volume() -> void:
+	music_player.volume_db = _level_db(preferences.music * _start_gain, 0.0)
 	if alarm_player != null: alarm_player.volume_db = _level_db(preferences.cues, -15.0)
 	if discovery_player != null: discovery_player.volume_db = _level_db(preferences.cues, -15.0)
-
-
-func poll_returned_discovery() -> bool:
-	if not discovery_provider.is_valid(): return false
-	var reports: int = discovery_provider.call()
-	var new_report: bool = reports > _reported_discoveries
-	_reported_discoveries = reports
-	if new_report and discovery_player != null and DisplayServer.get_name() != "headless": discovery_player.play()
-	return new_report
 
 
 func _level_db(level: float, authored_db: float) -> float:
 	return -80.0 if level <= 0 else authored_db + linear_to_db(level)
 
 
-func _music_players() -> Array[AudioStreamPlayer]:
-	return [base_player, growth_player, nursery_player, midden_player]
+func _players() -> Array[AudioStreamPlayer]:
+	return [music_player, alarm_player, discovery_player]

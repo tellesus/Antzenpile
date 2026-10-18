@@ -110,3 +110,5 @@ RunHistory is bounded private physical recording; ended state gates commands. It
 178 changes no save schema/version. The exact JSON payload must pass the loader's current RunState validation before a slot write begins; the4MiB limit, checksum and verified temporary-write/rename envelope remain. Historical compatibility is outside the player's current scope; existing migrations are retained.
 
 187 adds required build_id to the disk envelope, independently of file_version1 and snapshot version5. Missing, wrong-type, empty or different build identity rejects before state restoration; no migration. Same-build payload validation, SHA256,4MiB and atomic slot rules remain. Export manifest/latest metadata record the generated save_build_id. Direct typed snapshot tests do not create a cross-build disk support contract.
+
+200 adds no RunState or save-envelope keys. The C2 arrangement is presentation-only and has no colony MusicState projection. AudioPreferences persists only music/cues; the rejected ambience field is removed. Same-build reload resets audio phase softly and baselines delivered counts without changing saved simulation/RNG.
