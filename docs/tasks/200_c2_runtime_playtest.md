@@ -1,6 +1,6 @@
 # 200 — C2 soundtrack playtest integration
 
-Status: implementation in progress, 2026-10-17.
+Status: complete and delivered, 2026-10-17.
 
 Player outcome: the approved C2 suite plays in the default Windows game for a longer session. Completely retire190 music and195 leaf rustle from playback and distribution. Keep independent Music/Information cues controls, return-only cue eligibility, same-build reload baselines and clean shutdown.
 
@@ -9,3 +9,7 @@ Bounded implementation: render a cyclic Air/Warm/Current/Breath/Warm arrangement
 Verification planned: source-to-production waveform comparison, exact cyclic frame count, decoded loop seam/rest/headroom; focused controller/preferences/cue/lifecycle checks; full headless suite after final code; import/Main; native uninterrupted cycle plus wrap, pause/64x, mute/cues, reload and shutdown; compact/standard modal sound UI; committed Windows refresh and unchanged-PCK checks. Preserve unrelated local import changes. No previous-build save work.
 
 Implementation complete: compressed cyclic C2 asset/controller, removed old score/rustle and permanent chamber projection, two-category preferences/compact modal, production/contract updates and superseded tests/probes. Focused332 checks pass; import/Main/native UI/entrance/close pass. Uninterrupted270-second WASAPI capture confirms natural wrap, exact interior rest, peak0.265420, mute clock/cues, reload baseline and shutdown. Full suite and Windows delivery evidence follow in the delivery record. Unrelated retired .import line-ending copies are preserved locally under .godot/card200/retired-imports.
+
+Delivery: full12358 checks,0 failures (exit=0 elapsed_seconds=486.9789117); focused332/0. Final import/Main, source native cycle/UI/entrance/ordinary close,674-resource committed Windows export, extracted actual-release headless/native Main and unchanged-PCK audio/close/save-resume-review pass. Runtime `8f5a824b3631d2ada9f0b06b5870c38c84c918bd`; ZIP SHA256 `645fb863ab9ce478c545172cc7474044cb8260a7acff94a6f613eeead9ceb32e`. No cold-import retry. Package inventory proves all five retired audio assets absent. See [evidence](../evidence/card200/README.md).
+
+Changed-file groups: soundtrack asset/reproducible production; simpler controller/Root/prefs/modal/help contracts; current meaningful audio/cue/lifecycle tests and native probes replacing obsolete chamber/rustle checks; status/provenance/evidence. No simulation rules or save schema changed; actual-release gameplay193 harness not rerun. Longer-session musical fatigue is the next player check. This first trial uses authored musical layering, not gameplay-reactive scheduling. Paid/optional tools remain unused. Unrelated local files remain preserved.

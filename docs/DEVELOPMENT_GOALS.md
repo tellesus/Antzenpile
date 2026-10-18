@@ -24,3 +24,5 @@ Current audio priority is the C2 longer-play trial200. The player accepts199’s
 Mobile and Post-1.0 systems remain deliberately deferred in the [roadmap](ROADMAP_1_0.md). [Current build/evidence](CURRENT_BUILD.md) and [Windows guide](WINDOWS_BETA.md) identify actual delivery and its limits.
 
 Art/audio production194: the player authorizes the [specific free tools/resources and audio addon](CODING_RULES.md#authorized-art-and-audio-resources) discussed on 2026-10-16. Use these to support visual/sound improvements without repeated approval. Paid services remain unauthorized; ask for additional resources when useful. Tool adoption is driven by a concrete task, not a separate requirement to install the entire list.
+
+C2 runtime milestone200 delivered: full12358/0, focused332/0, native uninterrupted cycle/rest/wrap and sound UI/lifecycle pass;674-resource Windows package refreshed and its same-build/native/PCK checks pass. The user’s next useful outcome is longer play with the selected arrangement; further musical fatigue feedback takes priority over adding instruments or another director.

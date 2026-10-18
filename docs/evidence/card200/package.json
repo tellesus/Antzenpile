@@ -1,0 +1,23 @@
+{
+  "zip": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-windows.zip",
+  "archived_zip": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-umtw80p9.zip",
+  "zip_bytes": 56835966,
+  "zip_sha256": "645fb863ab9ce478c545172cc7474044cb8260a7acff94a6f613eeead9ceb32e",
+  "launch": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-umtw80p9\\Antzenpile\\Antzenpile.exe",
+  "revision": "8f5a824b3631d2ada9f0b06b5870c38c84c918bd",
+  "save_build_id": "windows-d167119be9711ab8e88542d917f31215a87256b9881cf1321e7a73a48089fb65",
+  "resources": 674,
+  "logs": "C:\\Users\\Michael\\Documents\\Antzenpile\\.godot\\windows-beta\\export-vfkn6fab",
+  "cold_import_shutdown_retry": false,
+  "checked": "isolated import/export/inventory/extraction/release Main; packed save-resume-review under pinned editor",
+  "not_checked": "native graphics/audio/feel/performance/clean machine",
+  "followup_checks": "native actual-release Main exit0; unchanged-PCK WASAPI decode/seek-wrap/mute/cues/reload/close; retired audio absent from exported inventory",
+  "retired_audio_absent": [
+    "base_loop",
+    "growth_loop",
+    "nursery_loop",
+    "midden_loop",
+    "colony_ambience"
+  ],
+  "production_asset_sha256": "49c0f7dfe0dc6aecf66fafd229a94909d0a424ae915975ce8bba5663b62a5c9d"
+}
