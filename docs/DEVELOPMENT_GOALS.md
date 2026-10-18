@@ -25,3 +25,5 @@ Useful checks protect play: targeted behavior/input/knowledge checks during chan
 - Godot/GDScript, pinned2D Compatibility renderer, Windows first. Keep simulation headless, aggregate labor authoritative and hidden reality separate from colony knowledge/presentation.
 - The specifically approved [free art/audio resources](CODING_RULES.md#authorized-art-and-audio-resources) may be used without repeat approval. Paid services are unauthorized; ask for additional tools/resources when needed.
 - Mobile, a fixed session-duration target and previously deferred major systems remain tabled. The Food Cache has no demonstrated need and is not an active task.
+
+Iteration201 is delivered: 12722 integrated checks and1,600 focused checks pass; native actual construction/returned encounter/fade/resource-draft checks and the refreshed playable build pass. Continue from personal play feedback; no public-release task has been activated.

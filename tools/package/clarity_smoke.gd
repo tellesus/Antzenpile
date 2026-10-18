@@ -24,7 +24,8 @@ func run() -> void:
 	if game.simulation.run.colony.piles.home.food_exchange_state!="developing": failed=true
 	var frozen: Dictionary=game.simulation.run.to_dict()
 	if not game.quick_save().accepted or not game.quick_load().accepted or game.simulation.run.to_dict()!=frozen: failed=true
-	view._process(0);view.selected_id="adaptation"
+	game.set_mode("inward");view._process(0);view.selected_id="adaptation"
+	if not view.visible: failed=true
 	view.activate_at(Web.positions(Vector2(900,600)).persistent)
 	if view.web_selection!="persistent" or Web.known(view._status,"persistent") or view._can_choose_adaptation(): failed=true
 	var out_dir: String=OS.get_environment("ANTZENPILE_PROBE_OUT")

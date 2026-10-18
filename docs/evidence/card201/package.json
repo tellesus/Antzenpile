@@ -1,0 +1,15 @@
+{
+  "zip": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-windows.zip",
+  "archived_zip": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-sdlqhp2f.zip",
+  "zip_bytes": 56871127,
+  "zip_sha256": "7b1da659e854f0c934dd9ba31830df214bad42cbda147b305412da91fdf7e281",
+  "launch": "C:\\Users\\Michael\\Documents\\Antzenpile\\builds\\Antzenpile-systems-beta-sdlqhp2f\\Antzenpile\\Antzenpile.exe",
+  "revision": "376aa7fad43dc7bd37562de9067af83e913dd81b",
+  "save_build_id": "windows-dfb322d2b840c3c1cff613ddbd144537f378f738d60f8498aa17e4c8fee74712",
+  "resources": 678,
+  "logs": "C:\\Users\\Michael\\Documents\\Antzenpile\\.godot\\windows-beta\\export-riehvlch",
+  "cold_import_shutdown_retry": false,
+  "checked": "isolated import/export/inventory/extraction/release Main; packed save-resume-review under pinned editor",
+  "not_checked": "native graphics/audio/feel/performance/clean machine",
+  "followup": "native executable startup; unchanged-pack native web/build/save/load/fade/picking and screenshot, in addition to builder continuation checks; no public-release campaign"
+}

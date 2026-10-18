@@ -6,7 +6,7 @@ Card [175](tasks/175_windows_systems_beta_package.md) packages the headlessly ve
 
 ## Current playable baseline
 
-Use current `main`. [C2 integration200](tasks/200_c2_runtime_playtest.md) installs the player-selected warm synthetic soundtrack with authored layer changes/blends/rests;190 music and195 rustle are removed. The accepted Blender entrance, organic controls, scout scent and release gameplay repair remain. **674 resources**; [full/native/package evidence200](evidence/card200/README.md) and [earlier actual-release gameplay193](evidence/card193/README.md). `builds/windows-beta-latest.json` identifies runtime/launch/ZIP hashes. Start a new colony after changing builds. Same-build save/review/load, independent music/cues, compact native modal controls, native decoder wrap/mute/reload and ordinary-close cleanup pass. Music continues at its own speed through pause/64x. Longer-play fatigue, physical touch, another machine and final release acceptance remain player review.
+Use current `main`. [Colony clarity201](tasks/201_colony_clarity_playtest.md) adds the development overview, single adaptation web, returned combat feedback/nonblocking resolved clouds, compact source controls and organic brood art. C2 music/accepted entrance remain. The current678-resource playable build is recorded in `builds/windows-beta-latest.json`; [evidence201](evidence/card201/README.md) covers actual native construction/save/load/encounter behavior and unchanged-pack checks. This is personal development, not public-release preparation. Historical beta filenames remain. Start a new colony after changing builds; same-build continuation remains supported.
 
 ## Rebuild from a checkout
 
