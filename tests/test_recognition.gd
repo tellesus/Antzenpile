@@ -186,7 +186,7 @@ func _test_ui(test: Object) -> void:
 	view.selected_id = "adaptation"
 	view.adaptation_command = root.queue_adaptation
 	var before: Dictionary = root.simulation.run.to_dict()
-	test.check(view.activate_at(view._web_family_rect().get_center()) and view.web_family == "recognition" and root.simulation.run.to_dict() == before, "Recognition family focus is navigation, not a trait purchase")
+	test.check(view.activate_at(Web.positions(view.get_viewport_rect().size).security) and view.web_selection == "security" and root.simulation.run.to_dict() == before, "Recognition leaf is directly inspectable in the single web without buying a trait")
 	for size: Vector2 in [Vector2(1280,720), Vector2(900,600)]:
 		for id: String in Web.visible_nodes(view._status, "recognition"):
 			test.check(Web.node_at(Web.positions(size)[id], size, view._status, "recognition") == id and Web.positions(size)[id].x + 44 <= size.x - 316, "Focused recognition graph keeps separated touch targets: " + id)

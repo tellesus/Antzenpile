@@ -129,9 +129,9 @@ func _check_saves(test: Object) -> void:
 func _check_ui(test: Object) -> void:
 	var root:=Root.new();root.simulation=experienced()
 	var view:=InwardView.new();test.get_root().add_child(view);view.status_provider=root.focused_inward_status;view.adaptation_command=root.queue_adaptation
-	view.selected_id="adaptation";view.web_family="chemistry";view.web_selection="rapid_repair";view._process(0)
+	view.selected_id="adaptation";view.web_selection="rapid_repair";view._process(0)
 	var before: Dictionary=root.simulation.run.to_dict()
-	test.check("rapid_repair" in AdaptationWeb.visible_nodes(view._status,"chemistry") and "rapid_repair" not in AdaptationWeb.visible_nodes(view._status,"foraging") and root.simulation.run.to_dict()==before,"Chemistry family provides a distinct free inspection context")
+	test.check("rapid_repair" in AdaptationWeb.visible_nodes(view._status,"chemistry") and AdaptationWeb.known(view._status,"rapid_repair") and root.simulation.run.to_dict()==before,"Chemistry family provides a distinct free inspection context")
 	for size: Vector2 in [Vector2(1280,720),Vector2(900,600)]:
 		var points: Dictionary=AdaptationWeb.positions(size)
 		for id: String in AdaptationWeb.visible_nodes(view._status,"chemistry"):

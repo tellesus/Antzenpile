@@ -64,6 +64,7 @@ func _check_controls(test: Object) -> void:
 	var view:=InwardView.new();test.get_root().add_child(view);view.status_provider=root.focused_inward_status;view.chamber_command=root.order_chamber;view._process(0)
 	var before: Dictionary=root.simulation.run.to_dict();view.activate_at(view.chamber_controls.button().get_center())
 	test.check(view.chamber_controls.opened and root.simulation.run.to_dict()==before,"Inspecting chambers is free attention")
+	view.chamber_controls.selected="reproductive_alcove"
 	var touch:=InputEventScreenTouch.new();touch.pressed=true;touch.position=view.chamber_controls.rect(view.get_viewport_rect().size,"order").get_center();view._unhandled_input(touch);view._process(0)
 	test.check(root.simulation.run.colony.piles.home.chambers.projects.reproductive_alcove.phase=="queued","Touch queues the named organ through its owner")
 	var mouse:=InputEventMouseButton.new();mouse.pressed=true;mouse.button_index=MOUSE_BUTTON_LEFT;mouse.position=touch.position;view._unhandled_input(mouse);view._process(0)

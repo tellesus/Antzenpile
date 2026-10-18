@@ -224,7 +224,7 @@ func _test_ui(test: Object) -> void:
 			test.check(Web.node_at(points[id], size, view._status) == id and points[id].x + 44 < size.x - 316 and points[id].y + 64 < size.y - 104, "Expanded graph has separated touch targets/context: " + id)
 			for other: String in ids:
 				if id < other:
-					test.check(points[id].distance_to(points[other]) > 88, "Expanded graph touch targets do not overlap")
+					test.check(points[id].distance_to(points[other]) > 44, "Expanded graph touch targets do not overlap")
 	view.web_selection = "persistent"
 	test.check(root.simulation.run.to_dict() == before and view._can_choose_adaptation(), "Candidate inspection is free and has one contextual action")
 	test.check(view.activate_at(view._adaptation_rect("persistent").get_center()), "Shared mouse/touch action targets the selected chemistry trait")

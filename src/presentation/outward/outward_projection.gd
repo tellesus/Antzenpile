@@ -28,9 +28,13 @@ static func project(signals: Array[Dictionary], facing: float, viewport: Vector2
 static func pick(placed: Array[Dictionary], at: Vector2) -> String:
 	var selected: String = ""
 	var nearest: float = INF
+	var selected_threat: bool = true
 	for entry: Dictionary in placed:
+		if entry.signal.get("memory_resolved",false): continue
+		var threat: bool=entry.signal.get("category","")=="threat"
 		var distance: float = at.distance_to(entry.center)
-		if distance <= maxf(HIT_RADIUS, entry.radius) and distance < nearest:
+		if distance <= maxf(HIT_RADIUS, entry.radius) and (selected.is_empty() or selected_threat and not threat or selected_threat==threat and distance<nearest):
 			selected = entry.id
 			nearest = distance
+			selected_threat=threat
 	return selected

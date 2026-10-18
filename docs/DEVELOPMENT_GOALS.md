@@ -1,28 +1,27 @@
 # Current development goals
 
-Updated 2026-10-17. Player feedback reopens M8:192 rebuilds shared UI/dispatch/entrance/scout presentation;193 repairs actual-release gameplay omissions;195 uses approved production resources for a tactile entrance and quiet local ambience. Appearance and gameplay coherence remain player acceptance. Canonical `main` and one latest Windows playtest build contain the combined work; earlier topic branches/exports are historical.
+Updated2026-10-18. This is Michael’s personal Windows game, made for fun. Make actual play clearer, more satisfying and more beautiful. Release preparation and professional shipping ceremony are tabled until the player asks for them. Historical milestones describe implemented systems, not obligations to run a release program.
 
-| Goal | Current result |
-| --- | --- |
-| Recover/consolidate stalled graphics work | Complete176/177: recovered code and six runtime captures, PRs1/2 merged; main is the only remote development branch. |
-| Development save policy/reliability | Complete178/187: same-build-only admission, exact continued state, save/end/review/load/restart and failed-write retention. |
-| M8 graphics/interface revisions | Complete179–189 and191: living neon clouds/workers, all supported food/threat/site/animal/foreign forms, explicit gathering/combat/borrowing/search, current help, bounded review and mature compact controls. Player appearance/feel remains acceptance. |
-| Historical music/ordinary audio exit | Superseded audio190; exit191 retained200: original longer stereo adaptive score, distinct voices/rests/cues and verified phase/fades/preferences; normal close drains queued audio before exit. Player listening/fatigue remains acceptance. |
-| Integrated gameplay/interface/package review | Complete191 automated scope: fresh three-setting development/network/recovery, native standard/compact inspection, active1×/64× measurements and current-main Windows/PCK gates. |
-| Organic UI, excavated entrance and scout scent | Complete192 implementation: shared warm surfaces, five-circle count editors, contextual icons/tooltips, pellet-built local entrance, textured scout memory, direct known adaptation navigation and clearer Midden rules. Full 12,380 checks and native captures/timing pass. |
-| Release gameplay correctness | Complete193: 42 mutations execute outside debug assertions; the original missing recruitment pool is reproduced in the old release and 1,237 corrected actual-release checks pass. |
-| Approved art/audio resources | Complete195 implementation: original Blender entrance with CC0 scanned soil, processed CC0 granular leaf ambience and independent controls. Full12,395 checks, native presentation/mixer checks and two1080p scene timing samples pass. Human appearance/listening remains acceptance. |
-| Music replacement after player rejection | Research196 complete:195 anthill accepted;190 music and195 rustle rejected. [Ambient/lofi production research](MUSIC_REPLACEMENT_RESEARCH.md) records RimWorld menu reference, synthesis/local-AI options and a listening-led replacement pilot. Full runtime replacement follows musical selection. |
-| Musical content audition | Pilot197 delivered: [three original listening sketches](evidence/card197/README.md), matched loudness and longer repetition files using approved/existing resources. Player selection or rejection comes before full adaptive replacement; optional tools remain deferred. |
-| Revise intrusive musical attacks | Feedback198 prefers C but rejects recurring three-note hits; A is weakest and B has promise. [C-based revisions](evidence/card198/README.md) remove plucks/rolled chords; the player selects C2's warmer keys in199 and rejects C1's piano. |
-| Develop selected C2 palette | Feedback199 calls C2 much better/pretty solid and finds C1's piano unpleasant. [Layered C2 suite](evidence/card199/README.md) supplies compatible Air/Warm/Current/Breath parts and a longer blend/rest demonstration without piano/plucks. The player approves trying this arrangement in the game; integration200 supplies the longer-play trial. |
+## Current iteration201
 
-Player feedback, 2026-10-18: the new music is good and gameplay is coming along. Keep C2 as the current musical baseline; another audio replacement or reactive music director is not the next priority. This is positive listening feedback, not blanket acceptance of gameplay or Windows1.0. The next planned gameplay design outcome remains the fresh-colony decision arc in [Gameplay coherence review](GAMEPLAY_REDESIGN_REVIEW.md), with combat, adaptation and construction choices assessed together. Define the player's information, competing choices, cost, visible consequence and failure/recovery before changing consequential rules. Continue player testing of balance/control feel, actual session frame pacing and another-machine launch. New concrete reports become bounded cards on main.
+The player requests these improvements, in order:
 
-[Save policy](SAVE_POLICY.md) overrides every older goal/card/catalog: loading, recovering, preserving compatibility or migrating **previous-build saves is not a development goal, priority, regression gate or resource allocation**. It stays tabled until true public release preparation. Start a new colony after changing builds. Same-build save/load/quit/restart/review must continue to work. Leaving unrelated files untouched is file safety, not old-save support.
+1. Construction: distinguish what the colony can already do from what building improves. Put benefits, food/labor/time, readiness and progress together. Preserve existing rules unless a deliberate later design change replaces them.
+2. Adaptation: show the existing repertoire together as a connected web, with anonymous `?` slots for undiscovered variation. Remove family tabs; keep known traits, brood inheritance and queue actions honest.
+3. Combat: explain recruiting, waiting for reports and actual returned results. A resolved encounter should fade and must not obstruct a resource. Keep uncertainty about unseen events.
+4. INWARD art: replace plain brood beads with organic egg/larva/pupa forms that fit the luminous colony. Keep representative counts bounded.
 
-Mobile and Post-1.0 systems remain deliberately deferred in the [roadmap](ROADMAP_1_0.md). [Current build/evidence](CURRENT_BUILD.md) and [Windows guide](WINDOWS_BETA.md) identify actual delivery and its limits.
+[Implementation/evidence201](tasks/201_colony_clarity_playtest.md) records actual status. Further combat/adaptation depth and the fresh-colony decision arc remain in [Gameplay coherence review](GAMEPLAY_REDESIGN_REVIEW.md); a clearer interface alone does not prove these systems are satisfying. Follow concrete play feedback after this iteration rather than automatically expanding the roster or adding new systems.
 
-Art/audio production194: the player authorizes the [specific free tools/resources and audio addon](CODING_RULES.md#authorized-art-and-audio-resources) discussed on 2026-10-16. Use these to support visual/sound improvements without repeated approval. Paid services remain unauthorized; ask for additional resources when useful. Tool adoption is driven by a concrete task, not a separate requirement to install the entire list.
+## Keep the parts that work
 
-C2 runtime milestone200 delivered: full12358/0, focused332/0, native uninterrupted cycle/rest/wrap and sound UI/lifecycle pass;674-resource Windows package refreshed and its same-build/native/PCK checks pass. The user’s next useful outcome is longer play with the selected arrangement; further musical fatigue feedback takes priority over adding instruments or another director.
+The player says C2 music is good and the195 anthill looks great. Keep them as the baseline; do not restart those redesigns or add another music director without a concrete reason. `main` is the canonical game. Refresh the default playable Windows build after runtime changes and publish completed related work while preserving unrelated local files.
+
+Useful checks protect play: targeted behavior/input/knowledge checks during changes, one final integrated headless pass, and affected native visual checks. A packaged game should launch and keep same-build save/load working. Do not turn this into release acceptance, signing, another-machine campaigns or unrequested performance projects.
+
+## Standing constraints
+
+- [Same-build saves only](SAVE_POLICY.md). Previous-build recovery, migration and compatibility are tabled. Start a new colony when changing builds; leave unrelated files and old slots untouched.
+- Godot/GDScript, pinned2D Compatibility renderer, Windows first. Keep simulation headless, aggregate labor authoritative and hidden reality separate from colony knowledge/presentation.
+- The specifically approved [free art/audio resources](CODING_RULES.md#authorized-art-and-audio-resources) may be used without repeat approval. Paid services are unauthorized; ask for additional tools/resources when needed.
+- Mobile, a fixed session-duration target and previously deferred major systems remain tabled. The Food Cache has no demonstrated need and is not an active task.

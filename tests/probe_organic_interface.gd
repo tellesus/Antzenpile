@@ -23,10 +23,10 @@ func _run() -> void:
 		game_root.set_mode("inward");inward.selected_id=""
 		await _capture("inward_%d" % size.x)
 		inward.selected_id="adaptation";inward.web_selection="foraging"
-		for family: String in ["foraging","environment"]:
-			inward.activate_at(inward._web_family_rect(family).get_center())
-			if inward.web_family!=family:failed=true
-			await _capture("web_%s_%d" % [family,size.x])
+		for leaf: String in ["lean","heat_resilience"]:
+			inward.activate_at(AdaptationWeb.positions(inward.get_viewport_rect().size)[leaf])
+			if inward.web_selection!=leaf:failed=true
+			await _capture("web_%s_%d" % [leaf,size.x])
 		inward.selected_id="midden"
 		await _capture("midden_%d" % size.x)
 	if frozen!=game_root.simulation.run.to_dict():failed=true

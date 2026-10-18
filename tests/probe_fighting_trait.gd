@@ -21,8 +21,6 @@ func go():
 		root._refresh_loaded_views(); root.set_mode("inward")
 		var view: InwardView = root._inward_view
 		view.selected_id = "adaptation"; view._process(0)
-		press(view,view._web_family_rect().get_center(),size.x == 900)
-		if view.web_family != "combat": failures += 1
 		press(view,Web.positions(view.get_viewport_rect().size).fighter,size.x == 900)
 		if view.web_selection != "fighter": failures += 1
 		await capture("inspect",size.x)

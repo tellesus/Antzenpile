@@ -4,6 +4,8 @@
 
 Translate the current design into code; do not invent major game systems during implementation. When the player explicitly requests design/planning work, develop it in the systems bible/catalogs and distinguish planned rules from implemented contracts.
 
+**Player direction (2026-10-18):** this is a personal game made for fun, with one player. Prioritize enjoyable play and concrete feedback. Public-release preparation, clean-machine campaigns and shipping ceremony are tabled. Keep useful regression checks, source history and a fresh playable Windows build; these support development rather than a professional release program.
+
 ## Begin each task
 
 - Follow `docs/SAVE_POLICY.md` and `docs/DEVELOPMENT_GOALS.md`: development saves are same-build only. Do not maintain, investigate, migrate or add compatibility tests for previous-build saves. Older card requirements are superseded; revisit only for true public release preparation.

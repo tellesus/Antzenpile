@@ -1,0 +1,11 @@
+# 201 — Colony choices and outcomes
+
+Status: in progress, 2026-10-18. Player explicitly requests construction clarity first, a single adaptation web with undiscovered question marks, clearer combat results/resolved markers that stop blocking resources, and brood artwork matching INWARD.
+
+Outcome: one playable presentation iteration addresses those four reported friction points, in that order. Construction separates current functions from paid improvements in one overview with benefits, costs, real blockers/progress and existing commands. Adaptation lays out all existing traits together with anonymous undiscovered placeholders and no family tabs; known details/actions remain knowledge-derived. Combat uses actual returned evidence for explanations and fading/nonblocking resolved memories. Original brood assets fit the existing luminous organic language. No new economy, traits, combat mechanics, construction prerequisite changes or hidden-information access.
+
+Verification: targeted behavior/knowledge/input checks while implementing; final full headless suite once for the integrated iteration; import/Main and native compact/standard captures with real interactions. Refresh the default playable Windows build and check the changed behavior in its contents. This is a personal development playtest, not release preparation. No clean-machine/signing/release checklist, paid service, previous-build save work or speculative new director.
+
+Current design sources: Gameplay coherence review; UI/architecture/data contracts; existing Chamber/Adaptation/Journey owners. Existing functional development model remains: basic care/feeding and revealed refuse cleanup can work before improvements, which provide specified benefits. The interface must make that distinction legible. Future rule changes need their own design decision.
+
+Implementation complete: development overview and modal shielding, one anonymous/known adaptation web, returned combat stages/notices and resolved cloud/input handling, compact source follow-through and original brood assets. Focused1,600 checks and native real construction/save/load/response/fade/source draft checks pass. Final integrated suite and refreshed Windows delivery follow. No simulation owner/rules/save keys changed.

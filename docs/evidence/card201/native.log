@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 26.8.1.260806 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon RX 6650 XT
+
+[RUN] seed=482817 scenario=backyard_slice time=0.00
+[NEON] capture=construction_ready_900 size=(900, 600)
+[NEON] capture=construction_building_900 size=(900, 600)
+[CLARITY201] real_build_and_same_build_reload=true
+[NEON] capture=brood_900 size=(900, 600)
+[NEON] capture=construction_midden_900 size=(900, 600)
+[NEON] capture=construction_open_heap_900 size=(900, 600)
+[NEON] capture=web_initial_900 size=(900, 600)
+[NEON] capture=web_unknown_900 size=(900, 600)
+[NEON] capture=brood_1280 size=(1280, 720)
+[NEON] capture=construction_midden_1280 size=(1280, 720)
+[NEON] capture=web_initial_1280 size=(1280, 720)
+[NEON] capture=web_unknown_1280 size=(1280, 720)
+[NEON] capture=brood_1920 size=(1920, 1080)
+[NEON] capture=construction_midden_1920 size=(1920, 1080)
+[NEON] capture=web_initial_1920 size=(1920, 1080)
+[NEON] capture=web_unknown_1920 size=(1920, 1080)
+[NEON] capture=web_known_900 size=(900, 600)
+[NEON] capture=web_known_1280 size=(1280, 720)
+[NEON] capture=combat_before_900 size=(900, 600)
+[NEON] capture=combat_return_900 size=(900, 600)
+[NEON] capture=combat_faded_source_clickable_900 size=(900, 600)
+[CLARITY201] real_response=secured returned=12 sent=16 resolved_fade_and_source_click=true graphics=AMD Radeon RX 6650 XT

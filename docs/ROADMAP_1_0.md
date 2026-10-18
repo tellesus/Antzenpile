@@ -4,7 +4,11 @@
 
 Current plan, 2026-10-05. Supersedes the archived post-slice, interface and desktop release plans. The [systems bible](SYSTEMS_BIBLE.md) owns rules; its [catalogs](README.md) own concrete content; [current build](CURRENT_BUILD.md) owns implemented status. This roadmap owns order and release gates.
 
-## The release promise
+## Current priority
+
+Player direction2026-10-18: this is a personal game made for fun. Release preparation/M9 and formal shipping acceptance are tabled until explicitly resumed. Current work follows [Development goals](DEVELOPMENT_GOALS.md): construction clarity, one visible adaptation web, legible combat results/nonblocking resolved memories and better brood artwork. Historical milestone coverage below remains a design reference, not the active priority list.
+
+## The longer-term game direction
 
 A player can learn an uncertain world, feed and develop a colony, make inherited tradeoffs, raise reproductives, establish a useful nest network, survive a crisis through real counterplay, and continue its lineage beyond the first queen/nest. Biological accomplishments and genuine unrecoverable failure have clear endings/review without forcing a fixed session duration.
 

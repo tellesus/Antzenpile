@@ -23,3 +23,9 @@ Use one fresh-colony arc to connect **discover food → commit labor → observe
 The current UI/art is a reviewable revision, not final player acceptance. Remaining UI work includes contextual hierarchy across dense construction/network/queen panels and stronger adaptation identity; remaining design work includes encounter pacing, meaningful progression and construction prerequisites. Same-build saves, the knowledge boundary, real travel, authoritative labor and the pinned renderer remain in force.
 
 The player also rejected scout traces on 2026-10-16. Card192 replaces their line-and-ring appearance with chemical ribbons and vapor, retaining honest departure memory and returned-course information. The final adaptation layout checks include the later honeydew relationship as well as the initial paired traits.
+
+## Player follow-up201 — 2026-10-18
+
+The player prioritizes construction clarity, requests a real single-screen adaptation web with `?` for undiscovered branches, reports uncertainty after combat orders and resolved threat clouds blocking resources, and requests better brood art. This is a personal game made for fun; release preparation is explicitly tabled.
+
+201 addresses presentation: one function/improvement overview with actual benefits/readiness/costs/progress; all ten trait slots together without family tabs or hidden names; returned response stages/survivors/losses/next action and noninteractive fading resolved clouds; original organic brood meshes. Existing function, inheritance, encounter and information rules remain. The fresh-colony arc and deeper strategic tradeoffs above remain useful future design work, not claims that these presentation changes finish gameplay depth.

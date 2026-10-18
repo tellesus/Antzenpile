@@ -35,7 +35,7 @@ func _run():
 		if game_root.inward_status("home").adaptation_trial.adaptation_id != "load" or not game_root.inward_status("home").adaptation_queue.trait_id.is_empty(): failed = true
 		game_root.simulation = Recognition.new().candidate_game()
 		game_root.simulation.start_adaptation("home", "lean"); game_root.simulation.queue_adaptation("home", "tolerance"); game_root.simulation.toggle_pause(); game_root._refresh_loaded_views()
-		view.selected_id = "adaptation"; view.web_family = "recognition"; view.web_selection = "tolerance"
+		view.selected_id = "adaptation";  view.web_selection = "tolerance"
 		await _capture("followup_%d" % size.x)
 		view.web_selection = "foraging"
 		await _capture("overview_%d" % size.x)

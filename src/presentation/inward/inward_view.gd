@@ -51,7 +51,6 @@ var save_command: Callable
 var load_command: Callable
 var selected_id: String = ""
 var web_selection: String = "foraging"
-var web_family: String = "foraging"
 var _animation_time: float = 0.0
 const FOCUS_SECONDS: float = 0.28
 var _focus_gains: Dictionary = {}
@@ -99,20 +98,26 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func activate_at(at: Vector2) -> bool:
+	if chamber_controls.opened:
+		chamber_controls.activate(self,at,_status.get("chambers",[]),chamber_command,_status)
+		return true
 	if refuge_controls.opened:refuge_controls.activate(self,at,_status,refuge_command);return true
-	if connection_controls.activate(self,at,_status.get("connections",[]),connection_command):return true
+	if connection_controls.opened:
+		connection_controls.activate(self,at,_status.get("connections",[]),connection_command)
+		return true
 	if effort_draft.opened:
 		var effort_action: String=effort_draft.action_at(get_viewport_rect().size,at)
 		if not effort_action.is_empty(): effort_draft.activate(self,get_viewport_rect().size,effort_action,effort_command);return true
 		for command: String in ["outward","pause","speed_1","speed_4","speed_16","speed_64"]:
 			if _button_rect(command).has_point(at): _run_command(command);return true
 		return true
+	if selected_id!="adaptation" and connection_controls.activate(self,at,_status.get("connections",[]),connection_command):return true
 	if not chamber_controls.opened and _effort_available() and _effort_link_rect().has_point(at):
 		var kind: String="climate" if selected_id=="nursery" else "cleanup"
 		var state: Dictionary=_status.get("humidity" if kind=="climate" else "midden",{})
 		effort_draft.begin(kind,int(state.get("carers" if kind=="climate" else "cleaners",0)),int(state.get("cap",4 if kind=="climate" else 8)),int(state.get("suggestion",1)));return true
-	if chamber_controls.activate(self,at,_status.get("chambers",[]),chamber_command): return true
-	if refuge_controls.activate(self,at,_status,refuge_command):return true
+	if selected_id!="adaptation" and chamber_controls.activate(self,at,_status.get("chambers",[]),chamber_command,_status): return true
+	if selected_id!="adaptation" and refuge_controls.activate(self,at,_status,refuge_command):return true
 	if refuge_controls.opened:return true
 	if chamber_controls.opened:
 		for command: String in ["outward","pause","speed_1","speed_4","speed_16","speed_64"]:
@@ -198,15 +203,8 @@ func activate_at(at: Vector2) -> bool:
 	if selected_id == "adaptation" and _web_back_rect().has_point(at):
 		selected_id = ""
 		web_selection = "foraging"
-		web_family = "foraging"
 		queue_redraw()
 		return true
-	if selected_id == "adaptation":
-		for family: String in Web.families(_status):
-			if _web_family_rect(family).has_point(at):
-				web_family=family
-				web_selection="foraging"
-				return true
 	if selected_id == "adaptation" and web_selection == "honeydew" and _status.get("honeydew", {}).get("relationship", "unknown") in ["exploited", "tended"] and _honeydew_rect().has_point(at):
 		var service: Dictionary=_status.honeydew
 		effort_draft.begin("producer",service.target if service.target>0 else service.required_workers,service.cap,service.required_workers)
@@ -242,7 +240,7 @@ func activate_at(at: Vector2) -> bool:
 			_run_command(command)
 			return true
 	if selected_id == "adaptation":
-		var leaf: String = Web.node_at(at, get_viewport_rect().size, _status, web_family)
+		var leaf: String = Web.node_at(at, get_viewport_rect().size, _status)
 		if not leaf.is_empty():
 			web_selection = leaf
 			queue_redraw()
@@ -480,11 +478,6 @@ func _web_back_rect() -> Rect2:
 	return Rect2(24, 116, 196, 44)
 
 
-func _web_family_rect(family: String = "") -> Rect2:
-	var index: int=Web.families(_status).find(family if not family.is_empty() else Web.next_family(_status,web_family))
-	return Rect2(236+(index%3)*104,116+(index/3)*50,96,44)
-
-
 func _honeydew_rect() -> Rect2:
 	return Rect2(get_viewport_rect().size.x - 300.0, 380.0, 260.0, 44.0)
 
@@ -507,20 +500,13 @@ func _draw() -> void:
 	var size: Vector2 = get_viewport_rect().size
 	draw_rect(Rect2(Vector2.ZERO, size), Color.BLACK)
 	if selected_id == "adaptation":
-		Web.draw_graph(self, size, _status, web_selection, _animation_time, web_family)
+		Web.draw_graph(self, size, _status, web_selection, _animation_time)
 		UIStyle.surface(self, _web_back_rect(), Color("18252b"))
 		_label(_web_back_rect().position + Vector2(98, 29), "COLONY NETWORK", Color("d3dcd4"), 14, HORIZONTAL_ALIGNMENT_CENTER)
-		for family: String in Web.families(_status):
-			var tab: Rect2=_web_family_rect(family)
-			UIStyle.surface(self,tab,Color("74664c") if family==web_family else Color("302d37"))
-			_label(tab.get_center()+Vector2(0,5),family.capitalize(),UIStyle.TEXT,11,HORIZONTAL_ALIGNMENT_CENTER)
 		_draw_hud(size)
 		_draw_context(size)
 		_draw_controls(size)
-		chamber_controls.draw(self,_status.get("chambers",[]))
-		refuge_controls.draw(self,_status)
 		if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
-		connection_controls.draw(self,_status.get("connections",[]))
 		activation.draw(self)
 		return
 	var centers: Dictionary = positions(size)
@@ -551,10 +537,11 @@ func _draw() -> void:
 	_draw_hud(size)
 	_draw_context(size)
 	_draw_controls(size)
-	chamber_controls.draw(self,_status.get("chambers",[]))
-	refuge_controls.draw(self,_status)
-	if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
-	connection_controls.draw(self,_status.get("connections",[]))
+	chamber_controls.draw(self,_status.get("chambers",[]),_status)
+	if not chamber_controls.opened:
+		refuge_controls.draw(self,_status)
+		if effort_draft.opened: effort_draft.draw(self,size,int(_status.get("workers_assignable",0)))
+		connection_controls.draw(self,_status.get("connections",[]))
 	activation.draw(self)
 
 
@@ -623,7 +610,7 @@ func _draw_node(id: String, at: Vector2) -> void:
 				var amount: float = float(stores.get(key,0.0))
 				for index: int in 3:
 					if amount >= [0.001,4.0,12.0][index]:
-						Contents.brood(self, at+Vector2(resource*25-25,index*17+5), "egg",attention,Art.color_for(key))
+						Contents.store(self, at+Vector2(resource*25-25,index*17+5), Color(Art.color_for(key),attention))
 		"entrance":
 			draw_arc(at+Vector2(0,8),20,PI,TAU,24,Color("b0d9df",0.55),1.0,true)
 		"queen":
@@ -695,6 +682,12 @@ func _draw_context(size: Vector2) -> void:
 		return
 	if web and web_selection == "honeydew":
 		_draw_relationship_context(box)
+		return
+	if web and web_selection in TraitCatalog.IDS and not Web.known(_status,web_selection):
+		_detail_line(box,65,"Undiscovered possibility")
+		_detail_line(box,99,"Colony experience reveals these branches.")
+		_detail_line(box,133,"No choice or payment is available yet.")
+		_detail_line(box,167,"Known traits show their costs and tradeoffs.")
 		return
 	if web and web_selection in TraitCatalog.IDS:
 		_draw_genetic_context(box)
@@ -908,7 +901,7 @@ func _draw_context(size: Vector2) -> void:
 			if observation in ["loss", "foreign"]:
 				_draw_action(_guest_rect(), "STOP REJECTION" if guest.get("rejection_active", false) else "ASSIGN %d TO REJECTION" % guest.workers_required, "" if guest.get("rejection_active", false) else Copy.local_shortage(_status, {}, guest.workers_required), Color("39323e"))
 		"adaptation":
-			_detail_line(box, 65, web_family.capitalize()+" tradeoffs · overview")
+			_detail_line(box, 65, "Variation, experience and inheritance")
 			_detail_line(box, 91, "Select a trait to inspect its tradeoff")
 			_detail_line(box, 117, "Queue → raise brood → adult carriers")
 			if not _status.adaptation_trial.is_empty():

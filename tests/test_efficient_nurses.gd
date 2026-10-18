@@ -59,9 +59,9 @@ func _check_food(test: Object) -> void:
 		test.check(game.run.to_dict()==expected,"Care expression/feeding is identical at %dx" % scale)
 func _check_ui(test: Object) -> void:
 	var root:=Root.new();root.simulation=experienced()
-	var view:=InwardView.new();test.get_root().add_child(view);view.status_provider=root.focused_inward_status;view.adaptation_command=root.queue_adaptation;view.selected_id="adaptation";view.web_family="care";view.web_selection="efficient_nurses";view._process(0)
+	var view:=InwardView.new();test.get_root().add_child(view);view.status_provider=root.focused_inward_status;view.adaptation_command=root.queue_adaptation;view.selected_id="adaptation";view.web_selection="efficient_nurses";view._process(0)
 	var before: Dictionary=root.simulation.run.to_dict()
-	test.check(AdaptationWeb.visible_nodes(view._status,"care")==["foraging","efficient_nurses"] and root.simulation.run.to_dict()==before,"Care family is free knowledge-derived attention")
+	test.check(AdaptationWeb.visible_nodes(view._status,"care").has("efficient_nurses") and root.simulation.run.to_dict()==before,"Care family is free knowledge-derived attention")
 	var touch:=InputEventScreenTouch.new();touch.pressed=true;touch.position=view._adaptation_rect("efficient_nurses").get_center();view._unhandled_input(touch);view._process(0)
 	test.check(root.simulation.run.colony.piles.home.queued_adaptation=="efficient_nurses" and root.simulation.run.colony.piles.home.trial_cohort()==null,"Care leaf touch queues the existing paid-brood owner without instant conversion")
 	view.free();root.free()

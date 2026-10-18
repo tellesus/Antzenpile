@@ -21,6 +21,7 @@ func sync(entries: Array[Dictionary], empty_ids: Dictionary, visual_time: float,
 			clouds[entry.id] = cloud
 			add_child(cloud)
 		clouds[entry.id].configure(entry, visual_time, empty_ids.get(entry.id, false))
+		clouds[entry.id].modulate=Color(1,1,1,entry.signal.get("memory_alpha",1.0))
 	for id: String in clouds.keys():
 		if not present.has(id):
 			clouds[id].free()

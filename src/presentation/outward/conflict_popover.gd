@@ -144,12 +144,9 @@ func draw(view: Node2D, route: Dictionary, status: Dictionary, size: Vector2) ->
 	for index: int in lines.size():
 		_text(view, center+Vector2(0,14+index*15), lines[index], 12, 2*radius-18, Color("e4f4f8"))
 	_text(view, center+Vector2(0,47), latest.date, 12, 2*radius-24, Color("92b5c2"))
-	var entry: Dictionary = state.get("recruitment", {}).get(route.get("id"), {})
-	var counts: String = "%d sent · awaiting report" % state.get("workers",0) if own_party(route,status) else "%d gatherers assigned" % route.get("allocated_workers",0)
-	if not entry.is_empty(): counts = "%d/%d recruits at nest" % [entry.reserved, entry.requested]
-	_text(view, center+Vector2(0,67), counts, 12, 2*radius-24)
-	var waiting: String = "%d still traveling home" % entry.returning if entry.get("returning",0)>0 else "Needs %d more workers" % entry.shortfall if entry.get("shortfall",0)>0 else "Waiting for food / party" if not entry.is_empty() else "Memory · not live"
-	_text(view, center+Vector2(0,83), waiting, 11, 2*radius-28, Color("92b5c2"))
+	var stage: Array[String]=progress_lines(route,status)
+	_text(view, center+Vector2(0,67),stage[0],12,2*radius-24)
+	_text(view, center+Vector2(0,83),stage[1],11,2*radius-28,Color("b9d6b1"))
 	for command: String in ["conflict_send","conflict_retreat","conflict_survey","conflict_approach"]:
 		var box: Rect2 = positions.buttons[command]
 		if (editing or history_open) and positions.editor.intersects(box): continue
@@ -325,3 +322,17 @@ func _text(view: Node2D, at: Vector2, value: String, font_size: int, width: floa
 	var fitted: String = Copy.fit_line(value,font,font_size,width)
 	var extent: float = font.get_string_size(fitted,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x
 	view.draw_string(font,at-Vector2(extent*0.5,0),fitted,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,color)
+
+func progress_lines(route: Dictionary, status: Dictionary) -> Array[String]:
+	var state: Dictionary=status.get("journey_response",{})
+	var entry: Dictionary=state.get("recruitment",{}).get(route.get("id",""),{})
+	if not entry.is_empty():
+		return ["Recruiting %d/%d at nest" % [entry.get("reserved",0),entry.get("requested",0)],"%d still coming home" % entry.returning if entry.get("returning",0)>0 else "Waiting for available workers" if entry.get("shortfall",0)>0 else "Ready; departure on next tick"]
+	if own_party(route,status):
+		return ["%d sent; awaiting their report" % state.get("workers",0),"No live view of the encounter"]
+	var outcome: Dictionary=state.get("outcomes",{}).get(route.get("id",""),{})
+	if Memory.defense_is_latest(outcome,route) and outcome.get("received_at",0)>=maxf(float(route.get("conflict_received_at",0)),float(state.get("reports",{}).get(route.get("id",""),{}).get("received_at",0))):
+		return ["%d/%d returned; %d lost" % [outcome.sent-outcome.lost,outcome.sent,outcome.lost],"Protein source reported" if outcome.get("goal")=="hunt" and outcome.get("outcome")=="secured" else "You can try gathering again" if outcome.get("outcome")=="secured" else "Route not secured; review options"]
+	if route.get("conflict_report","") in ["secured","dispersed"]:
+		return ["Encounter ended; report returned","Gathering can continue; check Reports"]
+	return ["No response party away","Choose workers, then SEND"]

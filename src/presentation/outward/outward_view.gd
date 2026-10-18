@@ -18,6 +18,7 @@ const Copy = preload("res://src/presentation/interface_text.gd")
 const Memories = preload("res://src/presentation/outward/source_memory.gd")
 const Conflict = preload("res://src/presentation/outward/conflict_popover.gd")
 var conflict: ConflictPopover = Conflict.new()
+var encounter_memory = preload("res://src/presentation/outward/encounter_memory.gd").new()
 var activation := preload("res://src/presentation/activation_feedback.gd").new()
 const MEMORY_CATEGORIES: Array[String] = ["carbohydrate", "protein", "water", "nest_site"]
 var sources_open: bool = false
@@ -80,6 +81,7 @@ var _feedback: String = ""
 var _feedback_until: int = 0
 var _request_rejected: bool = false
 var _request_selection: String = ""
+var _pending_combat_notice: String = ""
 
 
 func show_feedback(message: String, rejected: bool = false) -> void:
@@ -99,8 +101,14 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if signal_provider.is_valid() and status_provider.is_valid():
-		_signals = signal_provider.call()
 		_status = status_provider.call()
+		_signals = encounter_memory.apply(signal_provider.call(),_status,delta)
+		var notices: Array[String]=encounter_memory.notices(_status)
+		if not notices.is_empty(): _pending_combat_notice=notices[-1]
+		if visible and not _pending_combat_notice.is_empty():
+			show_feedback(_pending_combat_notice)
+			_pending_combat_notice=""
+			_feedback_until=Time.get_ticks_msec()+10000
 		_placed = Panorama.project(_signals, facing, get_viewport_rect().size)
 		_mission_traces = ScoutTrace.traces(_status.get("scout_missions", []), facing, get_viewport_rect().size)
 		_sync_departures()
@@ -121,6 +129,8 @@ func _process(delta: float) -> void:
 
 
 func reset_mission_visuals() -> void:
+	encounter_memory.reset()
+	_pending_combat_notice=""
 	effort_draft.opened=false
 	gathering_draft.opened=false
 	conflict.reset()
@@ -227,6 +237,7 @@ func _context_panel_rect() -> Rect2:
 	if effort_draft.opened: return effort_draft.panel(get_viewport_rect().size)
 	if gathering_draft.opened: return gathering_draft.panel(get_viewport_rect().size)
 	if _journey_attention(): return conflict.layout(get_viewport_rect().size).bounds
+	if _compact_source(): return Rect2(get_viewport_rect().size.x-316,144,292,344)
 	var height: float = 448 if _journey_attention() else 292 if not _selected_mission().is_empty() else 344 + _evidence_offset()
 	if _selected_signal().get("category")=="nest_site": height=400
 	return Rect2(get_viewport_rect().size.x - 316, 144, 292, height)
@@ -786,6 +797,7 @@ func _prepare_signal_captions(size: Vector2) -> void:
 		if (a.id == selected_id) != (b.id == selected_id): return a.id == selected_id
 		return a.id < b.id)
 	for entry: Dictionary in ordered:
+		if entry.signal.get("memory_resolved",false): continue
 		var text_size: Vector2 = _font.get_string_size(_signal_caption(entry.signal), HORIZONTAL_ALIGNMENT_LEFT, -1, 13)
 		var baseline: Variant = ScoutTrace.caption_at(entry.center + Vector2(0, entry.radius + 35), text_size,
 			_caption_blocks, Rect2(24, 148, size.x - 48, size.y - 266), [-13.0, 11.0, 35.0, 59.0, -37.0, -61.0, -85.0])
@@ -839,6 +851,7 @@ func _draw_anchor(size: Vector2) -> void:
 
 func _draw_signal(entry: Dictionary) -> void:
 	var signal_data: Dictionary = entry.signal
+	if signal_data.get("memory_resolved",false): return
 	var at: Vector2 = entry.center
 	var radius: float = entry.radius
 	var reported_empty: bool = _reported_empty(signal_data)
@@ -888,6 +901,9 @@ func _draw_context(size: Vector2) -> void:
 		_draw_mission_context(mission, size)
 		return
 	var selected: Dictionary = _selected_signal()
+	if _compact_source() and not gathering_draft.opened:
+		_draw_compact_source(selected)
+		return
 	if selected.is_empty():
 		return
 	if gathering_draft.opened:
@@ -1156,6 +1172,7 @@ func _trail_button_rect(command: String) -> Rect2:
 	var x: float = get_viewport_rect().size.x - 300.0
 	var y: float = 398.0 if _is_honeydew(_selected_signal()) else 380.0
 	y += _evidence_offset()
+	if _compact_source(): y=332 if _is_honeydew(_selected_signal()) else 280
 	match command:
 		"gather_edit": return Rect2(x,y,136,44)
 		"trail_create": return Rect2(x, y, 260, 44)
@@ -1167,15 +1184,18 @@ func _trail_button_rect(command: String) -> Rect2:
 
 
 func _investigate_button_rect() -> Rect2:
+	if _compact_source(): return Rect2(get_viewport_rect().size.x-300,384 if _is_honeydew(_selected_signal()) else 332,260,44)
 	if _selected_signal().get("category")=="nest_site": return Rect2(get_viewport_rect().size.x-300,488,260,44)
 	return Rect2(get_viewport_rect().size.x - 300.0, (444.0 if _is_honeydew(_selected_signal()) else 438.0) + _evidence_offset(), 260.0, 44.0)
 
 
 func _honeydew_button_rect() -> Rect2:
+	if _compact_source(): return Rect2(get_viewport_rect().size.x-300,280,260,44)
 	return Rect2(get_viewport_rect().size.x - 300.0, 350.0 + _evidence_offset(), 260.0, 44.0)
 
 
 func _evidence_offset() -> float:
+	if _compact_source(): return 0
 	return 48.0 if _selected_route(_selected_signal()).get("reported_losses", 0) > 0 else 0.0
 
 
@@ -1195,6 +1215,9 @@ func _draw_trail_button(command: String, title: String) -> void:
 		detail = "contest" if contested else "gatherer"
 	elif command == "trail_create": detail = "5 suggested · choose before ordering"
 	UIStyle.surface(self, box, Color("263b3c"))
+	if _compact_source():
+		_label(box.get_center()+Vector2(0,5),Copy.fit_line(title,_font,13,box.size.x-12),Color("d5ded8"),13,HORIZONTAL_ALIGNMENT_CENTER)
+		return
 	_label(box.position + Vector2(box.size.x * 0.5, 29 if detail.is_empty() else 17), title, Color("d5ded8"), 14, HORIZONTAL_ALIGNMENT_CENTER)
 	if not detail.is_empty(): _label(box.position + Vector2(box.size.x * 0.5, 36), detail, Color("a8b8bd"), 13 if command == "trail_create" else 12, HORIZONTAL_ALIGNMENT_CENTER)
 
@@ -1338,6 +1361,7 @@ func _journey_attention() -> bool:
 	return journey_open or _selected_signal().get("category") == "threat"
 
 func _journey_rect(command: String) -> Rect2:
+	if command=="journey_open" and _compact_source(): return Rect2(get_viewport_rect().size.x-300,436 if _is_honeydew(_selected_signal()) else 384,260,44)
 	if command != "journey_open":
 		var radial: String = "journey_close" if command == "journey_close" else "conflict_send" if command in ["journey_defend","journey_reinforce"] else "conflict_retreat" if conflict.own_party(_conflict_route(),_status) else "conflict_survey"
 		return _conflict_rect(radial)
@@ -1388,3 +1412,42 @@ func _mobilize_block_reason(route: Dictionary) -> String:
 func _carcass_returned(route: Dictionary) -> bool:
 	var outcome: Dictionary = _status.get("journey_response", {}).get("outcomes", {}).get(route.get("id"), {})
 	return outcome.get("goal", "clear") == "hunt" and outcome.get("outcome", "") == "secured"
+
+func _compact_source() -> bool:
+	return get_viewport_rect().size.y<700 and not _journey_attention() and _selected_signal().get("category","") in ["carbohydrate","protein","water"]
+
+func _draw_compact_source(selected: Dictionary) -> void:
+	var box:=Rect2(get_viewport_rect().size.x-316,144,292,344)
+	UIStyle.surface(self,box,Color("111921"))
+	UIStyle.surface(self,box,Color("41535a"),true)
+	_label(box.position+Vector2(16,31),Copy.fit_line(Memories.display_name(selected),_font,20,260),_signal_color(selected.category),20)
+	_label(box.position+Vector2(16,55),Copy.fit_line(Memories.description(selected),_font,12,260),Color("b6c6bf"),12)
+	_label(box.position+Vector2(16,78),"About %.0fm; sensed %s ago" % [selected.estimated_distance,Copy.duration(selected.age)],Color("91a7ac"),12)
+	var route: Dictionary=_selected_route(selected)
+	var outcome: Dictionary=_status.get("journey_response",{}).get("outcomes",{}).get(route.get("id",""),{})
+	var latest_return: float=maxf(float(route.get("conflict_received_at",0)),float(_status.get("journey_response",{}).get("reports",{}).get(route.get("id",""),{}).get("received_at",0)))
+	var current_defense: bool=Memories.defense_is_latest(outcome,route) and outcome.get("received_at",0)>=latest_return
+	var result: String=Memories.defense_label(outcome) if current_defense else "Returned losses: %d" % route.get("reported_losses",0) if route.get("reported_losses",0)>0 else "No loss reported; current safety is uncertain"
+	_label(box.position+Vector2(16,101),Copy.fit_line(result,_font,12,260),Color("c7d6b0"),12)
+	var staffing: String="%d gatherers assigned; %d away" % [route.get("allocated_workers",0),route.get("active_workers",0)] if not route.is_empty() else "Gatherers carry food home"
+	if _is_honeydew(selected):
+		var service: Dictionary=_status.honeydew
+		staffing="%d attendants committed; gatherers separate" % service.get("protection_workers",0)
+		if service.get("relationship","") in ["exploited","tended"]:
+			var target: Rect2=_honeydew_button_rect()
+			UIStyle.surface(self,target,Color("3d3328"))
+			_label(target.get_center()+Vector2(0,5),"CHOOSE ATTENDANTS",Color("e1d4ba"),13,HORIZONTAL_ALIGNMENT_CENTER)
+	_label(box.position+Vector2(16,124),Copy.fit_line(staffing,_font,12,260),Color("91a7ac"),12)
+	if route.get("waiting_workers",0)>0:
+		_draw_trail_button("gather_edit","ADJUST TARGET");_draw_trail_button("trail_cancel","CANCEL ORDER")
+	elif route.is_empty() or route.get("status","") in ["inactive","recalling"]:
+		_draw_trail_button("trail_create","PLAN GATHERING")
+	elif route.get("status","")=="depleted":
+		if route.get("active_workers",0)==0: _draw_trail_button("trail_recheck",_recheck_title(route))
+		_draw_trail_button("trail_cancel","RECALL")
+	else:
+		_draw_trail_button("gather_edit","ADJUST TARGET");_draw_trail_button("trail_cancel","RECALL")
+	var investigate: Rect2=_investigate_button_rect()
+	UIStyle.surface(self,investigate,Color("27383c"))
+	_label(investigate.get_center()+Vector2(0,5),Copy.fit_line(_investigation_title(selected),_font,12,248),Color("d5ded8"),12,HORIZONTAL_ALIGNMENT_CENTER)
+	_draw_journey_link()

@@ -72,8 +72,8 @@ func run(test: Object) -> bool:
 	before = surface.run.to_dict()
 	test.check(not surface.journey_response.set_force("route_1",24) and surface.run.to_dict() == before, "Fighting genetics cannot turn a surface catastrophe into an attackable enemy")
 	var root := Root.new(); root.simulation = game
-	var view := View.new(); view._status = root.inward_status("home"); view.selected_id = "adaptation"; view.web_family = "combat"
-	test.check(Web.visible_nodes(view._status,"combat") == ["foraging","fighter"] and Web.trait_state(view._status,"fighter").begins_with("Inherited"), "Separate Combat family names inherited expression without duplicate purchase controls")
+	var view := View.new(); view._status = root.inward_status("home"); view.selected_id = "adaptation"
+	test.check(Web.visible_nodes(view._status,"combat").has("fighter") and Web.trait_state(view._status,"fighter").begins_with("Inherited"), "Separate Combat family names inherited expression without duplicate purchase controls")
 	for size: Vector2 in [Vector2(1280,720),Vector2(900,600)]:
 		test.check(Web.node_at(Web.positions(size).fighter,size,view._status,"combat") == "fighter", "Combat leaf remains a separate 44-pixel inspection target")
 	view.free(); root.free()

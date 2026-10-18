@@ -29,3 +29,7 @@ Original C2 production and cyclic encoding sources are retained under
 tools/music/suite199 in the source repository. Blender/Audaspace is used only
 for offline compression. No runtime Blender, online audio service or additional
 addon is required.
+
+Brood artwork201 is original Blender mesh/lighting work, generated offline by
+tools/art/render_brood201.py. The egg, larva and pupa use no third-party model,
+recording or paid service. Runtime remains2D with baked transparent sprites.

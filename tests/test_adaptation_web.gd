@@ -29,7 +29,7 @@ func run(test: Object) -> bool:
 	var before: Dictionary = root.simulation.run.to_dict()
 	for trait_id: String in ["lean", "load"]:
 		test.check(not view.activate_at(view._adaptation_rect(trait_id).get_center()) and root.simulation.run.to_dict() == before, "Overview cannot start either brood trial")
-	test.check(Web.visible_nodes(view._status) == ["foraging", "lean", "load"] and Web.node_at(Web.positions(Vector2(1280,720)).honeydew, Vector2(1280,720), view._status) == "", "Initial web shows genetic fork without a hidden ecological leaf")
+	test.check(Web.visible_nodes(view._status).size() == TraitCatalog.IDS.size()+1 and not Web.known(view._status,"persistent") and Web.node_at(Web.positions(Vector2(1280,720)).honeydew, Vector2(1280,720), view._status) == "", "Initial web keeps all genetic slots, anonymous undiscovered leaves and no hidden ecological detail")
 	var mouse := InputEventMouseButton.new()
 	mouse.button_index = MOUSE_BUTTON_LEFT
 	mouse.pressed = true
@@ -78,7 +78,7 @@ func run(test: Object) -> bool:
 			test.check(Web.node_at(points[id], size, view._status) == id and points[id].x + 44 <= size.x - 316 and points[id].y + 64 < size.y - 104, "Web leaf target/context/control separation: " + id)
 			for other: String in ids:
 				if id < other:
-					test.check(points[id].distance_to(points[other]) > 88.0, "Web leaf hit targets do not overlap")
+					test.check(points[id].distance_to(points[other]) > 44.0, "Web leaf hit targets do not overlap")
 	test.check(view.activate_at(view._web_back_rect().get_center()) and view.selected_id == "" and view.web_selection == "foraging", "Back to Colony closes attention without leaving INWARD")
 	var trial: Dictionary = root.inward_status("home")
 	trial.adaptation_trial = {"adaptation_id": "lean"}

@@ -20,9 +20,6 @@ func _run() -> void:
 	game_root._inward_view.selected_id = "adaptation"
 	game_root.simulation.toggle_pause()
 	game_root._inward_view._process(0)
-	if not game_root._inward_view.activate_at(game_root._inward_view._web_family_rect().get_center()):
-		quit(1)
-		return
 	for id: String in ["security", "tolerance"]:
 		game_root._inward_view.web_selection = id
 		await _capture(id + "_candidate")

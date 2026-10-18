@@ -115,7 +115,7 @@ func _check_ui(test: Object) -> void:
 	test.check(view.activate_at(view._queen_tab_rect("reproduction").get_center()) and view.queen_tab=="reproduction" and root.simulation.run.to_dict()==before,"Daughter reproductive inspection is free attention")
 	var touch:=InputEventScreenTouch.new();touch.pressed=true;touch.position=view._reproduction_rect().get_center();view._unhandled_input(touch);view._process(0)
 	test.check(root.simulation.run.colony.piles.satellite_1.investments.reproduction,"Daughter touch queues real local reproductive intent before prerequisites finish")
-	view.selected_id="adaptation";view.web_selection="lean";view.web_family="foraging";view._process(0)
+	view.selected_id="adaptation";view.web_selection="lean";view._process(0)
 	touch.position=view._adaptation_rect("lean").get_center();view._unhandled_input(touch);view._process(0)
 	test.check(root.simulation.run.colony.piles.satellite_1.queued_adaptation=="lean" and root.simulation.run.colony.piles.home.queued_adaptation=="","Daughter adaptation touch uses her maternal intent and payer")
 	view.free();root.free()

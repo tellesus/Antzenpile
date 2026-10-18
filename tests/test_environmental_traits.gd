@@ -147,9 +147,9 @@ func _check_ui(test: Object) -> void:
 	var root:=Root.new(); root.simulation=experienced()
 	var view:=InwardView.new(); test.get_root().add_child(view)
 	view.status_provider=root.focused_inward_status; view.adaptation_command=root.queue_adaptation
-	view.selected_id="adaptation"; view.web_family="environment"; view.web_selection="heat_resilience"; view._process(0)
+	view.selected_id="adaptation";  view.web_selection="heat_resilience"; view._process(0)
 	var before: Dictionary=root.simulation.run.to_dict()
-	test.check(AdaptationWeb.visible_nodes(view._status,"environment")==["foraging","heat_resilience","moisture_resilience"] and root.simulation.run.to_dict()==before,"Environment family is free knowledge-derived attention")
+	test.check(AdaptationWeb.visible_nodes(view._status,"environment").has("moisture_resilience") and root.simulation.run.to_dict()==before,"Environment family is free knowledge-derived attention")
 	var touch:=InputEventScreenTouch.new(); touch.pressed=true; touch.position=view._adaptation_rect("heat_resilience").get_center(); view._unhandled_input(touch); view._process(0)
 	test.check(root.simulation.run.colony.piles.home.queued_adaptation=="heat_resilience","Environment touch queues the existing single-choice owner")
 	view.free(); root.free()

@@ -298,7 +298,7 @@ func colony_controls_blocked() -> bool:
 	return simulation.run.history.ended or debug_is_open() or _audio_settings != null and _audio_settings.opened or _reports_view!=null and _reports_view.opened
 
 func report_controls_blocked() -> bool:
-	return simulation.run.history.ended or debug_is_open() or _audio_settings!=null and _audio_settings.opened or _colony_controls!=null and _colony_controls.opened or mode=="outward" and _outward_view!=null and (_outward_view.sources_open or _outward_view.exploration_open)
+	return simulation.run.history.ended or debug_is_open() or _audio_settings!=null and _audio_settings.opened or _colony_controls!=null and _colony_controls.opened or mode=="outward" and _outward_view!=null and (_outward_view.sources_open or _outward_view.exploration_open) or mode=="inward" and _inward_view!=null and (_inward_view.selected_id=="adaptation" or _inward_view.chamber_controls.opened or _inward_view.refuge_controls.opened or _inward_view.connection_controls.opened or _inward_view.effort_draft.opened)
 
 func report_regions() -> Array[Rect2]:
 	var result: Array[Rect2]=[]
@@ -352,7 +352,7 @@ func inspect_report(id: int) -> Dictionary:
 		var organ: String="adaptation" if selected.kind=="producer" else "nursery" if selected.kind=="chamber" else "queen" if selected.kind in ["investment","queen"] else selected.subject_id if selected.kind=="project" else "nursery" if selected.kind=="brood" else "adaptation" if selected.kind=="trait" else "entrance"
 		if _inward_view!=null:
 			_inward_view.selected_id=organ
-			if selected.kind=="producer":_inward_view.web_family="foraging";_inward_view.web_selection="honeydew"
+			if selected.kind=="producer":_inward_view.web_selection="honeydew"
 			_inward_view._process(0)
 		if selected.kind in ["supplies","migration","relocation","brood_rescue","store_rescue","royal_rescue","connection","departure","evacuation","link_ground"] and _inward_view!=null:
 			_inward_view.connection_controls.opened=true
@@ -735,7 +735,7 @@ func inward_status(pile_id: String) -> Dictionary:
 		"nursery_max_care_capacity": pile.nursery_max_care_capacity(),
 		"nursery_progress": pile.nursery_progress_seconds,
 		"nursery_expansion": {"state": pile.nursery_expansion_state, "progress_seconds": pile.nursery_expansion_progress,
-			"duration": NURSERY_CONFIG.expansion_seconds, "capacity": NURSERY_CONFIG.expansion_capacity,
+			"matured_required":NURSERY_CONFIG.expansion_matured_required, "duration": NURSERY_CONFIG.expansion_seconds, "capacity": NURSERY_CONFIG.expansion_capacity,
 			"workers": NURSERY_CONFIG.expansion_workers, "costs": NURSERY_CONFIG.expansion_costs()},
 		"nursery_build_duration": NURSERY_CONFIG.build_seconds,
 		"nursery_costs": NURSERY_CONFIG.costs(),
@@ -797,7 +797,7 @@ func _refresh_loaded_views() -> void:
 		_inward_view.selected_id = ""
 		_inward_view._focus_gains.clear()
 		_inward_view.web_selection = "foraging"
-		_inward_view.web_family = "foraging"
+
 		_inward_view.gathering.reset()
 		_inward_view._feedback = ""
 		_inward_view.chamber_controls.reset()

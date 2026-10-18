@@ -5,52 +5,37 @@ extends RefCounted
 const Style = preload("res://src/presentation/organic_ui.gd")
 const Art = preload("res://src/presentation/sensory_art.gd")
 
-static func positions(size: Vector2) -> Dictionary:
-	var width: float = minf(size.x * 0.65, size.x - 340.0)
-	var height: float = maxf(0.0, size.y - 310.0)
-	var origin := Vector2(24, 170)
-	return {"foraging": origin + Vector2(width * 0.50, height * 0.25),
-		"lean": origin + Vector2(width * 0.27, height * 0.62),
-		"load": origin + Vector2(width * 0.73, height * 0.62),
-		"fighter": origin + Vector2(width * 0.50, height * 0.65),
-		"efficient_nurses": origin + Vector2(width * 0.50, height * 0.65),
-		"heat_resilience": origin + Vector2(width * 0.27, height * 0.62),
-		"moisture_resilience": origin + Vector2(width * 0.73, height * 0.62),
-		"security": origin + Vector2(width * 0.27, height * 0.62),
-		"tolerance": origin + Vector2(width * 0.73, height * 0.62),
-		"persistent": origin + Vector2(width * 0.27, height * 0.62),
-		"rapid_repair": origin + Vector2(width * 0.73, height * 0.62),
-		"honeydew": origin + Vector2(width * 0.50, height * 0.84)}
+const LEAVES: Array[String] = ["lean","load","fighter","efficient_nurses","security","tolerance","heat_resilience","moisture_resilience","persistent","rapid_repair"]
+const HIT_RADIUS: float = 22.0
 
-static func visible_nodes(status: Dictionary, family: String = "foraging") -> Array[String]:
-	if family=="chemistry":
-		var chemistry_nodes: Array[String]=["foraging"]
-		for id: String in ["persistent","rapid_repair"]:
-			if status.get("adaptation_options",{}).has(id): chemistry_nodes.append(id)
-		return chemistry_nodes
-	if family=="environment":
-		var environment_nodes: Array[String] = ["foraging"]
-		for id: String in BroodEnvironment.TRAITS:
-			if status.get("adaptation_options",{}).has(id): environment_nodes.append(id)
-		return environment_nodes
-	if family=="care" and status.get("adaptation_options",{}).has("efficient_nurses"): return ["foraging","efficient_nurses"]
-	if family == "combat" and status.get("adaptation_options", {}).has("fighter"):
-		return ["foraging", "fighter"]
-	if family == "recognition" and status.get("adaptation_options", {}).has("security"):
-		return ["foraging", "security", "tolerance"]
-	var result: Array[String] = ["foraging", "lean", "load"]
-	if not status.get("honeydew", {}).is_empty():
-		result.append("honeydew")
+static func positions(size: Vector2) -> Dictionary:
+	var width: float = size.x - 340.0
+	var result: Dictionary = {"foraging":Vector2(24+width*0.5,164)}
+	for index: int in LEAVES.size():
+		var row: int = index / 4
+		var column: int = index % 4
+		result[LEAVES[index]]=Vector2(24+width*(0.10+column*0.26),lerpf(246,size.y-198,row/2.0))
+	result.honeydew=Vector2(24+width*0.88,size.y-198)
 	return result
 
-static func node_at(at: Vector2, size: Vector2, status: Dictionary, family: String = "foraging") -> String:
+static func visible_nodes(status: Dictionary, _family: String = "") -> Array[String]:
+	var result: Array[String]=["foraging"]
+	result.append_array(LEAVES)
+	if not status.get("honeydew",{}).is_empty(): result.append("honeydew")
+	return result
+
+static func known(status: Dictionary, id: String) -> bool:
+	if id=="honeydew": return not status.get("honeydew",{}).is_empty()
+	return id=="foraging" or id in ["lean","load"] or status.get("adaptation_options",{}).has(id)
+
+static func node_at(at: Vector2, size: Vector2, status: Dictionary, _family: String = "") -> String:
 	var centers: Dictionary = positions(size)
-	for id: String in visible_nodes(status, family):
-		if at.distance_to(centers[id]) <= 44.0:
-			return id
+	for id: String in visible_nodes(status):
+		if at.distance_to(centers[id])<=HIT_RADIUS: return id
 	return ""
 
 static func trait_state(status: Dictionary, id: String) -> String:
+	if not known(status,id): return "Undiscovered"
 	if status.get("adaptation_queue", {}).get("trait_id", "") == id:
 		return "Queued · next brood"
 	if status.get("adaptation_trial", {}).get("adaptation_id", "") == id:
@@ -93,18 +78,6 @@ static func title(id: String) -> String:
 static func short_title(id: String) -> String:
 	return TraitCatalog.DEFINITIONS[id].short_title if TraitCatalog.DEFINITIONS.has(id) and not TraitCatalog.DEFINITIONS[id].short_title.is_empty() else title(id)
 
-static func families(status: Dictionary) -> Array[String]:
-	var result: Array[String]=["foraging"]
-	if status.get("adaptation_options",{}).has("security"): result.append("recognition")
-	if status.get("adaptation_options",{}).has("fighter"): result.append("combat")
-	if status.get("adaptation_options",{}).has("efficient_nurses"): result.append("care")
-	if status.get("adaptation_options",{}).has("heat_resilience") or status.get("adaptation_options",{}).has("moisture_resilience"): result.append("environment")
-	if status.get("adaptation_options",{}).has("persistent") or status.get("adaptation_options",{}).has("rapid_repair"): result.append("chemistry")
-	return result
-static func next_family(status: Dictionary, current: String) -> String:
-	var list: Array[String]=families(status);return list[(list.find(current)+1)%list.size()]
-
-
 static func queue_wait(status: Dictionary) -> String:
 	var waiting: String = status.get("adaptation_queue", {}).get("waiting", "none")
 	if waiting == "ready":
@@ -116,49 +89,41 @@ static func queue_wait(status: Dictionary) -> String:
 		"water": "Waiting for trial water", "unavailable": "Trait unavailable"}.get(waiting, "")
 
 
-static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected: String, phase: float, family: String = "foraging") -> void:
+static func draw_graph(view: Node2D, size: Vector2, status: Dictionary, selected: String, phase: float) -> void:
 	var centers: Dictionary = positions(size)
-	for id: String in visible_nodes(status, family):
-		var ecological: bool = id == "honeydew"
-		var color: Color = Color("99b59c") if ecological else Color("bba6c8")
-		var state: String = trait_state(status, id) if id not in ["foraging", "honeydew"] else ""
-		if state == "Other branch chosen":
-			color = Color("776e80")
-		if id != "foraging":
-			if ecological or id == "persistent":
-				view.draw_line(centers.foraging + Vector2(0, 84), centers[id] - Vector2(0, 36), Color(color, 0.24), 1.0, true)
-			else:
-				var direction: float = -1.0 if id in ["lean", "security", "heat_resilience", "persistent"] else 1.0
-				var start: Vector2 = centers.foraging + Vector2(direction * 34, 0)
-				var control: Vector2 = centers.foraging + Vector2(direction * 160, 10)
-				var finish: Vector2 = centers[id] - Vector2(0, 34)
-				var points := PackedVector2Array()
-				for step: int in 17:
-					var t: float = float(step) / 16.0
-					points.append(start * (1.0 - t) * (1.0 - t) + control * 2.0 * (1.0 - t) * t + finish * t * t)
-				view.draw_polyline(points, Color(color, 0.24), 1.0, true)
-		var at: Vector2 = centers[id]
-		var boundary: PackedVector2Array = Art.membrane(at, 28, phase * 0.18 + at.x * 0.01, 0.72 if ecological else 1.0)
-		Style.orb(view,Rect2(at-Vector2(28,28),Vector2(56,56)),Color("c3a5ea"),id==selected)
-		view.draw_polyline(boundary.slice(1, 27), Color(color, 0.48), 1.2, true)
-		if state.begins_with("Inherited") or state.begins_with("Queen lineage"):
-			view.draw_circle(at, 18.0, Color(color, 0.15))
-		elif state == "Growing trial brood":
-			view.draw_arc(at, 33.0, -PI * 0.5, PI * 0.8, 24, Color(color, 0.72), 1.5, true)
-		elif state == "Queued · next brood":
-			view.draw_arc(at, 33.0, 0.0, PI * 0.4, 12, Color("d9c5a5"), 2.0, true)
-			view.draw_arc(at, 33.0, PI, PI * 1.4, 12, Color("d9c5a5"), 2.0, true)
-		if ecological:
-			for offset: int in [-1, 1]:
-				view.draw_arc(at + Vector2(offset * 7, 0), 7, 0.1, 4.6, 18, Color(color, 0.6), 1.0, true)
+	# Branches group related variation; they do not invent purchase prerequisites.
+	for pair: Array in [["foraging","lean"],["lean","load"],["foraging","fighter"],["fighter","efficient_nurses"],["lean","security"],["security","tolerance"],["fighter","heat_resilience"],["heat_resilience","moisture_resilience"],["security","persistent"],["persistent","rapid_repair"]]:
+		var start: Vector2=centers[pair[0]]
+		var finish: Vector2=centers[pair[1]]
+		var points:=PackedVector2Array()
+		var control: Vector2=(start+finish)*0.5+Vector2(18,-18)
+		for index: int in 17:
+			var t: float=index/16.0
+			points.append(start*(1-t)*(1-t)+control*2*(1-t)*t+finish*t*t)
+		var tint: Color=Color("bb86f1") if known(status,pair[1]) else Color("514458")
+		view.draw_polyline(points,Color(tint,0.12),8,true)
+		view.draw_polyline(points,Color(tint,0.48),1.2,true)
+	if centers.has("honeydew") and not status.get("honeydew",{}).is_empty():
+		view.draw_line(centers.moisture_resilience,centers.honeydew,Color("7ebba2"),1,true)
+	for id: String in visible_nodes(status):
+		var at: Vector2=centers[id]
+		var discovered: bool=known(status,id)
+		var color: Color=Color("6e6577") if not discovered else Color("8ed9af") if id=="honeydew" else Color("bc8bf2")
+		var state: String=trait_state(status,id) if id not in ["foraging","honeydew"] else ""
+		Style.orb(view,Rect2(at-Vector2.ONE*22,Vector2.ONE*44),color,id==selected)
+		if not discovered:
+			view._label(at+Vector2(0,7),"?",Color("a59aae"),23,HORIZONTAL_ALIGNMENT_CENTER)
 		else:
-			view.draw_circle(at + Vector2(-4, -4), 3.0, Color(color, 0.65))
-			view.draw_circle(at + Vector2(4, 4), 3.0, Color(color, 0.40))
-			view.draw_line(at + Vector2(-4, -4), at + Vector2(4, 4), Color(color, 0.4), 1.0, true)
-		if id == selected:
-			view.draw_arc(at, 39, 0.0, 0.65, 12, Color("dce5d9"), 1.0, true)
-			view.draw_arc(at, 39, PI, PI + 0.65, 12, Color("dce5d9"), 1.0, true)
-		var label: String = family.capitalize()+" repertoire" if id=="foraging" and family!="foraging" else title(id)
-		view._label(at + Vector2(0, 45), label, color, 15, HORIZONTAL_ALIGNMENT_CENTER)
-		var subtitle: String = "Experience → brood → inheritance" if id == "foraging" else trait_state(status, id) if not ecological else "Ecological · tending active" if status.honeydew.relationship == "tended" else "Ecological · harvested" if status.honeydew.relationship == "exploited" else "Ecological · source observed"
-		view._label(at + Vector2(0, 64), subtitle, Color(color, 0.75), 12, HORIZONTAL_ALIGNMENT_CENTER)
+			var lobes: int=3 if id=="foraging" else 5 if id in ["fighter","heat_resilience","moisture_resilience"] else 2
+			for index: int in lobes:
+				var dot: Vector2=at+Vector2.from_angle(index*TAU/lobes+phase*.08)*9
+				view.draw_line(at,dot,Color(color,0.6),1,true)
+				view.draw_circle(dot,2.7,Color(color,0.8))
+		if state.begins_with("Inherited"): view.draw_arc(at,25,0,TAU,32,Color("99dab1"),1.7,true)
+		elif state=="Growing trial brood": view.draw_arc(at,25,phase,phase+PI*1.5,24,color,2,true)
+		elif state.begins_with("Queued"): view.draw_arc(at,25,0,PI*1.5,24,Style.GOLD,2,true)
+		var label: String="?" if not discovered else "Colony repertoire" if id=="foraging" else {"persistent":"Trail Persistence","rapid_repair":"Trail Repair"}.get(id,short_title(id))
+		label=preload("res://src/presentation/interface_text.gd").fit_line(label,ThemeDB.fallback_font,12,(size.x-340)*0.25)
+		view._label(at+Vector2(0,37),label,color,12,HORIZONTAL_ALIGNMENT_CENTER)
+		var subtitle: String="Undiscovered" if not discovered else "Inherited" if state.begins_with("Inherited") else "Queued" if state.begins_with("Queued") else "Growing" if state=="Growing trial brood" else "Other branch" if state=="Other branch chosen" else "Available" if state.begins_with("Available") else "Inspect" if id not in ["foraging","honeydew"] else "Learn / grow / inherit" if id=="foraging" else "Ecological relationship"
+		view._label(at+Vector2(0,52),subtitle,Color(color,0.7),10,HORIZONTAL_ALIGNMENT_CENTER)

@@ -1,0 +1,36 @@
+{
+  "authoring": "original Blender5.2.2 meshes; tools/art/render_brood201.py",
+  "runtime": "existing256px import limit,32px glyphs, six representatives; no runtime3D",
+  "assets": [
+    {
+      "path": "assets/graphics/colony/brood_egg.png",
+      "source_size": [
+        512,
+        512
+      ],
+      "rgba": true,
+      "sha256": "61d5eb92a999f9dbe885ee7f3542ffdd090917e9b7a48463928e8b3beac203d2",
+      "bytes": 150836
+    },
+    {
+      "path": "assets/graphics/colony/brood_larva.png",
+      "source_size": [
+        512,
+        512
+      ],
+      "rgba": true,
+      "sha256": "60e9b0375d480a405daff467065cabc7d0abf4c4b22ed9259a97e07d77453678",
+      "bytes": 147645
+    },
+    {
+      "path": "assets/graphics/colony/brood_pupa.png",
+      "source_size": [
+        512,
+        512
+      ],
+      "rgba": true,
+      "sha256": "cc4ea00737d4dfe8d3fbea4f99dc1942a0eb2e93bf62236c90683b4e8994f68c",
+      "bytes": 181328
+    }
+  ]
+}
