@@ -6,3 +6,4 @@
 *.tres text eol=lf
 *.uid text eol=lf
 *.md text eol=lf
+*.bat text eol=crlf

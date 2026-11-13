@@ -174,7 +174,7 @@ An adaptation is offered when the colony has met the pressure it answers (lost a
 - The visual ceiling of 1.0 came from the renderer choice. Forward+ gives HDR 2D, real bloom, GPU particles and compute shaders, and the development machine (RX 6650 XT) runs it comfortably.
 - Another engine would cost a rewrite of everything and gain nothing this game needs.
 - GDScript first. If the phase 1 measurement misses budget (10 ms per tick at 2,500 agents), move only the agent and field update into C# or a GDExtension.
-- Pin the engine version at the start of phase 1 and record it here.
+- **Pinned:** Godot 4.7.2 stable, standard (GDScript) build. A Windows and a Linux copy live in `.tools/godot/` in the local play folder and are not committed.
 
 ## 12. Visual direction
 

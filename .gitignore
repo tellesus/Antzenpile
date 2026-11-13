@@ -1,9 +1,10 @@
-# Godot-generated caches and local editor state.
+# Godot caches and local editor state
 .godot/
-# Local exports and credentials; keep source resources and .uid files.
+# Local engine binaries and sync scratch (not part of the source)
+.tools/
+.sync/
+# Local exports and credentials
 builds/
 exports/
 export_credentials.cfg
 *.tmp
-# CC0 authoring recordings are fetched by pinned checksum, not runtime assets.
-/tools/music/samples/
