@@ -1,6 +1,6 @@
 # Antzenpile 2.0 plan
 
-Status: draft 1, 2026-11-13. Decisions marked **Decided** were agreed with Michael on that date. Everything else is a proposal until a playtest confirms it.
+Status: draft 2, 2026-11-13. Decisions marked **Decided** were agreed with Michael on that date. Everything else is a proposal until a playtest confirms it.
 
 This is the only planning document. Version 1.0 lives in `archive/v1/` for reference and sets no rules for 2.0.
 
@@ -250,9 +250,12 @@ Little 1.0 code ports directly, because it models routes and 2.0 models space. T
 - Tests protect the simulation. Playtests judge the game. Passing tests is never reported as progress on fun.
 - Blunt feedback after every build. "This is boring" in phase 1 saves weeks.
 
-## 18. Open questions
+## 18. Decisions from 2026-11-13, second round
 
-1. Can Claude run builds on the development machine (by connecting the local repository folder), or does Michael run each build and send screenshots?
-2. Controls: mouse only, or should the brush also work well on a touchscreen?
-3. Lineage carry-over: adaptations only, or also a visible family tree of past colonies?
-4. Is there a name for the species, or does the game keep the fictional composite from 1.0?
+- **Decided:** Claude runs builds on the development machine through the connected local repository folder. Michael still plays every gate build himself.
+- **Decided:** desktop first, mouse and keyboard. Nothing is designed around touch. A mobile version is considered only if the finished game is fun.
+- **Decided:** lineage carry-over happens between runs only, as one or two adaptations. Saving a named lineage to reuse later is a possible addition after phase 6, not part of this plan.
+
+## 19. Open questions
+
+1. Is there a name for the species, or does the game keep the fictional composite from 1.0?
